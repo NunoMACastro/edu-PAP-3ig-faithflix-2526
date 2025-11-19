@@ -1,36 +1,36 @@
 # FaithStream — Requisitos Funcionais (RF)
 
-> **PAP — Curso Profissional de Informática de Gestão**  
-> **Áreas:** Programação · Gestão · Base de Dados
-> **Ano letivo:** 2025/2026  
-> **Versão:** 1.0  
-> **Elaborado por:** [Nome do Grupo]  
-> **Professor Orientador:** Nuno Miguel Almeida Castro
-
----
-
 ## Índice
 
--   [1. Identidade, Contas e Perfis](#1-identidade-contas-e-perfis)
--   [2. Catálogo e Metadados](#2-catálogo-e-metadados)
--   [3. Streaming e Reprodutor](#3-streaming-e-reprodutor)
--   [4. Favoritos, Watchlist e Histórico](#4-favoritos-watchlist-e-histórico)
--   [5. Classificações e Feedback](#5-classificações-e-feedback)
--   [6. Pesquisa e Descoberta](#6-pesquisa-e-descoberta)
--   [7. Recomendações IA](#7-recomendações-ia)
--   [8. Estudo Bíblico Integrado](#8-estudo-bíblico-integrado)
--   [9. Comunidade](#9-comunidade)
--   [10. Subscrições](#10-subscrições)
--   [11. Pool Rotativa de Associações](#11-pool-rotativa-de-associações)
--   [12. Moderação e Curadoria](#12-moderação-e-curadoria)
--   [13. Notificações](#13-notificações)
--   [14. Privacidade e RGPD](#14-privacidade-e-rgpd)
--   [15. Administração e Operação](#15-administração-e-operação)
--   [16. Critérios de Aceitação por Funcionalidade](#16-critérios-de-aceitação-por-funcionalidade)
+1. [Identidade, Contas e Perfis](#1-identidade-contas-e-perfis)
+2. [Catálogo e Metadados](#2-catálogo-e-metadados)
+3. [Streaming e Reprodutor](#3-streaming-e-reprodutor)
+4. [Favoritos, Watchlist e Histórico](#4-favoritos-watchlist-e-histórico)
+5. [Classificações e Feedback](#5-classificações-e-feedback)
+6. [Pesquisa e Descoberta](#6-pesquisa-e-descoberta)
+7. [Recomendações IA](#7-recomendações-ia)
+8. [Estudo Bíblico Integrado](#8-estudo-bíblico-integrado)
+9. [Comunidade](#9-comunidade)
+10. [Subscrições](#10-subscrições)
+11. [Pool Rotativa de Associações](#11-pool-rotativa-de-associações)
+12. [1Moderação e Curadoria](#12-moderação-e-curadoria)
+13. [Notificações](#13-notificações)
+14. [Privacidade e RGPD](#14-privacidade-e-rgpd)
+15. [Administração e Operação](#15-administração-e-operação)
+16. [Critérios de Aceitação](#critérios-de-aceitação)
+17. [Perfis Familiares, Dispositivos e Gamificação](#17-perfis-familiares-dispositivos-e-gamificação)
+18. [Sugestão de MVP organizado por fases e RF](#sugestão-de-mvp-organizado-por-fases-e-rf)
+19. [Créditos do projeto](#créditos-do-projeto)
+20. [Licença](#licença)
+21. [Changelog](#changelog)
+
+-   [Voltar ao início](../README.md)
 
 ---
 
-# 1. Identidade, Contas e Perfis
+## Requisitos Funcionais
+
+### 1. Identidade, Contas e Perfis
 
 | Código | Requisito                    | Atores        | Prioridade | Dependências |
 | ------ | ---------------------------- | ------------- | ---------- | ------------ |
@@ -42,7 +42,7 @@
 
 ---
 
-# 2. Catálogo e Metadados
+### 2. Catálogo e Metadados
 
 | Código | Requisito                        | Atores            | Prioridade | Dependências |
 | ------ | -------------------------------- | ----------------- | ---------- | ------------ |
@@ -54,7 +54,7 @@
 
 ---
 
-# 3. Streaming e Reprodutor
+### 3. Streaming e Reprodutor
 
 | Código | Requisito                      | Atores     | Prioridade | Dependências |
 | ------ | ------------------------------ | ---------- | ---------- | ------------ |
@@ -66,7 +66,7 @@
 
 ---
 
-# 4. Favoritos, Watchlist e Histórico
+### 4. Favoritos, Watchlist e Histórico
 
 | Código | Requisito                 | Atores     | Prioridade | Dependências |
 | ------ | ------------------------- | ---------- | ---------- | ------------ |
@@ -76,7 +76,7 @@
 
 ---
 
-# 5. Classificações e Feedback
+### 5. Classificações e Feedback
 
 | Código | Requisito            | Atores     | Prioridade | Dependências |
 | ------ | -------------------- | ---------- | ---------- | ------------ |
@@ -86,7 +86,7 @@
 
 ---
 
-# 6. Pesquisa e Descoberta
+### 6. Pesquisa e Descoberta
 
 | Código | Requisito             | Atores | Prioridade | Dependências |
 | ------ | --------------------- | ------ | ---------- | ------------ |
@@ -97,7 +97,7 @@
 
 ---
 
-# 7. Recomendações IA
+### 7. Recomendações IA
 
 | Código | Requisito                    | Atores        | Prioridade | Dependências     |
 | ------ | ---------------------------- | ------------- | ---------- | ---------------- |
@@ -107,7 +107,7 @@
 
 ---
 
-# 8. Estudo Bíblico Integrado
+### 8. Estudo Bíblico Integrado
 
 | Código | Requisito                  | Atores             | Prioridade | Dependências |
 | ------ | -------------------------- | ------------------ | ---------- | ------------ |
@@ -117,7 +117,7 @@
 
 ---
 
-# 9. Comunidade
+### 9. Comunidade
 
 | Código | Requisito                   | Atores               | Prioridade | Dependências |
 | ------ | --------------------------- | -------------------- | ---------- | ------------ |
@@ -127,7 +127,7 @@
 
 ---
 
-# 10. Subscrições
+### 10. Subscrições
 
 | Código | Requisito                        | Atores     | Prioridade | Dependências |
 | ------ | -------------------------------- | ---------- | ---------- | ------------ |
@@ -140,7 +140,7 @@
 
 ---
 
-# 11. Pool Rotativa de Associações
+### 11. Pool Rotativa de Associações
 
 | Código | Requisito                      | Atores           | Prioridade | Dependências |
 | ------ | ------------------------------ | ---------------- | ---------- | ------------ |
@@ -155,7 +155,7 @@
 
 ---
 
-# 12. Moderação e Curadoria
+### 12. Moderação e Curadoria
 
 | Código | Requisito            | Atores               | Prioridade | Dependências |
 | ------ | -------------------- | -------------------- | ---------- | ------------ |
@@ -165,7 +165,7 @@
 
 ---
 
-# 13. Notificações
+### 13. Notificações
 
 | Código | Requisito                   | Atores     | Prioridade | Dependências |
 | ------ | --------------------------- | ---------- | ---------- | ------------ |
@@ -175,7 +175,7 @@
 
 ---
 
-# 14. Privacidade e RGPD
+### 14. Privacidade e RGPD
 
 | Código | Requisito      | Atores     | Prioridade | Dependências |
 | ------ | -------------- | ---------- | ---------- | ------------ |
@@ -185,7 +185,7 @@
 
 ---
 
-# 15. Administração e Operação
+### 15. Administração e Operação
 
 | Código | Requisito                   | Atores | Prioridade | Dependências |
 | ------ | --------------------------- | ------ | ---------- | ------------ |
@@ -195,36 +195,67 @@
 
 ---
 
-# 16. Critérios de Aceitação por Funcionalidade
+### 17. Perfis Familiares, Dispositivos e Gamificação
 
-> Critérios de aceitção são descrições detalhadas que definem quando um requisito funcional está completo e funciona conforme esperado.
+| Código | Requisito                                                                 | Atores             | Prioridade | Dependências |
+| ------ | ------------------------------------------------------------------------- | ------------------ | ---------- | ------------ |
+| RF61   | Criar e gerir **vários perfis por conta** com idioma, preferências e PIN. | Utilizador         | Must       | RF02         |
+| RF62   | Registar e limitar **dispositivos autorizados**, com revogação remota.    | Utilizador/Sistema | Should     | RF02         |
+| RF63   | Implementar **gamificação** (pontos, desafios devocionais, badges).       | Sistema/Utilizador | Could      | RF29         |
 
-## Subscrições (RF35–RF40)
+---
+
+## Critérios de Aceitação
+
+> Critérios de aceitação são descrições detalhadas que definem quando um requisito funcional está completo e funciona conforme esperado.
+
+### Subscrições (RF35–RF40)
 
 -   Um utilizador com pagamento aceite deve permanecer ativo até ao fim do ciclo.
 -   Se o pagamento falhar, o sistema bloqueia o acesso e envia notificação.
 -   Trial só pode ser usado uma vez por utilizador.
 -   Página de gestão deve mostrar: método, ciclo, data de renovação, estado atual.
 
-## Streaming (RF11–RF15)
+### Streaming (RF11–RF15)
 
 -   Reprodução deve iniciar em até X segundos.
 -   Se retomar reprodução, deve saltar para o timestamp gravado.
 -   Conteúdos acima da idade configurada são bloqueados sem PIN.
 
-## Recomendações IA (RF26–RF28)
+### Recomendações IA (RF26–RF28)
 
 -   Devem ser apresentados pelo menos 3 grupos relevantes.
 -   Devem mostrar "Porque recomendamos".
 -   Em utilizadores novos, usar perfil básico e temas populares.
 
-## Favoritos e Histórico (RF16–RF18)
+### Favoritos e Histórico (RF16–RF18)
 
 -   Adicionar/remover favorito deve refletir imediatamente.
 -   Histórico deve mostrar episódios e progresso.
 
-## Pool de Associações (RF41–RF48)
+### Pool de Associações (RF41–RF48)
 
 -   Rotação mensal deve ocorrer automaticamente.
 -   Distribuição percentual deve ser registada e auditável.
 -   Associações devem ver apenas o histórico relativo à sua entidade.
+
+---
+
+## Sugestão de MVP organizado por fases e RF
+
+-   **Fase 1 — Fundacional:** RF01–RF18 (identidade, perfis, catálogo, streaming base, favoritos/histórico).
+-   **Fase 2 — Descoberta e Comunidade:** RF19–RF34 (classificações, pesquisa, recomendações IA, estudo bíblico, comunidade).
+-   **Fase 3 — Monetização Solidária:** RF35–RF54 (subscrições, notificações e pool de associações).
+-   **Fase 4 — Operação e Experiência Premium:** RF55–RF63 (privacidade, administração, integrações, perfis familiares, dispositivos e gamificação).
+
+---
+
+## Licença
+
+Projeto académico orientado para fins educativos no âmbito da PAP.
+
+---
+
+## Changelog
+
+-   **2024-04-27** — Reorganização para formato padrão com secções adicionais (MVP, créditos, licença e gamificação).

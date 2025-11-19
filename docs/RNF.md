@@ -1,14 +1,5 @@
 # FaithStream — Requisitos Não Funcionais (RNF) e Stack Tecnológica
 
-> **PAP — Curso Profissional de Informática de Gestão**  
-> **Áreas:** Programação · Gestão · Base de Dados
-> **Ano letivo:** 2025/2026  
-> **Versão:** 1.0  
-> **Elaborado por:** [Nome do Grupo]  
-> **Professor Orientador:** Nuno Miguel Almeida Castro
-
----
-
 ## Índice
 
 1. [Usabilidade e Acessibilidade](#1-usabilidade-e-acessibilidade)
@@ -20,6 +11,10 @@
 7. [Localização e Internacionalização](#7-localização-e-internacionalização)
 8. [Resumo das Prioridades](#8-resumo-das-prioridades)
 9. [Stack Tecnológica Sugerida](#9-stack-tecnológica-sugerida)
+10. [Licença](#licença)
+11. [Changelog](#changelog)
+
+-   [Voltar ao início](../README.md)
 
 ---
 
@@ -131,19 +126,19 @@
 
 ### 9.1. Frontend
 
--   Framework: **Next.js (React)**
+-   Framework: **Next.js (React)** com **Axios** para chamadas API
     -   Vantagens: Server-Side Rendering (SSR) para melhor performance e SEO, rotas simples, suporte nativo a API routes (se necessário).
--   Linguagem: **TypeScript**
--   Estilos: **Tailwind CSS** + componentes reutilizáveis (por exemplo, shadcn/ui ou outro kit leve).
--   Gestão de estado:
-    -   Estado global simples: Zustand ou Context API
-    -   Estado de dados remotos: React Query / TanStack Query
+-   Linguagem: **TypeScript** ou **JavaScript**
+    -   TypeScript recomendado para maior segurança e manutenção.
+-   Estilos: **Tailwind CSS** e/ou **Styled Components**
+    -   Tailwind para rapidez e consistência, Styled Components para estilos dinâmicos.
+
+**Alojamento:** **Vercel** (ideal para Next.js) ou **Netlify** ou **Render**
 
 ### 9.2. Backend
 
 -   Runtime: **Node.js (LTS)**
--   Framework: **NestJS** ou **Express** estruturado em módulos
-    -   NestJS recomendado para maior organização por domínio.
+-   Framework: **Express** estruturado em módulos com padrão MVC
 -   Autenticação:
     -   Cookies HttpOnly com JWT ou sessão baseada em tokens armazenados no servidor.
 -   Organização por módulos (exemplos):
@@ -156,22 +151,25 @@
     -   `recommendations` (IA de sugestão)
     -   `notifications` (emails, notificações internas)
 
+**Alojamento:** A definir conforme necessidades
+
 ### 9.3. Base de Dados
 
--   Motor principal: **PostgreSQL**
-    -   Adequado para histórico, subscrições, métricas e dados relacionais (conteúdos, utilizadores, associações, distribuição mensal).
--   ORM recomendado: **Prisma** ou **TypeORM**
--   Opcional: **Redis** para cache de sessões, recomendações ou listas de conteúdos populares.
+-   Motor principal: **Mongodb Atlas** (NoSQL)
+    -   Vantagens: Flexibilidade no esquema, fácil escalabilidade, bom suporte a consultas complexas.
+-   Alternativa: **PostgreSQL** (SQL)
+    -   Vantagens: Integridade referencial, consultas avançadas, suporte a JSONB para dados semi-estruturados.
 
 ### 9.4. Streaming de Vídeo
 
 -   Armazenamento e distribuição:
     -   **Cloudflare Stream** ou **AWS S3 + CloudFront**
 -   Idealmente, o backend não serve diretamente os ficheiros de vídeo, apenas gere permissões e URLs temporárias.
+-   **ELEVADO** nível de complexidade para alunos do 3º ano, considerar simplificar.
 
 ### 9.5. Integração de Pagamentos
 
--   Gateway: **Stripe** (ou outro com suporte a cartões e, se possível, MBWay via parceiro).
+-   Funcionalidade simulada
 -   Backend responsável por criar sessões de checkout e gerir webhooks para:
     -   Subscrição criada
     -   Pagamento falhado
@@ -190,15 +188,14 @@
     -   Serviço interno em Node.js ou Python (FastAPI)
     -   Possível uso de embeddings (OpenAI ou similar) para afinamento sem ser o foco principal.
 
-### 9.7. DevOps e Deploy
+---
 
-> DevOps é o conjunto de práticas que combina desenvolvimento de software (Dev) e operações de TI (Ops). O objetivo é encurtar o ciclo de vida do desenvolvimento de sistemas, proporcionando entrega contínua com alta qualidade de software.
+## Licença
 
--   Plataforma de deploy: **Railway**, **Render**, **Vercel** (para frontend)
--   CI/CD: **GitHub Actions**
--   Monitorização:
-    -   Health-checks
-    -   Logs centralizados
--   Backups automáticos da base de dados configurados na plataforma (PostgreSQL gerido).
+Projeto académico orientado para fins educativos no âmbito da PAP.
 
 ---
+
+## Changelog
+
+-   **2024-06-15** — Versão inicial dos Requisitos Não Funcionais (RNF) e Stack Tecnológica Sugerida.
