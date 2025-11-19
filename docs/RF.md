@@ -1,4 +1,4 @@
-# FaithStream — Requisitos Funcionais (RF)
+# FaithStream - Requisitos Funcionais (RF)
 
 ## Índice
 
@@ -34,7 +34,7 @@
 
 | Código | Requisito                    | Atores        | Prioridade | Dependências |
 | ------ | ---------------------------- | ------------- | ---------- | ------------ |
-| RF01   | Registo de utilizador        | Visitante     | Must       | —            |
+| RF01   | Registo de utilizador        | Visitante     | Must       | -            |
 | RF02   | Autenticação e sessão segura | Utilizador    | Must       | RF01         |
 | RF03   | Edição de perfil             | Utilizador    | Should     | RF02         |
 | RF04   | Papéis de utilizador         | Administrador | Must       | RF02         |
@@ -122,8 +122,8 @@
 | Código | Requisito                   | Atores               | Prioridade | Dependências |
 | ------ | --------------------------- | -------------------- | ---------- | ------------ |
 | RF32   | Partilha pública controlada | Utilizador           | Could      | RF16         |
-| RF33   | Discussões moderadas        | Utilizador/Moderador | Could      | —            |
-| RF34   | Grupos privados             | Utilizador           | Could      | —            |
+| RF33   | Discussões moderadas        | Utilizador/Moderador | Could      | -            |
+| RF34   | Grupos privados             | Utilizador           | Could      | -            |
 
 ---
 
@@ -144,7 +144,7 @@
 
 | Código | Requisito                      | Atores           | Prioridade | Dependências |
 | ------ | ------------------------------ | ---------------- | ---------- | ------------ |
-| RF41   | Submissão de candidaturas      | Associação       | Must       | —            |
+| RF41   | Submissão de candidaturas      | Associação       | Must       | -            |
 | RF42   | Aprovação/rejeição             | Administrador    | Must       | RF41         |
 | RF43   | Integração em pool             | Sistema/Admin    | Must       | RF42         |
 | RF44   | Distribuição mensal de %       | Sistema          | Must       | RF43         |
@@ -161,7 +161,7 @@
 | ------ | -------------------- | -------------------- | ---------- | ------------ |
 | RF49   | Workflow editorial   | Moderador            | Must       | RF09         |
 | RF50   | Curadoria teológica  | Curador              | Should     | RF29         |
-| RF51   | Sistema de denúncias | Utilizador/Moderador | Should     | —            |
+| RF51   | Sistema de denúncias | Utilizador/Moderador | Should     | -            |
 
 ---
 
@@ -169,7 +169,7 @@
 
 | Código | Requisito                   | Atores     | Prioridade | Dependências |
 | ------ | --------------------------- | ---------- | ---------- | ------------ |
-| RF52   | Notificações transacionais  | Sistema    | Must       | —            |
+| RF52   | Notificações transacionais  | Sistema    | Must       | -            |
 | RF53   | Preferências de notificação | Utilizador | Should     | RF02         |
 | RF54   | Alertas de continuidade     | Sistema    | Could      | RF12         |
 
@@ -190,8 +190,8 @@
 | Código | Requisito                   | Atores | Prioridade | Dependências |
 | ------ | --------------------------- | ------ | ---------- | ------------ |
 | RF58   | Gestão de utilizadores      | Admin  | Must       | RF04         |
-| RF59   | Painel de métricas          | Admin  | Should     | —            |
-| RF60   | Configuração de integrações | Admin  | Should     | —            |
+| RF59   | Painel de métricas          | Admin  | Should     | -            |
+| RF60   | Configuração de integrações | Admin  | Should     | -            |
 
 ---
 
@@ -243,10 +243,10 @@
 
 ## Sugestão de MVP organizado por fases e RF
 
--   **Fase 1 — Fundacional:** RF01–RF18 (identidade, perfis, catálogo, streaming base, favoritos/histórico).
--   **Fase 2 — Descoberta e Comunidade:** RF19–RF34 (classificações, pesquisa, recomendações IA, estudo bíblico, comunidade).
--   **Fase 3 — Monetização Solidária:** RF35–RF54 (subscrições, notificações e pool de associações).
--   **Fase 4 — Operação e Experiência Premium:** RF55–RF63 (privacidade, administração, integrações, perfis familiares, dispositivos e gamificação).
+-   **Fase 1 - Fundacional:** RF01–RF18 (identidade, perfis, catálogo, streaming base, favoritos/histórico).
+-   **Fase 2 - Descoberta e Comunidade:** RF19–RF34 (classificações, pesquisa, recomendações IA, estudo bíblico, comunidade).
+-   **Fase 3 - Monetização Solidária:** RF35–RF54 (subscrições, notificações e pool de associações).
+-   **Fase 4 - Operação e Experiência Premium:** RF55–RF63 (privacidade, administração, integrações, perfis familiares, dispositivos e gamificação).
 
 ---
 
@@ -258,4 +258,4 @@ Projeto académico orientado para fins educativos no âmbito da PAP.
 
 ## Changelog
 
--   **2024-04-27** — Reorganização para formato padrão com secções adicionais (MVP, créditos, licença e gamificação).
+-   **2024-04-27** - Reorganização para formato padrão com secções adicionais (MVP, créditos, licença e gamificação).
