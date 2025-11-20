@@ -1,10 +1,10 @@
-# FaithStream
+# Faithflix
 
-O FaithStream é uma plataforma de streaming cristão que reúne filmes, séries e documentários com curadoria teológica, integrando estudo bíblico e impacto social num único serviço. A aplicação oferece um catálogo selecionado, ferramentas de descoberta avançada, perfis familiares, recomendações personalizadas e recursos devocionais associados ao conteúdo audiovisual.
+O Faithflix é uma plataforma de streaming cristão que reúne filmes, séries e documentários com curadoria teológica, integrando estudo bíblico e impacto social num único serviço. A aplicação oferece um catálogo selecionado, ferramentas de descoberta avançada, perfis familiares, recomendações personalizadas e recursos devocionais associados ao conteúdo audiovisual.
 
-Para além do entretenimento, o FaithStream integra materiais de estudo (passagens bíblicas, notas teológicas e guias de reflexão) diretamente nos títulos, permitindo uma experiência mais profunda e formativa. O modelo de subscrição inclui ainda um sistema solidário: uma percentagem das receitas mensais é distribuída por uma pool rotativa de associações cristãs previamente aprovadas.
+Para além do entretenimento, o Faithflix integra materiais de estudo (passagens bíblicas, notas teológicas e guias de reflexão) diretamente nos títulos, permitindo uma experiência mais profunda e formativa. O modelo de subscrição inclui ainda um sistema solidário: uma percentagem das receitas mensais é distribuída por uma pool rotativa de associações cristãs previamente aprovadas.
 
-A plataforma inclui ferramentas editoriais, moderação, gestão de utilizadores, privacidade/RGPD e painéis administrativos completos, garantindo segurança, fiabilidade e qualidade de operação. O FaithStream foi desenvolvido no âmbito da PAP do Curso Profissional de Informática de Gestão, combinando tecnologia moderna com princípios de acessibilidade e boas práticas de desenvolvimento web.
+A plataforma inclui ferramentas editoriais, moderação, gestão de utilizadores, privacidade/RGPD e painéis administrativos completos, garantindo segurança, fiabilidade e qualidade de operação. O Faithflix foi desenvolvido no âmbito da PAP do Curso Profissional de Informática de Gestão, combinando tecnologia moderna com princípios de acessibilidade e boas práticas de desenvolvimento web.
 
 ---
 
@@ -135,7 +135,7 @@ scripts/    # Automatizações, ingestão de catálogo e tooling DevOps
 
 ## Identificação e Créditos
 
-> **Projeto:** FaithStream  
+> **Projeto:** Faithflix  
 > **Tipo:** PAP - Curso Profissional de Informática de Gestão  
 > **Áreas:** Programação · Gestão · Base de Dados  
 > **Ano letivo:** 2025/2026  

@@ -1,4 +1,4 @@
-# FaithStream - Requisitos Não Funcionais (RNF) e Stack Tecnológica
+# Faithflix - Requisitos Não Funcionais (RNF) e Stack Tecnológica
 
 ## Índice
 

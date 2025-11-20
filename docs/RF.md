@@ -1,4 +1,4 @@
-# FaithStream - Requisitos Funcionais (RF)
+# Faithflix - Requisitos Funcionais (RF)
 
 ## Índice
 
