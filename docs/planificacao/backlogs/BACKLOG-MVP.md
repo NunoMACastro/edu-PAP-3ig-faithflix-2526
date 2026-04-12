@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-11`
+- `last_updated`: `2026-04-12`
 
 ## Objetivo
 
@@ -32,6 +32,76 @@ Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios 
 | `MF6` | `TODO` | `0/6`     |
 | `MF7` | `TODO` | `0/5`     |
 | `MF8` | `TODO` | `0/5`     |
+
+---
+
+## Ligacao para guias BK (cobertura total)
+
+Tabela de referencia para todos os guias pedagogicos publicados (MF0..MF8).
+Estado do guia indica a fase de criacao documental.
+
+| BK          | Guia | Estado do guia |
+| ----------- | ---- | -------------- |
+| `BK-MF0-01` | `../guias-bk/MF0/BK-MF0-01-publicar-plano-total.md` | `CRIADO (Fase 1)` |
+| `BK-MF0-02` | `../guias-bk/MF0/BK-MF0-02-publicar-distribuicao-responsabilidades.md` | `CRIADO (Fase 1)` |
+| `BK-MF0-03` | `../guias-bk/MF0/BK-MF0-03-publicar-backlog-atomico-inicial.md` | `CRIADO (Fase 1)` |
+| `BK-MF0-04` | `../guias-bk/MF0/BK-MF0-04-definir-dod-e-formato-evidencia.md` | `CRIADO (Fase 1)` |
+| `BK-MF0-05` | `../guias-bk/MF0/BK-MF0-05-definir-calendario-sprints.md` | `CRIADO (Fase 1)` |
+| `BK-MF0-06` | `../guias-bk/MF0/BK-MF0-06-reuniao-alinhamento-inicial.md` | `CRIADO (Fase 1)` |
+| `BK-MF1-01` | `../guias-bk/MF1/BK-MF1-01-estrutura-base-backend-modulos.md` | `CRIADO (Fase 1)` |
+| `BK-MF1-02` | `../guias-bk/MF1/BK-MF1-02-estrutura-base-frontend-componentes.md` | `CRIADO (Fase 1)` |
+| `BK-MF1-03` | `../guias-bk/MF1/BK-MF1-03-cliente-api-frontend-tratamento-erro.md` | `CRIADO (Fase 1)` |
+| `BK-MF1-04` | `../guias-bk/MF1/BK-MF1-04-sessao-segura-backend-cookies-auth-base.md` | `CRIADO (Fase 1)` |
+| `BK-MF1-05` | `../guias-bk/MF1/BK-MF1-05-health-check-e-logging-estruturado.md` | `CRIADO (Fase 2)` |
+| `BK-MF1-06` | `../guias-bk/MF1/BK-MF1-06-smoke-tests-fe-be.md` | `CRIADO (Fase 2)` |
+| `BK-MF2-01` | `../guias-bk/MF2/BK-MF2-01-registo-login-recuperacao-password.md` | `CRIADO (Fase 1)` |
+| `BK-MF2-02` | `../guias-bk/MF2/BK-MF2-02-edicao-perfil-papeis-base.md` | `CRIADO (Fase 1)` |
+| `BK-MF2-03` | `../guias-bk/MF2/BK-MF2-03-crud-catalogo-taxonomias.md` | `CRIADO (Fase 1)` |
+| `BK-MF2-04` | `../guias-bk/MF2/BK-MF2-04-pagina-detalhe-conteudo.md` | `CRIADO (Fase 1)` |
+| `BK-MF2-05` | `../guias-bk/MF2/BK-MF2-05-reproducao-continuar-a-ver.md` | `CRIADO (Fase 1)` |
+| `BK-MF2-06` | `../guias-bk/MF2/BK-MF2-06-legendas-audio-parental-e-qualidade.md` | `CRIADO (Fase 2)` |
+| `BK-MF2-07` | `../guias-bk/MF2/BK-MF2-07-favoritos-watchlist-historico.md` | `CRIADO (Fase 1)` |
+| `BK-MF2-08` | `../guias-bk/MF2/BK-MF2-08-teste-e2e-fluxo-principal.md` | `CRIADO (Fase 1)` |
+| `BK-MF3-01` | `../guias-bk/MF3/BK-MF3-01-ratings-e-agregacao.md` | `CRIADO (Fase 2)` |
+| `BK-MF3-02` | `../guias-bk/MF3/BK-MF3-02-comentarios-curtos-moderados.md` | `CRIADO (Fase 2)` |
+| `BK-MF3-03` | `../guias-bk/MF3/BK-MF3-03-pesquisa-unificada.md` | `CRIADO (Fase 1)` |
+| `BK-MF3-04` | `../guias-bk/MF3/BK-MF3-04-filtros-carrosseis-e-relacionados.md` | `CRIADO (Fase 2)` |
+| `BK-MF3-05` | `../guias-bk/MF3/BK-MF3-05-recomendacao-baseline-cold-start.md` | `CRIADO (Fase 2)` |
+| `BK-MF3-06` | `../guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md` | `CRIADO (Fase 2)` |
+| `BK-MF3-07` | `../guias-bk/MF3/BK-MF3-07-estudo-biblico-e-guias.md` | `CRIADO (Fase 2)` |
+| `BK-MF3-08` | `../guias-bk/MF3/BK-MF3-08-funcionalidades-comunidade.md` | `CRIADO (Fase 2)` |
+| `BK-MF4-01` | `../guias-bk/MF4/BK-MF4-01-planos-ciclo-subscricao.md` | `CRIADO (Fase 1)` |
+| `BK-MF4-02` | `../guias-bk/MF4/BK-MF4-02-metodos-pagamento-simulados-trial.md` | `CRIADO (Fase 1)` |
+| `BK-MF4-03` | `../guias-bk/MF4/BK-MF4-03-candidaturas-associacoes.md` | `CRIADO (Fase 1)` |
+| `BK-MF4-04` | `../guias-bk/MF4/BK-MF4-04-aprovacao-entrada-pool.md` | `CRIADO (Fase 1)` |
+| `BK-MF4-05` | `../guias-bk/MF4/BK-MF4-05-distribuicao-mensal-rotacao.md` | `CRIADO (Fase 1)` |
+| `BK-MF4-06` | `../guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md` | `CRIADO (Fase 2)` |
+| `BK-MF4-07` | `../guias-bk/MF4/BK-MF4-07-workflow-editorial-e-denuncias.md` | `CRIADO (Fase 2)` |
+| `BK-MF4-08` | `../guias-bk/MF4/BK-MF4-08-notificacoes-transacionais-e-preferencias.md` | `CRIADO (Fase 2)` |
+| `BK-MF5-01` | `../guias-bk/MF5/BK-MF5-01-exportacao-dados-utilizador.md` | `CRIADO (Fase 1)` |
+| `BK-MF5-02` | `../guias-bk/MF5/BK-MF5-02-eliminacao-conta-dados.md` | `CRIADO (Fase 1)` |
+| `BK-MF5-03` | `../guias-bk/MF5/BK-MF5-03-gestao-consentimentos.md` | `CRIADO (Fase 1)` |
+| `BK-MF5-04` | `../guias-bk/MF5/BK-MF5-04-gestao-de-utilizadores-admin.md` | `CRIADO (Fase 2)` |
+| `BK-MF5-05` | `../guias-bk/MF5/BK-MF5-05-painel-de-metricas-admin.md` | `CRIADO (Fase 2)` |
+| `BK-MF5-06` | `../guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md` | `CRIADO (Fase 2)` |
+| `BK-MF5-07` | `../guias-bk/MF5/BK-MF5-07-perfis-familiares-e-dispositivos.md` | `CRIADO (Fase 2)` |
+| `BK-MF5-08` | `../guias-bk/MF5/BK-MF5-08-gamificacao-baseline.md` | `CRIADO (Fase 2)` |
+| `BK-MF6-01` | `../guias-bk/MF6/BK-MF6-01-suite-de-regressao-backend.md` | `CRIADO (Fase 3)` |
+| `BK-MF6-02` | `../guias-bk/MF6/BK-MF6-02-suite-de-regressao-frontend.md` | `CRIADO (Fase 3)` |
+| `BK-MF6-03` | `../guias-bk/MF6/BK-MF6-03-hardening-seguranca-e-privacidade.md` | `CRIADO (Fase 3)` |
+| `BK-MF6-04` | `../guias-bk/MF6/BK-MF6-04-otimizacao-de-performance-critica.md` | `CRIADO (Fase 3)` |
+| `BK-MF6-05` | `../guias-bk/MF6/BK-MF6-05-acessibilidade-e-ux-final.md` | `CRIADO (Fase 3)` |
+| `BK-MF6-06` | `../guias-bk/MF6/BK-MF6-06-validacao-tecnica-final-por-gate.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-01` | `../guias-bk/MF7/BK-MF7-01-matriz-de-cobertura-rf-evidencia.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-02` | `../guias-bk/MF7/BK-MF7-02-matriz-de-cobertura-rnf-validacao.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-03` | `../guias-bk/MF7/BK-MF7-03-roteiro-de-demo-final.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-04` | `../guias-bk/MF7/BK-MF7-04-ensaio-tecnico-da-defesa.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-05` | `../guias-bk/MF7/BK-MF7-05-avaliacao-final-e-feedback-orientador.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-01` | `../guias-bk/MF8/BK-MF8-01-lista-de-riscos-residuais.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-02` | `../guias-bk/MF8/BK-MF8-02-correcao-de-bugs-bloqueantes.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-03` | `../guias-bk/MF8/BK-MF8-03-scope-freeze-final.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-04` | `../guias-bk/MF8/BK-MF8-04-empacotamento-final-de-entrega.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-05` | `../guias-bk/MF8/BK-MF8-05-retro-final-e-licoes-aprendidas.md` | `CRIADO (Fase 3)` |
 
 ---
 
@@ -168,3 +238,4 @@ Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios 
 ## Changelog
 
 - `2026-04-11`: versao revista para equipa correta e ownership distribuido por 4 alunos.
+- `2026-04-12`: secao de ligacao para guias BK atualizada para cobertura total (60/60), com estado por fase de criacao documental.

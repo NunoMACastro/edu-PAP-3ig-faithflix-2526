@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-11`
+- `last_updated`: `2026-04-12`
 
 ## Objetivo
 
@@ -20,6 +20,7 @@ Organizar a execucao da PAP com uma estrutura clara para 4 alunos (`Matheus`, `M
 - `backlogs/BACKLOG-MVP.md`: backlog atomico oficial (`BK-*`) com owner/dependencias/criterios.
 - `backlogs/MF-VIEWS.md`: execucao pratica por macro fase.
 - `sprints/PLANO-SPRINTS.md`: plano de sprints, cadencia e metas semanais.
+- `guias-bk/README.md`: indice dos guias pedagogicos por BK e contrato editorial.
 
 ## Ordem de leitura recomendada
 
@@ -29,7 +30,16 @@ Organizar a execucao da PAP com uma estrutura clara para 4 alunos (`Matheus`, `M
 4. `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
 5. `docs/planificacao/backlogs/BACKLOG-MVP.md`
 6. `docs/planificacao/backlogs/MF-VIEWS.md`
-7. `docs/planificacao/sprints/PLANO-SPRINTS.md`
+7. `docs/planificacao/guias-bk/README.md`
+8. `docs/planificacao/sprints/PLANO-SPRINTS.md`
+
+## Guias BK pedagogicos
+
+- Local oficial: `docs/planificacao/guias-bk/`.
+- Formato: 1 ficheiro por BK com naming `BK-ID + slug`.
+- Cobertura atual (Fase 1): BKs `P0` de `MF0..MF5` no recorte definido (26/26).
+- Contrato editorial: `docs/planificacao/guias-bk/_TEMPLATE-BK.md`.
+- Nota de evolucao: quando ainda nao existir codigo consolidado, o guia inclui nota explicita para evolucao futura de snippets.
 
 ## Regra de precedencia (anti-drift)
 
@@ -63,3 +73,4 @@ Organizar a execucao da PAP com uma estrutura clara para 4 alunos (`Matheus`, `M
 ## Changelog
 
 - `2026-04-11`: versao revista para equipa correta (`Matheus`, `Mateus`, `Davi`, `Kaue`).
+- `2026-04-12`: adicionada estrutura `guias-bk`, ordem de leitura atualizada e crosslinks para guias pedagogicos por BK.

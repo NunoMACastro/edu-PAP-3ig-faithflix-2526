@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-11`
+- `last_updated`: `2026-04-12`
 
 ## Objetivo
 
@@ -30,6 +30,15 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. `BK-MF0-04`
 5. `BK-MF0-05`
 6. `BK-MF0-06`
+
+### Guias disponiveis
+
+- `BK-MF0-01`: `../guias-bk/MF0/BK-MF0-01-publicar-plano-total.md`
+- `BK-MF0-02`: `../guias-bk/MF0/BK-MF0-02-publicar-distribuicao-responsabilidades.md`
+- `BK-MF0-03`: `../guias-bk/MF0/BK-MF0-03-publicar-backlog-atomico-inicial.md`
+- `BK-MF0-04`: `../guias-bk/MF0/BK-MF0-04-definir-dod-e-formato-evidencia.md`
+- `BK-MF0-05`: `../guias-bk/MF0/BK-MF0-05-definir-calendario-sprints.md`
+- `BK-MF0-06`: `../guias-bk/MF0/BK-MF0-06-reuniao-alinhamento-inicial.md`
 
 ### Step-by-step
 
@@ -54,6 +63,15 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. `BK-MF1-04` (Matheus)
 5. `BK-MF1-05` (Kaue)
 6. `BK-MF1-06` (Kaue)
+
+### Guias disponiveis
+
+- `BK-MF1-01`: `../guias-bk/MF1/BK-MF1-01-estrutura-base-backend-modulos.md`
+- `BK-MF1-02`: `../guias-bk/MF1/BK-MF1-02-estrutura-base-frontend-componentes.md`
+- `BK-MF1-03`: `../guias-bk/MF1/BK-MF1-03-cliente-api-frontend-tratamento-erro.md`
+- `BK-MF1-04`: `../guias-bk/MF1/BK-MF1-04-sessao-segura-backend-cookies-auth-base.md`
+- `BK-MF1-05`: `../guias-bk/MF1/BK-MF1-05-health-check-e-logging-estruturado.md`
+- `BK-MF1-06`: `../guias-bk/MF1/BK-MF1-06-smoke-tests-fe-be.md`
 
 ### Step-by-step
 
@@ -85,6 +103,17 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 7. `BK-MF2-07`
 8. `BK-MF2-08`
 
+### Guias disponiveis
+
+- `BK-MF2-01`: `../guias-bk/MF2/BK-MF2-01-registo-login-recuperacao-password.md`
+- `BK-MF2-02`: `../guias-bk/MF2/BK-MF2-02-edicao-perfil-papeis-base.md`
+- `BK-MF2-03`: `../guias-bk/MF2/BK-MF2-03-crud-catalogo-taxonomias.md`
+- `BK-MF2-04`: `../guias-bk/MF2/BK-MF2-04-pagina-detalhe-conteudo.md`
+- `BK-MF2-05`: `../guias-bk/MF2/BK-MF2-05-reproducao-continuar-a-ver.md`
+- `BK-MF2-06`: `../guias-bk/MF2/BK-MF2-06-legendas-audio-parental-e-qualidade.md`
+- `BK-MF2-07`: `../guias-bk/MF2/BK-MF2-07-favoritos-watchlist-historico.md`
+- `BK-MF2-08`: `../guias-bk/MF2/BK-MF2-08-teste-e2e-fluxo-principal.md`
+
 ### Step-by-step
 
 1. Fechar autenticacao completa.
@@ -113,6 +142,17 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 7. `BK-MF3-07`
 8. `BK-MF3-08`
 
+### Guias disponiveis
+
+- `BK-MF3-01`: `../guias-bk/MF3/BK-MF3-01-ratings-e-agregacao.md`
+- `BK-MF3-02`: `../guias-bk/MF3/BK-MF3-02-comentarios-curtos-moderados.md`
+- `BK-MF3-03`: `../guias-bk/MF3/BK-MF3-03-pesquisa-unificada.md`
+- `BK-MF3-04`: `../guias-bk/MF3/BK-MF3-04-filtros-carrosseis-e-relacionados.md`
+- `BK-MF3-05`: `../guias-bk/MF3/BK-MF3-05-recomendacao-baseline-cold-start.md`
+- `BK-MF3-06`: `../guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md`
+- `BK-MF3-07`: `../guias-bk/MF3/BK-MF3-07-estudo-biblico-e-guias.md`
+- `BK-MF3-08`: `../guias-bk/MF3/BK-MF3-08-funcionalidades-comunidade.md`
+
 ### Step-by-step
 
 1. Priorizar pesquisa/filtros.
@@ -139,6 +179,17 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 6. `BK-MF4-06`
 7. `BK-MF4-08`
 8. `BK-MF4-07`
+
+### Guias disponiveis
+
+- `BK-MF4-01`: `../guias-bk/MF4/BK-MF4-01-planos-ciclo-subscricao.md`
+- `BK-MF4-02`: `../guias-bk/MF4/BK-MF4-02-metodos-pagamento-simulados-trial.md`
+- `BK-MF4-03`: `../guias-bk/MF4/BK-MF4-03-candidaturas-associacoes.md`
+- `BK-MF4-04`: `../guias-bk/MF4/BK-MF4-04-aprovacao-entrada-pool.md`
+- `BK-MF4-05`: `../guias-bk/MF4/BK-MF4-05-distribuicao-mensal-rotacao.md`
+- `BK-MF4-06`: `../guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md`
+- `BK-MF4-07`: `../guias-bk/MF4/BK-MF4-07-workflow-editorial-e-denuncias.md`
+- `BK-MF4-08`: `../guias-bk/MF4/BK-MF4-08-notificacoes-transacionais-e-preferencias.md`
 
 ### Step-by-step
 
@@ -168,6 +219,17 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 7. `BK-MF5-07`
 8. `BK-MF5-08`
 
+### Guias disponiveis
+
+- `BK-MF5-01`: `../guias-bk/MF5/BK-MF5-01-exportacao-dados-utilizador.md`
+- `BK-MF5-02`: `../guias-bk/MF5/BK-MF5-02-eliminacao-conta-dados.md`
+- `BK-MF5-03`: `../guias-bk/MF5/BK-MF5-03-gestao-consentimentos.md`
+- `BK-MF5-04`: `../guias-bk/MF5/BK-MF5-04-gestao-de-utilizadores-admin.md`
+- `BK-MF5-05`: `../guias-bk/MF5/BK-MF5-05-painel-de-metricas-admin.md`
+- `BK-MF5-06`: `../guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md`
+- `BK-MF5-07`: `../guias-bk/MF5/BK-MF5-07-perfis-familiares-e-dispositivos.md`
+- `BK-MF5-08`: `../guias-bk/MF5/BK-MF5-08-gamificacao-baseline.md`
+
 ### Step-by-step
 
 1. Fechar RGPD.
@@ -192,6 +254,15 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. `BK-MF6-04`
 5. `BK-MF6-05`
 6. `BK-MF6-06`
+
+### Guias disponiveis
+
+- `BK-MF6-01`: `../guias-bk/MF6/BK-MF6-01-suite-de-regressao-backend.md`
+- `BK-MF6-02`: `../guias-bk/MF6/BK-MF6-02-suite-de-regressao-frontend.md`
+- `BK-MF6-03`: `../guias-bk/MF6/BK-MF6-03-hardening-seguranca-e-privacidade.md`
+- `BK-MF6-04`: `../guias-bk/MF6/BK-MF6-04-otimizacao-de-performance-critica.md`
+- `BK-MF6-05`: `../guias-bk/MF6/BK-MF6-05-acessibilidade-e-ux-final.md`
+- `BK-MF6-06`: `../guias-bk/MF6/BK-MF6-06-validacao-tecnica-final-por-gate.md`
 
 ### Step-by-step
 
@@ -218,6 +289,14 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. `BK-MF7-04`
 5. `BK-MF7-05`
 
+### Guias disponiveis
+
+- `BK-MF7-01`: `../guias-bk/MF7/BK-MF7-01-matriz-de-cobertura-rf-evidencia.md`
+- `BK-MF7-02`: `../guias-bk/MF7/BK-MF7-02-matriz-de-cobertura-rnf-validacao.md`
+- `BK-MF7-03`: `../guias-bk/MF7/BK-MF7-03-roteiro-de-demo-final.md`
+- `BK-MF7-04`: `../guias-bk/MF7/BK-MF7-04-ensaio-tecnico-da-defesa.md`
+- `BK-MF7-05`: `../guias-bk/MF7/BK-MF7-05-avaliacao-final-e-feedback-orientador.md`
+
 ### Step-by-step
 
 1. Fechar matriz RF.
@@ -242,6 +321,14 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. `BK-MF8-04`
 5. `BK-MF8-05`
 
+### Guias disponiveis
+
+- `BK-MF8-01`: `../guias-bk/MF8/BK-MF8-01-lista-de-riscos-residuais.md`
+- `BK-MF8-02`: `../guias-bk/MF8/BK-MF8-02-correcao-de-bugs-bloqueantes.md`
+- `BK-MF8-03`: `../guias-bk/MF8/BK-MF8-03-scope-freeze-final.md`
+- `BK-MF8-04`: `../guias-bk/MF8/BK-MF8-04-empacotamento-final-de-entrega.md`
+- `BK-MF8-05`: `../guias-bk/MF8/BK-MF8-05-retro-final-e-licoes-aprendidas.md`
+
 ### Step-by-step
 
 1. Levantar riscos.
@@ -257,3 +344,4 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 ## Changelog
 
 - `2026-04-11`: versao revista com equipa correta e ownership atualizado.
+- `2026-04-12`: blocos "Guias disponiveis" sincronizados para cobertura total (MF0..MF8), sem entradas pendentes.
