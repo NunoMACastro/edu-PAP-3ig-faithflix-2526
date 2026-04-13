@@ -1,4 +1,4 @@
-# Plano de Sprints - MVP Faithflix
+# Plano de Sprints - MVP FaithFlix
 
 ## Header
 
@@ -104,7 +104,7 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 
 1. Fecho integral da cobertura RF/RNF na matriz.
 2. 100% dos guias BK conformes ao contrato v3.
-3. Score final calculado via `QUALITY-SCORE-97.md`.
+3. Score final consolidado no relatorio de gate `S12`.
 4. Emissao de parecer final GO/NO-GO documental.
 
 ### Registo obrigatorio de gate
@@ -134,3 +134,4 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 
 - `2026-04-11`: versao revista para equipa de 4 alunos.
 - `2026-04-13`: rebalanceamento de carga nas sprints 10-12 e reforco de gate orientado a meta `97/100`.
+- `2026-04-13`: removida referencia a ficheiro externo de score; avaliacao passa a ser consolidada no relatorio de gates.

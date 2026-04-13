@@ -1,4 +1,4 @@
-# Faithflix - Requisitos Não Funcionais (RNF) e Stack Tecnológica
+# FaithFlix - Requisitos Não Funcionais (RNF) e Stack Tecnológica
 
 ## Índice
 
@@ -199,3 +199,4 @@ Projeto académico orientado para fins educativos no âmbito da PAP.
 ## Changelog
 
 -   **2024-06-15** - Versão inicial dos Requisitos Não Funcionais (RNF) e Stack Tecnológica Sugerida.
+-   **2026-04-13** - Nome do projeto uniformizado para **FaithFlix** e revisão de coerência com a documentação de planificação.

@@ -15,7 +15,6 @@ Registar PASS/FAIL dos gates `S4`, `S8` e `S12` com separacao obrigatoria entre 
 
 ## Contrato de execucao de gate
 
-- Referencia de score: `docs/planificacao/QUALITY-SCORE-97.md`.
 - Validacao automatica obrigatoria: `scripts/validate-planificacao.sh`.
 - Fecho de gate so ocorre com:
 - resultado automatizado `PASS`;
@@ -76,7 +75,7 @@ Registar PASS/FAIL dos gates `S4`, `S8` e `S12` com separacao obrigatoria entre 
 - Sprints `9..12`
 - Data de execucao real: `A preencher`
 - Resultado do script: `A preencher`
-- Score final (`QUALITY-SCORE-97`): `A preencher`
+- Score final documental: `A preencher`
 
 | Criterio | Baseline | Execucao real | Evidencia | Acao corretiva | Owner | Prazo |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -96,3 +95,4 @@ Registar PASS/FAIL dos gates `S4`, `S8` e `S12` com separacao obrigatoria entre 
 ## Changelog
 
 - `2026-04-13`: migrado para formato de gate real (baseline + execucao + acao corretiva).
+- `2026-04-13`: removida dependencia de ficheiro externo de score; resultado final mantido no proprio relatorio de gate.

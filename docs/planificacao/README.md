@@ -1,4 +1,4 @@
-# Planificacao - Faithstream
+# Planificacao - FaithFlix
 
 `last_updated`: `2026-04-13`
 
@@ -10,7 +10,6 @@ Este diretorio agrega a planificacao operacional do projeto: backlog, rastreabil
 
 - `PLANO-IMPLEMENTACAO-TOTAL.md`: plano macro (`MF0..MF8`) e alinhamento de execucao.
 - `DISTRIBUICAO-RESPONSABILIDADES.md`: ownership, handoff e pairing.
-- `QUALITY-SCORE-97.md`: contrato de scoring e criterios PASS/FAIL.
 - `backlogs/BACKLOG-MVP.md`: backlog oficial (`BK-*`) com owner/prioridade/dependencias.
 - `backlogs/MATRIZ-RF-RNF-POR-BK.md`: rastreabilidade requisito -> BK -> evidencia.
 - `backlogs/MF-VIEWS.md`: vista por macrofases (derivada da ordem canonica).
@@ -29,7 +28,6 @@ Este diretorio agrega a planificacao operacional do projeto: backlog, rastreabil
 7. `docs/planificacao/backlogs/MF-VIEWS.md`
 8. `docs/planificacao/guias-bk/README.md`
 9. `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`
-10. `docs/planificacao/QUALITY-SCORE-97.md`
 
 ## Regras canonicas
 

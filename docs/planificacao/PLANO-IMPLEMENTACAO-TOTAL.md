@@ -1,4 +1,4 @@
-# Plano de Implementacao Total - Faithflix
+# Plano de Implementacao Total - FaithFlix
 
 ## Header
 
@@ -24,10 +24,9 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com r
 
 1. Rastreabilidade: `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
 2. Operacao do backlog: `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-3. Qualidade e score: `docs/planificacao/QUALITY-SCORE-97.md`.
-4. Qualidade dos guias BK: `docs/planificacao/guias-bk/_TEMPLATE-BK.md`.
-5. Gate e execucao real: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
-6. Validacao automatica: `scripts/validate-planificacao.sh`.
+3. Qualidade dos guias BK: `docs/planificacao/guias-bk/_TEMPLATE-BK.md`.
+4. Gate e execucao real: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
+5. Validacao automatica: `scripts/validate-planificacao.sh`.
 
 ## Macro fases
 
@@ -69,7 +68,7 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com r
 ### Gate S12
 
 - Fecho integral `103/103` e `60/60`.
-- Score final calculado via `QUALITY-SCORE-97`.
+- Score final consolidado no relatorio de gate `S12`.
 - Parecer final `GO/NO-GO` com assinatura do orientador.
 
 ## Criterios de saida do plano
@@ -82,3 +81,4 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com r
 
 - `2026-04-11`: versao revista com equipa correta.
 - `2026-04-13`: reforco de contratos canonicos, governance pedagogica e meta de qualidade `97/100`.
+- `2026-04-13`: removida dependencia de ficheiro externo de score e consolidada avaliacao no relatorio de gates.

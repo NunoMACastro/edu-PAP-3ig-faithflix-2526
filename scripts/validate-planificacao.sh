@@ -288,7 +288,6 @@ for pattern in \
   '## Execucao real - Gate S4' \
   '## Execucao real - Gate S8' \
   '## Execucao real - Gate S12' \
-  'QUALITY-SCORE-97.md' \
   'scripts/validate-planificacao.sh'
 do
   if ! rg -q --fixed-strings "$pattern" docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md; then
@@ -304,7 +303,6 @@ meta_errors=0
 for f in \
   docs/planificacao/README.md \
   docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md \
-  docs/planificacao/QUALITY-SCORE-97.md \
   docs/planificacao/backlogs/BACKLOG-MVP.md \
   docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md \
   docs/planificacao/sprints/PLANO-SPRINTS.md \

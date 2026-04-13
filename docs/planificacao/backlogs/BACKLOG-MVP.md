@@ -1,4 +1,4 @@
-# BACKLOG-MVP Faithflix
+# BACKLOG-MVP FaithFlix
 
 ## Header
 
@@ -27,9 +27,9 @@ Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios 
 - Cada guia deve ter objetivo especifico por BK, snippet tecnico e `Proximo BK recomendado` com ID real.
 - Validacao obrigatoria de conformidade em gates `S4`, `S8` e `S12`.
 
-## Contrato de score e validacao
+## Contrato de qualidade e validacao
 
-- Meta documental oficial: `>=97/100` via `docs/planificacao/QUALITY-SCORE-97.md`.
+- Meta documental oficial: `>=97/100` consolidada nos gates.
 - Script oficial de conformidade: `scripts/validate-planificacao.sh`.
 - Fecho de gate exige `PASS` no script + validacao humana do orientador.
 
@@ -262,7 +262,7 @@ Estado do guia indica a fase de criacao documental.
 - Gate `S8`: auditoria de coerencia backlog/matriz/guias para S5..S8.
 - Gate `S12`: auditoria final integral para defesa PAP.
 - Relatorio PASS/FAIL oficial: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
-- Score final e regra de aprovacao: `docs/planificacao/QUALITY-SCORE-97.md`.
+- Score final e regra de aprovacao: consolidados no relatorio de gates (`S4/S8/S12`).
 - Comando de pre-fecho: `bash scripts/validate-planificacao.sh`.
 
 ## Changelog
@@ -271,3 +271,4 @@ Estado do guia indica a fase de criacao documental.
 - `2026-04-12`: secao de ligacao para guias BK atualizada para cobertura total (60/60), com estado por fase de criacao documental.
 - `2026-04-13`: adicionado contrato com matriz RF/RNF, politica pedagogica v2 e gates obrigatorios S4/S8/S12.
 - `2026-04-13`: evoluido para contrato pedagogico v3 com score `97/100` e validacao automatica obrigatoria.
+- `2026-04-13`: removidas referencias a ficheiro externo de score; avaliacao documental passa a ser registada diretamente no relatorio de gates.

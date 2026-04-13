@@ -1,4 +1,4 @@
-# Faithflix - Requisitos Funcionais (RF)
+# FaithFlix - Requisitos Funcionais (RF)
 
 ## Índice
 
@@ -259,3 +259,4 @@ Projeto académico orientado para fins educativos no âmbito da PAP.
 ## Changelog
 
 -   **2024-04-27** - Reorganização para formato padrão com secções adicionais (MVP, créditos, licença e gamificação).
+-   **2026-04-13** - Nome do projeto uniformizado para **FaithFlix** e atualização editorial de consistência documental.
