@@ -1,129 +1,132 @@
-# BK-MF7-01 - Matriz de cobertura RF -> evidência
+# BK-MF7-01 - Matriz de cobertura RF -> evidencia
 
 ## Header
 
-- doc_id: GUIA-BK-MF7-01
-- bk_id: BK-MF7-01
-- macro: MF7
-- owner: Kaue
-- apoio: Matheus, Mateus, Davi
-- prioridade: P0
-- estado: TODO
-- esforço: M
-- dependências: BK-MF6-06
-- rf_rnf: RF01..RF63
-- last_updated: 2026-04-12
+- `doc_id`: `GUIA-BK-MF7-01`
+- `bk_id`: `BK-MF7-01`
+- `macro`: `MF7`
+- `owner`: `Kaue`
+- `apoio`: `Matheus, Mateus, Davi`
+- `prioridade`: `P0`
+- `estado`: `TODO`
+- `esforco`: `M`
+- `dependencias`: `BK-MF6-06`
+- `rf_rnf`: `RF01..RF63`
+- `last_updated`: `2026-04-13`
 
 ## O que vamos fazer neste BK
 
-Neste BK vamos entregar Matriz de cobertura RF -> evidência, com foco num fluxo claro e executável para alunos em contexto de PAP.
-O objetivo é produzir um resultado verificável, com passos pedagógicos e checkpoints objetivos, sem assumir código consolidado para além das dependências listadas.
+Entregar `Matriz de cobertura RF -> evidencia` cobrindo `RF01..RF63` na `MF7`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
 
-## Porque isto é importante
+## Porque isto e importante
 
-- Este BK fecha uma peça concreta da macro MF7 e reduz risco de bloqueios nos BKs seguintes.
-- Uma execução guiada melhora consistência entre equipa, reduz retrabalho e acelera revisão técnica.
-- A entrega deste BK contribui diretamente para os requisitos RF01..RF63 definidos no backlog.
-- Sem este BK bem fechado, a qualidade das evidências para sprint e defesa final fica comprometida.
+- Fecha capacidade critica desta macro sem criar drift de backlog.
+- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF7-02`).
+- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+
+## Pre-condicoes de entrada
+
+- Dependencias declaradas: `BK-MF6-06`.
+- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
 
 ## O que entra (scope)
 
-- Entregar o objetivo central: Matriz de cobertura RF -> evidência.
-- Produzir artefacto verificável alinhado com RF01..RF63 e com o estado atual do backlog.
-- Registar evidências mínimas para revisão técnica e handoff da equipa.
+- Entrega funcional de `Matriz de cobertura RF -> evidencia` com caminho principal completo.
+- Integracao com dependencias diretas e validacao de regressao local.
+- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
 
-## O que não entra (scope-out)
+## O que nao entra (scope-out)
 
-- Implementações profundas que pertencem a BKs seguintes ou paralelos.
-- Refactors amplos sem relação direta com o objetivo deste BK.
-- Decisões arquiteturais novas sem alinhamento com docs/RF.md, docs/RNF.md e docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md.
+- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
+- Refatoracao ampla sem impacto direto neste BK.
+- Trabalho de BK futuro fora da cadeia declarada.
 
 ## Como saber que isto ficou bem
 
-- O output do BK é observável e reproduzível por outro colega.
-- As dependências BK-MF6-06 foram respeitadas sem regressão funcional óbvia.
-- A equipa consegue explicar o porquê da solução e não apenas o como.
+- Fluxo principal de `BK-MF7-01` reproduzivel por outro colega.
+- Politica de negativos cumprida para prioridade `P0`.
+- Evidence documentada e pronta para auditoria de gate.
 
-## Pre-leitura mínima (10-15 min)
+## Pre-leitura minima (10-15 min)
 
-- docs/planificacao/backlogs/BACKLOG-MVP.md - localizar a linha do BK-MF7-01, owner, esforço e dependências.
-- docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md - rever secção da macro MF7.
-- docs/planificacao/backlogs/MF-VIEWS.md - confirmar sequência recomendada na macro.
-- docs/RF.md e/ou docs/RNF.md - focar os códigos RF01..RF63.
+- `docs/RF.md` e `docs/RNF.md` (itens de `RF01..RF63`).
+- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-01`).
+- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
 
-## Glossário rápido
+## Guia de execucao (passo-a-passo)
 
-- BK: bloco atómico de trabalho com owner único e critério de aceite.
-- scope: limite do que deve entrar neste BK para manter foco e previsibilidade.
-- negativo: teste de erro/acesso inválido que prova robustez da entrega.
-- evidence: prova objetiva de execução (teste, screenshot, log, nota técnica).
-- handoff: transferência clara para quem vai executar ou depender do BK seguinte.
+1. Validar pre-condicoes e dependencias de entrada.
+2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
+3. Implementar o fluxo principal de `Matriz de cobertura RF -> evidencia`.
+4. Executar smoke e validar integracao com BKs adjacentes.
+5. Executar negativos obrigatorios para `P0`.
+6. Atualizar evidence e preparar handoff para `BK-MF7-02`.
 
-## Guia de execução (passo-a-passo)
+## Outputs esperados
 
-1. **Objetivo (~10 min): confirmar ponto de partida**
-   - Justificação: evita iniciar trabalho com pressupostos errados sobre dependências e requisitos.
-   - Como fazer: validar se BK-MF6-06 está concluído ou suficientemente estável para suportar este BK.
-   - O que verificar: existe baseline claro para iniciar BK-MF7-01.
+- Output funcional de `BK-MF7-01` concluido sem blocker.
+- Output de validacao com teste/log/captura.
+- Output documental com `pr/proof/neg` para gate.
 
-2. **Objetivo (~15 min): traduzir o requisito em tarefas pequenas**
-   - Justificação: tarefas mais curtas tornam a execução pedagógica e controlável para alunos.
-   - Como fazer: decompor Matriz de cobertura RF -> evidência em 3 a 5 tarefas objetivas (entrada, processamento, saída, validação, evidência).
-   - O que verificar: cada tarefa tem dono, definição de pronto e estimativa realista.
+## Snippet tecnico obrigatorio
 
-3. **Objetivo (~25 min): desenhar fluxo e critérios antes de implementar**
-   - Justificação: desenhar antes reduz ambiguidades, retrabalho e regressões evitáveis.
-   - Como fazer: descrever caminho feliz, erros esperados e limites de scope deste BK.
-   - O que verificar: fluxo alinhado com RF01..RF63 e sem invadir BKs adjacentes.
+```text
+# pseudo-checklist BK-MF7-01
+precondicoes_ok = validar_dependencias(["BK-MF6-06"])
+assert precondicoes_ok == true
 
-4. **Objetivo (~45 min): executar primeiro incremento funcional**
-   - Justificação: valida cedo a direção técnica no contexto real do projeto.
-   - Como fazer: implementar/produzir o mínimo funcional que demonstre valor e rastreabilidade do BK.
-   - O que verificar: incremento funcional no caminho principal com evidência inicial.
+resultado = executar_fluxo_principal("Matriz de cobertura RF -> evidencia")
+assert resultado.status == "OK"
 
-5. **Objetivo (~35 min): fechar comportamentos essenciais e mensagens**
-   - Justificação: BK só fica robusto quando cobre estados principais e mensagens compreensíveis.
-   - Como fazer: completar estados, validações e pontos de integração previstos no escopo.
-   - O que verificar: resultado coerente, previsível e entendível por quem não implementou.
+negativos = executar_negativos(prioridade="P0", minimo=3)
+assert negativos.passados >= 3
 
-6. **Objetivo (~20 min): validar negativos e estabilidade**
-   - Justificação: testes negativos evitam falso sentimento de qualidade.
-   - Como fazer: testar entradas inválidas, ausência de pré-condições e bloqueios esperados.
-   - O que verificar: falhas controladas, mensagens claras e sem efeitos colaterais graves.
+registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
+```
 
-7. **Objetivo (~15 min): preparar handoff e evidência final**
-   - Justificação: garante continuidade para revisão e BKs dependentes.
-   - Como fazer: registar o que foi feito, o que ficou fora e qual o próximo BK recomendado.
-   - O que verificar: qualquer colega consegue reproduzir e continuar o trabalho sem reunião extra.
+## Checklist de validacao
 
-## Snippets de código (evolução)
+### Smoke
 
-Neste momento este BK ainda não tem snippet consolidado; os snippets serão adicionados aqui com a evolução do projeto.
+- [ ] Fluxo principal executa sem erro bloqueante.
+- [ ] Integracao com dependencias diretas valida.
+- [ ] Resultado reproduzivel por outro colega.
 
-## Checklist de validação
+### Negativos
 
-- **Smoke**
-  - O objetivo Matriz de cobertura RF -> evidência pode ser demonstrado de ponta a ponta no contexto atual.
-  - Não há bloqueio imediato para o BK-MF7-02.
-- **Negativos**
-  - Existe pelo menos 1 teste de erro/validação diretamente ligado a Matriz de cobertura RF -> evidência.
-  - Falhas esperadas ficam explícitas e sem comportamento ambíguo.
-- **Técnico**
-  - Alinhamento confirmado com RF01..RF63.
-  - Evidência mínima preparada para review e defesa.
+- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
+- [ ] Negativo 1: cenario de erro/limite executado e documentado.
+- [ ] Negativo 2: cenario de erro/limite executado e documentado.
+- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+### Tecnico
 
-## Critérios de aceite
+- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
+- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
+- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
 
-- BK entregue no escopo combinado e sem scope creep relevante.
-- Dependências e regras do backlog respeitadas.
-- Evidência mínima registada para comprovação objetiva.
+## Criterios de aceite (mensuraveis)
+
+- Condicao: fluxo principal de `BK-MF7-01` concluido ponta-a-ponta.
+- Metrica/Limiar: 100% dos passos de scope sem blocker.
+- Evidencia esperada: `proof` com teste/log/captura objetiva.
+- Condicao: politica de negativos cumprida para `P0`.
+- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
+- Evidencia esperada: `neg` com cenarios e resultado observado.
+- Condicao: coerencia documental com backlog e matriz.
+- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
+- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
 
 ## Evidence para PR/defesa
 
-- pr: N/A (entrega local/documental nesta fase)
-- proof: BK BK-MF7-01 documentado com guia pedagógico completo, alinhado com backlog e requisitos associados.
-- neg: manter registo de pelo menos 1 negativo executado durante a implementação real.
+- `pr`: link de PR/commit ou referencia de entrega local.
+- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
+- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
 
-## Próximo BK recomendado
+## Proximo BK recomendado
 
-BK-MF7-02
+`BK-MF7-02`
+
+## Changelog
+
+- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).

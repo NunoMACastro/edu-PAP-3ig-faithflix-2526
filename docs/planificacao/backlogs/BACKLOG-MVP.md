@@ -7,11 +7,31 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-12`
+- `last_updated`: `2026-04-13`
 
 ## Objetivo
 
 Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios de aceite e evidencias.
+
+## Contrato de rastreabilidade canonica
+
+- Fonte de rastreio requisito -> BK -> evidencia: `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- `BACKLOG-MVP.md` continua como fonte operacional de prioridade/estado/capacidade.
+- Divergencias entre backlog e matriz devem ser corrigidas no mesmo ciclo de sprint.
+
+## Contrato pedagogico v3 (obrigatorio)
+
+- Politica de negativos por prioridade: `P0/P1 >= 3`, `P2 >= 1`.
+- Criterios de aceite por guia devem ser mensuraveis (condicao + metrica/limiar + evidencia).
+- Evidence minima por BK: trio `pr`, `proof`, `neg`.
+- Cada guia deve ter objetivo especifico por BK, snippet tecnico e `Proximo BK recomendado` com ID real.
+- Validacao obrigatoria de conformidade em gates `S4`, `S8` e `S12`.
+
+## Contrato de score e validacao
+
+- Meta documental oficial: `>=97/100` via `docs/planificacao/QUALITY-SCORE-97.md`.
+- Script oficial de conformidade: `scripts/validate-planificacao.sh`.
+- Fecho de gate exige `PASS` no script + validacao humana do orientador.
 
 ## Legenda
 
@@ -230,12 +250,24 @@ Estado do guia indica a fase de criacao documental.
 
 1. Implementacao concluida pelo owner.
 2. Testes minimos executados com resultado.
-3. Criterios de aceite do BK validados.
-4. Evidencia anexada (teste + screenshot/video + nota de validacao).
-5. Revisao tecnica concluida.
-6. Estado atualizado para `DONE`.
+3. Politica de negativos validada por prioridade (`P0/P1 >= 3`, `P2 >= 1`).
+4. Criterios de aceite mensuraveis validados no guia do BK.
+5. Evidence anexada com trio `pr`, `proof`, `neg`.
+6. Revisao tecnica concluida.
+7. Estado atualizado para `DONE`.
+
+## Gates de conformidade documental
+
+- Gate `S4`: auditoria de cobertura de matriz + conformidade de guias da janela S1..S4.
+- Gate `S8`: auditoria de coerencia backlog/matriz/guias para S5..S8.
+- Gate `S12`: auditoria final integral para defesa PAP.
+- Relatorio PASS/FAIL oficial: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
+- Score final e regra de aprovacao: `docs/planificacao/QUALITY-SCORE-97.md`.
+- Comando de pre-fecho: `bash scripts/validate-planificacao.sh`.
 
 ## Changelog
 
 - `2026-04-11`: versao revista para equipa correta e ownership distribuido por 4 alunos.
 - `2026-04-12`: secao de ligacao para guias BK atualizada para cobertura total (60/60), com estado por fase de criacao documental.
+- `2026-04-13`: adicionado contrato com matriz RF/RNF, politica pedagogica v2 e gates obrigatorios S4/S8/S12.
+- `2026-04-13`: evoluido para contrato pedagogico v3 com score `97/100` e validacao automatica obrigatoria.

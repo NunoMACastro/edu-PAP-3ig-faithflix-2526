@@ -1,129 +1,132 @@
-# BK-MF4-01 - Planos e ciclo de subscrição
+# BK-MF4-01 - Planos e ciclo de subscricao
 
 ## Header
 
-- doc_id: GUIA-BK-MF4-01
-- bk_id: BK-MF4-01
-- macro: MF4
-- owner: Matheus
-- apoio: Davi
-- prioridade: P0
-- estado: TODO
-- esforço: L
-- dependências: BK-MF2-01
-- rf_rnf: RF35,RF36,RF38,RF39
-- last_updated: 2026-04-12
+- `doc_id`: `GUIA-BK-MF4-01`
+- `bk_id`: `BK-MF4-01`
+- `macro`: `MF4`
+- `owner`: `Matheus`
+- `apoio`: `Davi`
+- `prioridade`: `P0`
+- `estado`: `TODO`
+- `esforco`: `L`
+- `dependencias`: `BK-MF2-01`
+- `rf_rnf`: `RF35, RF36, RF38, RF39`
+- `last_updated`: `2026-04-13`
 
 ## O que vamos fazer neste BK
 
-Neste BK vamos definir planos, estados e ciclo de vida de subscrição com regras de renovação e bloqueio.
-O objetivo é produzir um resultado verificável, com passos claros para alunos em início de projeto, sem assumir código prévio para além das dependências listadas.
+Entregar `Planos e ciclo de subscricao` cobrindo `RF35, RF36, RF38, RF39` na `MF4`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
 
-## Porque isto é importante
+## Porque isto e importante
 
-- Este BK cria base concreta para os próximos itens da mesma macro, evitando bloqueios em cadeia.
-- Um processo bem explicado reduz retrabalho e acelera onboarding de quem ainda está a ganhar ritmo técnico.
-- A execução deste BK liga diretamente os requisitos RF35,RF36,RF38,RF39 ao plano operacional do backlog.
-- Sem este BK bem fechado, a validação de sprint fica frágil e a evidência para defesa perde qualidade.
+- Fecha capacidade critica desta macro sem criar drift de backlog.
+- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF4-02`).
+- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+
+## Pre-condicoes de entrada
+
+- Dependencias declaradas: `BK-MF2-01`.
+- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
 
 ## O que entra (scope)
 
-- Entregar o objetivo central: Planos e ciclo de subscrição.
-- Produzir artefacto verificável alinhado com RF35,RF36,RF38,RF39 e com o estado do backlog.
-- Registar evidências mínimas para revisão técnica e handoff entre colegas.
+- Entrega funcional de `Planos e ciclo de subscricao` com caminho principal completo.
+- Integracao com dependencias diretas e validacao de regressao local.
+- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
 
-## O que não entra (scope-out)
+## O que nao entra (scope-out)
 
-- Implementações profundas que pertencem a BKs seguintes ou paralelos.
-- Refactors amplos sem relação direta com o objetivo do BK.
-- Decisões arquiteturais novas sem alinhamento com docs/RF.md, docs/RNF.md e docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md.
+- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
+- Refatoracao ampla sem impacto direto neste BK.
+- Trabalho de BK futuro fora da cadeia declarada.
 
 ## Como saber que isto ficou bem
 
-- O output do BK é observável e reproduzível por outro colega.
-- As dependências BK-MF2-01 foram respeitadas sem regressão funcional óbvia.
-- A equipa consegue explicar o "porquê" da solução e não apenas o "como".
+- Fluxo principal de `BK-MF4-01` reproduzivel por outro colega.
+- Politica de negativos cumprida para prioridade `P0`.
+- Evidence documentada e pronta para auditoria de gate.
 
-## Pre-leitura mínima (10-15 min)
+## Pre-leitura minima (10-15 min)
 
-- docs/planificacao/backlogs/BACKLOG-MVP.md - localizar a linha do BK-MF4-01, owner, esforço e dependências.
-- docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md - rever secção da macro MF4.
-- docs/planificacao/backlogs/MF-VIEWS.md - confirmar sequência recomendada na macro.
-- docs/RF.md e/ou docs/RNF.md - focar os códigos RF35,RF36,RF38,RF39.
+- `docs/RF.md` e `docs/RNF.md` (itens de `RF35, RF36, RF38, RF39`).
+- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF4-01`).
+- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
 
-## Glossário rápido
+## Guia de execucao (passo-a-passo)
 
-- BK: bloco atómico de trabalho com owner único e critério de aceite.
-- scope: limite do que deve entrar neste BK para manter foco e previsibilidade.
-- negativo: teste de erro/acesso inválido que prova robustez da entrega.
-- evidence: prova objetiva de execução (teste, screenshot, log, nota técnica).
-- handoff: transferência clara para quem vai executar ou depender do BK seguinte.
+1. Validar pre-condicoes e dependencias de entrada.
+2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
+3. Implementar o fluxo principal de `Planos e ciclo de subscricao`.
+4. Executar smoke e validar integracao com BKs adjacentes.
+5. Executar negativos obrigatorios para `P0`.
+6. Atualizar evidence e preparar handoff para `BK-MF4-02`.
 
-## Guia de execução (passo-a-passo)
+## Outputs esperados
 
-1. **Objetivo (~10 min): confirmar ponto de partida**
-   - Justificação: evita começar com suposições erradas sobre dependências.
-   - Como fazer: validar se BK-MF2-01 está concluído ou suficientemente estável para permitir progresso real.
-   - O que verificar: existe um baseline claro para iniciar BK-MF4-01.
+- Output funcional de `BK-MF4-01` concluido sem blocker.
+- Output de validacao com teste/log/captura.
+- Output documental com `pr/proof/neg` para gate.
 
-2. **Objetivo (~15 min): traduzir requisito para tarefas pequenas**
-   - Justificação: alunos executam melhor quando o problema está quebrado em blocos simples.
-   - Como fazer: decompor Planos e ciclo de subscrição em 3 a 5 tarefas objetivas (entrada, processamento, saída, validação, evidência).
-   - O que verificar: cada tarefa tem dono, definição de pronto e tempo estimado.
+## Snippet tecnico obrigatorio
 
-3. **Objetivo (~25 min): desenhar fluxo e critérios antes de implementar**
-   - Justificação: desenhar antes reduz idas e voltas durante a codificação.
-   - Como fazer: descrever caminho feliz, erros esperados e limites do scope deste BK.
-   - O que verificar: fluxo alinhado com RF35,RF36,RF38,RF39 e sem invadir BKs seguintes.
+```text
+# pseudo-checklist BK-MF4-01
+precondicoes_ok = validar_dependencias(["BK-MF2-01"])
+assert precondicoes_ok == true
 
-4. **Objetivo (~45 min): executar o primeiro incremento funcional**
-   - Justificação: validar cedo se a direção escolhida funciona no contexto real do projeto.
-   - Como fazer: implementar/produzir o mínimo necessário para demonstrar valor do BK, mantendo simplicidade.
-   - O que verificar: incremento funciona no caminho principal e já gera evidência inicial.
+resultado = executar_fluxo_principal("Planos e ciclo de subscricao")
+assert resultado.status == "OK"
 
-5. **Objetivo (~35 min): fechar comportamentos essenciais e mensagens**
-   - Justificação: BK só deve ser considerado pronto quando cobre casos principais e comunicação ao utilizador/equipa.
-   - Como fazer: completar estados necessários, mensagens de erro/informação e detalhes de integração.
-   - O que verificar: resultado é coerente, previsível e entendível por quem não implementou.
+negativos = executar_negativos(prioridade="P0", minimo=3)
+assert negativos.passados >= 3
 
-6. **Objetivo (~20 min): validar negativos e estabilidade**
-   - Justificação: sem negativos, é fácil confundir "funciona no meu caso" com qualidade real.
-   - Como fazer: testar entradas inválidas, ausência de pré-condições e cenários de bloqueio esperados.
-   - O que verificar: sistema falha de forma controlada e sem efeitos colaterais graves.
+registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
+```
 
-7. **Objetivo (~15 min): preparar handoff e evidência final**
-   - Justificação: o BK seguinte depende de contexto claro e rastreável.
-   - Como fazer: registar o que foi feito, o que ficou de fora e qual o próximo BK recomendado.
-   - O que verificar: qualquer colega consegue retomar o trabalho sem reunião extra.
+## Checklist de validacao
 
-## Snippets de código (evolução)
+### Smoke
 
-Neste momento este BK ainda não tem snippet consolidado; os snippets serão adicionados aqui com a evolução do projeto.
+- [ ] Fluxo principal executa sem erro bloqueante.
+- [ ] Integracao com dependencias diretas valida.
+- [ ] Resultado reproduzivel por outro colega.
 
-## Checklist de validação
+### Negativos
 
-- **Smoke**
-  - O objetivo Planos e ciclo de subscrição pode ser demonstrado de ponta a ponta no contexto atual.
-  - Não há bloqueio imediato para o BK-MF4-02.
-- **Negativos**
-  - Existe pelo menos 1 teste de erro/validação diretamente ligado a Planos e ciclo de subscrição.
-  - Falhas esperadas ficam explícitas e sem comportamento ambíguo.
-- **Técnico**
-  - Alinhamento confirmado com RF35,RF36,RF38,RF39.
-  - Evidência mínima preparada para review e defesa.
+- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
+- [ ] Negativo 1: cenario de erro/limite executado e documentado.
+- [ ] Negativo 2: cenario de erro/limite executado e documentado.
+- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+### Tecnico
 
-## Critérios de aceite
+- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
+- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
+- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
 
-- BK entregue no escopo combinado e sem "scope creep" relevante.
-- Dependências e regras do backlog respeitadas.
-- Evidência mínima registada para comprovação objetiva.
+## Criterios de aceite (mensuraveis)
+
+- Condicao: fluxo principal de `BK-MF4-01` concluido ponta-a-ponta.
+- Metrica/Limiar: 100% dos passos de scope sem blocker.
+- Evidencia esperada: `proof` com teste/log/captura objetiva.
+- Condicao: politica de negativos cumprida para `P0`.
+- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
+- Evidencia esperada: `neg` com cenarios e resultado observado.
+- Condicao: coerencia documental com backlog e matriz.
+- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
+- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
 
 ## Evidence para PR/defesa
 
-- pr: N/A (entrega local/documental nesta fase)
-- proof: BK BK-MF4-01 documentado com guia pedagógico completo, alinhado com backlog e requisitos associados.
-- neg: manter registo de pelo menos 1 negativo executado durante a implementação real.
+- `pr`: link de PR/commit ou referencia de entrega local.
+- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
+- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
 
-## Próximo BK recomendado
+## Proximo BK recomendado
 
-BK-MF4-02
+`BK-MF4-02`
+
+## Changelog
+
+- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).

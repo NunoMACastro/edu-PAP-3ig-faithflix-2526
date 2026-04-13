@@ -1,4 +1,4 @@
-# BK-XXXX - Título do BK
+# BK-XXXX - Titulo do BK
 
 ## Header
 
@@ -9,110 +9,111 @@
 - `apoio`: `A definir`
 - `prioridade`: `P0|P1|P2`
 - `estado`: `TODO|IN_PROGRESS|DONE|BLOCKED`
-- `esforço`: `S|M|L`
-- `dependências`: `BK-...`
+- `esforco`: `S|M|L`
+- `dependencias`: `BK-...|-`
 - `rf_rnf`: `RFxx/RNFxx/transversal`
 - `last_updated`: `YYYY-MM-DD`
 
 ## O que vamos fazer neste BK
 
-Descrever em 1-2 parágrafos o objetivo concreto do BK, com linguagem simples para alunos.
+Descrever objetivo especifico do BK em contexto real (sem texto generico).
 
-## Porque isto é importante
+## Porque isto e importante
 
-- Explicar impacto direto no produto.
-- Explicar impacto na arquitetura e no trabalho dos BK seguintes.
-- Explicar o risco de não fazer este BK corretamente.
+- Impacto direto no produto e no fluxo da sprint.
+- Impacto no BK seguinte.
+- Risco de nao entregar com qualidade.
+
+## Pre-condicoes de entrada
+
+- Dependencias desbloqueadas e validadas.
+- Contexto tecnico alinhado com backlog e matriz.
+- Criterio de entrada registado antes de executar.
 
 ## O que entra (scope)
 
-- Entregável 1.
-- Entregável 2.
-- Entregável 3.
+- Entregavel principal do BK.
+- Integracoes obrigatorias do BK.
+- Evidence minima obrigatoria (`pr`, `proof`, `neg`).
 
-## O que não entra (scope-out)
+## O que nao entra (scope-out)
 
-- Atividade que pertence a outro BK.
-- Atividade que depende de requisito ainda não atacado.
+- Trabalho fora do objetivo deste BK.
+- Refatoracoes amplas sem dependencia direta.
+- Alteracoes de RF/RNF ou ownership sem aprovacao.
 
 ## Como saber que isto ficou bem
 
-- Critério observável 1.
-- Critério observável 2.
-- Critério observável 3.
+- Resultado observavel e reproduzivel.
+- Dependencias e integracoes validadas.
+- Criterios mensuraveis e evidence preenchida.
 
-## Pre-leitura mínima (10-15 min)
+## Pre-leitura minima (10-15 min)
 
-- `docs/RF.md` (requisitos relevantes).
-- `docs/RNF.md` (restrições de qualidade relevantes).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha do BK e dependências).
+- `docs/RF.md` e `docs/RNF.md`.
+- `docs/planificacao/backlogs/BACKLOG-MVP.md`.
+- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
 
-## Glossário rápido
+## Guia de execucao (passo-a-passo)
 
-- `termo 1`: definição curta.
-- `termo 2`: definição curta.
-- `termo 3`: definição curta.
+1. Validar pre-condicoes e dependencias.
+2. Definir mini-plano tecnico com entradas/saidas e limites.
+3. Implementar caminho principal do BK.
+4. Validar smoke + integracao com BKs dependentes.
+5. Executar negativos conforme prioridade.
+6. Consolidar evidence e preparar handoff para BK seguinte.
 
-## Guia de execução (passo-a-passo)
+## Outputs esperados
 
-1. **Objetivo (~10 min): validar contexto e dependências**
-   - Justificação: evita implementar em cima de base incompleta.
-   - Como fazer: confirmar BKs dependentes, RF/RNF e artefactos existentes.
-   - O que verificar: dependências desbloqueadas e critério de entrada claro.
+- Output funcional principal do BK concluido.
+- Output de validacao (smoke + negativos) com prova objetiva.
+- Output documental (`pr/proof/neg`) pronto para gate.
 
-2. **Objetivo (~20 min): detalhar desenho da solução**
-   - Justificação: reduz retrabalho e ambiguidades na implementação.
-   - Como fazer: listar entradas, saídas, regras e pontos de validação.
-   - O que verificar: desenho coerente com RF/RNF e sem conflito com outros BKs.
+## Snippet tecnico obrigatorio
 
-3. **Objetivo (~45 min): implementar primeiro incremento**
-   - Justificação: entregar valor cedo e validar direção técnica.
-   - Como fazer: construir a parte mínima funcional do BK.
-   - O que verificar: incremento funcional e sem quebrar fluxos existentes.
+Adicionar bloco de codigo ou pseudocodigo validavel e contextualizado ao BK.
 
-4. **Objetivo (~45 min): completar o BK com casos principais**
-   - Justificação: cobrir o caminho feliz de ponta a ponta.
-   - Como fazer: fechar regras principais, mensagens e estados esperados.
-   - O que verificar: comportamento aderente ao requisito funcional.
+```text
+# exemplo minimo (adaptar ao BK real)
+precondicoes_ok = validar_dependencias([...])
+resultado = executar_fluxo_principal(...)
+assert resultado == "OK"
+```
 
-5. **Objetivo (~20 min): validar erros e negativos**
-   - Justificação: evitar falsos positivos de qualidade.
-   - Como fazer: testar acessos inválidos, dados inválidos e bloqueios esperados.
-   - O que verificar: erros claros, previsíveis e rastreáveis.
+## Checklist de validacao
 
-6. **Objetivo (~15 min): consolidar evidência e handoff**
-   - Justificação: facilitar revisão, avaliação e defesa da PAP.
-   - Como fazer: registar evidências mínimas e atualizar estado do BK.
-   - O que verificar: qualquer colega consegue reproduzir resultados.
+### Smoke
 
-## Snippets de código (evolução)
+- [ ] Fluxo principal executa sem erro bloqueante.
+- [ ] Integracao com dependencias diretas valida.
+- [ ] Resultado reproduzivel por outro colega.
 
-Neste momento este BK ainda não tem snippet consolidado; os snippets serão adicionados aqui com a evolução do projeto.
+### Negativos
 
-## Checklist de validação
+- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
+- [ ] Cenarios negativos executados com resultado esperado.
 
-- **Smoke**
-  - Fluxo principal do BK executa sem erro.
-  - Integração com dependências diretas válida.
-- **Negativos**
-  - Cenários inválidos bloqueados com mensagem clara.
-  - Estado do sistema mantém consistência após erro.
-- **Técnico**
-  - Sem regressão óbvia nos fluxos já entregues.
-  - Evidências prontas para revisão.
+### Tecnico
 
-## Critérios de aceite
+- [ ] Metadados alinhados com BACKLOG-MVP e MATRIZ-RF-RNF-POR-BK.
+- [ ] Criterios mensuraveis definidos com limiar claro.
+- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
 
-- Entregável principal do BK concluído conforme backlog.
-- Dependências respeitadas e sem contradizer RF/RNF.
-- Evidência mínima anexada (captura, log, nota técnica ou teste).
+## Criterios de aceite (mensuraveis)
+
+- Condicao observavel + metrica/limiar + evidencia esperada.
+- Politica de negativos validada por prioridade.
+- Coerencia documental confirmada no fecho.
 
 ## Evidence para PR/defesa
 
-- `pr`: `N/A (documentação/implementação local)`
-- `proof`: resumo objetivo do que foi validado.
-- `neg`: pelo menos 1 negativo relevante com resultado.
+- `pr`: link de PR/commit ou referencia local.
+- `proof`: 2-3 evidencias objetivas.
+- `neg`: resumo dos cenarios negativos executados.
 
-## Próximo BK recomendado
+## Proximo BK recomendado
 
-`BK-XXXX` (ajustar conforme sequência/dependências reais).
+- Valor derivado da ordem canonica de `docs/planificacao/sprints/PLANO-SPRINTS.md`.
+- Formato permitido:
+- `BK-MFxx-yy` para BKs nao terminais.
+- `-` apenas para BK terminal da sequencia canonica.

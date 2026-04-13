@@ -13,7 +13,7 @@
 9. [Comunidade](#9-comunidade)
 10. [Subscrições](#10-subscrições)
 11. [Pool Rotativa de Associações](#11-pool-rotativa-de-associações)
-12. [1Moderação e Curadoria](#12-moderação-e-curadoria)
+12. [Moderação e Curadoria](#12-moderação-e-curadoria)
 13. [Notificações](#13-notificações)
 14. [Privacidade e RGPD](#14-privacidade-e-rgpd)
 15. [Administração e Operação](#15-administração-e-operação)

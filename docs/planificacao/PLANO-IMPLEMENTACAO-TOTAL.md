@@ -7,18 +7,27 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-11`
+- `last_updated`: `2026-04-13`
 
 ## Objetivo
 
-Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel, com fases, gates, backlog e sprints para a equipa de alunos.
+Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com rastreabilidade canonica, rigor pedagogico e qualidade documental orientada a meta `>=97/100`.
 
-## Assuncoes
+## Assuncoes de execucao
 
 - Equipa tecnica: `Matheus`, `Mateus`, `Davi`, `Kaue`.
-- Orientacao: `Nuno` (governance, avaliacao, preparacao e gates).
-- Cadencia: sprints semanais.
-- Escopo: MVP academico robusto.
+- Orientacao: `Nuno` (governance, avaliacao, gates e defesa).
+- Limites estruturais: `12 sprints`, `60 BK`.
+- Distribuicao desigual de BK mantida por criterio pedagogico e tecnico.
+
+## Contratos canonicos obrigatorios
+
+1. Rastreabilidade: `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+2. Operacao do backlog: `docs/planificacao/backlogs/BACKLOG-MVP.md`.
+3. Qualidade e score: `docs/planificacao/QUALITY-SCORE-97.md`.
+4. Qualidade dos guias BK: `docs/planificacao/guias-bk/_TEMPLATE-BK.md`.
+5. Gate e execucao real: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
+6. Validacao automatica: `scripts/validate-planificacao.sh`.
 
 ## Macro fases
 
@@ -31,236 +40,45 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel, com fases, gates, b
 | `MF4` | Monetizacao solidaria | `RF35..RF54` |
 | `MF5` | Operacao e privacidade | `RF55..RF63` |
 | `MF6` | Hardening | `RNF` criticos de qualidade/performance/seguranca |
-| `MF7` | Evidencias PAP | matriz RF/RNF + demo |
-| `MF8` | Buffer e fecho | estabilizacao final |
+| `MF7` | Evidencias PAP | matriz RF/RNF + demo + ensaio |
+| `MF8` | Buffer e fecho | estabilizacao, freeze e retro final |
 
----
+## Regras transversais por macro
 
-## MF0 - Kickoff e governance
+1. Cada BK com owner unico, apoio explicito e dependencias validas.
+2. Politica de negativos obrigatoria: `P0/P1 >= 3`, `P2 >= 1`.
+3. Evidence minima por BK: `pr`, `proof`, `neg`.
+4. Guias BK obrigatoriamente especificos (sem placeholders de proximo BK).
+5. Handoff semanal obrigatorio para BK `P0`.
+6. Pairing semanal (60-90 min) obrigatorio entre aluno forte e aluno em evolucao.
 
-### Owners
+## Gate de conformidade e fecho
 
-- Owner: `Nuno`
-- Apoio: `Matheus`, `Mateus`, `Davi`, `Kaue`
+### Gate S4
 
-### Step-by-step
+- Cobertura de matriz para janela `S1..S4`.
+- Guias da janela conformes ao template v3.
+- Evidence minima e criterios mensuraveis validados.
 
-1. Confirmar leitura de `RF.md` e `RNF.md` por toda a equipa.
-2. Publicar distribuicao de responsabilidades.
-3. Publicar backlog atomico inicial.
-4. Definir DoD e formato de evidencia.
-5. Definir calendario de sprints.
-6. Fazer reuniao de alinhamento inicial.
+### Gate S8
 
-### Gate de saida
+- Coerencia backlog/matriz/guias para janela `S5..S8`.
+- Auditoria de ownership, prioridade, dependencias e `rf_rnf`.
+- Consolidacao de acao corretiva em casos `FAIL`.
 
-- Planificacao completa publicada em `docs/planificacao`.
-- Todos os BKs criticos com owner.
+### Gate S12
 
----
+- Fecho integral `103/103` e `60/60`.
+- Score final calculado via `QUALITY-SCORE-97`.
+- Parecer final `GO/NO-GO` com assinatura do orientador.
 
-## MF1 - Fundacao tecnica
+## Criterios de saida do plano
 
-### Owners por stream
-
-- Backend core: `Matheus`
-- Frontend base: `Mateus`
-- Dados e observabilidade: `Davi`
-- QA base e smoke tests: `Kaue`
-- Gate: `Nuno`
-
-### Step-by-step
-
-1. Estruturar backend modular.
-2. Estruturar frontend por componentes.
-3. Criar cliente API com tratamento de erro.
-4. Implementar sessao segura base.
-5. Implementar health-check e logs.
-6. Executar smoke tests FE/BE.
-
-### Gate de saida
-
-- FE e BE sobem sem bloqueios.
-- Sessao base funcional.
-- Smoke tests executados.
-
----
-
-## MF2 - Core streaming MVP (`RF01..RF18`)
-
-### Owners por stream
-
-- Auth e regras de acesso: `Matheus`
-- UI/UX e player: `Mateus`
-- Catalogo/historico de consumo: `Davi`
-- Testes E2E de fluxo principal: `Kaue`
-- Gate: `Nuno`
-
-### Step-by-step
-
-1. Fechar registo/login/recuperacao.
-2. Fechar perfil e papeis base.
-3. Fechar catalogo e detalhe.
-4. Fechar reproducao e continuar a ver.
-5. Fechar favoritos/watchlist/historico.
-6. Executar E2E do fluxo principal.
-
-### Gate de saida
-
-- Fluxo `login -> detalhe -> play -> continuar` validado.
-- Evidencias de teste registadas.
-
----
-
-## MF3 - Descoberta e comunidade (`RF19..RF34`)
-
-### Owners por stream
-
-- Pesquisa/recomendacao e dados: `Davi`
-- UX de descoberta e comunidade: `Mateus`
-- Moderacao e regras: `Kaue`
-- APIs de suporte: `Matheus`
-- Gate: `Nuno`
-
-### Step-by-step
-
-1. Fechar ratings e agregacao.
-2. Fechar comentarios moderados.
-3. Fechar pesquisa unificada e filtros.
-4. Fechar recomendacao baseline + cold start.
-5. Fechar explicabilidade.
-6. Fechar estudo biblico e comunidade.
-
-### Gate de saida
-
-- Pesquisa e recomendacoes consistentes.
-- Moderacao minima funcional.
-
----
-
-## MF4 - Monetizacao solidaria (`RF35..RF54`)
-
-### Owners por stream
-
-- Subscricoes e ciclo de faturacao: `Matheus`
-- Pool, calculos e relatorios: `Davi`
-- UX de transparencia e notificacoes: `Mateus`
-- Fluxos admin/moderacao operacional: `Kaue`
-- Gate: `Nuno`
-
-### Step-by-step
-
-1. Fechar planos e estado de subscricao.
-2. Fechar metodos de pagamento simulados e trial.
-3. Fechar candidaturas e aprovacao de associacoes.
-4. Fechar distribuicao/rotacao da pool.
-5. Fechar relatorios e historicos.
-6. Fechar notificacoes e workflow editorial.
-
-### Gate de saida
-
-- Subscricao e pool auditaveis.
-- Relatorios e notificacoes operacionais.
-
----
-
-## MF5 - Operacao e privacidade (`RF55..RF63`)
-
-### Owners por stream
-
-- RGPD e seguranca de dados: `Matheus`
-- Admin e operacao: `Kaue`
-- UX admin e perfis: `Mateus`
-- Metricas/integracoes: `Davi`
-- Gate: `Nuno`
-
-### Step-by-step
-
-1. Fechar exportacao e eliminacao de dados.
-2. Fechar consentimentos.
-3. Fechar gestao de utilizadores/admin.
-4. Fechar painel de metricas e integracoes.
-5. Fechar perfis/dispositivos.
-6. Fechar gamificacao baseline.
-
-### Gate de saida
-
-- Fluxos RGPD completos.
-- Operacao admin estavel.
-
----
-
-## MF6 - Hardening tecnico (`RNF`)
-
-### Owners por stream
-
-- Hardening de seguranca: `Matheus`
-- Performance e dados: `Davi`
-- Acessibilidade e UX final: `Mateus`
-- Regressao completa e evidencia tecnica: `Kaue`
-- Gate final: `Nuno`
-
-### Step-by-step
-
-1. Executar regressao backend.
-2. Executar regressao frontend.
-3. Corrigir seguranca e privacidade.
-4. Corrigir performance critica.
-5. Corrigir acessibilidade e UX.
-6. Passar quality gate final.
-
-### Gate de saida
-
-- Sem falhas criticas abertas.
-- RNF criticos validados.
-
----
-
-## MF7 - Consolidacao e evidencia PAP
-
-### Owners
-
-- Cobertura RF: `Kaue`
-- Cobertura RNF: `Davi`
-- Roteiro de demo: `Mateus`
-- Ensaio tecnico: `Matheus`
-- Avaliacao final: `Nuno`
-
-### Step-by-step
-
-1. Construir matriz RF -> evidencias.
-2. Construir matriz RNF -> validacoes.
-3. Preparar roteiro da demo.
-4. Ensaiar apresentacao tecnica.
-5. Receber feedback final do orientador.
-
-### Gate de saida
-
-- Pacote de defesa pronto.
-- Demonstração consistente.
-
----
-
-## MF8 - Buffer e fecho final
-
-### Owners
-
-- Riscos e bugs finais: `Matheus`, `Mateus`, `Davi`, `Kaue`
-- Scope freeze e fecho: `Nuno`
-
-### Step-by-step
-
-1. Levantar riscos residuais.
-2. Corrigir bugs bloqueantes.
-3. Fechar escopo final.
-4. Empacotar entrega final.
-5. Registar retro final.
-
-### Gate de saida
-
-- Sem bloqueadores de entrega.
-- Escopo final congelado.
+- Validacao automatica a `PASS`: `scripts/validate-planificacao.sh`.
+- Gate `S4/S8/S12` com baseline + execucao real + acao corretiva.
+- Score total `>=97/100` no contrato oficial.
 
 ## Changelog
 
-- `2026-04-11`: versao revista com equipa correta (`Matheus`, `Mateus`, `Davi`, `Kaue`) e papel de orientacao do Nuno.
+- `2026-04-11`: versao revista com equipa correta.
+- `2026-04-13`: reforco de contratos canonicos, governance pedagogica e meta de qualidade `97/100`.

@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-12`
+- `last_updated`: `2026-04-13`
 
 ## Objetivo
 
@@ -16,7 +16,8 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 ## Regra
 
 - Estado oficial: `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Esta view nao substitui o backlog oficial.
+- Ordem canonica de execucao: `docs/planificacao/sprints/PLANO-SPRINTS.md`.
+- Esta view e derivada da ordem por sprint e nao pode divergir.
 
 ---
 
@@ -133,10 +134,10 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 ### Sequencia
 
-1. `BK-MF3-03`
-2. `BK-MF3-04`
-3. `BK-MF3-01`
-4. `BK-MF3-02`
+1. `BK-MF3-01`
+2. `BK-MF3-02`
+3. `BK-MF3-03`
+4. `BK-MF3-04`
 5. `BK-MF3-05`
 6. `BK-MF3-06`
 7. `BK-MF3-07`
@@ -173,11 +174,11 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 1. `BK-MF4-01`
 2. `BK-MF4-02`
-3. `BK-MF4-03`
-4. `BK-MF4-04`
-5. `BK-MF4-05`
-6. `BK-MF4-06`
-7. `BK-MF4-08`
+3. `BK-MF4-08`
+4. `BK-MF4-03`
+5. `BK-MF4-04`
+6. `BK-MF4-05`
+7. `BK-MF4-06`
 8. `BK-MF4-07`
 
 ### Guias disponiveis
@@ -345,3 +346,4 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 - `2026-04-11`: versao revista com equipa correta e ownership atualizado.
 - `2026-04-12`: blocos "Guias disponiveis" sincronizados para cobertura total (MF0..MF8), sem entradas pendentes.
+- `2026-04-13`: ordem de sequencia normalizada para derivar de `PLANO-SPRINTS` (fonte canonica).

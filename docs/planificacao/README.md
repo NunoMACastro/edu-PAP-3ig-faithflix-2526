@@ -1,76 +1,45 @@
-# Planificacao do Projeto Faithflix
+# Planificacao - Faithstream
 
-## Header
+`last_updated`: `2026-04-13`
 
-- `doc_id`: `PLANIFICACAO-README`
-- `path`: `docs/planificacao/README.md`
-- `area`: `project`
-- `owner`: `Nuno (orientacao)`
-- `status`: `ativo`
-- `last_updated`: `2026-04-12`
+## O que esta pasta contem
 
-## Objetivo
+Este diretorio agrega a planificacao operacional do projeto: backlog, rastreabilidade de requisitos, plano de sprints, guias BK e regras de validacao.
 
-Organizar a execucao da PAP com uma estrutura clara para 4 alunos (`Matheus`, `Mateus`, `Davi`, `Kaue`) e orientacao do `Nuno`.
+## Mapa rapido
 
-## Estrutura da pasta `docs/planificacao`
+- `PLANO-IMPLEMENTACAO-TOTAL.md`: plano macro (`MF0..MF8`) e alinhamento de execucao.
+- `DISTRIBUICAO-RESPONSABILIDADES.md`: ownership, handoff e pairing.
+- `QUALITY-SCORE-97.md`: contrato de scoring e criterios PASS/FAIL.
+- `backlogs/BACKLOG-MVP.md`: backlog oficial (`BK-*`) com owner/prioridade/dependencias.
+- `backlogs/MATRIZ-RF-RNF-POR-BK.md`: rastreabilidade requisito -> BK -> evidencia.
+- `backlogs/MF-VIEWS.md`: vista por macrofases (derivada da ordem canonica).
+- `sprints/PLANO-SPRINTS.md`: calendario e ordem temporal oficial.
+- `sprints/RELATORIO-GATES-S4-S8-S12.md`: baseline + execucao real dos gates.
+- `guias-bk/README.md`: indice e contrato dos guias BK.
 
-- `PLANO-IMPLEMENTACAO-TOTAL.md`: plano macro completo (`MF0..MF8`) com gates.
-- `DISTRIBUICAO-RESPONSABILIDADES.md`: ownership, regras de colaboracao e papel de orientacao.
-- `backlogs/BACKLOG-MVP.md`: backlog atomico oficial (`BK-*`) com owner/dependencias/criterios.
-- `backlogs/MF-VIEWS.md`: execucao pratica por macro fase.
-- `sprints/PLANO-SPRINTS.md`: plano de sprints, cadencia e metas semanais.
-- `guias-bk/README.md`: indice dos guias pedagogicos por BK e contrato editorial.
-
-## Ordem de leitura recomendada
+## Ordem recomendada de leitura
 
 1. `docs/RF.md`
 2. `docs/RNF.md`
 3. `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
-4. `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-5. `docs/planificacao/backlogs/BACKLOG-MVP.md`
-6. `docs/planificacao/backlogs/MF-VIEWS.md`
-7. `docs/planificacao/guias-bk/README.md`
-8. `docs/planificacao/sprints/PLANO-SPRINTS.md`
+4. `docs/planificacao/backlogs/BACKLOG-MVP.md`
+5. `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`
+6. `docs/planificacao/sprints/PLANO-SPRINTS.md`
+7. `docs/planificacao/backlogs/MF-VIEWS.md`
+8. `docs/planificacao/guias-bk/README.md`
+9. `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`
+10. `docs/planificacao/QUALITY-SCORE-97.md`
 
-## Guias BK pedagogicos
+## Regras canonicas
 
-- Local oficial: `docs/planificacao/guias-bk/`.
-- Formato: 1 ficheiro por BK com naming `BK-ID + slug`.
-- Cobertura atual (Fase 1): BKs `P0` de `MF0..MF5` no recorte definido (26/26).
-- Contrato editorial: `docs/planificacao/guias-bk/_TEMPLATE-BK.md`.
-- Nota de evolucao: quando ainda nao existir codigo consolidado, o guia inclui nota explicita para evolucao futura de snippets.
+- Requisitos: `docs/RF.md` e `docs/RNF.md`.
+- Estado operacional de BK: `docs/planificacao/backlogs/BACKLOG-MVP.md`.
+- Ordem temporal de execucao: `docs/planificacao/sprints/PLANO-SPRINTS.md`.
+- `MF-VIEWS.md` e `Proximo BK recomendado` dos guias BK sao derivados e nao podem divergir da ordem canonica.
+- BK terminal da sequencia canonica: `BK-MF8-05`, com `Proximo BK recomendado = -`.
 
-## Regra de precedencia (anti-drift)
+## Validacao
 
-1. `docs/RF.md` e `docs/RNF.md` (verdade funcional/nao funcional).
-2. `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md` (ordem estrategica).
-3. `docs/planificacao/backlogs/BACKLOG-MVP.md` (estado operacional real).
-4. `docs/planificacao/backlogs/MF-VIEWS.md` (guia de execucao).
-5. `docs/planificacao/sprints/PLANO-SPRINTS.md` (cadencia temporal).
-
-## Fluxo semanal (step-by-step)
-
-1. `Planning`: selecionar BKs, confirmar dependencias e capacidade.
-2. `Execucao`: implementar BKs prioritarios da sprint.
-3. `Integracao`: validar FE/BE e corrigir conflitos.
-4. `Validacao`: executar testes e verificar criterios de aceite.
-5. `Demo e retro`: demonstrar entrega e registar melhorias.
-
-## Regras de atualizacao documental
-
-1. BK iniciado muda para `IN_PROGRESS` no mesmo dia.
-2. BK concluido so muda para `DONE` com evidencia minima.
-3. Mudanca de escopo exige atualizacao coordenada do plano, backlog e sprints.
-4. O Nuno valida coerencia no fim de cada sprint.
-
-## Papel do Nuno (orientador)
-
-- Owner de governance, gates, avaliacao e preparacao de defesa.
-- Nao substitui ownership tecnico continuo dos alunos.
-- Pode assumir BKs apenas de planeamento, quality-gate e fecho.
-
-## Changelog
-
-- `2026-04-11`: versao revista para equipa correta (`Matheus`, `Mateus`, `Davi`, `Kaue`).
-- `2026-04-12`: adicionada estrutura `guias-bk`, ordem de leitura atualizada e crosslinks para guias pedagogicos por BK.
+- Comando oficial: `bash scripts/validate-planificacao.sh`
+- Fecho de gate (`S4/S8/S12`): script em `PASS` + validacao humana do orientador + registo no relatorio de gates.

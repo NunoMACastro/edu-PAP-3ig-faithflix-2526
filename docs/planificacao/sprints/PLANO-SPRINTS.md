@@ -7,11 +7,11 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-11`
+- `last_updated`: `2026-04-13`
 
 ## Objetivo
 
-Definir cadencia semanal para transformar backlog em entregas incrementais com 4 alunos.
+Definir cadencia semanal para transformar backlog em entregas incrementais com 4 alunos, mantendo `12 sprints` e reduzindo picos de carga para `<=11` pontos.
 
 ## Capacidade recomendada
 
@@ -27,22 +27,24 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 - `M = 2`
 - `L = 3`
 
-## Calendario de 12 sprints
+## Calendario de 12 sprints (rebalanced)
 
-| Sprint      | Foco                              | BKs alvo                                  |
-| ----------- | --------------------------------- | ----------------------------------------- |
-| `Sprint 1`  | Governance e arranque             | `BK-MF0-01..06`, `BK-MF1-01`, `BK-MF1-02` |
-| `Sprint 2`  | Fundacao completa                 | `BK-MF1-03..06`, `BK-MF2-01`              |
-| `Sprint 3`  | Auth + catalogo + detalhe         | `BK-MF2-02..04`                           |
-| `Sprint 4`  | Player + historico + E2E          | `BK-MF2-05..08`                           |
-| `Sprint 5`  | Descoberta base                   | `BK-MF3-01..04`                           |
-| `Sprint 6`  | IA baseline e comunidade          | `BK-MF3-05..08`                           |
-| `Sprint 7`  | Subscricoes e pagamentos          | `BK-MF4-01`, `BK-MF4-02`, `BK-MF4-08`     |
-| `Sprint 8`  | Pool de associacoes               | `BK-MF4-03..07`                           |
-| `Sprint 9`  | RGPD e admin base                 | `BK-MF5-01..05`                           |
-| `Sprint 10` | Integracoes, perfis e gamificacao | `BK-MF5-06..08`                           |
-| `Sprint 11` | Hardening tecnico                 | `BK-MF6-01..06`                           |
-| `Sprint 12` | Evidencias + fecho                | `BK-MF7-01..05`, `BK-MF8-01..05`          |
+| Sprint      | Foco                              | BKs alvo                                               | Carga alvo |
+| ----------- | --------------------------------- | ------------------------------------------------------ | ---------- |
+| `Sprint 1`  | Governance e arranque             | `BK-MF0-01..06`, `BK-MF1-01`, `BK-MF1-02`             | `11`       |
+| `Sprint 2`  | Fundacao completa                 | `BK-MF1-03..06`, `BK-MF2-01`                          | `10`       |
+| `Sprint 3`  | Auth + catalogo + detalhe         | `BK-MF2-02..04`                                        | `7`        |
+| `Sprint 4`  | Player + historico + E2E          | `BK-MF2-05..08`                                        | `9`        |
+| `Sprint 5`  | Descoberta base                   | `BK-MF3-01..04`                                        | `8`        |
+| `Sprint 6`  | IA baseline e comunidade          | `BK-MF3-05..08`                                        | `8`        |
+| `Sprint 7`  | Subscricoes e pagamentos          | `BK-MF4-01`, `BK-MF4-02`, `BK-MF4-08`                 | `7`        |
+| `Sprint 8`  | Pool de associacoes               | `BK-MF4-03..07`                                        | `11`       |
+| `Sprint 9`  | RGPD e admin base                 | `BK-MF5-01..05`                                        | `10`       |
+| `Sprint 10` | Integracoes + perfis + regressao  | `BK-MF5-06..08`, `BK-MF6-01..02`                      | `11`       |
+| `Sprint 11` | Hardening + matrizes de cobertura | `BK-MF6-03..06`, `BK-MF7-01..02`                      | `11`       |
+| `Sprint 12` | Defesa + buffer + fecho           | `BK-MF7-03..05`, `BK-MF8-01..05`                      | `9`        |
+
+> Regra operacional: nenhuma sprint pode ultrapassar `11` pontos.
 
 ## Step-by-step semanal
 
@@ -80,6 +82,35 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 2. Surgindo blocker critico, cortar `P2` no mesmo sprint.
 3. Se cair capacidade, priorizar estabilidade sobre volume.
 4. Scope cuts finais sao decididos por Nuno em gate.
+5. Sempre que uma sprint exceder `11` pontos, redistribuir BK para sprint seguinte no mesmo macro-bloco.
+
+## Gates obrigatorios de conformidade (S4/S8/S12)
+
+### Gate Sprint 4 (S4)
+
+1. Cobertura da matriz `MATRIZ-RF-RNF-POR-BK.md` para requisitos de gate.
+2. Conformidade dos guias BK com template v3 (especificidade + snippets + proximos BKs reais).
+3. Criterios de aceite mensuraveis presentes nos guias da janela.
+4. Evidence minima (`pr`, `proof`, `neg`) validada.
+
+### Gate Sprint 8 (S8)
+
+1. Revalidar cobertura da matriz para requisitos em curso.
+2. Revalidar conformidade de guias e metadados com backlog.
+3. Auditar coerencia `owner`, `prioridade`, `dependencias`, `rf_rnf`.
+4. Consolidar PASS/FAIL por criterio com acao corretiva.
+
+### Gate Sprint 12 (S12)
+
+1. Fecho integral da cobertura RF/RNF na matriz.
+2. 100% dos guias BK conformes ao contrato v3.
+3. Score final calculado via `QUALITY-SCORE-97.md`.
+4. Emissao de parecer final GO/NO-GO documental.
+
+### Registo obrigatorio de gate
+
+- Cada gate (S4, S8, S12) e registado em: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
+- Formato de resultado por criterio: `PASS` ou `FAIL` + acao corretiva + dono + prazo.
 
 ## KPI por sprint
 
@@ -88,6 +119,9 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 - `numero de blockers`
 - `numero de regressões`
 - `tempo medio de fecho por BK`
+- `% guias conformes ao template v3`
+- `% requisitos com rastreabilidade validada na matriz RF/RNF`
+- `carga total de sprint (pontos)`
 
 ## Papel do Nuno nas sprints
 
@@ -99,3 +133,4 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 ## Changelog
 
 - `2026-04-11`: versao revista para equipa de 4 alunos.
+- `2026-04-13`: rebalanceamento de carga nas sprints 10-12 e reforco de gate orientado a meta `97/100`.

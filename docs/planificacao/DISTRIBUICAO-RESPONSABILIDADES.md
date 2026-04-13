@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-11`
+- `last_updated`: `2026-04-13`
 
 ## Objetivo
 
@@ -36,6 +36,8 @@ Distribuir responsabilidades de forma equilibrada entre os 4 alunos e separar cl
 3. Troca de owner em sprint exige justificacao e registo.
 4. BK sem owner nao entra no sprint planning.
 5. BK `DONE` exige evidencia + validacao tecnica.
+6. BK `P0` exige handoff semanal documentado para a equipa.
+7. Pairing semanal (60-90 min) e obrigatorio entre aluno forte e aluno em evolucao.
 
 ## Matriz por area funcional
 
@@ -76,6 +78,22 @@ Distribuir responsabilidades de forma equilibrada entre os 4 alunos e separar cl
 | Review/Demo      | semanal    | Mateus           | Matheus, Davi, Kaue, Nuno   | demo funcional             |
 | Retro            | semanal    | Nuno             | Matheus, Mateus, Davi, Kaue | acoes de melhoria          |
 | Gate macro fase  | por macro  | Nuno             | Matheus, Mateus, Davi, Kaue | GO/NO-GO                   |
+| Handoff BK P0    | semanal    | Owner do BK P0   | equipa tecnica               | transferencia de contexto  |
+| Pairing tecnico  | semanal    | Matheus ou Davi  | 1 aluno em evolucao          | aprendizagem transferida   |
+
+## Mecanismos pedagogicos obrigatorios
+
+### Handoff semanal de BK P0
+
+1. Cada owner P0 regista o estado tecnico no fim da semana.
+2. O registo inclui: escopo entregue, riscos, proximos passos e dependencias.
+3. O handoff e validado no planning seguinte antes de novo compromisso P0.
+
+### Pairing semanal (60-90 min)
+
+1. O pairing ocorre entre aluno forte e aluno em evolucao.
+2. O foco e um BK ativo ou bloqueio tecnico real da sprint.
+3. O resultado minimo e 1 aprendizagem transferida registada no fecho da semana.
 
 ## Step-by-step para atribuicao de BK
 
@@ -119,3 +137,4 @@ Distribuir responsabilidades de forma equilibrada entre os 4 alunos e separar cl
 ## Changelog
 
 - `2026-04-11`: versao revista para equipa de 4 alunos e papel de orientacao do Nuno.
+- `2026-04-13`: adicionados handoff semanal de BK P0 e pairing semanal obrigatorio (60-90 min).
