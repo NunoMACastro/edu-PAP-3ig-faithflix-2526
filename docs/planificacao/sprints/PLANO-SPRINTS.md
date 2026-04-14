@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-13`
+- `last_updated`: `2026-04-14`
 
 ## Objetivo
 
@@ -27,6 +27,11 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 - `M = 2`
 - `L = 3`
 
+## Artefactos oficiais de controlo semanal
+
+- Scorecard oficial por sprint: `docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md`
+- Guiao docente semanal: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
+
 ## Calendario de 12 sprints (rebalanced)
 
 | Sprint      | Foco                              | BKs alvo                                               | Carga alvo |
@@ -45,6 +50,36 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 | `Sprint 12` | Defesa + buffer + fecho           | `BK-MF7-03..05`, `BK-MF8-01..05`                      | `9`        |
 
 > Regra operacional: nenhuma sprint pode ultrapassar `11` pontos.
+
+## Scorecard oficial por sprint (pesos OPSA)
+
+| Dimensao | Peso |
+| --- | --- |
+| Rastreabilidade backlog <-> matriz | `25` |
+| Conformidade dos guias BK | `20` |
+| Evidencia minima e negativos | `20` |
+| Cadencia e carga realista | `15` |
+| Qualidade tecnica e regressao | `10` |
+| Governanca e handoff | `10` |
+| **Total** | **`100`** |
+
+Regra de uso: score preenchido no fim de cada sprint e consolidado por janela de gate (`S1..S4`, `S5..S8`, `S9..S12`).
+
+## Guiao docente semanal (checkpoints e remediacao)
+
+Checkpoints obrigatorios:
+
+1. Segunda: arranque, risco inicial e ownership.
+2. Terca: controlo tecnico intermédio e rastreabilidade.
+3. Quarta: decisao de corte e tratamento de blockers.
+4. Quinta: pre-gate interno e score preliminar.
+5. Sexta: fecho, score final e plano corretivo.
+
+Remediacao minima:
+
+1. Drift documental: corrigir em `24h`.
+2. BK `P0` atrasado ate quarta: cortar `P2` e reforcar pairing em `48h`.
+3. Score de sprint `< 85`: plano de remediacao obrigatorio na sprint seguinte.
 
 ## Step-by-step semanal
 
@@ -135,3 +170,4 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 - `2026-04-11`: versao revista para equipa de 4 alunos.
 - `2026-04-13`: rebalanceamento de carga nas sprints 10-12 e reforco de gate orientado a meta `97/100`.
 - `2026-04-13`: removida referencia a ficheiro externo de score; avaliacao passa a ser consolidada no relatorio de gates.
+- `2026-04-14`: alinhado com scorecard oficial por sprint e guiao docente semanal com checkpoints/remediacao.

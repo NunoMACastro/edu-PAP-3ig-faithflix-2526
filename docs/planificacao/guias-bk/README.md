@@ -1,6 +1,6 @@
 # Guias BK - README
 
-`last_updated`: `2026-04-13`
+`last_updated`: `2026-04-14`
 
 ## O que esta pasta contem
 
@@ -24,6 +24,17 @@ Guias de execucao por backlog item (`BK-*`) para apoiar implementacao, validacao
 - Criterios de aceite mensuraveis: condicao observavel + metrica/limiar + evidencia esperada.
 - Politica de negativos: `P0/P1 >= 3` e `P2 >= 1`.
 - Snippet tecnico obrigatorio em todos os guias.
+- Bloco pedagogico obrigatorio em todos os guias:
+- `Objetivo pedagogico`
+- `Tempo estimado`
+- `Erros comuns`
+- `Check de compreensao`
+- Bloco operacional obrigatorio em todos os guias:
+- `Pre-condicoes`
+- `Execucao`
+- `Outputs`
+- `Validacao`
+- `Handoff`
 - `Proximo BK recomendado` obrigatorio: `BK-MFxx-yy` para BK nao terminal, ou `-` apenas no BK terminal.
 
 ## Ordem de execucao
@@ -34,4 +45,4 @@ Guias de execucao por backlog item (`BK-*`) para apoiar implementacao, validacao
 ## Validacao
 
 - Comando oficial: `bash scripts/validate-planificacao.sh`
-- Qualquer drift entre guias, `MF-VIEWS` e `PLANO-SPRINTS` reprova validacao.
+- Qualquer drift entre backlog, matriz, guias, `MF-VIEWS` e `PLANO-SPRINTS` reprova validacao.

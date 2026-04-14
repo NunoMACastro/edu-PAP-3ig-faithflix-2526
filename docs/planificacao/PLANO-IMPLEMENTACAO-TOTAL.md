@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-13`
+- `last_updated`: `2026-04-14`
 
 ## Objetivo
 
@@ -26,7 +26,9 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com r
 2. Operacao do backlog: `docs/planificacao/backlogs/BACKLOG-MVP.md`.
 3. Qualidade dos guias BK: `docs/planificacao/guias-bk/_TEMPLATE-BK.md`.
 4. Gate e execucao real: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
-5. Validacao automatica: `scripts/validate-planificacao.sh`.
+5. Scorecard oficial por sprint: `docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md`.
+6. Guiao docente semanal: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`.
+7. Validacao automatica: `scripts/validate-planificacao.sh`.
 
 ## Macro fases
 
@@ -57,17 +59,20 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com r
 
 - Cobertura de matriz para janela `S1..S4`.
 - Guias da janela conformes ao template v3.
+- Guias da janela com bloco pedagogico + bloco operacional completos.
 - Evidence minima e criterios mensuraveis validados.
 
 ### Gate S8
 
 - Coerencia backlog/matriz/guias para janela `S5..S8`.
 - Auditoria de ownership, prioridade, dependencias e `rf_rnf`.
+- Checkpoints docentes e remediacao semanal registados.
 - Consolidacao de acao corretiva em casos `FAIL`.
 
 ### Gate S12
 
 - Fecho integral `103/103` e `60/60`.
+- Scorecard oficial consolidado sprint-a-sprint com pesos OPSA.
 - Score final consolidado no relatorio de gate `S12`.
 - Parecer final `GO/NO-GO` com assinatura do orientador.
 
@@ -82,3 +87,4 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com r
 - `2026-04-11`: versao revista com equipa correta.
 - `2026-04-13`: reforco de contratos canonicos, governance pedagogica e meta de qualidade `97/100`.
 - `2026-04-13`: removida dependencia de ficheiro externo de score e consolidada avaliacao no relatorio de gates.
+- `2026-04-14`: incorporada hierarquia canonica OPSA adaptada, scorecard oficial por sprint e guiao docente semanal.

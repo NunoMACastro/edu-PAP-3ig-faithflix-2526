@@ -7,11 +7,18 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-13`
+- `last_updated`: `2026-04-14`
 
 ## Objetivo
 
 Garantir rastreabilidade canonica requisito -> BK -> evidencia sem aumentar o numero de BKs do backlog atual.
+
+## Contrato canonico de validacao cruzada
+
+- `bk_id`, `macro`, `owner` e `prioridade` devem refletir o valor oficial do `BACKLOG-MVP.md`.
+- Toda alteracao em backlog que mexa em `owner`, `prioridade`, `dependencias` ou `rf_rnf` obriga revisao da matriz no mesmo sprint.
+- O estado `status_validacao` evolui por gate (`S4`, `S8`, `S12`) e deve estar alinhado com o relatorio de gates.
+- A matriz e fonte de rastreabilidade, mas nao substitui a ordem temporal canonica definida em `PLANO-SPRINTS.md`.
 
 ## Tabela canonica por requisito (103 linhas)
 
@@ -164,3 +171,4 @@ Estes BKs partilham requisitos com outros BKs de base tecnica e, por isso, entra
 ## Changelog
 
 - `2026-04-13`: matriz canonica leve criada para rastreabilidade requisito -> BK -> evidencia.
+- `2026-04-14`: reforcada validacao cruzada com backlog e contrato de fecho por gate.

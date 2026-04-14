@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-13`
+- `last_updated`: `2026-04-14`
 
 ## Objetivo
 
@@ -18,6 +18,27 @@ Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios 
 - Fonte de rastreio requisito -> BK -> evidencia: `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
 - `BACKLOG-MVP.md` continua como fonte operacional de prioridade/estado/capacidade.
 - Divergencias entre backlog e matriz devem ser corrigidas no mesmo ciclo de sprint.
+
+## Contrato canonico de campos BK (fonte oficial)
+
+Campos obrigatorios por linha BK: `bk_id`, `titulo`, `owner`, `apoio`, `prioridade`, `estado`, `esforco`, `dependencias`, `rf_rnf`.
+
+Regras obrigatorias:
+
+1. `bk_id` segue formato `BK-MF[0-8]-[0-9][0-9]`.
+2. `prioridade` so permite `P0|P1|P2`.
+3. `estado` so permite `TODO|IN_PROGRESS|BLOCKED|DONE`.
+4. `esforco` so permite `S|M|L`.
+5. `dependencias` aceita `-` ou lista de `BK-*` existentes no backlog.
+6. `owner`, `prioridade`, `dependencias` e `rf_rnf` devem coincidir 1:1 com cada guia BK.
+
+## Validacao cruzada obrigatoria (sem drift)
+
+1. `BACKLOG-MVP` <-> `MATRIZ-RF-RNF-POR-BK`: cobertura e rastreabilidade sem faltas nem extras.
+2. `BACKLOG-MVP` <-> `guias-bk/MF*/BK-MF*.md`: metadados BK alinhados.
+3. `PLANO-SPRINTS` <-> `MF-VIEWS` <-> `Proximo BK recomendado` dos guias: ordem canonica unica.
+4. `SCORECARD-OFICIAL-POR-SPRINT` <-> `RELATORIO-GATES-S4-S8-S12`: pesos e score consolidados.
+5. `GUIAO-DOCENTE-SEMANAL` <-> execucao de sprint: checkpoints e remediacao registados.
 
 ## Contrato pedagogico v3 (obrigatorio)
 
@@ -263,6 +284,8 @@ Estado do guia indica a fase de criacao documental.
 - Gate `S12`: auditoria final integral para defesa PAP.
 - Relatorio PASS/FAIL oficial: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
 - Score final e regra de aprovacao: consolidados no relatorio de gates (`S4/S8/S12`).
+- Pesos oficiais e formulario de score por sprint: `docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md`.
+- Checkpoints e remediacao docente: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`.
 - Comando de pre-fecho: `bash scripts/validate-planificacao.sh`.
 
 ## Changelog
@@ -272,3 +295,4 @@ Estado do guia indica a fase de criacao documental.
 - `2026-04-13`: adicionado contrato com matriz RF/RNF, politica pedagogica v2 e gates obrigatorios S4/S8/S12.
 - `2026-04-13`: evoluido para contrato pedagogico v3 com score `97/100` e validacao automatica obrigatoria.
 - `2026-04-13`: removidas referencias a ficheiro externo de score; avaliacao documental passa a ser registada diretamente no relatorio de gates.
+- `2026-04-14`: reforcado contrato canonico de campos BK e validacao cruzada backlog<->matriz<->guias<->sprints.

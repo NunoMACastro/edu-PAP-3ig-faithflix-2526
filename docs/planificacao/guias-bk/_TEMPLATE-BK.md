@@ -14,6 +14,57 @@
 - `rf_rnf`: `RFxx/RNFxx/transversal`
 - `last_updated`: `YYYY-MM-DD`
 
+## Bloco pedagogico (obrigatorio)
+
+### Objetivo pedagogico
+
+- Competencia que o aluno vai consolidar neste BK.
+- Ligacao direta da competencia ao contexto real do FaithFlix.
+
+### Tempo estimado
+
+- Planeamento recomendado para este BK: `90-180 min` de execucao focada.
+- Se exceder em `>30 min`, ativar remediacao no guiao docente semanal.
+
+### Erros comuns
+
+- Ignorar dependencias e arrancar implementacao fora de ordem canonica.
+- Fechar BK sem evidencias minimas (`pr`, `proof`, `neg`).
+- Entregar sem validar negativos minimos por prioridade.
+
+### Check de compreensao
+
+- [ ] Sei explicar o objetivo do BK em 30 segundos.
+- [ ] Sei quais sao entradas, saidas e criterio de sucesso.
+- [ ] Sei qual e o `Proximo BK recomendado` e o handoff esperado.
+
+## Bloco operacional (obrigatorio)
+
+### Pre-condicoes
+
+- Dependencias desbloqueadas e alinhadas com `BACKLOG-MVP.md`.
+- Rastreabilidade confirmada em `MATRIZ-RF-RNF-POR-BK.md`.
+
+### Execucao
+
+- Implementar primeiro o caminho principal do BK.
+- Validar integracoes diretas antes de otimizar detalhes.
+
+### Outputs
+
+- Entregavel funcional do BK.
+- Evidencia objetiva (`proof`) e resumo de negativos (`neg`).
+
+### Validacao
+
+- Checklist de smoke + negativos + tecnico concluida.
+- Criterios de aceite mensuraveis validados.
+
+### Handoff
+
+- Registar transicao objetiva para o proximo BK da sequencia.
+- Se houver bloqueio, abrir acao corretiva com owner e prazo.
+
 ## O que vamos fazer neste BK
 
 Descrever objetivo especifico do BK em contexto real (sem texto generico).
