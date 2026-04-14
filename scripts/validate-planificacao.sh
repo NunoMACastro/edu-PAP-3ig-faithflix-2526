@@ -19,6 +19,50 @@ assert_zero() {
   if [ "$actual" = "0" ]; then pass "$name ($actual)"; else fail "$name expected=0 actual=$actual"; fi
 }
 
+expected_date="2026-04-14"
+
+# ------------------------------
+# 0) Governance canonical hierarchy
+# ------------------------------
+governance_missing=0
+for f in \
+  docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md \
+  docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md \
+  docs/planificacao/RELATORIO-CONFORMIDADE-DOCUMENTAL-OPSA-FAITHFLIX.md
+do
+  if [ ! -f "$f" ]; then governance_missing=$((governance_missing+1)); fi
+done
+assert_zero "Governance docs missing (scorecard/guiao/relatorio)" "$governance_missing"
+
+hierarchy_missing=0
+for pattern in \
+  '## Hierarquia canonica de verdade documental (OPSA adaptada ao FaithFlix)' \
+  '### Nivel 0 - Requisitos (fonte normativa)' \
+  '### Nivel 1 - Planeamento canonico de execucao' \
+  '### Nivel 2 - Governanca e rastreabilidade' \
+  '### Nivel 3 - Guias de implementacao por BK' \
+  '### Nivel 4 - Auditoria de gates e conformidade'
+do
+  if ! rg -q --fixed-strings "$pattern" docs/planificacao/README.md; then
+    hierarchy_missing=$((hierarchy_missing+1))
+  fi
+done
+assert_zero "Canonical hierarchy sections missing in plan index" "$hierarchy_missing"
+
+bk_contract_missing=0
+for pattern in \
+  '## Contrato canonico de campos BK (fonte oficial)' \
+  '## Validacao cruzada obrigatoria (sem drift)'
+do
+  if ! rg -q --fixed-strings "$pattern" docs/planificacao/backlogs/BACKLOG-MVP.md; then
+    bk_contract_missing=$((bk_contract_missing+1))
+  fi
+done
+if ! rg -q --fixed-strings '## Contrato canonico de validacao cruzada' docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md; then
+  bk_contract_missing=$((bk_contract_missing+1))
+fi
+assert_zero "Canonical BK contract sections missing" "$bk_contract_missing"
+
 # ------------------------------
 # 1) RF/RNF coverage
 # ------------------------------
@@ -63,17 +107,27 @@ guides_total=$(rg --files docs/planificacao/guias-bk | rg 'BK-MF[0-9]-[0-9]{2}.*
 placeholder_next=$( (rg -l --fixed-strings 'A preencher conforme sequencia/dependencias do backlog.' docs/planificacao/guias-bk/MF*/BK-MF*.md || true) | wc -l | tr -d ' ' )
 generic_objective=$( (rg -l --fixed-strings 'com entrega verificavel, preservando o scope do backlog e o contrato pedagogico de evidencia.' docs/planificacao/guias-bk/MF*/BK-MF*.md || true) | wc -l | tr -d ' ' )
 with_snippet=$( (rg -l '```text' docs/planificacao/guias-bk/MF*/BK-MF*.md || true) | wc -l | tr -d ' ' )
+with_pedagogic_block=$( (rg -l '^## Bloco pedagogico \(obrigatorio\)$' docs/planificacao/guias-bk/MF*/BK-MF*.md || true) | wc -l | tr -d ' ' )
+with_operational_block=$( (rg -l '^## Bloco operacional \(obrigatorio\)$' docs/planificacao/guias-bk/MF*/BK-MF*.md || true) | wc -l | tr -d ' ' )
 
 assert_eq "Guide files total" "60" "$guides_total"
 assert_zero "Guides with placeholder next BK" "$placeholder_next"
 assert_zero "Guides with generic objective phrase" "$generic_objective"
 assert_eq "Guides with snippet block" "60" "$with_snippet"
+assert_eq "Guides with pedagogic block" "60" "$with_pedagogic_block"
+assert_eq "Guides with operational block" "60" "$with_operational_block"
 
 policy_errors=0
 invalid_next_format=0
 terminal_next_count=0
+ped_ops_errors=0
+header_contract_errors=0
 while IFS= read -r f; do
   pri=$(sed -n 's/^- `prioridade`: `\(P[0-2]\)`$/\1/p' "$f")
+  estado=$(sed -n 's/^- `estado`: `\([^`]*\)`$/\1/p' "$f")
+  bk=$(sed -n 's/^- `bk_id`: `\(BK-MF[0-9]-[0-9][0-9]\)`$/\1/p' "$f")
+  doc_id=$(sed -n 's/^- `doc_id`: `\([^`]*\)`$/\1/p' "$f")
+  macro=$(sed -n 's/^- `macro`: `\(MF[0-9]\)`$/\1/p' "$f")
   neg_lines=$(rg -n '^- \[ \] Negativo [0-9]+:' "$f" | wc -l | tr -d ' ')
   next_id=$(awk '
     /## Proximo BK recomendado/{
@@ -86,6 +140,48 @@ while IFS= read -r f; do
       }
     }
   ' "$f")
+
+  for header_key in doc_id bk_id macro owner apoio prioridade estado esforco dependencias rf_rnf last_updated; do
+    key_count=$(rg -c "^- \`$header_key\`: " "$f")
+    if [ "$key_count" != "1" ]; then
+      header_contract_errors=$((header_contract_errors+1))
+      break
+    fi
+  done
+
+  if [ -n "$bk" ] && [ "$doc_id" != "GUIA-${bk}" ]; then
+    header_contract_errors=$((header_contract_errors+1))
+  fi
+  if [[ "$bk" =~ ^BK-(MF[0-8])-[0-9]{2}$ ]]; then
+    if [ "$macro" != "${BASH_REMATCH[1]}" ]; then
+      header_contract_errors=$((header_contract_errors+1))
+    fi
+  else
+    header_contract_errors=$((header_contract_errors+1))
+  fi
+  if ! [[ "$estado" =~ ^(TODO|IN_PROGRESS|BLOCKED|DONE)$ ]]; then
+    header_contract_errors=$((header_contract_errors+1))
+  fi
+
+  for block_pattern in \
+    '## Bloco pedagogico (obrigatorio)' \
+    '### Objetivo pedagogico' \
+    '### Tempo estimado' \
+    '### Erros comuns' \
+    '### Check de compreensao' \
+    '## Bloco operacional (obrigatorio)' \
+    '### Pre-condicoes' \
+    '### Execucao' \
+    '### Outputs' \
+    '### Validacao' \
+    '### Handoff'
+  do
+    if ! rg -q --fixed-strings "$block_pattern" "$f"; then
+      ped_ops_errors=$((ped_ops_errors+1))
+      break
+    fi
+  done
+
   if [[ "$next_id" = "-" ]]; then
     terminal_next_count=$((terminal_next_count+1))
   elif ! [[ "$next_id" =~ ^BK-MF[0-9]-[0-9]{2}$ ]]; then
@@ -102,6 +198,8 @@ done < <(rg --files docs/planificacao/guias-bk | rg 'BK-MF[0-9]-[0-9]{2}.*\.md$'
 assert_zero "Guides violating negative policy" "$policy_errors"
 assert_zero "Guides with invalid next BK format" "$invalid_next_format"
 assert_eq "Guides with terminal next marker '-'" "1" "$terminal_next_count"
+assert_zero "Guides missing pedagogic/operational contract blocks" "$ped_ops_errors"
+assert_zero "Guides violating canonical BK header contract" "$header_contract_errors"
 
 # ------------------------------
 # 4) Cross-integrity backlog <-> guides
@@ -172,7 +270,43 @@ done < <(grep '^| `Sprint [0-9]' docs/planificacao/sprints/PLANO-SPRINTS.md)
 assert_zero "Sprints over 11 points" "$load_errors"
 
 # ------------------------------
-# 6) Canonical order consistency
+# 6) Scorecard + guiao docente checks
+# ------------------------------
+scorecard_weight_sum=$(awk -F'|' '/^\|/ {w=$3; gsub(/[` ]/,"",w); if (w ~ /^[0-9]+$/) s+=w} END{print s+0}' docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md)
+scorecard_sprint_rows=$(grep '^| `Sprint [0-9]' docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md | wc -l | tr -d ' ')
+assert_eq "Scorecard weight sum" "100" "$scorecard_weight_sum"
+assert_eq "Scorecard sprint rows" "12" "$scorecard_sprint_rows"
+
+scorecard_missing=0
+for pattern in \
+  'Rastreabilidade backlog <-> matriz' \
+  'Conformidade dos guias BK' \
+  'Evidencia minima e negativos' \
+  'Cadencia e carga realista' \
+  'Qualidade tecnica e regressao' \
+  'Governanca e handoff'
+do
+  if ! rg -q --fixed-strings "$pattern" docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md; then
+    scorecard_missing=$((scorecard_missing+1))
+  fi
+done
+assert_zero "Scorecard required dimensions missing" "$scorecard_missing"
+
+guiao_missing=0
+for pattern in \
+  '## Checkpoints obrigatorios por dia' \
+  '### Segunda - Arranque controlado' \
+  '### Sexta - Fecho formal' \
+  '## Remediacao orientada a risco'
+do
+  if ! rg -q --fixed-strings "$pattern" docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md; then
+    guiao_missing=$((guiao_missing+1))
+  fi
+done
+assert_zero "Guiao docente sections missing" "$guiao_missing"
+
+# ------------------------------
+# 7) Canonical order consistency
 # ------------------------------
 read -r sprint_order_total sprint_order_unique sprint_order_duplicates mf_order_total mf_only_in_sprint mf_only_in_mfviews mf_relative_conflicts guide_next_conflicts guide_terminal_count <<<"$(python3 - <<'PY'
 import re
@@ -280,7 +414,7 @@ assert_zero "Guide next-BK conflicts vs canonical order" "$guide_next_conflicts"
 assert_eq "Guide terminal next markers" "1" "$guide_terminal_count"
 
 # ------------------------------
-# 7) Gate format + references
+# 8) Gate format + references
 # ------------------------------
 gate_missing=0
 for pattern in \
@@ -288,7 +422,9 @@ for pattern in \
   '## Execucao real - Gate S4' \
   '## Execucao real - Gate S8' \
   '## Execucao real - Gate S12' \
-  'scripts/validate-planificacao.sh'
+  'scripts/validate-planificacao.sh' \
+  'SCORECARD-OFICIAL-POR-SPRINT.md' \
+  'GUIAO-DOCENTE-SEMANAL.md'
 do
   if ! rg -q --fixed-strings "$pattern" docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md; then
     gate_missing=$((gate_missing+1))
@@ -297,7 +433,22 @@ done
 assert_zero "Gate report required sections missing" "$gate_missing"
 
 # ------------------------------
-# 8) Core metadata alignment
+# 9) Conformidade report checks
+# ------------------------------
+conformidade_missing=0
+for pattern in \
+  '## Resultado de validacao automatica' \
+  'VALIDATION_RESULT=PASS errors=0' \
+  '## Evidencia dos criterios de aceite'
+do
+  if ! rg -q --fixed-strings "$pattern" docs/planificacao/RELATORIO-CONFORMIDADE-DOCUMENTAL-OPSA-FAITHFLIX.md; then
+    conformidade_missing=$((conformidade_missing+1))
+  fi
+done
+assert_zero "Conformidade report required sections missing" "$conformidade_missing"
+
+# ------------------------------
+# 10) Core metadata alignment
 # ------------------------------
 meta_errors=0
 for f in \
@@ -306,15 +457,21 @@ for f in \
   docs/planificacao/backlogs/BACKLOG-MVP.md \
   docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md \
   docs/planificacao/sprints/PLANO-SPRINTS.md \
+  docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md \
+  docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md \
   docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md \
+  docs/planificacao/RELATORIO-CONFORMIDADE-DOCUMENTAL-OPSA-FAITHFLIX.md \
   docs/planificacao/guias-bk/README.md
 
 do
-  if ! rg -q --fixed-strings '2026-04-13' "$f"; then
+  if ! rg -q --fixed-strings "$expected_date" "$f"; then
     meta_errors=$((meta_errors+1))
   fi
 done
 assert_zero "Core docs without aligned last_updated date" "$meta_errors"
+
+guides_date_errors=$( (rg --files-without-match --fixed-strings "\`last_updated\`: \`$expected_date\`" docs/planificacao/guias-bk/MF*/BK-MF*.md || true) | wc -l | tr -d ' ' )
+assert_zero "Guides without aligned last_updated date" "$guides_date_errors"
 
 # ------------------------------
 # Final

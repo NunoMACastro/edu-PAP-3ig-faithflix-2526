@@ -12,7 +12,32 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF5-04`
 - `rf_rnf`: `RF60`
-- `last_updated`: `2026-04-13`
+- `last_updated`: `2026-04-14`
+
+## Bloco pedagogico (obrigatorio)
+
+### Objetivo pedagogico
+
+- Competencia pratica que este BK treina no contexto do FaithFlix.
+- Ligacao direta do BK ao objetivo da sprint atual.
+
+### Tempo estimado
+
+- Tempo recomendado: `90-180 min` de foco tecnico.
+- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
+
+### Erros comuns
+
+- Comecar sem validar dependencias.
+- Fechar BK sem `pr/proof/neg`.
+- Ignorar negativos minimos por prioridade.
+
+### Check de compreensao
+
+- [ ] Sei explicar o objetivo do BK em 30 segundos.
+- [ ] Sei distinguir scope e scope-out deste BK.
+- [ ] Sei qual e o handoff para o proximo BK.
+
 
 ## O que vamos fazer neste BK
 
@@ -23,6 +48,29 @@ Entregar `Configuracao de integracoes admin` cobrindo `RF60` na `MF5`, com fluxo
 - Fecha capacidade critica desta macro sem criar drift de backlog.
 - Reduz risco tecnico para o proximo BK da sequencia (`BK-MF5-07`).
 - Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+
+## Bloco operacional (obrigatorio)
+
+### Pre-condicoes
+
+- Confirmar dependencias e rastreabilidade antes de executar.
+
+### Execucao
+
+- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+
+### Outputs
+
+- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+
+### Validacao
+
+- Fechar checklist de smoke, negativos e criterios mensuraveis.
+
+### Handoff
+
+- Preparar transicao objetiva para o `Proximo BK recomendado`.
+
 
 ## Pre-condicoes de entrada
 

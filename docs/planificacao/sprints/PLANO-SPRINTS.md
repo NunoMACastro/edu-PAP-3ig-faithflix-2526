@@ -70,7 +70,7 @@ Regra de uso: score preenchido no fim de cada sprint e consolidado por janela de
 Checkpoints obrigatorios:
 
 1. Segunda: arranque, risco inicial e ownership.
-2. Terca: controlo tecnico intermédio e rastreabilidade.
+2. Terca: controlo tecnico intermedio e rastreabilidade.
 3. Quarta: decisao de corte e tratamento de blockers.
 4. Quinta: pre-gate interno e score preliminar.
 5. Sexta: fecho, score final e plano corretivo.
@@ -152,7 +152,7 @@ Remediacao minima:
 - `% BK DONE`
 - `% BK P0 DONE`
 - `numero de blockers`
-- `numero de regressões`
+- `numero de regressoes`
 - `tempo medio de fecho por BK`
 - `% guias conformes ao template v3`
 - `% requisitos com rastreabilidade validada na matriz RF/RNF`
