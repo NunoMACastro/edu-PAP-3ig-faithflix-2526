@@ -12,14 +12,19 @@
 - `esforco`: `S`
 - `dependencias`: `BK-MF6-03,BK-MF6-05`
 - `rf_rnf`: `transversal`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S11`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF7-01`
+- `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-06-validacao-tecnica-final-por-gate.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Validacao tecnica final por gate` com rastreabilidade explicita para `transversal`.
+- Executar o BK `BK-MF6-06` no contexto da macro `MF6` e da sprint `S11`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Validacao tecnica final por gate` cobrindo `transversal` na `MF6`, com
 
 - Dependencias declaradas: `BK-MF6-03,BK-MF6-05`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Validacao tecnica final por gate` cobrindo `transversal` na `MF6`, com
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `transversal`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF6-06`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Validacao tecnica final por gate` cobrindo `transversal` na `MF6`, com
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF6-06

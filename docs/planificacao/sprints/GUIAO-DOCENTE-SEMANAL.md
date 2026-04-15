@@ -62,7 +62,7 @@ Dar ao orientador um guiao semanal simples e executavel para controlo de sprint,
 - [ ] Blockers com owner e prazo definidos.
 - [ ] BKs replaneados sem ultrapassar 11 pontos na sprint.
 - [ ] Guias atualizados com handoff claro para proximo BK.
-- [ ] Scorecard e relatorio de gate alinhados.
+- [ ] Scorecard e checklist de gate alinhados.
 
 ## Evidencia minima do orientador
 

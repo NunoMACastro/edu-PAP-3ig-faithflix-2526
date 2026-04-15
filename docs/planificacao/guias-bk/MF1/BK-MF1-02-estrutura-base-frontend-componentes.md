@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF0-06`
 - `rf_rnf`: `RNF28`
+- `fase_documental`: `Fase 1`
+- `sprint`: `S01`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF1-03`
+- `guia_path`: `docs/planificacao/guias-bk/MF1/BK-MF1-02-estrutura-base-frontend-componentes.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Estrutura base frontend por componentes` com rastreabilidade explicita para `RNF28`.
+- Executar o BK `BK-MF1-02` no contexto da macro `MF1` e da sprint `S01`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Estrutura base frontend por componentes` cobrindo `RNF28` na `MF1`, co
 
 - Dependencias declaradas: `BK-MF0-06`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Estrutura base frontend por componentes` cobrindo `RNF28` na `MF1`, co
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RNF28`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF1-02`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Estrutura base frontend por componentes` cobrindo `RNF28` na `MF1`, co
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF1-02

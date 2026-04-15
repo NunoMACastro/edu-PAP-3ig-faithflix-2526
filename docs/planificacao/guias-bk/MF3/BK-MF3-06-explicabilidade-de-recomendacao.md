@@ -12,14 +12,19 @@
 - `esforco`: `S`
 - `dependencias`: `BK-MF3-05`
 - `rf_rnf`: `RF28, RNF34`
+- `fase_documental`: `Fase 2`
+- `sprint`: `S06`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF3-07`
+- `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Explicabilidade de recomendacao` com rastreabilidade explicita para `RF28, RNF34`.
+- Executar o BK `BK-MF3-06` no contexto da macro `MF3` e da sprint `S06`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Explicabilidade de recomendacao` cobrindo `RF28, RNF34` na `MF3`, com 
 
 - Dependencias declaradas: `BK-MF3-05`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Explicabilidade de recomendacao` cobrindo `RF28, RNF34` na `MF3`, com 
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF28, RNF34`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF3-06`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Explicabilidade de recomendacao` cobrindo `RF28, RNF34` na `MF3`, com 
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF3-06

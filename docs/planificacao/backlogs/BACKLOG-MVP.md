@@ -15,7 +15,7 @@ Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios 
 
 ## Contrato de rastreabilidade canonica
 
-- Fonte de rastreio requisito -> BK -> evidencia: `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Fonte de rastreio requisito -> BK -> evidencia: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 - `BACKLOG-MVP.md` continua como fonte operacional de prioridade/estado/capacidade.
 - Divergencias entre backlog e matriz devem ser corrigidas no mesmo ciclo de sprint.
 
@@ -34,10 +34,10 @@ Regras obrigatorias:
 
 ## Validacao cruzada obrigatoria (sem drift)
 
-1. `BACKLOG-MVP` <-> `MATRIZ-RF-RNF-POR-BK`: cobertura e rastreabilidade sem faltas nem extras.
+1. `BACKLOG-MVP` <-> `MATRIZ-CANONICA-BK`: cobertura e rastreabilidade sem faltas nem extras.
 2. `BACKLOG-MVP` <-> `guias-bk/MF*/BK-MF*.md`: metadados BK alinhados.
 3. `PLANO-SPRINTS` <-> `MF-VIEWS` <-> `Proximo BK recomendado` dos guias: ordem canonica unica.
-4. `SCORECARD-OFICIAL-POR-SPRINT` <-> `RELATORIO-GATES-S4-S8-S12`: pesos e score consolidados.
+4. `SCORECARD-SPRINTS` e `GUIAO-DOCENTE-SEMANAL`: pesos, score e checkpoints consolidados.
 5. `GUIAO-DOCENTE-SEMANAL` <-> execucao de sprint: checkpoints e remediacao registados.
 
 ## Contrato pedagogico v3 (obrigatorio)
@@ -238,9 +238,9 @@ Estado do guia indica a fase de criacao documental.
 | ----------- | --------------------------------- | ------- | --------------------------- | --- | ------ | ------- | ----------------------- | ------------------- |
 | `BK-MF6-01` | Suite de regressao backend        | Kaue    | Matheus                     | P0  | TODO   | M       | `BK-MF5-08`             | RNF29               |
 | `BK-MF6-02` | Suite de regressao frontend       | Kaue    | Mateus                      | P0  | TODO   | M       | `BK-MF5-08`             | RNF29               |
-| `BK-MF6-03` | Hardening seguranca e privacidade | Matheus | Kaue                        | P0  | TODO   | M       | `BK-MF6-01`             | RNF13..RNF20, RNF37 |
-| `BK-MF6-04` | Otimizacao de performance critica | Davi    | Mateus                      | P1  | TODO   | M       | `BK-MF6-02`             | RNF07..RNF12        |
-| `BK-MF6-05` | Acessibilidade e UX final         | Mateus  | Kaue                        | P1  | TODO   | M       | `BK-MF6-02`             | RNF01..RNF06        |
+| `BK-MF6-03` | Hardening seguranca e privacidade | Matheus | Kaue                        | P0  | TODO   | M       | `BK-MF6-01`             | RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37 |
+| `BK-MF6-04` | Otimizacao de performance critica | Davi    | Mateus                      | P1  | TODO   | M       | `BK-MF6-02`             | RNF07, RNF08, RNF09, RNF10, RNF11, RNF12 |
+| `BK-MF6-05` | Acessibilidade e UX final         | Mateus  | Kaue                        | P1  | TODO   | M       | `BK-MF6-02`             | RNF01, RNF02, RNF03, RNF04, RNF05, RNF06 |
 | `BK-MF6-06` | Validacao tecnica final por gate  | Nuno    | Matheus, Mateus, Davi, Kaue | P0  | TODO   | S       | `BK-MF6-03`,`BK-MF6-05` | transversal         |
 
 ---
@@ -250,7 +250,7 @@ Estado do guia indica a fase de criacao documental.
 | BK          | Titulo                                | Owner   | Apoio                       | Pri | Estado | Esforco | Dependencias            | RF/RNF       |
 | ----------- | ------------------------------------- | ------- | --------------------------- | --- | ------ | ------- | ----------------------- | ------------ |
 | `BK-MF7-01` | Matriz de cobertura RF -> evidencia   | Kaue    | Matheus, Mateus, Davi       | P0  | TODO   | M       | `BK-MF6-06`             | RF01..RF63   |
-| `BK-MF7-02` | Matriz de cobertura RNF -> validacao  | Davi    | Kaue                        | P0  | TODO   | M       | `BK-MF6-06`             | RNF01..RNF40 |
+| `BK-MF7-02` | Matriz de cobertura RNF -> validacao  | Davi    | Kaue                        | P0  | TODO   | M       | `BK-MF6-06`             | RNF01, RNF02, RNF03, RNF04, RNF05, RNF06, RNF07, RNF08, RNF09, RNF10, RNF11, RNF12, RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF27, RNF28, RNF29, RNF30, RNF31, RNF32, RNF33, RNF34, RNF35, RNF36, RNF37, RNF38, RNF39, RNF40 |
 | `BK-MF7-03` | Roteiro de demo final                 | Mateus  | Kaue                        | P1  | TODO   | S       | `BK-MF7-01`             | transversal  |
 | `BK-MF7-04` | Ensaio tecnico da defesa              | Matheus | Davi                        | P1  | TODO   | S       | `BK-MF7-03`             | transversal  |
 | `BK-MF7-05` | Avaliacao final e feedback orientador | Nuno    | Matheus, Mateus, Davi, Kaue | P0  | TODO   | S       | `BK-MF7-02`,`BK-MF7-04` | transversal  |
@@ -282,9 +282,8 @@ Estado do guia indica a fase de criacao documental.
 - Gate `S4`: auditoria de cobertura de matriz + conformidade de guias da janela S1..S4.
 - Gate `S8`: auditoria de coerencia backlog/matriz/guias para S5..S8.
 - Gate `S12`: auditoria final integral para defesa PAP.
-- Relatorio PASS/FAIL oficial: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
-- Score final e regra de aprovacao: consolidados no relatorio de gates (`S4/S8/S12`).
-- Pesos oficiais e formulario de score por sprint: `docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md`.
+- Score final e regra de aprovacao: consolidados no processo de gate (`S4/S8/S12`).
+- Pesos oficiais e formulario de score por sprint: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`.
 - Checkpoints e remediacao docente: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`.
 - Comando de pre-fecho: `bash scripts/validate-planificacao.sh`.
 
@@ -294,5 +293,5 @@ Estado do guia indica a fase de criacao documental.
 - `2026-04-12`: secao de ligacao para guias BK atualizada para cobertura total (60/60), com estado por fase de criacao documental.
 - `2026-04-13`: adicionado contrato com matriz RF/RNF, politica pedagogica v2 e gates obrigatorios S4/S8/S12.
 - `2026-04-13`: evoluido para contrato pedagogico v3 com score `97/100` e validacao automatica obrigatoria.
-- `2026-04-13`: removidas referencias a ficheiro externo de score; avaliacao documental passa a ser registada diretamente no relatorio de gates.
+- `2026-04-13`: removidas referencias a ficheiro externo de score; avaliacao documental passa a ser registada diretamente no processo de gate.
 - `2026-04-14`: reforcado contrato canonico de campos BK e validacao cruzada backlog<->matriz<->guias<->sprints.

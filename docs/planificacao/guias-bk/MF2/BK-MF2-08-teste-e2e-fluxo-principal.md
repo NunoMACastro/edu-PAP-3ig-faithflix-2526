@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF2-01,BK-MF2-07`
 - `rf_rnf`: `RNF07, RNF08`
+- `fase_documental`: `Fase 1`
+- `sprint`: `S04`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF3-01`
+- `guia_path`: `docs/planificacao/guias-bk/MF2/BK-MF2-08-teste-e2e-fluxo-principal.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Teste E2E do fluxo principal` com rastreabilidade explicita para `RNF07, RNF08`.
+- Executar o BK `BK-MF2-08` no contexto da macro `MF2` e da sprint `S04`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Teste E2E do fluxo principal` cobrindo `RNF07, RNF08` na `MF2`, com fl
 
 - Dependencias declaradas: `BK-MF2-01,BK-MF2-07`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Teste E2E do fluxo principal` cobrindo `RNF07, RNF08` na `MF2`, com fl
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RNF07, RNF08`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF2-08`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Teste E2E do fluxo principal` cobrindo `RNF07, RNF08` na `MF2`, com fl
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF2-08

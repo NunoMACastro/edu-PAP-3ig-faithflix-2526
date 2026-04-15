@@ -12,14 +12,19 @@
 - `esforco`: `L`
 - `dependencias`: `BK-MF1-01`
 - `rf_rnf`: `RF06, RF07, RF09, RF10`
+- `fase_documental`: `Fase 1`
+- `sprint`: `S03`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF2-04`
+- `guia_path`: `docs/planificacao/guias-bk/MF2/BK-MF2-03-crud-catalogo-taxonomias.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `CRUD de catalogo e taxonomias` com rastreabilidade explicita para `RF06, RF07, RF09, RF10`.
+- Executar o BK `BK-MF2-03` no contexto da macro `MF2` e da sprint `S03`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `CRUD de catalogo e taxonomias` cobrindo `RF06, RF07, RF09, RF10` na `M
 
 - Dependencias declaradas: `BK-MF1-01`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `CRUD de catalogo e taxonomias` cobrindo `RF06, RF07, RF09, RF10` na `M
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF06, RF07, RF09, RF10`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF2-03`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `CRUD de catalogo e taxonomias` cobrindo `RF06, RF07, RF09, RF10` na `M
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF2-03

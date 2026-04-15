@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF1-02`
 - `rf_rnf`: `RNF05, RNF30`
+- `fase_documental`: `Fase 1`
+- `sprint`: `S02`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF1-04`
+- `guia_path`: `docs/planificacao/guias-bk/MF1/BK-MF1-03-cliente-api-frontend-tratamento-erro.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Cliente API frontend com tratamento de erro` com rastreabilidade explicita para `RNF05, RNF30`.
+- Executar o BK `BK-MF1-03` no contexto da macro `MF1` e da sprint `S02`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Cliente API frontend com tratamento de erro` cobrindo `RNF05, RNF30` n
 
 - Dependencias declaradas: `BK-MF1-02`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Cliente API frontend com tratamento de erro` cobrindo `RNF05, RNF30` n
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RNF05, RNF30`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF1-03`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Cliente API frontend com tratamento de erro` cobrindo `RNF05, RNF30` n
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF1-03

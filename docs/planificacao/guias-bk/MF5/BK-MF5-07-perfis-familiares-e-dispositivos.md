@@ -12,14 +12,19 @@
 - `esforco`: `L`
 - `dependencias`: `BK-MF2-02,BK-MF2-05`
 - `rf_rnf`: `RF61, RF62`
+- `fase_documental`: `Fase 2`
+- `sprint`: `S10`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF5-08`
+- `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-07-perfis-familiares-e-dispositivos.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Perfis familiares e dispositivos` com rastreabilidade explicita para `RF61, RF62`.
+- Executar o BK `BK-MF5-07` no contexto da macro `MF5` e da sprint `S10`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Perfis familiares e dispositivos` cobrindo `RF61, RF62` na `MF5`, com 
 
 - Dependencias declaradas: `BK-MF2-02,BK-MF2-05`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Perfis familiares e dispositivos` cobrindo `RF61, RF62` na `MF5`, com 
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF61, RF62`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF5-07`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Perfis familiares e dispositivos` cobrindo `RF61, RF62` na `MF5`, com 
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF5-07

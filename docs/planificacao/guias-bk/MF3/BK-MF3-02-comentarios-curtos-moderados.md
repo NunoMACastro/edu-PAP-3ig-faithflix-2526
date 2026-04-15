@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF3-01`
 - `rf_rnf`: `RF20`
+- `fase_documental`: `Fase 2`
+- `sprint`: `S05`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF3-03`
+- `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-02-comentarios-curtos-moderados.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Comentarios curtos moderados` com rastreabilidade explicita para `RF20`.
+- Executar o BK `BK-MF3-02` no contexto da macro `MF3` e da sprint `S05`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Comentarios curtos moderados` cobrindo `RF20` na `MF3`, com fluxo prin
 
 - Dependencias declaradas: `BK-MF3-01`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Comentarios curtos moderados` cobrindo `RF20` na `MF3`, com fluxo prin
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF20`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF3-02`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Comentarios curtos moderados` cobrindo `RF20` na `MF3`, com fluxo prin
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF3-02

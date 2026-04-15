@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF5-01`
 - `rf_rnf`: `RF56`
+- `fase_documental`: `Fase 1`
+- `sprint`: `S09`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF5-03`
+- `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-02-eliminacao-conta-dados.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Eliminacao de conta e dados` com rastreabilidade explicita para `RF56`.
+- Executar o BK `BK-MF5-02` no contexto da macro `MF5` e da sprint `S09`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Eliminacao de conta e dados` cobrindo `RF56` na `MF5`, com fluxo princ
 
 - Dependencias declaradas: `BK-MF5-01`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Eliminacao de conta e dados` cobrindo `RF56` na `MF5`, com fluxo princ
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF56`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF5-02`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Eliminacao de conta e dados` cobrindo `RF56` na `MF5`, com fluxo princ
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF5-02

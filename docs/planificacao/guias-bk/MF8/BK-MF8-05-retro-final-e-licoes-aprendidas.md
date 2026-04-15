@@ -12,14 +12,19 @@
 - `esforco`: `S`
 - `dependencias`: `BK-MF8-04`
 - `rf_rnf`: `transversal`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S12`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `-`
+- `guia_path`: `docs/planificacao/guias-bk/MF8/BK-MF8-05-retro-final-e-licoes-aprendidas.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Retro final e licoes aprendidas` com rastreabilidade explicita para `transversal`.
+- Executar o BK `BK-MF8-05` no contexto da macro `MF8` e da sprint `S12`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Retro final e licoes aprendidas` cobrindo `transversal` na `MF8`, com 
 
 - Dependencias declaradas: `BK-MF8-04`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Retro final e licoes aprendidas` cobrindo `transversal` na `MF8`, com 
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `transversal`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF8-05`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Retro final e licoes aprendidas` cobrindo `transversal` na `MF8`, com 
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF8-05

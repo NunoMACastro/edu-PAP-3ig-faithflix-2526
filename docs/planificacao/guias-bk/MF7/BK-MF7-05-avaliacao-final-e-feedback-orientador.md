@@ -12,14 +12,19 @@
 - `esforco`: `S`
 - `dependencias`: `BK-MF7-02,BK-MF7-04`
 - `rf_rnf`: `transversal`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S12`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF8-01`
+- `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-05-avaliacao-final-e-feedback-orientador.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Avaliacao final e feedback orientador` com rastreabilidade explicita para `transversal`.
+- Executar o BK `BK-MF7-05` no contexto da macro `MF7` e da sprint `S12`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Avaliacao final e feedback orientador` cobrindo `transversal` na `MF7`
 
 - Dependencias declaradas: `BK-MF7-02,BK-MF7-04`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Avaliacao final e feedback orientador` cobrindo `transversal` na `MF7`
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `transversal`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-05`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Avaliacao final e feedback orientador` cobrindo `transversal` na `MF7`
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF7-05

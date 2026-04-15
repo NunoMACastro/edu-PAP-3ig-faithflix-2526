@@ -12,14 +12,19 @@
 - `esforco`: `S`
 - `dependencias`: `-`
 - `rf_rnf`: `transversal`
+- `fase_documental`: `Fase 1`
+- `sprint`: `S01`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF0-02`
+- `guia_path`: `docs/planificacao/guias-bk/MF0/BK-MF0-01-publicar-plano-total.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Publicar plano total` com rastreabilidade explicita para `transversal`.
+- Executar o BK `BK-MF0-01` no contexto da macro `MF0` e da sprint `S01`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Publicar plano total` cobrindo `transversal` na `MF0`, com fluxo princ
 
 - Sem dependencias bloqueantes para iniciar este BK.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Publicar plano total` cobrindo `transversal` na `MF0`, com fluxo princ
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `transversal`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF0-01`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Publicar plano total` cobrindo `transversal` na `MF0`, com fluxo princ
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF0-01

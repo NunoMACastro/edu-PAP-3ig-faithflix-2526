@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF4-05`
 - `rf_rnf`: `RF46, RF47, RF48`
+- `fase_documental`: `Fase 2`
+- `sprint`: `S08`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF4-07`
+- `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Relatorios e historico por associacao` com rastreabilidade explicita para `RF46, RF47, RF48`.
+- Executar o BK `BK-MF4-06` no contexto da macro `MF4` e da sprint `S08`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Relatorios e historico por associacao` cobrindo `RF46, RF47, RF48` na 
 
 - Dependencias declaradas: `BK-MF4-05`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Relatorios e historico por associacao` cobrindo `RF46, RF47, RF48` na 
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF46, RF47, RF48`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF4-06`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Relatorios e historico por associacao` cobrindo `RF46, RF47, RF48` na 
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF4-06

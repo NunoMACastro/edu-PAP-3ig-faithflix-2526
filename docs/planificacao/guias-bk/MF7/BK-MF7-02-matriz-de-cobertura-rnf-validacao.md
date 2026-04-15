@@ -11,15 +11,20 @@
 - `estado`: `TODO`
 - `esforco`: `M`
 - `dependencias`: `BK-MF6-06`
-- `rf_rnf`: `RNF01..RNF40`
+- `rf_rnf`: `RNF01, RNF02, RNF03, RNF04, RNF05, RNF06, RNF07, RNF08, RNF09, RNF10, RNF11, RNF12, RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF27, RNF28, RNF29, RNF30, RNF31, RNF32, RNF33, RNF34, RNF35, RNF36, RNF37, RNF38, RNF39, RNF40`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S11`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF7-03`
+- `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-02-matriz-de-cobertura-rnf-validacao.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Matriz de cobertura RNF -> validacao` com rastreabilidade explicita para `RNF01, RNF02, RNF03, RNF04, RNF05, RNF06, RNF07, RNF08, RNF09, RNF10, RNF11, RNF12, RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF27, RNF28, RNF29, RNF30, RNF31, RNF32, RNF33, RNF34, RNF35, RNF36, RNF37, RNF38, RNF39, RNF40`.
+- Executar o BK `BK-MF7-02` no contexto da macro `MF7` e da sprint `S11`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Matriz de cobertura RNF -> validacao` cobrindo `RNF01..RNF40` na `MF7`
 
 - Dependencias declaradas: `BK-MF6-06`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Matriz de cobertura RNF -> validacao` cobrindo `RNF01..RNF40` na `MF7`
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RNF01..RNF40`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-02`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Matriz de cobertura RNF -> validacao` cobrindo `RNF01..RNF40` na `MF7`
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF7-02

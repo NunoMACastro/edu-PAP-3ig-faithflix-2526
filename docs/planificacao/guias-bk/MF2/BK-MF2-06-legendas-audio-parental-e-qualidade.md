@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF2-05`
 - `rf_rnf`: `RF13, RF14, RF15`
+- `fase_documental`: `Fase 2`
+- `sprint`: `S04`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF2-07`
+- `guia_path`: `docs/planificacao/guias-bk/MF2/BK-MF2-06-legendas-audio-parental-e-qualidade.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Legendas/audio, parental e qualidade` com rastreabilidade explicita para `RF13, RF14, RF15`.
+- Executar o BK `BK-MF2-06` no contexto da macro `MF2` e da sprint `S04`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Legendas/audio, parental e qualidade` cobrindo `RF13, RF14, RF15` na `
 
 - Dependencias declaradas: `BK-MF2-05`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Legendas/audio, parental e qualidade` cobrindo `RF13, RF14, RF15` na `
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF13, RF14, RF15`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF2-06`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Legendas/audio, parental e qualidade` cobrindo `RF13, RF14, RF15` na `
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF2-06

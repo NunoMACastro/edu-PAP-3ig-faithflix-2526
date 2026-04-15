@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF3-03`
 - `rf_rnf`: `RF23, RF24, RF25`
+- `fase_documental`: `Fase 2`
+- `sprint`: `S05`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF3-05`
+- `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-04-filtros-carrosseis-e-relacionados.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Filtros, carrosseis e relacionados` com rastreabilidade explicita para `RF23, RF24, RF25`.
+- Executar o BK `BK-MF3-04` no contexto da macro `MF3` e da sprint `S05`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Filtros, carrosseis e relacionados` cobrindo `RF23, RF24, RF25` na `MF
 
 - Dependencias declaradas: `BK-MF3-03`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Filtros, carrosseis e relacionados` cobrindo `RF23, RF24, RF25` na `MF
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF23, RF24, RF25`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF3-04`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Filtros, carrosseis e relacionados` cobrindo `RF23, RF24, RF25` na `MF
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF3-04

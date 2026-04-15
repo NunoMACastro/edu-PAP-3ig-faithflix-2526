@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF5-08`
 - `rf_rnf`: `RNF29`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S10`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF6-02`
+- `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-01-suite-de-regressao-backend.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Suite de regressao backend` com rastreabilidade explicita para `RNF29`.
+- Executar o BK `BK-MF6-01` no contexto da macro `MF6` e da sprint `S10`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Suite de regressao backend` cobrindo `RNF29` na `MF6`, com fluxo princ
 
 - Dependencias declaradas: `BK-MF5-08`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Suite de regressao backend` cobrindo `RNF29` na `MF6`, com fluxo princ
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RNF29`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF6-01`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Suite de regressao backend` cobrindo `RNF29` na `MF6`, com fluxo princ
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF6-01

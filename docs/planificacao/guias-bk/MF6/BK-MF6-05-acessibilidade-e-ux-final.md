@@ -11,15 +11,20 @@
 - `estado`: `TODO`
 - `esforco`: `M`
 - `dependencias`: `BK-MF6-02`
-- `rf_rnf`: `RNF01..RNF06`
+- `rf_rnf`: `RNF01, RNF02, RNF03, RNF04, RNF05, RNF06`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S11`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF6-06`
+- `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-05-acessibilidade-e-ux-final.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Acessibilidade e UX final` com rastreabilidade explicita para `RNF01, RNF02, RNF03, RNF04, RNF05, RNF06`.
+- Executar o BK `BK-MF6-05` no contexto da macro `MF6` e da sprint `S11`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Acessibilidade e UX final` cobrindo `RNF01..RNF06` na `MF6`, com fluxo
 
 - Dependencias declaradas: `BK-MF6-02`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Acessibilidade e UX final` cobrindo `RNF01..RNF06` na `MF6`, com fluxo
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RNF01..RNF06`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF6-05`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Acessibilidade e UX final` cobrindo `RNF01..RNF06` na `MF6`, com fluxo
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF6-05

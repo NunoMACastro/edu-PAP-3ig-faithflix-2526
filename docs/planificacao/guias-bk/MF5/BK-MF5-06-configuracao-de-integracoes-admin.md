@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF5-04`
 - `rf_rnf`: `RF60`
+- `fase_documental`: `Fase 2`
+- `sprint`: `S10`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF5-07`
+- `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Configuracao de integracoes admin` com rastreabilidade explicita para `RF60`.
+- Executar o BK `BK-MF5-06` no contexto da macro `MF5` e da sprint `S10`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Configuracao de integracoes admin` cobrindo `RF60` na `MF5`, com fluxo
 
 - Dependencias declaradas: `BK-MF5-04`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Configuracao de integracoes admin` cobrindo `RF60` na `MF5`, com fluxo
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF60`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF5-06`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Configuracao de integracoes admin` cobrindo `RF60` na `MF5`, com fluxo
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF5-06

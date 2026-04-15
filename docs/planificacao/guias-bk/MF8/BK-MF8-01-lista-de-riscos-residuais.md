@@ -12,14 +12,19 @@
 - `esforco`: `S`
 - `dependencias`: `BK-MF7-05`
 - `rf_rnf`: `transversal`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S12`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF8-02`
+- `guia_path`: `docs/planificacao/guias-bk/MF8/BK-MF8-01-lista-de-riscos-residuais.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Lista de riscos residuais` com rastreabilidade explicita para `transversal`.
+- Executar o BK `BK-MF8-01` no contexto da macro `MF8` e da sprint `S12`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Lista de riscos residuais` cobrindo `transversal` na `MF8`, com fluxo 
 
 - Dependencias declaradas: `BK-MF7-05`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Lista de riscos residuais` cobrindo `transversal` na `MF8`, com fluxo 
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `transversal`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF8-01`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Lista de riscos residuais` cobrindo `transversal` na `MF8`, com fluxo 
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF8-01

@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF4-01`
 - `rf_rnf`: `RF52, RF53, RF54`
+- `fase_documental`: `Fase 2`
+- `sprint`: `S07`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF4-03`
+- `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-08-notificacoes-transacionais-e-preferencias.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Notificacoes transacionais e preferencias` com rastreabilidade explicita para `RF52, RF53, RF54`.
+- Executar o BK `BK-MF4-08` no contexto da macro `MF4` e da sprint `S07`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Notificacoes transacionais e preferencias` cobrindo `RF52, RF53, RF54`
 
 - Dependencias declaradas: `BK-MF4-01`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Notificacoes transacionais e preferencias` cobrindo `RF52, RF53, RF54`
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF52, RF53, RF54`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF4-08`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Notificacoes transacionais e preferencias` cobrindo `RF52, RF53, RF54`
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF4-08

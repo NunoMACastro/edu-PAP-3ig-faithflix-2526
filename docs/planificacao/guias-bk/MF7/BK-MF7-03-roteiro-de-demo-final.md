@@ -12,14 +12,19 @@
 - `esforco`: `S`
 - `dependencias`: `BK-MF7-01`
 - `rf_rnf`: `transversal`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S12`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF7-04`
+- `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-03-roteiro-de-demo-final.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Roteiro de demo final` com rastreabilidade explicita para `transversal`.
+- Executar o BK `BK-MF7-03` no contexto da macro `MF7` e da sprint `S12`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Roteiro de demo final` cobrindo `transversal` na `MF7`, com fluxo prin
 
 - Dependencias declaradas: `BK-MF7-01`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Roteiro de demo final` cobrindo `transversal` na `MF7`, com fluxo prin
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `transversal`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-03`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Roteiro de demo final` cobrindo `transversal` na `MF7`, com fluxo prin
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF7-03

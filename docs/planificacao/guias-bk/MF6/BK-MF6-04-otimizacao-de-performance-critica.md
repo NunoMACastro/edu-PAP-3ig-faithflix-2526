@@ -11,15 +11,20 @@
 - `estado`: `TODO`
 - `esforco`: `M`
 - `dependencias`: `BK-MF6-02`
-- `rf_rnf`: `RNF07..RNF12`
+- `rf_rnf`: `RNF07, RNF08, RNF09, RNF10, RNF11, RNF12`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S11`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF6-05`
+- `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-04-otimizacao-de-performance-critica.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Otimizacao de performance critica` com rastreabilidade explicita para `RNF07, RNF08, RNF09, RNF10, RNF11, RNF12`.
+- Executar o BK `BK-MF6-04` no contexto da macro `MF6` e da sprint `S11`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Otimizacao de performance critica` cobrindo `RNF07..RNF12` na `MF6`, c
 
 - Dependencias declaradas: `BK-MF6-02`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Otimizacao de performance critica` cobrindo `RNF07..RNF12` na `MF6`, c
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RNF07..RNF12`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF6-04`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Otimizacao de performance critica` cobrindo `RNF07..RNF12` na `MF6`, c
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF6-04

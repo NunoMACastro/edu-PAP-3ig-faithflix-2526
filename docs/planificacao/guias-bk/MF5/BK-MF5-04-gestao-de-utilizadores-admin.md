@@ -12,14 +12,19 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF2-02`
 - `rf_rnf`: `RF58`
+- `fase_documental`: `Fase 2`
+- `sprint`: `S09`
+- `core_or_reforco`: `Core`
+- `proximo_bk`: `BK-MF5-05`
+- `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-04-gestao-de-utilizadores-admin.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Gestao de utilizadores admin` com rastreabilidade explicita para `RF58`.
+- Executar o BK `BK-MF5-04` no contexto da macro `MF5` e da sprint `S09`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Gestao de utilizadores admin` cobrindo `RF58` na `MF5`, com fluxo prin
 
 - Dependencias declaradas: `BK-MF2-02`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Gestao de utilizadores admin` cobrindo `RF58` na `MF5`, com fluxo prin
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RF58`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF5-04`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Gestao de utilizadores admin` cobrindo `RF58` na `MF5`, com fluxo prin
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF5-04

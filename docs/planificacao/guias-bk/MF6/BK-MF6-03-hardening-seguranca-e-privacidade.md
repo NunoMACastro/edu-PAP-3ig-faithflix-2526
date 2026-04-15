@@ -11,15 +11,20 @@
 - `estado`: `TODO`
 - `esforco`: `M`
 - `dependencias`: `BK-MF6-01`
-- `rf_rnf`: `RNF13..RNF20, RNF37`
+- `rf_rnf`: `RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37`
+- `fase_documental`: `Fase 3`
+- `sprint`: `S11`
+- `core_or_reforco`: `Reforco`
+- `proximo_bk`: `BK-MF6-04`
+- `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-03-hardening-seguranca-e-privacidade.md`
 - `last_updated`: `2026-04-14`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Competencia pratica que este BK treina no contexto do FaithFlix.
-- Ligacao direta do BK ao objetivo da sprint atual.
+- Consolidar a entrega de `Hardening seguranca e privacidade` com rastreabilidade explicita para `RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37`.
+- Executar o BK `BK-MF6-03` no contexto da macro `MF6` e da sprint `S11`.
 
 ### Tempo estimado
 
@@ -76,7 +81,7 @@ Entregar `Hardening seguranca e privacidade` cobrindo `RNF13..RNF20, RNF37` na `
 
 - Dependencias declaradas: `BK-MF6-01`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md`.
+- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
 ## O que entra (scope)
 
@@ -100,7 +105,7 @@ Entregar `Hardening seguranca e privacidade` cobrindo `RNF13..RNF20, RNF37` na `
 
 - `docs/RF.md` e `docs/RNF.md` (itens de `RNF13..RNF20, RNF37`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF6-03`).
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (rastreabilidade).
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
@@ -117,7 +122,7 @@ Entregar `Hardening seguranca e privacidade` cobrindo `RNF13..RNF20, RNF37` na `
 - Output de validacao com teste/log/captura.
 - Output documental com `pr/proof/neg` para gate.
 
-## Snippet tecnico obrigatorio
+## Snippet tecnico aplicavel
 
 ```text
 # pseudo-checklist BK-MF6-03

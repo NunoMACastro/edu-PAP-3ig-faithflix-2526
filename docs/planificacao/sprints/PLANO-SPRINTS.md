@@ -29,39 +29,38 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 
 ## Artefactos oficiais de controlo semanal
 
-- Scorecard oficial por sprint: `docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md`
+- Scorecard oficial por sprint: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`
 - Guiao docente semanal: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
 
-## Calendario de 12 sprints (rebalanced)
+## Calendario de 12 sprints
 
-| Sprint      | Foco                              | BKs alvo                                               | Carga alvo |
-| ----------- | --------------------------------- | ------------------------------------------------------ | ---------- |
-| `Sprint 1`  | Governance e arranque             | `BK-MF0-01..06`, `BK-MF1-01`, `BK-MF1-02`             | `11`       |
-| `Sprint 2`  | Fundacao completa                 | `BK-MF1-03..06`, `BK-MF2-01`                          | `10`       |
-| `Sprint 3`  | Auth + catalogo + detalhe         | `BK-MF2-02..04`                                        | `7`        |
-| `Sprint 4`  | Player + historico + E2E          | `BK-MF2-05..08`                                        | `9`        |
-| `Sprint 5`  | Descoberta base                   | `BK-MF3-01..04`                                        | `8`        |
-| `Sprint 6`  | IA baseline e comunidade          | `BK-MF3-05..08`                                        | `8`        |
-| `Sprint 7`  | Subscricoes e pagamentos          | `BK-MF4-01`, `BK-MF4-02`, `BK-MF4-08`                 | `7`        |
-| `Sprint 8`  | Pool de associacoes               | `BK-MF4-03..07`                                        | `11`       |
-| `Sprint 9`  | RGPD e admin base                 | `BK-MF5-01..05`                                        | `10`       |
-| `Sprint 10` | Integracoes + perfis + regressao  | `BK-MF5-06..08`, `BK-MF6-01..02`                      | `11`       |
-| `Sprint 11` | Hardening + matrizes de cobertura | `BK-MF6-03..06`, `BK-MF7-01..02`                      | `11`       |
-| `Sprint 12` | Defesa + buffer + fecho           | `BK-MF7-03..05`, `BK-MF8-01..05`                      | `9`        |
+| Sprint      | Foco                              | BKs alvo                                  | Carga alvo |
+| ----------- | --------------------------------- | ----------------------------------------- | ---------- |
+| `Sprint 1`  | Governance e arranque             | `BK-MF0-01..06`, `BK-MF1-01`, `BK-MF1-02` | `11`       |
+| `Sprint 2`  | Fundacao completa                 | `BK-MF1-03..06`, `BK-MF2-01`              | `10`       |
+| `Sprint 3`  | Auth + catalogo + detalhe         | `BK-MF2-02..04`                           | `7`        |
+| `Sprint 4`  | Player + historico + E2E          | `BK-MF2-05..08`                           | `9`        |
+| `Sprint 5`  | Descoberta base                   | `BK-MF3-01..04`                           | `8`        |
+| `Sprint 6`  | IA baseline e comunidade          | `BK-MF3-05..08`                           | `8`        |
+| `Sprint 7`  | Subscricoes e pagamentos          | `BK-MF4-01`, `BK-MF4-02`, `BK-MF4-08`     | `7`        |
+| `Sprint 8`  | Pool de associacoes               | `BK-MF4-03..07`                           | `11`       |
+| `Sprint 9`  | RGPD e admin base                 | `BK-MF5-01..05`                           | `10`       |
+| `Sprint 10` | Integracoes + perfis + regressao  | `BK-MF5-06..08`, `BK-MF6-01..02`          | `11`       |
+| `Sprint 11` | Hardening + matrizes de cobertura | `BK-MF6-03..06`, `BK-MF7-01..02`          | `11`       |
+| `Sprint 12` | Defesa + buffer + fecho           | `BK-MF7-03..05`, `BK-MF8-01..05`          | `9`        |
 
 > Regra operacional: nenhuma sprint pode ultrapassar `11` pontos.
 
-## Scorecard oficial por sprint (pesos OPSA)
+## Scorecard oficial por sprint (contrato canonico)
 
-| Dimensao | Peso |
-| --- | --- |
-| Rastreabilidade backlog <-> matriz | `25` |
-| Conformidade dos guias BK | `20` |
-| Evidencia minima e negativos | `20` |
-| Cadencia e carga realista | `15` |
-| Qualidade tecnica e regressao | `10` |
-| Governanca e handoff | `10` |
-| **Total** | **`100`** |
+| Criterio                        | Peso      |
+| ------------------------------- | --------- |
+| Cobertura/rastreabilidade       | `25`      |
+| Coerencia documental            | `20`      |
+| Pedagogia/guidance/step-by-step | `25`      |
+| Adequacao ao 12o                | `20`      |
+| Governanca/avaliacao            | `10`      |
+| **Total**                       | **`100`** |
 
 Regra de uso: score preenchido no fim de cada sprint e consolidado por janela de gate (`S1..S4`, `S5..S8`, `S9..S12`).
 
@@ -123,7 +122,7 @@ Remediacao minima:
 
 ### Gate Sprint 4 (S4)
 
-1. Cobertura da matriz `MATRIZ-RF-RNF-POR-BK.md` para requisitos de gate.
+1. Cobertura da matriz `MATRIZ-CANONICA-BK.md` para requisitos de gate.
 2. Conformidade dos guias BK com template v3 (especificidade + snippets + proximos BKs reais).
 3. Criterios de aceite mensuraveis presentes nos guias da janela.
 4. Evidence minima (`pr`, `proof`, `neg`) validada.
@@ -139,12 +138,11 @@ Remediacao minima:
 
 1. Fecho integral da cobertura RF/RNF na matriz.
 2. 100% dos guias BK conformes ao contrato v3.
-3. Score final consolidado no relatorio de gate `S12`.
+3. Score final consolidado no fecho de gate `S12`.
 4. Emissao de parecer final GO/NO-GO documental.
 
 ### Registo obrigatorio de gate
 
-- Cada gate (S4, S8, S12) e registado em: `docs/planificacao/sprints/RELATORIO-GATES-S4-S8-S12.md`.
 - Formato de resultado por criterio: `PASS` ou `FAIL` + acao corretiva + dono + prazo.
 
 ## KPI por sprint
@@ -169,5 +167,5 @@ Remediacao minima:
 
 - `2026-04-11`: versao revista para equipa de 4 alunos.
 - `2026-04-13`: rebalanceamento de carga nas sprints 10-12 e reforco de gate orientado a meta `97/100`.
-- `2026-04-13`: removida referencia a ficheiro externo de score; avaliacao passa a ser consolidada no relatorio de gates.
+- `2026-04-13`: removida referencia a ficheiro externo de score; avaliacao passa a ser consolidada no scorecard oficial.
 - `2026-04-14`: alinhado com scorecard oficial por sprint e guiao docente semanal com checkpoints/remediacao.
