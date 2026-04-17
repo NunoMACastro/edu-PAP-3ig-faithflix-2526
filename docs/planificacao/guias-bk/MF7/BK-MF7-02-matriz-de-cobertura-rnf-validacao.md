@@ -11,7 +11,7 @@
 - `estado`: `TODO`
 - `esforco`: `M`
 - `dependencias`: `BK-MF6-06`
-- `rf_rnf`: `RNF01, RNF02, RNF03, RNF04, RNF05, RNF06, RNF07, RNF08, RNF09, RNF10, RNF11, RNF12, RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF27, RNF28, RNF29, RNF30, RNF31, RNF32, RNF33, RNF34, RNF35, RNF36, RNF37, RNF38, RNF39, RNF40`
+- `rf_rnf`: `RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40`
 - `fase_documental`: `Fase 3`
 - `sprint`: `S11`
 - `core_or_reforco`: `Reforco`
@@ -23,7 +23,7 @@
 
 ### Objetivo pedagogico
 
-- Consolidar a entrega de `Matriz de cobertura RNF -> validacao` com rastreabilidade explicita para `RNF01, RNF02, RNF03, RNF04, RNF05, RNF06, RNF07, RNF08, RNF09, RNF10, RNF11, RNF12, RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF27, RNF28, RNF29, RNF30, RNF31, RNF32, RNF33, RNF34, RNF35, RNF36, RNF37, RNF38, RNF39, RNF40`.
+- Consolidar a entrega de `Matriz de cobertura RNF -> validacao` com rastreabilidade explicita para `RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40`.
 - Executar o BK `BK-MF7-02` no contexto da macro `MF7` e da sprint `S11`.
 
 ### Tempo estimado
@@ -46,7 +46,7 @@
 
 ## O que vamos fazer neste BK
 
-Entregar `Matriz de cobertura RNF -> validacao` cobrindo `RNF01..RNF40` na `MF7`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+Entregar `Matriz de cobertura RNF -> validacao` cobrindo os RNF remanescentes da consolidacao final (`RNF21..RNF26`, `RNF32`, `RNF33`, `RNF35`, `RNF36`, `RNF38..RNF40`) na `MF7`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
 
 ## Porque isto e importante
 
@@ -103,18 +103,18 @@ Entregar `Matriz de cobertura RNF -> validacao` cobrindo `RNF01..RNF40` na `MF7`
 
 ## Pre-leitura minima (10-15 min)
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RNF01..RNF40`).
+- `docs/RF.md` e `docs/RNF.md` (itens de `RNF21..RNF26`, `RNF32`, `RNF33`, `RNF35`, `RNF36`, `RNF38..RNF40`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-02`).
 - `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Matriz de cobertura RNF -> validacao`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
-6. Atualizar evidence e preparar handoff para `BK-MF7-03`.
+1. Criar/atualizar tabela de cobertura RNF com colunas minimas: `RNF`, `BK fonte`, `evidencia`, `status`, `responsavel`.
+2. Consolidar evidencias dos BKs que cobrem os RNF desta fase e normalizar formato de referencia (`pr/proof/neg`).
+3. Validar que cada RNF tem pelo menos uma evidencia objetiva e que o link/referencia e resolvivel.
+4. Executar revisao cruzada com `BACKLOG-MVP` e `MATRIZ-CANONICA-BK` para garantir ausencia de drift.
+5. Marcar lacunas (se existirem) com acao corretiva e dono antes do fecho do gate.
+6. Atualizar evidence final e preparar handoff para `BK-MF7-03`.
 
 ## Outputs esperados
 
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: RNF sem evidencia associada e sinalizado como `FAIL` com acao corretiva.
+- [ ] Negativo 2: referencia de evidencia quebrada/invalida e detetada na validacao.
+- [ ] Negativo 3: conflito de rastreabilidade (RNF mapeado de forma contraditoria) e resolvido antes do fecho.
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF7-02` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: cobertura RNF da fase final esta completa e auditavel.
+- Metrica/Limiar: 100% dos RNF de `BK-MF7-02` com `status` definido e evidencia valida.
+- Evidencia esperada: `proof` com matriz final preenchida e links/resumos verificaveis.
+- Condicao: coerencia entre matriz de cobertura, backlog e rastreabilidade canonica.
+- Metrica/Limiar: 0 divergencias abertas em `owner`, `rf_rnf`, `dependencias` no fecho do BK.
+- Evidencia esperada: `proof` com resultado da verificacao cruzada e assinatura de revisao.
+- Condicao: tratamento de lacunas e falhas de evidencia robusto.
+- Metrica/Limiar: 3/3 negativos obrigatorios executados com classificacao e acao corretiva quando aplicavel.
+- Evidencia esperada: `neg` com lista de falhas simuladas/detetadas e respetiva resolucao.
 
 ## Evidence para PR/defesa
 

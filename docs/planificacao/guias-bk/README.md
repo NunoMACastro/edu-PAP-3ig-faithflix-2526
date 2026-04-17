@@ -1,6 +1,6 @@
 # Guias BK - README
 
-`last_updated`: `2026-04-14`
+`last_updated`: `2026-04-17`
 
 ## O que esta pasta contem
 
@@ -18,6 +18,7 @@ Todos os guias devem conter os campos de header:
 
 Regras obrigatorias:
 - `core_or_reforco`: `P0 => Reforco`; `P1/P2 => Core`.
+- Leitura pedagogica: `Reforco` = item critico (normalmente `P0`) com acompanhamento reforcado; `Core` = execucao base prevista para a sprint.
 - `proximo_bk`: `BK-MFxx-yy` para BK nao terminal; `-` apenas no terminal.
 - `guia_path` deve corresponder ao caminho real do ficheiro.
 

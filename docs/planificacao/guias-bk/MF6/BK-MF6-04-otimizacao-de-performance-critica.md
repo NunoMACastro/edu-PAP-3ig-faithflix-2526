@@ -11,7 +11,7 @@
 - `estado`: `TODO`
 - `esforco`: `M`
 - `dependencias`: `BK-MF6-02`
-- `rf_rnf`: `RNF07, RNF08, RNF09, RNF10, RNF11, RNF12`
+- `rf_rnf`: `RNF09, RNF10, RNF11, RNF12`
 - `fase_documental`: `Fase 3`
 - `sprint`: `S11`
 - `core_or_reforco`: `Core`
@@ -23,7 +23,7 @@
 
 ### Objetivo pedagogico
 
-- Consolidar a entrega de `Otimizacao de performance critica` com rastreabilidade explicita para `RNF07, RNF08, RNF09, RNF10, RNF11, RNF12`.
+- Consolidar a entrega de `Otimizacao de performance critica` com rastreabilidade explicita para `RNF09, RNF10, RNF11, RNF12`.
 - Executar o BK `BK-MF6-04` no contexto da macro `MF6` e da sprint `S11`.
 
 ### Tempo estimado
@@ -46,7 +46,7 @@
 
 ## O que vamos fazer neste BK
 
-Entregar `Otimizacao de performance critica` cobrindo `RNF07..RNF12` na `MF6`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+Entregar `Otimizacao de performance critica` cobrindo `RNF09..RNF12` na `MF6`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
 
 ## Porque isto e importante
 
@@ -103,17 +103,17 @@ Entregar `Otimizacao de performance critica` cobrindo `RNF07..RNF12` na `MF6`, c
 
 ## Pre-leitura minima (10-15 min)
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RNF07..RNF12`).
+- `docs/RF.md` e `docs/RNF.md` (itens de `RNF09..RNF12`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF6-04`).
 - `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Otimizacao de performance critica`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P1`.
+1. Definir baseline de performance para endpoints/listagens de `RNF09..RNF12` com dados de teste controlados.
+2. Medir estado atual (`before`) de latencia e throughput para catalogo, pesquisa e recomendacao baseline.
+3. Aplicar otimizacoes tecnicas prioritarias (indexacao, paginacao obrigatoria, query tuning, cache simples onde fizer sentido).
+4. Medir estado final (`after`) com o mesmo cenario para comprovar melhoria objetiva.
+5. Validar impacto em carga concorrente e confirmar que nao houve regressao funcional no fluxo principal.
 6. Atualizar evidence e preparar handoff para `BK-MF6-05`.
 
 ## Outputs esperados
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: pedido de listagem sem paginacao/limite permitido e bloqueado com erro de validacao.
+- [ ] Negativo 2: cenario de carga concorrente elevado sem degradacao acima do limiar acordado.
+- [ ] Negativo 3: consulta pesada sem filtro obrigatorio nao causa indisponibilidade da API.
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF6-04` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P1`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: melhoria de performance comprovada nos pontos criticos do BK.
+- Metrica/Limiar: latencia `after` melhor ou igual a `before` em pelo menos 3 cenarios medidos.
+- Evidencia esperada: `proof` com tabela comparativa `before/after` e comando/ferramenta usada.
+- Condicao: requisitos de resposta para listagens/pesquisa mantidos no alvo do MVP.
+- Metrica/Limiar: respostas de catalogo/pesquisa dentro do limiar definido no plano de testes de performance.
+- Evidencia esperada: `proof` com relatorio de execucao e percentis relevantes.
+- Condicao: resiliência sob cenarios limite sem quebra funcional.
+- Metrica/Limiar: 3/3 negativos obrigatorios executados sem erro bloqueante de disponibilidade.
+- Evidencia esperada: `neg` com cenarios de carga/validacao e resultados observados.
 
 ## Evidence para PR/defesa
 

@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-04-17`
 
 ## Objetivo
 
@@ -51,11 +51,11 @@ Campos obrigatorios por sprint:
 | S03 | - | - | - | - | - | 7 | - | - | Verde | - |
 | S04 | - | - | - | - | - | 9 | - | - | Verde | - |
 | S05 | - | - | - | - | - | 8 | - | - | Verde | - |
-| S06 | - | - | - | - | - | 8 | - | - | Verde | - |
+| S06 | - | - | - | - | - | 4 | - | - | Verde | - |
 | S07 | - | - | - | - | - | 7 | - | - | Verde | - |
-| S08 | - | - | - | - | - | 11 | - | - | Verde | - |
+| S08 | - | - | - | - | - | 9 | - | - | Verde | - |
 | S09 | - | - | - | - | - | 10 | - | - | Verde | - |
-| S10 | - | - | - | - | - | 11 | - | - | Verde | - |
+| S10 | - | - | - | - | - | 6 | - | - | Verde | - |
 | S11 | - | - | - | - | - | 11 | - | - | Verde | - |
 | S12 | - | - | - | - | - | 9 | - | - | Verde | - |
 
@@ -74,3 +74,4 @@ Campos obrigatorios por sprint:
 ## Changelog
 
 - `2026-04-14`: scorecard alinhado ao contrato canonicamente unificado (5 criterios, 25/20/25/20/10).
+- `2026-04-17`: cargas planeadas sincronizadas com `PLANO-SPRINTS.md` e com a soma real de pontos dos BK por sprint.

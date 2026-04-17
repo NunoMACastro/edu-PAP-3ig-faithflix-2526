@@ -7,17 +7,26 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-04-17`
 
 ## Objetivo
 
 Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios de aceite e evidencias.
+
+## Baseline de escopo MVP (2026-04-17)
+
+Aplicacao direta do `PLANO-MESTRE-ALTERACOES-PAP.md` ao FaithFlix.
+
+- Universo final de backlog ativo: `55 BK`.
+- Regra operacional: backlog e planificacao incluem apenas BK em escopo do MVP atual.
 
 ## Contrato de rastreabilidade canonica
 
 - Fonte de rastreio requisito -> BK -> evidencia: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 - `BACKLOG-MVP.md` continua como fonte operacional de prioridade/estado/capacidade.
 - Divergencias entre backlog e matriz devem ser corrigidas no mesmo ciclo de sprint.
+- O campo `rf_rnf` no backlog representa o escopo primario do BK e nao implica cardinalidade `1:1` entre requisito e BK.
+- Cobertura total (inclusive mapeamentos complementares) e validada na matriz canonica.
 
 ## Contrato canonico de campos BK (fonte oficial)
 
@@ -30,7 +39,7 @@ Regras obrigatorias:
 3. `estado` so permite `TODO|IN_PROGRESS|BLOCKED|DONE`.
 4. `esforco` so permite `S|M|L`.
 5. `dependencias` aceita `-` ou lista de `BK-*` existentes no backlog.
-6. `owner`, `prioridade`, `dependencias` e `rf_rnf` devem coincidir 1:1 com cada guia BK.
+6. `owner`, `prioridade` e `dependencias` devem coincidir com cada guia BK; `rf_rnf` pode ser recorte primario quando a cobertura completa estiver na matriz canonica.
 
 ## Validacao cruzada obrigatoria (sem drift)
 
@@ -67,9 +76,9 @@ Regras obrigatorias:
 | `MF0` | `TODO` | `0/6`     |
 | `MF1` | `TODO` | `0/6`     |
 | `MF2` | `TODO` | `0/8`     |
-| `MF3` | `TODO` | `0/8`     |
-| `MF4` | `TODO` | `0/8`     |
-| `MF5` | `TODO` | `0/8`     |
+| `MF3` | `TODO` | `0/6`     |
+| `MF4` | `TODO` | `0/7`     |
+| `MF5` | `TODO` | `0/6`     |
 | `MF6` | `TODO` | `0/6`     |
 | `MF7` | `TODO` | `0/5`     |
 | `MF8` | `TODO` | `0/5`     |
@@ -109,15 +118,12 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF3-04` | `../guias-bk/MF3/BK-MF3-04-filtros-carrosseis-e-relacionados.md` | `CRIADO (Fase 2)` |
 | `BK-MF3-05` | `../guias-bk/MF3/BK-MF3-05-recomendacao-baseline-cold-start.md` | `CRIADO (Fase 2)` |
 | `BK-MF3-06` | `../guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md` | `CRIADO (Fase 2)` |
-| `BK-MF3-07` | `../guias-bk/MF3/BK-MF3-07-estudo-biblico-e-guias.md` | `CRIADO (Fase 2)` |
-| `BK-MF3-08` | `../guias-bk/MF3/BK-MF3-08-funcionalidades-comunidade.md` | `CRIADO (Fase 2)` |
 | `BK-MF4-01` | `../guias-bk/MF4/BK-MF4-01-planos-ciclo-subscricao.md` | `CRIADO (Fase 1)` |
 | `BK-MF4-02` | `../guias-bk/MF4/BK-MF4-02-metodos-pagamento-simulados-trial.md` | `CRIADO (Fase 1)` |
 | `BK-MF4-03` | `../guias-bk/MF4/BK-MF4-03-candidaturas-associacoes.md` | `CRIADO (Fase 1)` |
 | `BK-MF4-04` | `../guias-bk/MF4/BK-MF4-04-aprovacao-entrada-pool.md` | `CRIADO (Fase 1)` |
 | `BK-MF4-05` | `../guias-bk/MF4/BK-MF4-05-distribuicao-mensal-rotacao.md` | `CRIADO (Fase 1)` |
 | `BK-MF4-06` | `../guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md` | `CRIADO (Fase 2)` |
-| `BK-MF4-07` | `../guias-bk/MF4/BK-MF4-07-workflow-editorial-e-denuncias.md` | `CRIADO (Fase 2)` |
 | `BK-MF4-08` | `../guias-bk/MF4/BK-MF4-08-notificacoes-transacionais-e-preferencias.md` | `CRIADO (Fase 2)` |
 | `BK-MF5-01` | `../guias-bk/MF5/BK-MF5-01-exportacao-dados-utilizador.md` | `CRIADO (Fase 1)` |
 | `BK-MF5-02` | `../guias-bk/MF5/BK-MF5-02-eliminacao-conta-dados.md` | `CRIADO (Fase 1)` |
@@ -125,8 +131,6 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF5-04` | `../guias-bk/MF5/BK-MF5-04-gestao-de-utilizadores-admin.md` | `CRIADO (Fase 2)` |
 | `BK-MF5-05` | `../guias-bk/MF5/BK-MF5-05-painel-de-metricas-admin.md` | `CRIADO (Fase 2)` |
 | `BK-MF5-06` | `../guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md` | `CRIADO (Fase 2)` |
-| `BK-MF5-07` | `../guias-bk/MF5/BK-MF5-07-perfis-familiares-e-dispositivos.md` | `CRIADO (Fase 2)` |
-| `BK-MF5-08` | `../guias-bk/MF5/BK-MF5-08-gamificacao-baseline.md` | `CRIADO (Fase 2)` |
 | `BK-MF6-01` | `../guias-bk/MF6/BK-MF6-01-suite-de-regressao-backend.md` | `CRIADO (Fase 3)` |
 | `BK-MF6-02` | `../guias-bk/MF6/BK-MF6-02-suite-de-regressao-frontend.md` | `CRIADO (Fase 3)` |
 | `BK-MF6-03` | `../guias-bk/MF6/BK-MF6-03-hardening-seguranca-e-privacidade.md` | `CRIADO (Fase 3)` |
@@ -167,7 +171,7 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF1-02` | Estrutura base frontend por componentes     | Mateus  | Kaue    | P0  | TODO   | M       | `BK-MF0-06`             | RNF28        |
 | `BK-MF1-03` | Cliente API frontend com tratamento de erro | Mateus  | Matheus | P0  | TODO   | M       | `BK-MF1-02`             | RNF05, RNF30 |
 | `BK-MF1-04` | Sessao segura backend (cookies e auth base) | Matheus | Kaue    | P0  | TODO   | M       | `BK-MF1-01`             | RNF13, RNF15 |
-| `BK-MF1-05` | Health-check e logging estruturado          | Kaue    | Davi    | P1  | TODO   | S       | `BK-MF1-01`             | RNF30, RNF31 |
+| `BK-MF1-05` | Health-check e logging estruturado          | Kaue    | Davi    | P1  | TODO   | S       | `BK-MF1-01`             | RNF31 |
 | `BK-MF1-06` | Smoke tests FE/BE                           | Kaue    | Mateus  | P1  | TODO   | M       | `BK-MF1-03`,`BK-MF1-04` | RNF29        |
 
 ---
@@ -187,7 +191,7 @@ Estado do guia indica a fase de criacao documental.
 
 ---
 
-## MF3 - Descoberta e comunidade (`RF19..RF34`)
+## MF3 - Descoberta e recomendacao (`RF19..RF28`)
 
 | BK          | Titulo                             | Owner   | Apoio   | Pri | Estado | Esforco | Dependencias            | RF/RNF           |
 | ----------- | ---------------------------------- | ------- | ------- | --- | ------ | ------- | ----------------------- | ---------------- |
@@ -197,12 +201,10 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF3-04` | Filtros, carrosseis e relacionados | Mateus  | Davi    | P1  | TODO   | M       | `BK-MF3-03`             | RF23, RF24, RF25 |
 | `BK-MF3-05` | Recomendacao baseline + cold start | Davi    | Matheus | P1  | TODO   | L       | `BK-MF3-01`,`BK-MF2-07` | RF26, RF27       |
 | `BK-MF3-06` | Explicabilidade de recomendacao    | Mateus  | Davi    | P2  | TODO   | S       | `BK-MF3-05`             | RF28, RNF34      |
-| `BK-MF3-07` | Estudo biblico e guias             | Kaue    | Davi    | P1  | TODO   | M       | `BK-MF2-04`             | RF29, RF30, RF31 |
-| `BK-MF3-08` | Funcionalidades comunidade         | Mateus  | Kaue    | P2  | TODO   | M       | `BK-MF3-02`             | RF32, RF33, RF34 |
 
 ---
 
-## MF4 - Monetizacao solidaria (`RF35..RF54`)
+## MF4 - Monetizacao solidaria (`RF35..RF48, RF52..RF54`)
 
 | BK          | Titulo                                    | Owner   | Apoio   | Pri | Estado | Esforco | Dependencias | RF/RNF                 |
 | ----------- | ----------------------------------------- | ------- | ------- | --- | ------ | ------- | ------------ | ---------------------- |
@@ -212,12 +214,11 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF4-04` | Aprovacao e entrada na pool               | Matheus | Kaue    | P0  | TODO   | M       | `BK-MF4-03`  | RF42, RF43             |
 | `BK-MF4-05` | Distribuicao mensal e rotacao             | Davi    | Matheus | P0  | TODO   | L       | `BK-MF4-04`  | RF44, RF45             |
 | `BK-MF4-06` | Relatorios e historico por associacao     | Kaue    | Mateus  | P1  | TODO   | M       | `BK-MF4-05`  | RF46, RF47, RF48       |
-| `BK-MF4-07` | Workflow editorial e denuncias            | Kaue    | Matheus | P1  | TODO   | M       | `BK-MF3-02`  | RF49, RF50, RF51       |
 | `BK-MF4-08` | Notificacoes transacionais e preferencias | Mateus  | Davi    | P1  | TODO   | M       | `BK-MF4-01`  | RF52, RF53, RF54       |
 
 ---
 
-## MF5 - Operacao e privacidade (`RF55..RF63`)
+## MF5 - Operacao e privacidade (`RF55..RF60`)
 
 | BK          | Titulo                            | Owner   | Apoio   | Pri | Estado | Esforco | Dependencias            | RF/RNF     |
 | ----------- | --------------------------------- | ------- | ------- | --- | ------ | ------- | ----------------------- | ---------- |
@@ -227,8 +228,6 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF5-04` | Gestao de utilizadores admin      | Kaue    | Matheus | P1  | TODO   | M       | `BK-MF2-02`             | RF58       |
 | `BK-MF5-05` | Painel de metricas admin          | Davi    | Mateus  | P1  | TODO   | M       | `BK-MF5-04`             | RF59       |
 | `BK-MF5-06` | Configuracao de integracoes admin | Davi    | Matheus | P1  | TODO   | M       | `BK-MF5-04`             | RF60       |
-| `BK-MF5-07` | Perfis familiares e dispositivos  | Mateus  | Kaue    | P1  | TODO   | L       | `BK-MF2-02`,`BK-MF2-05` | RF61, RF62 |
-| `BK-MF5-08` | Gamificacao baseline              | Kaue    | Mateus  | P2  | TODO   | M       | `BK-MF5-07`             | RF63       |
 
 ---
 
@@ -236,11 +235,11 @@ Estado do guia indica a fase de criacao documental.
 
 | BK          | Titulo                            | Owner   | Apoio                       | Pri | Estado | Esforco | Dependencias            | RF/RNF              |
 | ----------- | --------------------------------- | ------- | --------------------------- | --- | ------ | ------- | ----------------------- | ------------------- |
-| `BK-MF6-01` | Suite de regressao backend        | Kaue    | Matheus                     | P0  | TODO   | M       | `BK-MF5-08`             | RNF29               |
-| `BK-MF6-02` | Suite de regressao frontend       | Kaue    | Mateus                      | P0  | TODO   | M       | `BK-MF5-08`             | RNF29               |
-| `BK-MF6-03` | Hardening seguranca e privacidade | Matheus | Kaue                        | P0  | TODO   | M       | `BK-MF6-01`             | RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37 |
-| `BK-MF6-04` | Otimizacao de performance critica | Davi    | Mateus                      | P1  | TODO   | M       | `BK-MF6-02`             | RNF07, RNF08, RNF09, RNF10, RNF11, RNF12 |
-| `BK-MF6-05` | Acessibilidade e UX final         | Mateus  | Kaue                        | P1  | TODO   | M       | `BK-MF6-02`             | RNF01, RNF02, RNF03, RNF04, RNF05, RNF06 |
+| `BK-MF6-01` | Suite de regressao backend        | Kaue    | Matheus                     | P0  | TODO   | M       | `BK-MF5-06`             | RNF29               |
+| `BK-MF6-02` | Suite de regressao frontend       | Kaue    | Mateus                      | P0  | TODO   | M       | `BK-MF5-06`             | RNF29               |
+| `BK-MF6-03` | Hardening seguranca e privacidade | Matheus | Kaue                        | P0  | TODO   | M       | `BK-MF6-01`             | RNF14, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37 |
+| `BK-MF6-04` | Otimizacao de performance critica | Davi    | Mateus                      | P1  | TODO   | M       | `BK-MF6-02`             | RNF09, RNF10, RNF11, RNF12 |
+| `BK-MF6-05` | Acessibilidade e UX final         | Mateus  | Kaue                        | P1  | TODO   | M       | `BK-MF6-02`             | RNF01, RNF02, RNF03, RNF04, RNF06 |
 | `BK-MF6-06` | Validacao tecnica final por gate  | Nuno    | Matheus, Mateus, Davi, Kaue | P0  | TODO   | S       | `BK-MF6-03`,`BK-MF6-05` | transversal         |
 
 ---
@@ -249,8 +248,8 @@ Estado do guia indica a fase de criacao documental.
 
 | BK          | Titulo                                | Owner   | Apoio                       | Pri | Estado | Esforco | Dependencias            | RF/RNF       |
 | ----------- | ------------------------------------- | ------- | --------------------------- | --- | ------ | ------- | ----------------------- | ------------ |
-| `BK-MF7-01` | Matriz de cobertura RF -> evidencia   | Kaue    | Matheus, Mateus, Davi       | P0  | TODO   | M       | `BK-MF6-06`             | RF01..RF63   |
-| `BK-MF7-02` | Matriz de cobertura RNF -> validacao  | Davi    | Kaue                        | P0  | TODO   | M       | `BK-MF6-06`             | RNF01, RNF02, RNF03, RNF04, RNF05, RNF06, RNF07, RNF08, RNF09, RNF10, RNF11, RNF12, RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF27, RNF28, RNF29, RNF30, RNF31, RNF32, RNF33, RNF34, RNF35, RNF36, RNF37, RNF38, RNF39, RNF40 |
+| `BK-MF7-01` | Matriz de cobertura RF -> evidencia   | Kaue    | Matheus, Mateus, Davi       | P0  | TODO   | M       | `BK-MF6-06`             | RF_ATIVOS_MVP |
+| `BK-MF7-02` | Matriz de cobertura RNF -> validacao  | Davi    | Kaue                        | P0  | TODO   | M       | `BK-MF6-06`             | RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40 |
 | `BK-MF7-03` | Roteiro de demo final                 | Mateus  | Kaue                        | P1  | TODO   | S       | `BK-MF7-01`             | transversal  |
 | `BK-MF7-04` | Ensaio tecnico da defesa              | Matheus | Davi                        | P1  | TODO   | S       | `BK-MF7-03`             | transversal  |
 | `BK-MF7-05` | Avaliacao final e feedback orientador | Nuno    | Matheus, Mateus, Davi, Kaue | P0  | TODO   | S       | `BK-MF7-02`,`BK-MF7-04` | transversal  |
@@ -290,8 +289,9 @@ Estado do guia indica a fase de criacao documental.
 ## Changelog
 
 - `2026-04-11`: versao revista para equipa correta e ownership distribuido por 4 alunos.
-- `2026-04-12`: secao de ligacao para guias BK atualizada para cobertura total (60/60), com estado por fase de criacao documental.
+- `2026-04-12`: secao de ligacao para guias BK atualizada para cobertura total.
 - `2026-04-13`: adicionado contrato com matriz RF/RNF, politica pedagogica v2 e gates obrigatorios S4/S8/S12.
 - `2026-04-13`: evoluido para contrato pedagogico v3 com score `97/100` e validacao automatica obrigatoria.
 - `2026-04-13`: removidas referencias a ficheiro externo de score; avaliacao documental passa a ser registada diretamente no processo de gate.
 - `2026-04-14`: reforcado contrato canonico de campos BK e validacao cruzada backlog<->matriz<->guias<->sprints.
+- `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral dos BK fora de escopo e ajuste de dependencias para `BK-MF5-06`.

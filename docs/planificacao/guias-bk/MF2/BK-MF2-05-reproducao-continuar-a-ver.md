@@ -109,11 +109,11 @@ Entregar `Reproducao e continuar a ver` cobrindo `RF11, RF12` na `MF2`, com flux
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Reproducao e continuar a ver`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
+1. Definir contratos de leitura/escrita de progresso de reproducao (inicio, pausa, retoma, fim) por `user_id + content_id`.
+2. Implementar arranque de reproducao no player com validacao de permissao e estado do conteudo.
+3. Persistir progresso em momentos-chave (pausa, fecho, heartbeat) para garantir `continuar a ver` fiavel.
+4. Implementar retoma no ultimo timestamp valido e regra de conclusao (conteudo marcado como concluido perto do fim).
+5. Cobrir o fluxo com testes de integracao FE/BE para retoma apos logout/login e apos refresh de pagina.
 6. Atualizar evidence e preparar handoff para `BK-MF2-06`.
 
 ## Outputs esperados
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: tentativa de gravar progresso com timestamp invalido (negativo ou acima da duracao) e rejeitada.
+- [ ] Negativo 2: tentativa de aceder/reproduzir conteudo nao publicado ou sem permissao retorna bloqueio funcional.
+- [ ] Negativo 3: tentativa de atualizar progresso de outro utilizador e bloqueada por controlo de acesso.
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF2-05` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: reproducao e retoma funcionam ponta-a-ponta no fluxo principal.
+- Metrica/Limiar: retoma abre no ultimo progresso com desvio maximo de `<=5s`.
+- Evidencia esperada: `proof` com video curto/capturas antes e depois da retoma.
+- Condicao: persistencia de progresso e consistente e isolada por utilizador.
+- Metrica/Limiar: 100% dos testes de integracao de progresso passam sem escrita cruzada entre contas.
+- Evidencia esperada: `proof` com logs/asserts de `user_id + content_id`.
+- Condicao: politicas negativas e autorizacao aplicadas.
+- Metrica/Limiar: 3/3 negativos obrigatorios executados com resposta previsivel.
+- Evidencia esperada: `neg` com requests/responses dos cenarios de bloqueio.
 
 ## Evidence para PR/defesa
 

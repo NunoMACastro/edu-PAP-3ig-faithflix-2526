@@ -11,7 +11,7 @@
 - `estado`: `TODO`
 - `esforco`: `M`
 - `dependencias`: `BK-MF6-01`
-- `rf_rnf`: `RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37`
+- `rf_rnf`: `RNF14, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37`
 - `fase_documental`: `Fase 3`
 - `sprint`: `S11`
 - `core_or_reforco`: `Reforco`
@@ -23,7 +23,7 @@
 
 ### Objetivo pedagogico
 
-- Consolidar a entrega de `Hardening seguranca e privacidade` com rastreabilidade explicita para `RNF13, RNF14, RNF15, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37`.
+- Consolidar a entrega de `Hardening seguranca e privacidade` com rastreabilidade explicita para `RNF14, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37`.
 - Executar o BK `BK-MF6-03` no contexto da macro `MF6` e da sprint `S11`.
 
 ### Tempo estimado
@@ -46,7 +46,7 @@
 
 ## O que vamos fazer neste BK
 
-Entregar `Hardening seguranca e privacidade` cobrindo `RNF13..RNF20, RNF37` na `MF6`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+Entregar `Hardening seguranca e privacidade` cobrindo `RNF14, RNF16..RNF20, RNF37` na `MF6`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
 
 ## Porque isto e importante
 
@@ -103,17 +103,17 @@ Entregar `Hardening seguranca e privacidade` cobrindo `RNF13..RNF20, RNF37` na `
 
 ## Pre-leitura minima (10-15 min)
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RNF13..RNF20, RNF37`).
+- `docs/RF.md` e `docs/RNF.md` (itens de `RNF14, RNF16..RNF20, RNF37`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF6-03`).
 - `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Hardening seguranca e privacidade`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
+1. Inventariar endpoints/operacoes sensiveis e mapear controlos exigidos por `RNF14, RNF16..RNF20, RNF37`.
+2. Reforcar validacao de input e sanitizacao em endpoints criticos (auth, perfil, subscricao, administracao).
+3. Garantir politicas de segredo/credenciais em variaveis de ambiente e remover defaults inseguros.
+4. Validar trilho de auditoria para operacoes administrativas criticas com ator, timestamp e acao.
+5. Executar bateria de testes de seguranca basicos (payloads maliciosos, privilegio indevido, acesso a dados de terceiros).
 6. Atualizar evidence e preparar handoff para `BK-MF6-04`.
 
 ## Outputs esperados
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: payload de injecao em campo de pesquisa/formulario e neutralizado sem execucao.
+- [ ] Negativo 2: tentativa de acao administrativa por utilizador sem permissao e bloqueada.
+- [ ] Negativo 3: tentativa de aceder dados de recomendacao de outro utilizador e rejeitada.
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF6-03` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: controlos de seguranca/privacidade definidos neste BK estao ativos.
+- Metrica/Limiar: 100% dos endpoints criticos inventariados possuem validacao/autorizacao e logging de auditoria quando aplicavel.
+- Evidencia esperada: `proof` com checklist de endpoints e amostra de logs de auditoria.
+- Condicao: dados de recomendacao e dados sensiveis mantem isolamento por utilizador.
+- Metrica/Limiar: 0 leituras cruzadas autorizadas nos testes de seguranca executados.
+- Evidencia esperada: `proof` com testes automatizados/manuais de isolamento.
+- Condicao: bateria minima de seguranca executada sem falhas criticas.
+- Metrica/Limiar: 3/3 negativos obrigatorios executados com comportamento seguro previsivel.
+- Evidencia esperada: `neg` com payload usado, resposta e impacto observado.
 
 ## Evidence para PR/defesa
 

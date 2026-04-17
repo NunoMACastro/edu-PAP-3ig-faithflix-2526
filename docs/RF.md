@@ -9,26 +9,23 @@
 5. [Classificações e Feedback](#5-classificações-e-feedback)
 6. [Pesquisa e Descoberta](#6-pesquisa-e-descoberta)
 7. [Recomendações IA](#7-recomendações-ia)
-8. [Estudo Bíblico Integrado](#8-estudo-bíblico-integrado)
-9. [Comunidade](#9-comunidade)
-10. [Subscrições](#10-subscrições)
-11. [Pool Rotativa de Associações](#11-pool-rotativa-de-associações)
-12. [Moderação e Curadoria](#12-moderação-e-curadoria)
-13. [Notificações](#13-notificações)
-14. [Privacidade e RGPD](#14-privacidade-e-rgpd)
-15. [Administração e Operação](#15-administração-e-operação)
-16. [Critérios de Aceitação](#critérios-de-aceitação)
-17. [Perfis Familiares, Dispositivos e Gamificação](#17-perfis-familiares-dispositivos-e-gamificação)
-18. [Sugestão de MVP organizado por fases e RF](#sugestão-de-mvp-organizado-por-fases-e-rf)
-19. [Créditos do projeto](#créditos-do-projeto)
-20. [Licença](#licença)
-21. [Changelog](#changelog)
+8. [Subscrições](#8-subscrições)
+9. [Pool Rotativa de Associações](#9-pool-rotativa-de-associações)
+10. [Notificações](#10-notificações)
+11. [Privacidade e RGPD](#11-privacidade-e-rgpd)
+12. [Administração e Operação](#12-administração-e-operação)
+13. [Critérios de Aceitação](#critérios-de-aceitação)
+14. [Sugestão de MVP organizado por fases e RF](#sugestão-de-mvp-organizado-por-fases-e-rf)
+15. [Licença](#licença)
+16. [Changelog](#changelog)
 
 -   [Voltar ao início](../README.md)
 
 ---
 
 ## Requisitos Funcionais
+
+> Nota de numeracao: apos rebaseline do MVP (2026-04-17), alguns IDs RF ficaram descontinuados por remocao de escopo. A numeracao foi mantida para preservar historico e rastreabilidade.
 
 ### 1. Identidade, Contas e Perfis
 
@@ -107,27 +104,7 @@
 
 ---
 
-### 8. Estudo Bíblico Integrado
-
-| Código | Requisito                  | Atores             | Prioridade | Dependências |
-| ------ | -------------------------- | ------------------ | ---------- | ------------ |
-| RF29   | Conteúdo bíblico associado | Curador/Utilizador | Should     | RF07         |
-| RF30   | Guias de reflexão          | Curador/Utilizador | Could      | RF29         |
-| RF31   | Ligações canónicas         | Curador/Utilizador | Should     | RF29         |
-
----
-
-### 9. Comunidade
-
-| Código | Requisito                   | Atores               | Prioridade | Dependências |
-| ------ | --------------------------- | -------------------- | ---------- | ------------ |
-| RF32   | Partilha pública controlada | Utilizador           | Could      | RF16         |
-| RF33   | Discussões moderadas        | Utilizador/Moderador | Could      | -            |
-| RF34   | Grupos privados             | Utilizador           | Could      | -            |
-
----
-
-### 10. Subscrições
+### 8. Subscrições
 
 | Código | Requisito                        | Atores     | Prioridade | Dependências |
 | ------ | -------------------------------- | ---------- | ---------- | ------------ |
@@ -140,7 +117,7 @@
 
 ---
 
-### 11. Pool Rotativa de Associações
+### 9. Pool Rotativa de Associações
 
 | Código | Requisito                      | Atores           | Prioridade | Dependências |
 | ------ | ------------------------------ | ---------------- | ---------- | ------------ |
@@ -155,17 +132,7 @@
 
 ---
 
-### 12. Moderação e Curadoria
-
-| Código | Requisito            | Atores               | Prioridade | Dependências |
-| ------ | -------------------- | -------------------- | ---------- | ------------ |
-| RF49   | Workflow editorial   | Moderador            | Must       | RF09         |
-| RF50   | Curadoria teológica  | Curador              | Should     | RF29         |
-| RF51   | Sistema de denúncias | Utilizador/Moderador | Should     | -            |
-
----
-
-### 13. Notificações
+### 10. Notificações
 
 | Código | Requisito                   | Atores     | Prioridade | Dependências |
 | ------ | --------------------------- | ---------- | ---------- | ------------ |
@@ -175,7 +142,7 @@
 
 ---
 
-### 14. Privacidade e RGPD
+### 11. Privacidade e RGPD
 
 | Código | Requisito      | Atores     | Prioridade | Dependências |
 | ------ | -------------- | ---------- | ---------- | ------------ |
@@ -185,23 +152,13 @@
 
 ---
 
-### 15. Administração e Operação
+### 12. Administração e Operação
 
 | Código | Requisito                   | Atores | Prioridade | Dependências |
 | ------ | --------------------------- | ------ | ---------- | ------------ |
 | RF58   | Gestão de utilizadores      | Admin  | Must       | RF04         |
 | RF59   | Painel de métricas          | Admin  | Should     | -            |
 | RF60   | Configuração de integrações | Admin  | Should     | -            |
-
----
-
-### 17. Perfis Familiares, Dispositivos e Gamificação
-
-| Código | Requisito                                                                 | Atores             | Prioridade | Dependências |
-| ------ | ------------------------------------------------------------------------- | ------------------ | ---------- | ------------ |
-| RF61   | Criar e gerir **vários perfis por conta** com idioma, preferências e PIN. | Utilizador         | Must       | RF02         |
-| RF62   | Registar e limitar **dispositivos autorizados**, com revogação remota.    | Utilizador/Sistema | Should     | RF02         |
-| RF63   | Implementar **gamificação** (pontos, desafios devocionais, badges).       | Sistema/Utilizador | Could      | RF29         |
 
 ---
 
@@ -244,9 +201,9 @@
 ## Sugestão de MVP organizado por fases e RF
 
 -   **Fase 1 - Fundacional:** RF01–RF18 (identidade, perfis, catálogo, streaming base, favoritos/histórico).
--   **Fase 2 - Descoberta e Comunidade:** RF19–RF34 (classificações, pesquisa, recomendações IA, estudo bíblico, comunidade).
--   **Fase 3 - Monetização Solidária:** RF35–RF54 (subscrições, notificações e pool de associações).
--   **Fase 4 - Operação e Experiência Premium:** RF55–RF63 (privacidade, administração, integrações, perfis familiares, dispositivos e gamificação).
+-   **Fase 2 - Descoberta MVP:** RF19–RF28 (classificações, pesquisa e recomendações IA baseline).
+-   **Fase 3 - Monetização Solidária:** RF35–RF48, RF52–RF54 (subscrições, pool de associações e notificações essenciais).
+-   **Fase 4 - Operação e Privacidade:** RF55–RF60 (RGPD, administração e operação base).
 
 ---
 
@@ -260,3 +217,5 @@ Projeto académico orientado para fins educativos no âmbito da PAP.
 
 -   **2024-04-27** - Reorganização para formato padrão com secções adicionais (MVP, créditos, licença e gamificação).
 -   **2026-04-13** - Nome do projeto uniformizado para **FaithFlix** e atualização editorial de consistência documental.
+-   **2026-04-17** - Removidos RF fora de escopo da versão PAP para manter requisitos e planificação sem referências residuais.
+-   **2026-04-17** - Clarificada a política de numeracao RF apos rebaseline para evitar ambiguidade pedagógica.

@@ -109,11 +109,11 @@ Entregar `Eliminacao de conta e dados` cobrindo `RF56` na `MF5`, com fluxo princ
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Eliminacao de conta e dados`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
+1. Definir fluxo de eliminacao com dupla confirmacao (sessao autenticada + confirmacao explicita da operacao).
+2. Implementar revogacao imediata de sessao/tokens apos pedido de eliminacao confirmado.
+3. Implementar rotina de eliminacao/anonymizacao de dados pessoais nas entidades dependentes do utilizador.
+4. Preservar apenas dados tecnicos estritamente necessarios para auditoria minima, sem identificadores pessoais diretos.
+5. Validar que o utilizador eliminado deixa de aparecer em consultas funcionais (perfil, favoritos, historico, comentarios).
 6. Atualizar evidence e preparar handoff para `BK-MF5-03`.
 
 ## Outputs esperados
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: tentativa de eliminar conta com credenciais de confirmacao invalidas e rejeitada.
+- [ ] Negativo 2: tentativa de eliminar conta de outro utilizador e bloqueada por autorizacao.
+- [ ] Negativo 3: segunda tentativa sobre conta ja eliminada retorna estado funcional controlado (sem falha interna).
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF5-02` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: eliminacao de conta executa ponta-a-ponta com revogacao de acesso.
+- Metrica/Limiar: apos eliminacao, 100% dos pedidos autenticados do utilizador devolvem nao autorizado.
+- Evidencia esperada: `proof` com sequencia antes/depois da eliminacao.
+- Condicao: dados pessoais deixam de estar disponiveis nos modulos funcionais da app.
+- Metrica/Limiar: 0 registos pessoais visiveis nas consultas de perfil/favoritos/historico apos o processo.
+- Evidencia esperada: `proof` com consultas de verificacao e respetivo resultado.
+- Condicao: resiliencia e seguranca do fluxo RGPD.
+- Metrica/Limiar: 3/3 negativos obrigatorios executados com resultado previsivel e sem erro 500.
+- Evidencia esperada: `neg` com cenarios, resposta de API e estado final dos dados.
 
 ## Evidence para PR/defesa
 

@@ -7,11 +7,16 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-04-17`
 
 ## Objetivo
 
 Definir cadencia semanal para transformar backlog em entregas incrementais com 4 alunos, mantendo `12 sprints` e reduzindo picos de carga para `<=11` pontos.
+
+## Baseline de escopo MVP (aplicada em 2026-04-17)
+
+- Planeamento alinhado ao backlog final de `55 BK`.
+- Itens fora de escopo nao aparecem no calendario ativo de sprints.
 
 ## Capacidade recomendada
 
@@ -41,11 +46,11 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 | `Sprint 3`  | Auth + catalogo + detalhe         | `BK-MF2-02..04`                           | `7`        |
 | `Sprint 4`  | Player + historico + E2E          | `BK-MF2-05..08`                           | `9`        |
 | `Sprint 5`  | Descoberta base                   | `BK-MF3-01..04`                           | `8`        |
-| `Sprint 6`  | IA baseline e comunidade          | `BK-MF3-05..08`                           | `8`        |
+| `Sprint 6`  | IA baseline e explicabilidade     | `BK-MF3-05..06`                           | `4`        |
 | `Sprint 7`  | Subscricoes e pagamentos          | `BK-MF4-01`, `BK-MF4-02`, `BK-MF4-08`     | `7`        |
-| `Sprint 8`  | Pool de associacoes               | `BK-MF4-03..07`                           | `11`       |
+| `Sprint 8`  | Pool de associacoes               | `BK-MF4-03..06`                           | `9`        |
 | `Sprint 9`  | RGPD e admin base                 | `BK-MF5-01..05`                           | `10`       |
-| `Sprint 10` | Integracoes + perfis + regressao  | `BK-MF5-06..08`, `BK-MF6-01..02`          | `11`       |
+| `Sprint 10` | Integracoes + regressao           | `BK-MF5-06`, `BK-MF6-01..02`              | `6`        |
 | `Sprint 11` | Hardening + matrizes de cobertura | `BK-MF6-03..06`, `BK-MF7-01..02`          | `11`       |
 | `Sprint 12` | Defesa + buffer + fecho           | `BK-MF7-03..05`, `BK-MF8-01..05`          | `9`        |
 
@@ -169,3 +174,5 @@ Remediacao minima:
 - `2026-04-13`: rebalanceamento de carga nas sprints 10-12 e reforco de gate orientado a meta `97/100`.
 - `2026-04-13`: removida referencia a ficheiro externo de score; avaliacao passa a ser consolidada no scorecard oficial.
 - `2026-04-14`: alinhado com scorecard oficial por sprint e guiao docente semanal com checkpoints/remediacao.
+- `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral de itens fora de escopo.
+- `2026-04-17`: recalibrada carga planeada das sprints `S06` e `S10` para coincidir com a soma de pontos dos BKs alocados.

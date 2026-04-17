@@ -10,7 +10,7 @@
 - `prioridade`: `P0`
 - `estado`: `TODO`
 - `esforco`: `M`
-- `dependencias`: `BK-MF5-08`
+- `dependencias`: `BK-MF5-06`
 - `rf_rnf`: `RNF29`
 - `fase_documental`: `Fase 3`
 - `sprint`: `S10`
@@ -79,7 +79,7 @@ Entregar `Suite de regressao frontend` cobrindo `RNF29` na `MF6`, com fluxo prin
 
 ## Pre-condicoes de entrada
 
-- Dependencias declaradas: `BK-MF5-08`.
+- Dependencias declaradas: `BK-MF5-06`.
 - Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
 - Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
 
@@ -126,7 +126,7 @@ Entregar `Suite de regressao frontend` cobrindo `RNF29` na `MF6`, com fluxo prin
 
 ```text
 # pseudo-checklist BK-MF6-02
-precondicoes_ok = validar_dependencias(["BK-MF5-08"])
+precondicoes_ok = validar_dependencias(["BK-MF5-06"])
 assert precondicoes_ok == true
 
 resultado = executar_fluxo_principal("Suite de regressao frontend")

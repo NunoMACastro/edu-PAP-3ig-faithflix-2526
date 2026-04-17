@@ -15,7 +15,7 @@
 - `fase_documental`: `Fase 2`
 - `sprint`: `S06`
 - `core_or_reforco`: `Core`
-- `proximo_bk`: `BK-MF3-07`
+- `proximo_bk`: `BK-MF4-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md`
 - `last_updated`: `2026-04-14`
 
@@ -51,7 +51,7 @@ Entregar `Explicabilidade de recomendacao` cobrindo `RF28, RNF34` na `MF3`, com 
 ## Porque isto e importante
 
 - Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF3-07`).
+- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF4-01`).
 - Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
 
 ## Bloco operacional (obrigatorio)
@@ -114,7 +114,7 @@ Entregar `Explicabilidade de recomendacao` cobrindo `RF28, RNF34` na `MF3`, com 
 3. Implementar o fluxo principal de `Explicabilidade de recomendacao`.
 4. Executar smoke e validar integracao com BKs adjacentes.
 5. Executar negativos obrigatorios para `P2`.
-6. Atualizar evidence e preparar handoff para `BK-MF3-07`.
+6. Atualizar evidence e preparar handoff para `BK-MF4-01`.
 
 ## Outputs esperados
 
@@ -176,7 +176,7 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Proximo BK recomendado
 
-`BK-MF3-07`
+`BK-MF4-01`
 
 ## Changelog
 

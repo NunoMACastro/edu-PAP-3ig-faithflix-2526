@@ -109,11 +109,11 @@ Entregar `Planos e ciclo de subscricao` cobrindo `RF35, RF36, RF38, RF39` na `MF
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Planos e ciclo de subscricao`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
+1. Definir modelo de subscricao com estados explicitos (`active`, `past_due`, `expired`, `canceled`) e datas de ciclo.
+2. Implementar criacao/ativacao de plano mensal e anual com calculo correto da proxima renovacao.
+3. Implementar regra de renovacao automatica e transicao de estado quando o ciclo termina.
+4. Implementar gestao de subscricao no perfil (estado atual, ciclo, proxima data, acao de cancelamento).
+5. Integrar guardas de acesso para bloquear conteudo premium quando a subscricao estiver expirada.
 6. Atualizar evidence e preparar handoff para `BK-MF4-02`.
 
 ## Outputs esperados
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: tentativa de ativar subscricao com plano invalido e rejeitada sem criar registo.
+- [ ] Negativo 2: tentativa de aceder a conteudo premium com estado `expired` e bloqueada corretamente.
+- [ ] Negativo 3: tentativa de renovar com datas inconsistentes (ciclo no passado) e rejeitada.
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF4-01` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: ciclo de subscricao (ativacao, renovacao, expiracao) funciona ponta-a-ponta.
+- Metrica/Limiar: 100% das transicoes de estado previstas validadas por testes funcionais.
+- Evidencia esperada: `proof` com tabela de estados + logs de transicao por caso.
+- Condicao: controlo de acesso por estado de subscricao esta ativo.
+- Metrica/Limiar: conteudo premium bloqueado em 100% dos casos `expired/past_due` definidos no teste.
+- Evidencia esperada: `proof` com capturas/API response do bloqueio e do acesso valido.
+- Condicao: robustez do dominio financeiro no MVP validada.
+- Metrica/Limiar: 3/3 negativos obrigatorios executados com resultado previsivel e sem corrupcao de dados.
+- Evidencia esperada: `neg` com requests/responses e estado final da subscricao.
 
 ## Evidence para PR/defesa
 

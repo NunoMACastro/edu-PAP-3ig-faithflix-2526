@@ -11,8 +11,9 @@
 7. [Localização e Internacionalização](#7-localização-e-internacionalização)
 8. [Resumo das Prioridades](#8-resumo-das-prioridades)
 9. [Stack Tecnológica Sugerida](#9-stack-tecnológica-sugerida)
-10. [Licença](#licença)
-11. [Changelog](#changelog)
+10. [Delimitação de Escopo RNF no MVP (2026-04-17)](#10-delimitação-de-escopo-rnf-no-mvp-2026-04-17)
+11. [Licença](#licença)
+12. [Changelog](#changelog)
 
 -   [Voltar ao início](../README.md)
 
@@ -190,6 +191,16 @@
 
 ---
 
+## 10. Delimitação de Escopo RNF no MVP (2026-04-17)
+
+- O rebaseline do MVP em FaithFlix corta funcionalidades RF específicas, mas **não remove RNF** da base normativa.
+- Todos os `RNF01..RNF40` mantêm-se ativos como contrato de qualidade, segurança, operação e conformidade.
+- Aplicação prática no MVP corrente:
+  - requisitos de IA (`RNF34..RNF37`) são cumpridos em modo baseline, sem expansão para modelos avançados;
+  - requisitos de operação e hardening mantêm-se inalterados para fecho de gates `S4/S8/S12`.
+
+---
+
 ## Licença
 
 Projeto académico orientado para fins educativos no âmbito da PAP.
@@ -200,3 +211,4 @@ Projeto académico orientado para fins educativos no âmbito da PAP.
 
 -   **2024-06-15** - Versão inicial dos Requisitos Não Funcionais (RNF) e Stack Tecnológica Sugerida.
 -   **2026-04-13** - Nome do projeto uniformizado para **FaithFlix** e revisão de coerência com a documentação de planificação.
+-   **2026-04-17** - Adicionada delimitação formal de escopo RNF no MVP alinhada ao rebaseline do plano mestre.

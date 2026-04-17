@@ -109,12 +109,12 @@ Entregar `Registo, login e recuperacao de password` cobrindo `RF01, RF02, RF05` 
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Registo, login e recuperacao de password`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
-6. Atualizar evidence e preparar handoff para `BK-MF2-02`.
+1. Definir contratos de API para `registo`, `login`, `forgot-password` e `reset-password` (payload, codigos HTTP, mensagens de erro).
+2. Implementar registo com validacao forte (email valido, password minima, email unico) e persistencia segura.
+3. Implementar login com verificacao de credenciais e criacao de sessao/cookie de autenticacao conforme base de seguranca da `MF1`.
+4. Implementar recuperacao de password com token de uso unico e expiracao controlada, invalidando token apos reset bem-sucedido.
+5. Cobrir com testes de integracao os 4 fluxos principais e validar que nao existe fuga de informacao sensivel em erros.
+6. Atualizar evidence e preparar handoff tecnico para `BK-MF2-02`.
 
 ## Outputs esperados
 
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: tentativa de registo com email ja existente retorna erro funcional (sem criar conta duplicada).
+- [ ] Negativo 2: tentativa de login com password errada retorna erro generico (sem indicar se o email existe).
+- [ ] Negativo 3: tentativa de reset com token invalido/expirado falha e nao altera a password atual.
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF2-01` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: fluxos `registo`, `login`, `forgot-password` e `reset-password` funcionam ponta-a-ponta.
+- Metrica/Limiar: 4/4 fluxos validados por teste de integracao sem erro bloqueante.
+- Evidencia esperada: `proof` com output dos testes + captura de cookie/sessao criada no login.
+- Condicao: erros de autenticacao e recuperacao nao expõem dados sensiveis.
+- Metrica/Limiar: 100% das respostas negativas usam mensagem segura e codigos HTTP coerentes.
+- Evidencia esperada: `neg` com resposta de API para os 3 cenarios negativos obrigatorios.
+- Condicao: conformidade documental e de rastreabilidade.
+- Metrica/Limiar: `rf_rnf`, `dependencias` e `proximo_bk` alinhados com backlog/matriz no fecho.
+- Evidencia esperada: checklist tecnico assinado pelo owner + validacao de gate.
 
 ## Evidence para PR/defesa
 

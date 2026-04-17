@@ -7,15 +7,15 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-13`
+- `last_updated`: `2026-04-17`
 
 ## Objetivo
 
-Consolidar a manutencao dos guias BK apos cobertura total (`60/60`), garantindo alinhamento continuo com backlog, matriz RF/RNF, plano de sprints e evidencias de gate.
+Consolidar a manutencao dos guias BK apos cobertura total (`55/55`), garantindo alinhamento continuo com backlog, matriz RF/RNF, plano de sprints e evidencias de gate.
 
 ## Estado atual (snapshot)
 
-- Guias BK criados: `60/60`.
+- Guias BK criados: `55/55`.
 - BKs pendentes de criacao: `0`.
 - Fonte de verdade operacional: `docs/planificacao/backlogs/BACKLOG-MVP.md`.
 - Ordem canonica de execucao: `docs/planificacao/sprints/PLANO-SPRINTS.md`.
@@ -62,3 +62,4 @@ Consolidar a manutencao dos guias BK apos cobertura total (`60/60`), garantindo 
 
 - `2026-04-12`: roadmap inicial dos BKs em falta (fase de criacao).
 - `2026-04-13`: roadmap atualizado para fase pos-cobertura total (`60/60`) com foco em manutencao, evidencias e fecho de gates.
+- `2026-04-17`: roadmap atualizado para baseline final do MVP (`55/55`) apos rebaseline de escopo.

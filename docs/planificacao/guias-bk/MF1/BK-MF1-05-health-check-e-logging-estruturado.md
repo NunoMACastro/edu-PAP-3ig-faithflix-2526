@@ -11,7 +11,7 @@
 - `estado`: `TODO`
 - `esforco`: `S`
 - `dependencias`: `BK-MF1-01`
-- `rf_rnf`: `RNF30, RNF31`
+- `rf_rnf`: `RNF31`
 - `fase_documental`: `Fase 2`
 - `sprint`: `S02`
 - `core_or_reforco`: `Core`
@@ -23,7 +23,7 @@
 
 ### Objetivo pedagogico
 
-- Consolidar a entrega de `Health-check e logging estruturado` com rastreabilidade explicita para `RNF30, RNF31`.
+- Consolidar a entrega de `Health-check e logging estruturado` com rastreabilidade explicita para `RNF31`.
 - Executar o BK `BK-MF1-05` no contexto da macro `MF1` e da sprint `S02`.
 
 ### Tempo estimado
@@ -46,7 +46,7 @@
 
 ## O que vamos fazer neste BK
 
-Entregar `Health-check e logging estruturado` cobrindo `RNF30, RNF31` na `MF1`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+Entregar `Health-check e logging estruturado` cobrindo `RNF31` na `MF1`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
 
 ## Porque isto e importante
 
@@ -103,7 +103,7 @@ Entregar `Health-check e logging estruturado` cobrindo `RNF30, RNF31` na `MF1`, 
 
 ## Pre-leitura minima (10-15 min)
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RNF30, RNF31`).
+- `docs/RF.md` e `docs/RNF.md` (itens de `RNF31`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF1-05`).
 - `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 

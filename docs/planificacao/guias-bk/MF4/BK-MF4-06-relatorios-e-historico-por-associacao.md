@@ -15,7 +15,7 @@
 - `fase_documental`: `Fase 2`
 - `sprint`: `S08`
 - `core_or_reforco`: `Core`
-- `proximo_bk`: `BK-MF4-07`
+- `proximo_bk`: `BK-MF5-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md`
 - `last_updated`: `2026-04-14`
 
@@ -51,7 +51,7 @@ Entregar `Relatorios e historico por associacao` cobrindo `RF46, RF47, RF48` na 
 ## Porque isto e importante
 
 - Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF4-07`).
+- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF5-01`).
 - Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
 
 ## Bloco operacional (obrigatorio)
@@ -109,12 +109,12 @@ Entregar `Relatorios e historico por associacao` cobrindo `RF46, RF47, RF48` na 
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Relatorios e historico por associacao`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P1`.
-6. Atualizar evidence e preparar handoff para `BK-MF4-07`.
+1. Definir consultas/enderecos de relatorio por associacao com filtros minimos (`periodo`, `estado`, `tipo de distribuicao`).
+2. Implementar historico cronologico por associacao com totais acumulados e detalhe por mes.
+3. Implementar visao publica agregada (sem dados sensiveis) e visao privada por entidade com autenticacao.
+4. Garantir controlo de acesso para impedir leitura cruzada entre associacoes.
+5. Adicionar exportacao simples (`CSV`) dos dados filtrados para suporte a transparencia e defesa PAP.
+6. Atualizar evidence e preparar handoff para `BK-MF5-01`.
 
 ## Outputs esperados
 
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: associacao A tenta consultar historico da associacao B e o acesso e bloqueado.
+- [ ] Negativo 2: filtro de periodo invalido (`data_inicio > data_fim`) devolve erro de validacao.
+- [ ] Negativo 3: pedido de relatorio sem registos devolve estado vazio controlado (sem erro 500).
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF4-06` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P1`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: relatorios e historico por associacao funcionam com filtros e totais corretos.
+- Metrica/Limiar: 100% dos filtros declarados retornam dados coerentes com as distribuicoes registadas.
+- Evidencia esperada: `proof` com amostra de relatorio + comparacao com dados fonte.
+- Condicao: isolamento de acesso por associacao garantido.
+- Metrica/Limiar: 0 acessos cruzados permitidos em testes de autorizacao entre entidades.
+- Evidencia esperada: `proof`/`neg` com requests autenticados e respostas de bloqueio.
+- Condicao: comportamento degradado controlado em cenarios limite.
+- Metrica/Limiar: 3/3 negativos obrigatorios executados sem erro bloqueante da aplicacao.
+- Evidencia esperada: `neg` com capturas/logs dos cenarios de filtro invalido e dataset vazio.
 
 ## Evidence para PR/defesa
 
@@ -178,7 +178,7 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Proximo BK recomendado
 
-`BK-MF4-07`
+`BK-MF5-01`
 
 ## Changelog
 

@@ -109,11 +109,11 @@ Entregar `Distribuicao mensal e rotacao` cobrindo `RF44, RF45` na `MF4`, com flu
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Distribuicao mensal e rotacao`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
+1. Definir algoritmo mensal de distribuicao com entrada (`valor_pool_mes`, associacoes elegiveis, regra de rotacao) e saida auditavel.
+2. Implementar regra de rotacao deterministica para garantir alternancia justa entre associacoes elegiveis.
+3. Implementar calculo de percentagens/valores com tratamento de arredondamentos e reconciliacao final do total.
+4. Persistir execucao da distribuicao com `run_id` unico por mes para garantir idempotencia.
+5. Expor resultado da distribuicao para consumo por relatarios/admin sem permitir alteracao retroativa indevida.
 6. Atualizar evidence e preparar handoff para `BK-MF4-06`.
 
 ## Outputs esperados
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: tentativa de executar distribuicao duas vezes no mesmo mes nao cria duplicados.
+- [ ] Negativo 2: configuracao de percentagens invalida (soma diferente de 100%) e bloqueada antes da execucao.
+- [ ] Negativo 3: associacao inelegivel/inativa nao recebe valores no processamento mensal.
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF4-05` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: distribuicao mensal e rotacao executam sem ambiguidades.
+- Metrica/Limiar: 1 execucao valida por mes, com `run_id` unico e sem duplicacao.
+- Evidencia esperada: `proof` com registos do processamento mensal e respetivo resumo.
+- Condicao: reconciliacao financeira da pool esta correta.
+- Metrica/Limiar: soma dos valores distribuidos = valor da pool do mes (diferenca maxima permitida: `0.01`).
+- Evidencia esperada: `proof` com tabela de calculo e comprovativo de reconciliacao.
+- Condicao: robustez de regras de elegibilidade e configuracao.
+- Metrica/Limiar: 3/3 negativos obrigatorios executados com bloqueio/resultado esperado.
+- Evidencia esperada: `neg` com cenarios de erro e estado final dos registos.
 
 ## Evidence para PR/defesa
 

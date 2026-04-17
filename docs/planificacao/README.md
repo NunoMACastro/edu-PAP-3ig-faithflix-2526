@@ -1,14 +1,20 @@
 # Planificacao - FaithFlix
 
-`last_updated`: `2026-04-14`
+`last_updated`: `2026-04-17`
 
 ## Objetivo
 
-Centralizar a planificacao executavel do FaithFlix com contrato canonico alinhado ao modelo OPSA, sem alterar o numero de BKs.
+Centralizar a planificacao executavel do FaithFlix com contrato canonico alinhado ao modelo de avaliacao documental da PAP.
+
+## Baseline de escopo MVP (2026-04-17)
+
+- Backlog ativo final: `55 BK`.
+- Regra aplicada: BK/RF fora de escopo foram removidos integralmente dos requisitos e da planificacao.
+- Estado operativo esperado: apenas itens em escopo aparecem nos artefactos canónicos.
 
 ## Mapa rapido
 
-- `PLANO-IMPLEMENTACAO-TOTAL.md`: plano macro (`MF0..MF8`) e alinhamento de execucao.
+- `PLANO-IMPLEMENTACAO-TOTAL.md`: plano macro (`MF0..MF8`) e regras de execucao.
 - `DISTRIBUICAO-RESPONSABILIDADES.md`: ownership, handoff e pairing.
 - `backlogs/BACKLOG-MVP.md`: backlog oficial (`BK-*`) com owner/prioridade/dependencias/rf_rnf.
 - `backlogs/MATRIZ-CANONICA-BK.md`: rastreabilidade requisito -> BK -> evidencia.
@@ -41,24 +47,12 @@ Centralizar a planificacao executavel do FaithFlix com contrato canonico alinhad
 - `docs/planificacao/guias-bk/MF*/BK-MF*.md`
 - `docs/planificacao/guias-bk/_TEMPLATE-BK.md`
 
-### Nivel 4 - Auditoria e fecho
-
-- `docs/planificacao/sprints/SCORECARD-SPRINTS.md`
-- `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
-
-## Contrato canonico comum (FaithFlix + OPSA)
+## Contrato canonico comum
 
 - Scorecard oficial fixo: `Cobertura/rastreabilidade=25`, `Coerencia documental=20`, `Pedagogia/guidance/step-by-step=25`, `Adequacao ao 12o=20`, `Governanca/avaliacao=10`.
 - Header obrigatorio em todos os guias BK:
 `bk_id`, `macro`, `owner`, `apoio`, `prioridade`, `estado`, `esforco`, `dependencias`, `rf_rnf`, `fase_documental`, `sprint`, `core_or_reforco`, `proximo_bk`, `guia_path`, `last_updated`.
-- Regra de modo: `P0 => Reforco`; `P1/P2 => Core`.
-- Regra de rastreabilidade: `Matriz 100% + Backlog 100%` para RF/RNF.
-
-## Regras de precedencia
-
-- Em caso de conflito, prevalece sempre o nivel mais alto.
-- `MF-VIEWS.md` e `proximo_bk` dos guias sao artefactos derivados e nao podem divergir dos niveis 1 e 2.
-- Alteracoes em backlog/sprints exigem revalidacao imediata da matriz, guias e scorecard.
+- Regra de rastreabilidade: `Matriz 100% + Backlog 100%` para RF/RNF ativos.
 
 ## Validacao
 

@@ -7,18 +7,24 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-04-17`
 
 ## Objetivo
 
-Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com rastreabilidade canonica, rigor pedagogico e qualidade documental orientada a meta `>=97/100`.
+Traduzir os requisitos ativos (`RF` e `RNF`) num plano executavel para 4 alunos, com rastreabilidade canonica, rigor pedagogico e qualidade documental orientada a meta `>=97/100`.
 
 ## Assuncoes de execucao
 
 - Equipa tecnica: `Matheus`, `Mateus`, `Davi`, `Kaue`.
 - Orientacao: `Nuno` (governance, avaliacao, gates e defesa).
-- Limites estruturais: `12 sprints`, `60 BK`.
+- Limites estruturais: `12 sprints`, `55 BK`.
 - Distribuicao desigual de BK mantida por criterio pedagogico e tecnico.
+
+## Baseline de escopo MVP (2026-04-17)
+
+- BK ativos no MVP corrente: `55/55`.
+- RF fora de escopo removidos integralmente de `docs/RF.md`, backlog e matriz.
+- Regra documental: apenas itens ativos permanecem nos artefactos canonicos.
 
 ## Contratos canonicos obrigatorios
 
@@ -36,9 +42,9 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com r
 | `MF0` | Kickoff e governance | alinhamento, ownership, backlog, DoD |
 | `MF1` | Fundacao tecnica | base FE/BE, seguranca, observabilidade |
 | `MF2` | Core streaming | `RF01..RF18` |
-| `MF3` | Descoberta e comunidade | `RF19..RF34` |
-| `MF4` | Monetizacao solidaria | `RF35..RF54` |
-| `MF5` | Operacao e privacidade | `RF55..RF63` |
+| `MF3` | Descoberta e recomendacao | `RF19..RF28` |
+| `MF4` | Monetizacao solidaria | `RF35..RF48`, `RF52..RF54` |
+| `MF5` | Operacao e privacidade | `RF55..RF60` |
 | `MF6` | Hardening | `RNF` criticos de qualidade/performance/seguranca |
 | `MF7` | Evidencias PAP | matriz RF/RNF + demo + ensaio |
 | `MF8` | Buffer e fecho | estabilizacao, freeze e retro final |
@@ -70,8 +76,8 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com r
 
 ### Gate S12
 
-- Fecho integral `103/103` e `60/60`.
-- Scorecard oficial consolidado sprint-a-sprint com pesos OPSA.
+- Fecho integral `91/91` (RF+RNF ativos) e `55/55` BK.
+- Scorecard oficial consolidado sprint-a-sprint.
 - Score final consolidado no scorecard oficial.
 - Parecer final `GO/NO-GO` com assinatura do orientador.
 
@@ -86,4 +92,5 @@ Traduzir `RF01..RF63` e `RNF01..RNF40` num plano executavel para 4 alunos, com r
 - `2026-04-11`: versao revista com equipa correta.
 - `2026-04-13`: reforco de contratos canonicos, governance pedagogica e meta de qualidade `97/100`.
 - `2026-04-13`: removida dependencia de ficheiro externo de score e consolidada avaliacao no scorecard oficial.
-- `2026-04-14`: incorporada hierarquia canonica OPSA adaptada, scorecard oficial por sprint e guiao docente semanal.
+- `2026-04-14`: incorporada hierarquia canonica adaptada, scorecard oficial por sprint e guiao docente semanal.
+- `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral de itens fora de escopo.

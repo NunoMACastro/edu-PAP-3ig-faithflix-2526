@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-04-17`
 
 ## Objetivo
 
@@ -33,6 +33,7 @@ Dar ao orientador um guiao semanal simples e executavel para controlo de sprint,
 1. Verificar blockers e decidir corte de scope (primeiro `P2`, depois `P1`).
 2. Reforcar BKs P0 com pairing e apoio tecnico imediato.
 3. Confirmar evidencias parciais (`proof`) para evitar fecho vazio.
+4. Reconfirmar alinhamento sprint/backlog apos qualquer corte intermédio.
 
 ### Quinta - Pre-gate interno
 
@@ -73,3 +74,4 @@ Dar ao orientador um guiao semanal simples e executavel para controlo de sprint,
 ## Changelog
 
 - `2026-04-14`: criado guiao docente semanal com checkpoints e remediacao objetiva.
+- `2026-04-17`: alinhado ao rebaseline de escopo MVP sem referencias residuais a itens fora de escopo.

@@ -15,7 +15,7 @@
 - `fase_documental`: `Fase 2`
 - `sprint`: `S10`
 - `core_or_reforco`: `Core`
-- `proximo_bk`: `BK-MF5-07`
+- `proximo_bk`: `BK-MF6-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md`
 - `last_updated`: `2026-04-14`
 
@@ -51,7 +51,7 @@ Entregar `Configuracao de integracoes admin` cobrindo `RF60` na `MF5`, com fluxo
 ## Porque isto e importante
 
 - Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF5-07`).
+- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF6-01`).
 - Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
 
 ## Bloco operacional (obrigatorio)
@@ -114,7 +114,7 @@ Entregar `Configuracao de integracoes admin` cobrindo `RF60` na `MF5`, com fluxo
 3. Implementar o fluxo principal de `Configuracao de integracoes admin`.
 4. Executar smoke e validar integracao com BKs adjacentes.
 5. Executar negativos obrigatorios para `P1`.
-6. Atualizar evidence e preparar handoff para `BK-MF5-07`.
+6. Atualizar evidence e preparar handoff para `BK-MF6-01`.
 
 ## Outputs esperados
 
@@ -178,7 +178,7 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Proximo BK recomendado
 
-`BK-MF5-07`
+`BK-MF6-01`
 
 ## Changelog
 

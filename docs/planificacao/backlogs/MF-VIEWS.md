@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-13`
+- `last_updated`: `2026-04-17`
 
 ## Objetivo
 
@@ -140,8 +140,6 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. `BK-MF3-04`
 5. `BK-MF3-05`
 6. `BK-MF3-06`
-7. `BK-MF3-07`
-8. `BK-MF3-08`
 
 ### Guias disponiveis
 
@@ -151,8 +149,6 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 - `BK-MF3-04`: `../guias-bk/MF3/BK-MF3-04-filtros-carrosseis-e-relacionados.md`
 - `BK-MF3-05`: `../guias-bk/MF3/BK-MF3-05-recomendacao-baseline-cold-start.md`
 - `BK-MF3-06`: `../guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md`
-- `BK-MF3-07`: `../guias-bk/MF3/BK-MF3-07-estudo-biblico-e-guias.md`
-- `BK-MF3-08`: `../guias-bk/MF3/BK-MF3-08-funcionalidades-comunidade.md`
 
 ### Step-by-step
 
@@ -160,7 +156,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 2. Fechar ratings/comentarios.
 3. Fechar recomendacao baseline.
 4. Fechar explicabilidade.
-5. Fechar estudo biblico e comunidade.
+5. Consolidar descoberta e preparar handoff para monetizacao.
 
 ### Pronto da macro
 
@@ -179,7 +175,6 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 5. `BK-MF4-04`
 6. `BK-MF4-05`
 7. `BK-MF4-06`
-8. `BK-MF4-07`
 
 ### Guias disponiveis
 
@@ -189,7 +184,6 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 - `BK-MF4-04`: `../guias-bk/MF4/BK-MF4-04-aprovacao-entrada-pool.md`
 - `BK-MF4-05`: `../guias-bk/MF4/BK-MF4-05-distribuicao-mensal-rotacao.md`
 - `BK-MF4-06`: `../guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md`
-- `BK-MF4-07`: `../guias-bk/MF4/BK-MF4-07-workflow-editorial-e-denuncias.md`
 - `BK-MF4-08`: `../guias-bk/MF4/BK-MF4-08-notificacoes-transacionais-e-preferencias.md`
 
 ### Step-by-step
@@ -199,7 +193,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 3. Fechar candidaturas/aprovacoes.
 4. Fechar distribuicao da pool.
 5. Fechar relatorios/notificacoes.
-6. Fechar workflow editorial.
+6. Fechar evidencias da pool solidaria para gate.
 
 ### Pronto da macro
 
@@ -217,8 +211,6 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. `BK-MF5-04`
 5. `BK-MF5-05`
 6. `BK-MF5-06`
-7. `BK-MF5-07`
-8. `BK-MF5-08`
 
 ### Guias disponiveis
 
@@ -228,16 +220,13 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 - `BK-MF5-04`: `../guias-bk/MF5/BK-MF5-04-gestao-de-utilizadores-admin.md`
 - `BK-MF5-05`: `../guias-bk/MF5/BK-MF5-05-painel-de-metricas-admin.md`
 - `BK-MF5-06`: `../guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md`
-- `BK-MF5-07`: `../guias-bk/MF5/BK-MF5-07-perfis-familiares-e-dispositivos.md`
-- `BK-MF5-08`: `../guias-bk/MF5/BK-MF5-08-gamificacao-baseline.md`
 
 ### Step-by-step
 
 1. Fechar RGPD.
 2. Fechar operacao admin.
 3. Fechar metricas/integracoes.
-4. Fechar perfis/dispositivos.
-5. Fechar gamificacao.
+4. Consolidar handoff para regressao e hardening.
 
 ### Pronto da macro
 
@@ -347,3 +336,4 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 - `2026-04-11`: versao revista com equipa correta e ownership atualizado.
 - `2026-04-12`: blocos "Guias disponiveis" sincronizados para cobertura total (MF0..MF8), sem entradas pendentes.
 - `2026-04-13`: ordem de sequencia normalizada para derivar de `PLANO-SPRINTS` (fonte canonica).
+- `2026-04-17`: sequencias MF3/MF4/MF5 alinhadas ao rebaseline de escopo MVP com limpeza de itens fora de escopo.

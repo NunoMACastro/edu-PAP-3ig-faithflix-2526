@@ -1,157 +1,113 @@
 # FaithFlix
 
-O FaithFlix é uma plataforma de streaming cristão que reúne filmes, séries e documentários com curadoria teológica, integrando estudo bíblico e impacto social num único serviço. A aplicação oferece um catálogo selecionado, ferramentas de descoberta avançada, perfis familiares, recomendações personalizadas e recursos devocionais associados ao conteúdo audiovisual.
+## Metadados
+- Nome da app: FaithFlix
+- Ano letivo: 2025/2026
+- Turma: 12º IG
+- Nome dos alunos: Matheus, Kaue, Davi, Mateus
+- Orientador: Nuno Castro e Cláudia Marques
 
-Para além do entretenimento, o FaithFlix integra materiais de estudo (passagens bíblicas, notas teológicas e guias de reflexão) diretamente nos títulos, permitindo uma experiência mais profunda e formativa. O modelo de subscrição inclui ainda um sistema solidário: uma percentagem das receitas mensais é distribuída por uma pool rotativa de associações cristãs previamente aprovadas.
+## 1. Visão Geral Extensa da Aplicação
+O FaithFlix é uma plataforma de streaming cristão concebida para unir consumo audiovisual, formação espiritual e impacto social num único produto digital. A aplicação combina catálogo curado de filmes, séries e documentários com ferramentas de descoberta, continuidade de visualização e gestão de perfis. Em paralelo, incorpora um mecanismo solidário de redistribuição de valor para associações cristãs, tornando a subscrição parte de um ciclo de apoio comunitário mensurável.
 
-A plataforma inclui ferramentas editoriais, moderação, gestão de utilizadores, privacidade/RGPD e painéis administrativos completos, garantindo segurança, fiabilidade e qualidade de operação. O FaithFlix foi desenvolvido no âmbito da PAP do Curso Profissional de Informática de Gestão, combinando tecnologia moderna com princípios de acessibilidade e boas práticas de desenvolvimento web.
+No contexto da PAP de Informática de Gestão (12.º ano), o projeto foi desenhado para trabalhar competências técnicas e de gestão: modelação de produto, decisões de escopo, rastreabilidade entre backlog e documentação, privacidade de dados e governação operacional. O FaithFlix posiciona-se como um caso prático de produto digital com propósito social e com requisitos de operação realistas.
 
----
+## 2. Problema que Resolve e Proposta de Valor
+Plataformas genéricas de streaming raramente oferecem curadoria cristã consistente, nem mecanismos transparentes de apoio direto a organizações religiosas e sociais. O FaithFlix resolve esta lacuna em três frentes:
 
-**Indíce**
+- curadoria temática e teológica de conteúdos;
+- experiência de visualização moderna, comparável ao padrão esperado em plataformas comerciais;
+- modelo de subscrição com pool solidária, onde parte da receita é distribuída com regras explícitas e auditáveis.
 
-1. [Contexto do Projeto](#contexto-do-projeto)
-2. [Visão e Objetivos](#visão-e-objetivos)
-3. [Público-Alvo e Stakeholders](#público-alvo-e-stakeholders)
-4. [Funcionalidades Principais](#funcionalidades-principais)
-5. [Requisitos Não Funcionais Essenciais](#requisitos-não-funcionais-essenciais)
-6. [Stack e Arquitetura Recomendada](#stack-e-arquitetura-recomendada)
-7. [Roadmap para o MVP (inclui todos os RF)](#roadmap-para-o-mvp-inclui-todos-os-rf)
-8. [Identificação e Créditos](#identificação-e-créditos)
-9. [Licença](#licença)
-10. [Changelog](#changelog)
+A proposta de valor está na integração destas dimensões sem fragmentação: o utilizador encontra conteúdo relevante, acompanha o seu consumo e participa num ecossistema com retorno social claro.
 
----
+## 3. Público-Alvo e Stakeholders
+- famílias e jovens cristãos que procuram conteúdo alinhado com valores e orientação espiritual;
+- igrejas, grupos de estudo e líderes comunitários que usam conteúdos como apoio pedagógico;
+- associações beneficiárias da pool solidária;
+- equipa editorial e moderadores, responsáveis por qualidade e conformidade do catálogo;
+- administradores funcionais/financeiros, responsáveis por subscrições, distribuição e auditoria.
 
-## Contexto do Projeto
+## 4. Funcionalidades Principais por Domínio Funcional
+### 4.1 Identidade, acesso e perfis
+- registo, autenticação e recuperação de acesso;
+- gestão de perfil de utilizador e preferências de consumo;
+- consentimentos e operações de privacidade (exportação e eliminação de dados).
 
--   Catálogo premium dedicado a filmes, séries, documentários e recursos devocionais com curadoria teológica.
--   Operação focada em garantir acesso seguro a conteúdos cristãos e apoiar associações de caridade via pool rotativa.
--   Envolve equipas editoriais, moderadores, administradores, utilizadores finais e parceiros de distribuição.
+### 4.2 Catálogo e experiência de streaming
+- gestão de catálogo e taxonomias de conteúdo;
+- página de detalhe com metadados essenciais;
+- reprodução com continuidade (“continuar a ver”);
+- favoritos, watchlist e histórico pessoal.
 
----
+### 4.3 Descoberta e recomendação
+- pesquisa unificada por título e tema;
+- filtros por tipo de conteúdo e critérios de navegação;
+- recomendação baseline para melhorar descoberta sem sobrecarga algorítmica de MVP.
 
-## Visão e Objetivos
+### 4.4 Monetização e pool solidária (núcleo diferencial)
+Fluxo funcional da pool solidária no MVP:
+- candidatura de associação elegível;
+- validação/aprovação para entrada na pool;
+- distribuição mensal por rotação/regras definidas;
+- registo histórico e transparência da distribuição por associação.
 
-1. Disponibilizar um serviço de streaming moderno e responsivo com funcionalidades comparáveis a plataformas comerciais.
-2. Integrar estudo bíblico e recursos pastorais diretamente no conteúdo audiovisual.
-3. Financiar mensalmente associações cristãs através de percentagem da receita de subscrições.
-4. Fornecer ferramentas administrativas robustas, com auditoria e conformidade RGPD.
+### 4.5 Operação, administração e governação
+- gestão administrativa de utilizadores e estados de conta;
+- políticas mínimas de notificação transacional;
+- relatórios operacionais essenciais para acompanhamento do ciclo solidário.
 
----
+Fontes funcionais canónicas: [docs/RF.md](docs/RF.md), [docs/planificacao/backlogs/BACKLOG-MVP.md](docs/planificacao/backlogs/BACKLOG-MVP.md).
 
-## Público-Alvo e Stakeholders
+## 5. Arquitetura/Stack Recomendada (Alto Nível)
+- frontend web moderno com componentes reutilizáveis e navegação responsiva;
+- backend modular por domínios (identidade, catálogo, streaming, subscrição, pool solidária);
+- base de dados principal `MongoDB Atlas` no MVP (com alternativa `PostgreSQL` para evolução pós-PAP), mantendo rastreabilidade e consistência por desenho de modelo;
+- camada de observabilidade (logs, métricas, health-checks);
+- integração de pagamento em modo MVP controlado.
 
--   **Famílias e jovens cristãos** – consumo de conteúdo e participação comunitária.
--   **Igrejas e líderes** – curadoria, estudos bíblicos e recomendações de conteúdo.
--   **Associações parceiras** – beneficiam da distribuição solidária.
--   **Equipa editorial e moderadores** – gestão do catálogo e curadoria.
--   **Administradores e finanças** – controlo de subscrições, métricas, pagamentos e segurança.
+A arquitetura privilegia separação de responsabilidades, rastreabilidade de decisões e simplicidade de operação para contexto PAP.
 
----
+## 6. Escopo MVP vs Pós-PAP
+### MVP (incluído)
+- núcleo de streaming e catálogo;
+- gestão básica de conta e privacidade;
+- pesquisa e recomendação baseline;
+- pool solidária completa no fluxo essencial (candidatura, aprovação, rotação, transparência);
+- administração mínima para operar o produto.
 
-## Funcionalidades Principais
+### Pós-PAP (adiado)
+- funcionalidades de comunidade avançada;
+- gamificação;
+- workflow editorial avançado com denúncias complexas;
+- perfis familiares/dispositivos com regras avançadas;
+- automações de recomendação e notificação de maior complexidade.
 
-### Identidade, Perfis e Segurança
+## 7. Requisitos Não Funcionais Críticos
+- segurança de sessão e proteção de dados pessoais;
+- desempenho consistente no catálogo e no início de reprodução;
+- confiabilidade operacional mínima para uso contínuo;
+- acessibilidade base e linguagem clara para diferentes perfis de utilizador;
+- governança documental e rastreabilidade entre backlog, decisões e evidências.
 
--   Registo/login (RF01–RF05), recuperação de password, papéis (utilizador, moderador, administrador) e perfis partilhados.
--   Preferências de idioma, filtros de maturidade e controlo parental com PIN.
--   Sessões seguras (cookies HttpOnly), deteção de anomalias e gestão de dispositivos.
+Fonte canónica RNF: [docs/RNF.md](docs/RNF.md).
 
-### Catálogo e Curadoria
+## 8. Roadmap Resumido por Fases
+1. fundação técnica e identidade da aplicação;
+2. catálogo, detalhe e experiência de visualização;
+3. subscrição e pool solidária em ciclo completo;
+4. endurecimento operacional, qualidade documental e preparação de defesa.
 
--   Gestão de conteúdos com metadados ricos, taxonomias teológicas, estados de publicação e histórico de revisões (RF06–RF10).
--   Conteúdo destacado com trailers, galerias, referências bíblicas e recursos adicionais (estudos, devocionais, podcasts).
--   Workflow editorial com aprovação, rejeição, duplicação e rollback.
+## 9. Créditos, Licença e Changelog
+### Créditos
+- Projeto: FaithFlix
+- Tipo: PAP - Curso Profissional de Informática de Gestão
+- Ano letivo: 2025/2026
+- Equipa: Matheus, Kaue, Davi, Mateus
+- Orientador: Nuno Castro e Cláudia Marques
 
-### Streaming e Experiência de Visualização
+### Licença
+Projeto académico para fins educativos.
 
--   Entrega adaptativa HLS/DASH, seleção de áudio/legendas, qualidade manual, “Continuar a ver” e watchlist (RF11–RF18).
--   Favoritos, histórico sincronizado e dispositivos autorizados.
--   Estatísticas de visualização para recomendações e métricas administrativas.
-
-### Descoberta, IA e Comunidade
-
--   Pesquisa unificada, filtros e ordenação, carrosséis temáticos e conteúdos relacionados (RF22–RF25).
--   Recomendações IA personalizadas baseadas em favoritos, histórico e ratings (RF26–RF30), com explicação e opt-out.
--   Estudo bíblico integrado: planos temáticos por série, devocionais ligados a episódios, comparações de traduções (RF31–RF34).
--   Comentários curtos moderados, ratings agregados e gamificação opcional (RF19–RF21, RF35–RF39).
-
-### Subscrições e Pool Solidária
-
--   Planos mensais/anuais, upgrades/downgrades, faturação automática e gestão de falhas (RF40–RF44).
--   Pool rotativa que distribui percentagem das subscrições por associações escolhidas pela comunidade (RF45–RF49).
--   Relatórios transparentes por associação, histórico de contribuições e comunicação de impacto social.
-
-### Operação e Governança
-
--   Painel administrativo para catálogo, utilizadores, associações, notificações e métricas (RF50–RF55).
--   Gestão de moderação, auditorias, logs de integrações e configuração de notificações (email, push, in-app).
--   Ferramentas para privacidade/RGPD: exportação, eliminação, consentimentos e políticas.
-
-> Detalhes completos encontram-se em [`docs/RF.md`](docs/RF.md#índice).
-
----
-
-## Requisitos Não Funcionais Essenciais
-
--   **Usabilidade/Acessibilidade** – UI responsiva, contraste AA, mensagens claras em PT-PT, player intuitivo (RNF01–RNF06).
--   **Performance** – Catálogo inicial <3s, stream ≤3s após “play”, pesquisa e recomendações ≤2–3s, suporte ≥100 streams simultâneos (RNF07–RNF12).
--   **Segurança & RGPD** – HTTPS, hashing seguro, cookies protegidos, encriptação de dados sensíveis, políticas de retenção e consentimento explícito (RNF13–RNF22).
--   **Compatibilidade/Integração** – Browsers modernos, exportações (CSV/PDF), gateways de pagamento, APIs internas para futuras integrações (RNF21–RNF26).
--   **Operação** – Arquitetura modular, testes críticos, logs estruturados, health-checks, backups e CI/CD (RNF27–RNF33).
--   **IA Ética** – Explicabilidade, mitigação de viés, respeito por preferências do utilizador e anonimização de dados (RNF34–RNF37).
--   **Localização** – Português europeu com preparação para internacionalização (RNF38–RNF40).
-
->
-
----
-
-## Stack e Arquitetura Recomendada
-
-```
-frontend/   # Next.js + TypeScript, Tailwind CSS, Zustand/React Query
-backend/    # NestJS/Express modular, Prisma/TypeORM, serviços por domínio
-streaming/  # Integração Cloudflare Stream ou AWS S3 + CloudFront
-docs/       # RF, RNF, arquitetura, decisões técnicas e testes
-scripts/    # Automatizações, ingestão de catálogo e tooling DevOps
-```
-
--   **Base de dados:** PostgreSQL (dados relacionais) + Redis (cache/sessões).
--   **Pagamentos:** Stripe/MBWay com webhooks para subscrições e pool solidária.
--   **Observabilidade:** Logs centralizados, métricas, alertas e backups automáticos.
--   **Deploy:** Render/Railway/Vercel com pipelines GitHub Actions.
-
----
-
-## Roadmap para o MVP (inclui todos os RF)
-
-1. **Fase 1 - Fundacional:** identidade, perfis, catálogo inicial, player básico, painel administrativo mínimo.
-2. **Fase 2 - Experiência Premium:** pesquisa avançada, recomendações IA, favoritos/watchlist, estudo bíblico integrado e comunidade.
-3. **Fase 3 - Monetização Solidária:** subscrições completas, pool de associações, relatórios, notificações e processos financeiros.
-4. **Fase 4 - Operação e Escala:** monitorização, auditorias, automação editorial, integrações com CDN e otimizações de performance.
-
----
-
-## Identificação e Créditos
-
-> **Projeto:** FaithFlix  
-> **Tipo:** PAP - Curso Profissional de Informática de Gestão  
-> **Áreas:** Programação · Gestão · Base de Dados  
-> **Ano letivo:** 2025/2026  
-> **Versão:** 1.0  
-> **Equipa:** [Matheus, Mateus, Davi, Kaue]  
-> **Professor Orientador:** Nuno Castro e Cláudia Marques
-
----
-
-## Licença
-
-Projeto académico. Utilização exclusivamente para fins educativos no âmbito da PAP.
-
----
-
-## Changelog
-
--   **2024-04-27** – README uniformizado com nova estrutura, funcionalidades detalhadas, roadmap e créditos.
--   **2026-04-13** – Nome do projeto uniformizado para **FaithFlix** e revisão editorial de consistência com a planificação.
+### Changelog
+- 2026-04-17: README reescrito integralmente com estrutura canónica, escopo MVP/pós-PAP e alinhamento com plano mestre.

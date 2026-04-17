@@ -11,7 +11,7 @@
 - `estado`: `TODO`
 - `esforco`: `M`
 - `dependencias`: `BK-MF6-02`
-- `rf_rnf`: `RNF01, RNF02, RNF03, RNF04, RNF05, RNF06`
+- `rf_rnf`: `RNF01, RNF02, RNF03, RNF04, RNF06`
 - `fase_documental`: `Fase 3`
 - `sprint`: `S11`
 - `core_or_reforco`: `Core`
@@ -23,7 +23,7 @@
 
 ### Objetivo pedagogico
 
-- Consolidar a entrega de `Acessibilidade e UX final` com rastreabilidade explicita para `RNF01, RNF02, RNF03, RNF04, RNF05, RNF06`.
+- Consolidar a entrega de `Acessibilidade e UX final` com rastreabilidade explicita para `RNF01, RNF02, RNF03, RNF04, RNF06`.
 - Executar o BK `BK-MF6-05` no contexto da macro `MF6` e da sprint `S11`.
 
 ### Tempo estimado
@@ -46,7 +46,7 @@
 
 ## O que vamos fazer neste BK
 
-Entregar `Acessibilidade e UX final` cobrindo `RNF01..RNF06` na `MF6`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+Entregar `Acessibilidade e UX final` cobrindo `RNF01..RNF04 e RNF06` na `MF6`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
 
 ## Porque isto e importante
 
@@ -103,7 +103,7 @@ Entregar `Acessibilidade e UX final` cobrindo `RNF01..RNF06` na `MF6`, com fluxo
 
 ## Pre-leitura minima (10-15 min)
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RNF01..RNF06`).
+- `docs/RF.md` e `docs/RNF.md` (itens de `RNF01..RNF04 e RNF06`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF6-05`).
 - `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 

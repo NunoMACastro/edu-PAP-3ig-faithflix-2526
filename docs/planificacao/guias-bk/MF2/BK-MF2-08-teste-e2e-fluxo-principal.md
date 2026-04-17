@@ -109,12 +109,12 @@ Entregar `Teste E2E do fluxo principal` cobrindo `RNF07, RNF08` na `MF2`, com fl
 
 ## Guia de execucao (passo-a-passo)
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Teste E2E do fluxo principal`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
-6. Atualizar evidence e preparar handoff para `BK-MF3-01`.
+1. Definir roteiro E2E unico do fluxo principal: `registo -> login -> detalhe -> reproducao -> continuar a ver -> favoritos`.
+2. Implementar testes E2E automatizados com dados previsiveis e ambiente limpo de arranque.
+3. Medir tempos de resposta dos passos criticos do fluxo para validar RNF07/RNF08 com limiares declarados.
+4. Incluir assercoes de UI e de API para cada etapa (estado esperado no frontend e persistencia no backend).
+5. Executar bateria negativa minima no mesmo pipeline E2E para validar comportamento de erro sem quebra da sessao.
+6. Publicar evidence consolidada e preparar handoff para `BK-MF3-01`.
 
 ## Outputs esperados
 
@@ -149,9 +149,9 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ### Negativos
 
 - [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
+- [ ] Negativo 1: acesso ao player sem autenticacao e bloqueado/redirecionado.
+- [ ] Negativo 2: tentativa de abrir detalhe de conteudo inexistente devolve estado de erro controlado.
+- [ ] Negativo 3: falha simulada de API no fluxo principal apresenta fallback sem crash da aplicacao.
 ### Tecnico
 
 - [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
@@ -160,15 +160,15 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF2-08` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- Condicao: roteiro E2E do fluxo principal executa sem regressao.
+- Metrica/Limiar: 100% dos passos do roteiro passam em execucao local e em pipeline.
+- Evidencia esperada: `proof` com relatorio de testes + capturas dos passos criticos.
+- Condicao: validacao basica de performance do fluxo principal concluida.
+- Metrica/Limiar: pagina inicial `<3s` e inicio de reproducao `<=3s` no ambiente de teste definido.
+- Evidencia esperada: `proof` com logs de medicao/tempos por etapa.
+- Condicao: robustez de erro e autorizacao validada.
+- Metrica/Limiar: 3/3 negativos obrigatorios executados com comportamento esperado.
+- Evidencia esperada: `neg` com detalhes do cenario, resposta e estado final da UI.
 
 ## Evidence para PR/defesa
 

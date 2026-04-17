@@ -11,7 +11,7 @@
 - `estado`: `TODO`
 - `esforco`: `M`
 - `dependencias`: `BK-MF6-06`
-- `rf_rnf`: `RF01..RF63`
+- `rf_rnf`: `RF_ATIVOS_MVP`
 - `fase_documental`: `Fase 3`
 - `sprint`: `S11`
 - `core_or_reforco`: `Reforco`
@@ -23,7 +23,7 @@
 
 ### Objetivo pedagogico
 
-- Consolidar a entrega de `Matriz de cobertura RF -> evidencia` com rastreabilidade explicita para `RF01..RF63`.
+- Consolidar a entrega de `Matriz de cobertura RF -> evidencia` com rastreabilidade explicita para `RF_ATIVOS_MVP`.
 - Executar o BK `BK-MF7-01` no contexto da macro `MF7` e da sprint `S11`.
 
 ### Tempo estimado
@@ -46,7 +46,7 @@
 
 ## O que vamos fazer neste BK
 
-Entregar `Matriz de cobertura RF -> evidencia` cobrindo `RF01..RF63` na `MF7`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+Entregar `Matriz de cobertura RF -> evidencia` cobrindo `RF_ATIVOS_MVP` na `MF7`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
 
 ## Porque isto e importante
 
@@ -103,7 +103,7 @@ Entregar `Matriz de cobertura RF -> evidencia` cobrindo `RF01..RF63` na `MF7`, c
 
 ## Pre-leitura minima (10-15 min)
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RF01..RF63`).
+- `docs/RF.md` e `docs/RNF.md` (itens de `RF_ATIVOS_MVP`).
 - `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-01`).
 - `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
 
