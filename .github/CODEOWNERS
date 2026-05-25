@@ -1,0 +1,17 @@
+# CODEOWNERS
+
+# Regras:
+
+# - Linhas mais específicas devem vir depois das mais gerais
+
+# - Os owners devem ser GitHub handles (ex.: @nuno, @guilherme, @matheus)
+
+# - Ajusta os handles abaixo aos nomes reais da tua org
+
+# Tudo por defeito
+
+- @NunoMACastro
+
+# Documentação
+
+/docs/\*\* @NunoMACastro

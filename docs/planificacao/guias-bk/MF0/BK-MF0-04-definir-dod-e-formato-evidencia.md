@@ -17,164 +17,305 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF0-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF0/BK-MF0-04-definir-dod-e-formato-evidencia.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-05-25`
 
 ## Bloco pedagogico (obrigatorio)
 
-### Objetivo pedagogico
-
-- Consolidar a entrega de `Definir DoD e formato de evidencia` com rastreabilidade explicita para `transversal`.
-- Executar o BK `BK-MF0-04` no contexto da macro `MF0` e da sprint `S01`.
-
-### Tempo estimado
-
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
-
-### Erros comuns
-
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
-
-### Check de compreensao
-
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
-
-
-## O que vamos fazer neste BK
-
-Entregar `Definir DoD e formato de evidencia` cobrindo `transversal` na `MF0`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
-
-## Porque isto e importante
-
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF0-05`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+Este BK ensina o que significa "feito" num projeto técnico. Para os alunos, a ideia essencial é: um BK não está concluído só porque o código ou documento foi escrito; precisa de validação, negativos, regressão e evidência.
 
 ## Bloco operacional (obrigatorio)
 
-### Pre-condicoes
+O trabalho operacional é transformar as regras do backlog, matriz e plano de sprints numa Definition of Done comum para todos os BK, com formato de evidence reutilizável até à defesa.
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+#### BK-MF0-04 - Definir DoD e formato de evidencia
 
-### Execucao
+##### O que vamos fazer neste BK
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+Neste BK vamos definir a Definition of Done (DoD) e o formato mínimo de evidência para fechar BKs do FaithFlix. O DoD é a lista objetiva que diz quando uma entrega pode ser marcada como `DONE`. A evidence é o conjunto de provas que acompanha essa decisão: PR/commit, prova do caso válido, negativos e ficheiros/comandos relevantes.
 
-### Outputs
+O resultado deve ser usado por todos os BKs seguintes, incluindo BKs técnicos de backend, frontend, dados, segurança, testes e UI. Como a MF0 não implementa produto funcional, este BK prepara o contrato de qualidade que será aplicado quando a app começar a ser construída em `MF1`.
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo de screenshots/mockup quando aplicável, mas este BK não define identidade visual final.
 
-### Validacao
+##### Porque e que isto e importante
 
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
+- Impede que BKs sejam fechados sem prova.
+- Torna os critérios de aceite mensuráveis e auditáveis.
+- Obriga a testar negativos, especialmente em BKs P0/P1.
+- Cria padrão comum para defesa da PAP.
+- Desbloqueia `BK-MF0-05`, porque o calendário de sprints precisa saber que evidência será exigida no fecho semanal.
 
-### Handoff
+##### O que entra (scope)
 
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
+- Definir o que significa `DONE` para BKs documentais e técnicos.
+- Definir evidence mínima: `pr`, `proof`, `neg`, `files`, `commands`, `screenshots`, `notes`.
+- Definir política de negativos por prioridade.
+- Definir regressão mínima contra BKs anteriores.
+- Definir como tratar blockers e TODOs.
 
+##### O que nao entra (scope-out)
 
-## Pre-condicoes de entrada
+- Executar testes reais da app, porque ainda não há código.
+- Criar ferramenta nova de CI/CD.
+- Alterar backlog, matriz ou plano de sprints.
+- Definir critérios específicos de cada RF futuro em detalhe final.
+- Substituir validação humana do orientador.
 
-- Dependencias declaradas: `BK-MF0-03`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+##### Como saber que isto ficou bem
 
-## O que entra (scope)
+- Qualquer aluno consegue olhar para um BK e saber que provas precisa anexar.
+- A política `P0/P1 >= 3 negativos` e `P2 >= 1 negativo` fica clara.
+- O formato de evidence serve tanto para documentação como para código.
+- O DoD inclui smoke, negativos, técnica, regressão, UI/mockup quando aplicável e segurança quando aplicável.
+- O próximo BK pode planear sprints sabendo o custo real de validar e fechar.
 
-- Entrega funcional de `Definir DoD e formato de evidencia` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
+#### Metadados do BK (CANONICO/DERIVADO):
 
-## O que nao entra (scope-out)
+- Prioridade: `P0` (CANONICO, `BACKLOG-MVP.md`)
+- Estado: `TODO` (CANONICO, `BACKLOG-MVP.md`)
+- Esforco: `S` (CANONICO, `BACKLOG-MVP.md`)
+- macro: `MF0` (CANONICO, `BACKLOG-MVP.md`)
+- Owner: `Nuno` (CANONICO, `BACKLOG-MVP.md`)
+- Apoio: `Matheus, Mateus, Davi, Kaue` (CANONICO, `BACKLOG-MVP.md`)
+- Dependencias (BK IDs): `BK-MF0-03` (CANONICO, `BACKLOG-MVP.md`)
+- Pre-condicoes: backlog atómico validado e campos BK estáveis (DERIVADO)
+- Ref. Plano: `BACKLOG-MVP > Contrato pedagogico v3`, `PLANO-SPRINTS > Gates obrigatorios`, `_TEMPLATE-BK.md` (CANONICO)
+- Flow ID: `MF0-governance-kickoff-04` (DERIVADO)
+- Fonte de verdade: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- Fonte de verdade: `docs/planificacao/guias-bk/_TEMPLATE-BK.md`
+- Fonte de verdade: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- Descricao: definir DoD e evidence mínima para fechar BKs com prova objetiva, negativos e continuidade (DERIVADO)
 
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
+#### O que vamos fazer neste BK (DERIVADO):
 
-## Como saber que isto ficou bem
+- Reutilizar o backlog atómico de `BK-MF0-03`.
+- Escrever regras de fecho aplicáveis a qualquer BK.
+- Definir evidence mínima e placeholders quando ainda não há execução.
+- Explicar aos alunos a diferença entre smoke, negativo, regressão e proof.
+- Preparar handoff para calendário de sprints, incluindo tempo real para validação.
 
-- Fluxo principal de `BK-MF0-04` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P0`.
-- Evidence documentada e pronta para auditoria de gate.
+#### Estado, ficheiros e impacto (DERIVADO):
 
-## Pre-leitura minima (10-15 min)
+- Estado esperado antes do BK: backlog atómico validado, mas ainda sem contrato operacional de fecho.
+- Estado esperado depois do BK: DoD e formato de evidence definidos para BKs documentais e técnicos.
+- Ficheiros a criar: nenhum.
+- Ficheiros a editar: apenas este guia se forem registados ajustes/evidence do BK.
+- Ficheiros a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`, `docs/planificacao/guias-bk/_TEMPLATE-BK.md`, `docs/planificacao/sprints/PLANO-SPRINTS.md`, `docs/planificacao/sprints/SCORECARD-SPRINTS.md`, `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`.
+- Dependencias de BK anteriores e uso: depende de `BK-MF0-03` para saber que BKs e campos o DoD vai avaliar.
+- Impacto na arquitetura da app: cria contrato de qualidade que futuros módulos backend/frontend/dados terão de cumprir.
+- Impacto em frontend/backend/dados: define formato de validação para quando essas camadas forem criadas em `MF1+`.
+- Impacto em segurança/testes/UI: obriga negativos de segurança quando aplicável, regressão, smoke e screenshots em BKs de UI.
+- Handoff para o próximo BK: entregar a `BK-MF0-05` a regra de que sprints devem reservar tempo para validação/evidence.
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `transversal`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF0-04`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
+#### Pre-leitura minima (10-15 min) (DERIVADO):
 
-## Guia de execucao (passo-a-passo)
+- `docs/planificacao/backlogs/BACKLOG-MVP.md`: contrato pedagógico v3 e critérios globais.
+- `docs/planificacao/guias-bk/_TEMPLATE-BK.md`: estrutura mínima atual dos guias.
+- `docs/planificacao/sprints/PLANO-SPRINTS.md`: gates `S4/S8/S12`.
+- `docs/planificacao/sprints/SCORECARD-SPRINTS.md`: critérios de avaliação por sprint.
+- `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`: remediação e evidence incompleta.
+- Guias `MF0/BK-MF0-01..03`: outputs anteriores.
+- Mockup: não existe; screenshots só serão obrigatórios em BKs de UI quando aplicável.
+- Código: não existe app detetável; comandos técnicos ficam como contrato futuro.
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Definir DoD e formato de evidencia`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
-6. Atualizar evidence e preparar handoff para `BK-MF0-05`.
+#### Glossario (rapido) (DERIVADO):
 
-## Outputs esperados
+- DoD: Definition of Done, lista do que tem de estar verdadeiro para fechar.
+- Evidence: provas objetivas anexadas ao BK.
+- Smoke test: teste rápido do fluxo principal.
+- Negativo: teste de erro, limite ou uso indevido.
+- Regressão: validação de que algo anterior não quebrou.
+- Proof: prova do caso válido, como log, output, screenshot ou teste.
+- Gate: validação formal por janela de sprint.
+- Blocker: impedimento que bloqueia avanço sem decisão.
 
-- Output funcional de `BK-MF0-04` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
+#### Conceitos teoricos essenciais (DERIVADO):
+
+**Definition of Done.** DoD é um acordo de qualidade. Em software, "funciona no meu computador" não chega. O BK só fecha quando cumpre critérios, testes e evidências acordadas.
+
+**Smoke vs negativos.** Smoke confirma o caminho feliz: por exemplo, "o endpoint responde 200". Negativo confirma robustez: por exemplo, "dados inválidos respondem 400". Os dois são necessários.
+
+**Regressão.** Regressão acontece quando uma nova alteração quebra algo que já estava certo. Por isso, cada BK deve validar dependências anteriores, mesmo quando trabalha noutra área.
+
+**Evidence auditável.** Evidence deve ser objetiva. "Testei e deu" é fraco; `npm test passou`, screenshot, log ou output de comando são provas mais fortes.
+
+**Segurança no DoD.** BKs com autenticação, passwords, dados pessoais, pagamento simulado ou pool solidária devem ter negativos de segurança. Isto evita fechar código que aceita input perigoso, expõe dados ou ignora permissões.
+
+#### Guia de execucao (passo-a-passo) (DERIVADO):
+
+0. **Objetivo (~10 min): Confirmar backlog validado**
+   - Descricao detalhada do objetivo: verificar que `BK-MF0-03` entregou a lista estável de BKs.
+   - Justificacao: não se define DoD no vazio; o DoD avalia BKs concretos.
+   - Como fazer (0.1): rever o contrato pedagógico v3 no backlog.
+   - Como fazer (0.2): confirmar política de negativos por prioridade.
+   - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+   - Ficheiro alvo: `docs/planificacao/guias-bk/MF0/BK-MF0-04-definir-dod-e-formato-evidencia.md`
+   - Snippet de referencia: `P0/P1 >= 3; P2 >= 1`
+   - O que verificar: a política de negativos fica preservada.
+
+1. **Objetivo (~10 min): Definir estados de fecho**
+   - Descricao detalhada do objetivo: clarificar quando usar `TODO`, `IN_PROGRESS`, `BLOCKED` e `DONE`.
+   - Justificacao: estados errados mascaram risco real da sprint.
+   - Como fazer (1.1): rever valores permitidos no backlog.
+   - Como fazer (1.2): escrever regra prática para cada estado na evidência do BK.
+   - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+   - Ficheiro alvo: guia do BK em execução
+   - Snippet de referencia: `estado so permite TODO|IN_PROGRESS|BLOCKED|DONE`
+   - O que verificar: `DONE` exige evidence, não apenas intenção.
+
+2. **Objetivo (~15 min): Definir evidence mínima**
+   - Descricao detalhada do objetivo: padronizar os campos `pr`, `proof`, `neg`, `files`, `commands`, `screenshots`, `notes`.
+   - Justificacao: sem formato comum, a defesa fica difícil de auditar.
+   - Como fazer (2.1): rever template de BK.
+   - Como fazer (2.2): complementar com campos pedidos na prompt e no backlog.
+   - Ficheiro a rever: `docs/planificacao/guias-bk/_TEMPLATE-BK.md`
+   - Ficheiro alvo: guias BK de cada fase
+   - Snippet de referencia: `Evidence minima por BK: trio pr, proof, neg`
+   - O que verificar: os campos aceitam placeholders claros enquanto não há execução.
+
+3. **Objetivo (~15 min): Definir smoke por tipo de BK**
+   - Descricao detalhada do objetivo: explicar como smoke muda entre documentação, backend, frontend, dados e segurança.
+   - Justificacao: o aluno precisa saber validar o fluxo principal do seu BK.
+   - Como fazer (3.1): listar exemplos de smoke por tipo de BK.
+   - Como fazer (3.2): garantir que não inventa endpoints futuros sem RF/RNF.
+   - Ficheiro a rever: `docs/RF.md`, `docs/RNF.md`
+   - Ficheiro alvo: guia do BK em execução
+   - Snippet de referencia: `backend: endpoint válido responde código esperado`
+   - O que verificar: exemplos são genéricos o suficiente para não criar requisitos novos.
+
+4. **Objetivo (~15 min): Definir negativos por prioridade**
+   - Descricao detalhada do objetivo: transformar a política de negativos em regra executável.
+   - Justificacao: negativos reduzem bugs, falhas de segurança e regressões.
+   - Como fazer (4.1): definir mínimo de cenários por prioridade.
+   - Como fazer (4.2): exigir em cada negativo passo, input/ação, resultado esperado e risco coberto.
+   - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+   - Ficheiro alvo: guias BK
+   - Snippet de referencia: `passo; input/acao; resultado esperado; risco que cobre`
+   - O que verificar: P0 inclui pelo menos 3 negativos concretos.
+
+5. **Objetivo (~15 min): Definir regressão mínima**
+   - Descricao detalhada do objetivo: exigir validação contra dependências e BKs anteriores relevantes.
+   - Justificacao: BKs cumulativos não podem quebrar contratos anteriores.
+   - Como fazer (5.1): cada guia deve listar dependências e como são usadas.
+   - Como fazer (5.2): cada checklist deve incluir regressão das fases anteriores quando existir.
+   - Ficheiro a rever: `docs/planificacao/backlogs/MF-VIEWS.md`
+   - Ficheiro alvo: guias BK
+   - Snippet de referencia: `Regressao das fases anteriores`
+   - O que verificar: MF0 indica não aplicável antes do primeiro BK, mas BKs seguintes validam dependências.
+
+6. **Objetivo (~10 min): Definir DoD para UI/mockup**
+   - Descricao detalhada do objetivo: preparar regra para quando existirem BKs de frontend/UI.
+   - Justificacao: mockup orienta fluxo, mas não é contrato pixel-perfect.
+   - Como fazer (6.1): escrever que screenshots são obrigatórios quando houver UI aplicável.
+   - Como fazer (6.2): escrever que ausência de mockup deve ser registada, não inventada.
+   - Ficheiro a rever: `docs/RNF.md`
+   - Ficheiro alvo: guias BK de frontend futuros
+   - Snippet de referencia: `screenshots: Nao aplicavel; BK documental sem UI`
+   - O que verificar: este BK não cria identidade visual definitiva.
+
+7. **Objetivo (~15 min): Definir DoD de segurança**
+   - Descricao detalhada do objetivo: preparar exigências mínimas para BKs com dados sensíveis, auth, permissões, pagamentos ou RGPD.
+   - Justificacao: segurança é prioridade nos RNF e não deve ser validada só no fim.
+   - Como fazer (7.1): rever RNF13..RNF20 e RNF37.
+   - Como fazer (7.2): exigir negativos de segurança quando aplicável.
+   - Ficheiro a rever: `docs/RNF.md`
+   - Ficheiro alvo: guias BK técnicos futuros
+   - Snippet de referencia: `Nao guardar passwords em texto puro`
+   - O que verificar: o DoD força validação de riscos, não só funcionalidade.
+
+8. **Objetivo (~10 min): Fechar evidence e handoff**
+   - Descricao detalhada do objetivo: entregar o formato de DoD para ser usado no calendário.
+   - Justificacao: sprint planning deve considerar tempo de validação, não só implementação.
+   - Como fazer (8.1): preencher evidence do BK.
+   - Como fazer (8.2): resumir para `BK-MF0-05` a política de fecho por BK.
+   - Ficheiro a rever: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+   - Ficheiro alvo: `docs/planificacao/guias-bk/MF0/BK-MF0-04-definir-dod-e-formato-evidencia.md`
+   - Snippet de referencia: `proximo_bk: BK-MF0-05`
+   - O que verificar: o calendário futuro reserva espaço mental para validação/evidence.
+
+#### Checklist de validacao (DERIVADO):
+
+**Smoke**
+- [ ] DoD exige implementação/entrega concluída pelo owner.
+- [ ] DoD exige critérios mensuráveis e evidence.
+- [ ] DoD distingue smoke, negativos, regressão e segurança.
+
+**Negativos**
+- [ ] Passo: 4; input/acao: tentar fechar P0 com apenas 1 negativo; resultado esperado: fecho rejeitado; risco que cobre: validação insuficiente.
+- [ ] Passo: 2; input/acao: tentar fechar BK sem `proof`; resultado esperado: fecho bloqueado; risco que cobre: entrega sem prova.
+- [ ] Passo: 5; input/acao: ignorar dependência anterior no checklist; resultado esperado: revisão exige regressão; risco que cobre: quebra de contrato cumulativo.
+
+**Tecnico**
+- [ ] Campos de evidence cobrem `pr`, `proof`, `neg`, `files`, `commands`, `screenshots`, `notes`.
+- [ ] Política de negativos preserva `P0/P1 >= 3`, `P2 >= 1`.
+- [ ] O próximo BK recomendado é `BK-MF0-05`.
+
+**Regressao das fases anteriores**
+- [ ] `BK-MF0-03` continua como dependência.
+- [ ] O DoD é compatível com backlog e matriz.
+
+**UI/mockup**
+- [ ] Sem mockup nesta fase; screenshots ficam como aplicáveis a BKs de UI futuros.
+
+**Seguranca**
+- [ ] BKs com auth, dados pessoais, permissões, pagamentos ou RGPD exigem negativos de segurança.
+- [ ] DoD proíbe evidências com segredos, tokens ou passwords reais.
+
+#### Criterios de aceite:
+
+**Outputs:**
+- DoD comum definido para BKs documentais e técnicos.
+- Formato de evidence mínimo definido.
+
+**Verificacoes:**
+- Campos `pr`, `proof`, `neg`, `files`, `commands`, `screenshots`, `notes` presentes.
+- Política de negativos por prioridade explícita.
+- Regressão e segurança incluídas quando aplicável.
+
+**Qualidade:**
+- Critérios mensuráveis e compreensíveis para alunos.
+- Sem dependências novas e sem alteração de escopo.
+
+**Continuidade:**
+- `BK-MF0-05` consegue planear sprints sabendo o custo de validação.
+- BKs de `MF1..MF8` podem reutilizar o mesmo padrão.
+
+**Evidencia:**
+- `pr`, `proof` e `neg` preenchidos antes de marcar `DONE`.
+
+#### Evidence (para o PR/defesa):
+
+- `pr`: `A preencher no fecho do BK`
+- `proof`: `A preencher apos validacao`
+- `neg`: `A preencher apos testes negativos`
+- `files`: `docs/planificacao/backlogs/BACKLOG-MVP.md`, `docs/planificacao/guias-bk/_TEMPLATE-BK.md`, `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- `commands`: `bash scripts/validate-planificacao.sh`
+- `screenshots`: `Nao aplicavel; BK documental sem UI`
+- `notes`: `Fase detalhada sem mockup e sem codigo de app existente`
+
+#### TODOs
+
+- TODO: preencher evidence real no fecho do BK.
+- TODO: validar com a equipa se todos compreendem diferença entre smoke e negativo.
+- TODO (BLOCKER): se a equipa não aceitar o formato mínimo de evidence, bloquear fecho da MF0.
+- FOLLOW-UP: incorporar tempo de validação no calendário em `BK-MF0-05`.
+- Assuncao a validar com o orientador: este DoD será aplicado a todos os BK, com adaptações por tipo.
+- Decisao dependente de mockup: screenshots e comparação visual só entram em BKs de UI futuros.
+- Decisao dependente de app/codigo ainda inexistente: comandos concretos (`npm test`, `npm run build`) serão fechados em `MF1`.
 
 ## Snippet tecnico aplicavel
 
 ```text
-# pseudo-checklist BK-MF0-04
-precondicoes_ok = validar_dependencias(["BK-MF0-03"])
-assert precondicoes_ok == true
-
-resultado = executar_fluxo_principal("Definir DoD e formato de evidencia")
-assert resultado.status == "OK"
-
-negativos = executar_negativos(prioridade="P0", minimo=3)
-assert negativos.passados >= 3
-
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
+CHECK BK-MF0-04
+done = (
+  owner_validou &&
+  criterios_aceite_mensuraveis &&
+  proof_preenchido &&
+  negativos_minimos_por_prioridade &&
+  regressao_relevante_validada &&
+  sem_blockers_abertos
+)
 ```
-
-## Checklist de validacao
-
-### Smoke
-
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
-
-### Negativos
-
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
-### Tecnico
-
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
-
-## Criterios de aceite (mensuraveis)
-
-- Condicao: fluxo principal de `BK-MF0-04` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
-
-## Evidence para PR/defesa
-
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
 
 ## Proximo BK recomendado
 
@@ -183,3 +324,4 @@ registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
 ## Changelog
 
 - `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+- `2026-05-25`: refinado para guia executável de DoD, evidence, negativos e regressão.
