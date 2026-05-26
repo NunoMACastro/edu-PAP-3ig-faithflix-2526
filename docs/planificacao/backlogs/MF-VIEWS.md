@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-05-25`
 
 ## Objetivo
 
@@ -22,6 +22,8 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 ---
 
 ## MF0 - Kickoff e governance
+
+> Nota anti-drift: em FaithFlix, `MF0` nao e fase funcional. Esta macro fecha apenas plano, responsabilidades, backlog, DoD, calendario e reuniao de alinhamento. Backend, frontend, base de dados, streaming, catalogo, componentes, rotas e comandos reais comecam apenas em `MF1` ou fases posteriores.
 
 ### Sequencia
 
@@ -47,6 +49,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 2. Matheus, Mateus, Davi e Kaue validam leitura.
 3. Equipa fecha DoD e evidencias.
 4. Equipa fecha sprint 1.
+5. Equipa confirma handoff para `BK-MF1-01` e `BK-MF1-02`, sem implementar funcionalidades em `MF0`.
 
 ### Pronto da macro
 
@@ -337,3 +340,4 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 - `2026-04-12`: blocos "Guias disponiveis" sincronizados para cobertura total (MF0..MF8), sem entradas pendentes.
 - `2026-04-13`: ordem de sequencia normalizada para derivar de `PLANO-SPRINTS` (fonte canonica).
 - `2026-04-17`: sequencias MF3/MF4/MF5 alinhadas ao rebaseline de escopo MVP com limpeza de itens fora de escopo.
+- `2026-05-25`: reforcada nota anti-drift para impedir leitura de `MF0` como fase de implementacao funcional.

@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-05-25`
 
 ## Objetivo
 
@@ -48,6 +48,12 @@ Traduzir os requisitos ativos (`RF` e `RNF`) num plano executavel para 4 alunos,
 | `MF6` | Hardening | `RNF` criticos de qualidade/performance/seguranca |
 | `MF7` | Evidencias PAP | matriz RF/RNF + demo + ensaio |
 | `MF8` | Buffer e fecho | estabilizacao, freeze e retro final |
+
+### Nota anti-drift sobre `MF0`
+
+No FaithFlix, `MF0` e exclusivamente uma macro fase de governance/kickoff. Fecha plano, responsabilidades, backlog, DoD, calendario e reuniao de alinhamento. Nao cria backend, frontend, base de dados, streaming, catalogo, autenticacao, componentes, endpoints ou qualquer funcionalidade real da aplicacao.
+
+A fundacao tecnica com ficheiros, comandos, estrutura de projeto e decisoes implementaveis comeca em `MF1`. Qualquer referencia tecnica feita em `MF0` deve ser lida como decisao documental, assuncao ou contrato para preparar `MF1`, nunca como implementacao.
 
 ## Regras transversais por macro
 
@@ -94,3 +100,4 @@ Traduzir os requisitos ativos (`RF` e `RNF`) num plano executavel para 4 alunos,
 - `2026-04-13`: removida dependencia de ficheiro externo de score e consolidada avaliacao no scorecard oficial.
 - `2026-04-14`: incorporada hierarquia canonica adaptada, scorecard oficial por sprint e guiao docente semanal.
 - `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral de itens fora de escopo.
+- `2026-05-25`: adicionada nota anti-drift para explicitar que `MF0` e governance/kickoff e que a fundacao tecnica comeca em `MF1`.

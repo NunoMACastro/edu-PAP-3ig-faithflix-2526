@@ -27,6 +27,10 @@ Este BK ensina o que significa "feito" num projeto técnico. Para os alunos, a i
 
 O trabalho operacional é transformar as regras do backlog, matriz e plano de sprints numa Definition of Done comum para todos os BK, com formato de evidence reutilizável até à defesa.
 
+#### Nota anti-drift MF0
+
+`MF0` fecha apenas governance/kickoff: plano, responsabilidades, backlog, DoD, calendário e reunião de alinhamento. Este BK não cria backend, frontend, base de dados, streaming, catálogo, endpoints, componentes ou funcionalidade real. Exemplos técnicos neste guia são exemplos de validação futura; não são tarefas de implementação da `MF0`.
+
 #### BK-MF0-04 - Definir DoD e formato de evidencia
 
 ##### O que vamos fazer neste BK

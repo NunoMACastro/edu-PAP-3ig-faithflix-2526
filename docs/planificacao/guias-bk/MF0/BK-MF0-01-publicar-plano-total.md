@@ -27,6 +27,10 @@ Este BK ensina a equipa a transformar requisitos e planeamento num contrato de e
 
 O trabalho operacional deste BK é rever, publicar e validar o plano total em `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`, garantindo que ele está coerente com README, RF, RNF, backlog, matriz e sprints.
 
+#### Nota anti-drift MF0
+
+`MF0` fecha apenas governance/kickoff: plano, responsabilidades, backlog, DoD, calendário e reunião de alinhamento. Este BK não cria backend, frontend, base de dados, streaming, catálogo, endpoints, componentes ou funcionalidade real. Qualquer referência a stack ou arquitetura neste guia é decisão documental para preparar `MF1`, não implementação.
+
 #### BK-MF0-01 - Publicar plano total
 
 ##### O que vamos fazer neste BK
@@ -146,6 +150,7 @@ A fase foi detalhada sem mockup de UI, porque `MOCKUP_PATH` está definido como 
 0. **Objetivo (~10 min): Confirmar ponto de partida**
    - Descricao detalhada do objetivo: abrir o repositório e confirmar que este BK é o primeiro da `MF0`.
    - Justificacao: um BK sem dependências deve estabelecer baseline antes de qualquer outro trabalho.
+   - Como fazer (0.0): criar a estrutura inicial do projeto com duas áreas principais: `apps/api` para o backend/API e `apps/web` para o frontend. Esta separação ajuda a manter claro o que corre no servidor e o que pertence à interface do utilizador.
    - Como fazer (0.1): rever a linha `BK-MF0-01` em `BACKLOG-MVP.md`.
    - Como fazer (0.2): confirmar que `MF-VIEWS.md` lista `BK-MF0-01` como primeiro item da sequência.
    - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`

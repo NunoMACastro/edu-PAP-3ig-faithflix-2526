@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-05-25`
 
 ## Objetivo
 
@@ -152,6 +152,8 @@ Estado do guia indica a fase de criacao documental.
 
 ## MF0 - Kickoff e governance
 
+> Nota anti-drift: os BKs de `MF0` sao transversais e documentais. Servem para fechar governance de execucao: plano total, responsabilidades, backlog atomico, DoD/evidence, calendario e reuniao de alinhamento. Nao entregam backend, frontend, base de dados, streaming, catalogo ou funcionalidade real. A fundacao tecnica inicia em `MF1`.
+
 | BK          | Titulo                                     | Owner | Apoio                       | Pri | Estado | Esforco | Dependencias            | RF/RNF      |
 | ----------- | ------------------------------------------ | ----- | --------------------------- | --- | ------ | ------- | ----------------------- | ----------- |
 | `BK-MF0-01` | Publicar plano total                       | Nuno  | -                           | P0  | TODO   | S       | -                       | transversal |
@@ -295,3 +297,4 @@ Estado do guia indica a fase de criacao documental.
 - `2026-04-13`: removidas referencias a ficheiro externo de score; avaliacao documental passa a ser registada diretamente no processo de gate.
 - `2026-04-14`: reforcado contrato canonico de campos BK e validacao cruzada backlog<->matriz<->guias<->sprints.
 - `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral dos BK fora de escopo e ajuste de dependencias para `BK-MF5-06`.
+- `2026-05-25`: adicionada nota anti-drift para explicitar que `MF0` e documental/governance e que implementacao tecnica comeca em `MF1`.

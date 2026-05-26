@@ -27,6 +27,10 @@ Este BK ensina a equipa a separar ownership, apoio e validação. Para alunos de
 
 O trabalho operacional é publicar e validar `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`, reutilizando o plano total fechado em `BK-MF0-01` e preparando o backlog atómico de `BK-MF0-03`.
 
+#### Nota anti-drift MF0
+
+`MF0` fecha apenas governance/kickoff: plano, responsabilidades, backlog, DoD, calendário e reunião de alinhamento. Este BK não cria backend, frontend, base de dados, streaming, catálogo, endpoints, componentes ou funcionalidade real. Qualquer referência a áreas técnicas neste guia serve para distribuir responsabilidade futura, não para implementar essas áreas agora.
+
 #### BK-MF0-02 - Publicar distribuicao de responsabilidades
 
 ##### O que vamos fazer neste BK

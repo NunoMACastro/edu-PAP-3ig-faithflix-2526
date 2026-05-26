@@ -27,6 +27,10 @@ Este BK ensina a transformar um projeto grande numa lista de entregas pequenas, 
 
 O trabalho operacional é validar `docs/planificacao/backlogs/BACKLOG-MVP.md` como backlog atómico oficial, cruzando-o com a matriz canónica, as MF views e o plano de sprints.
 
+#### Nota anti-drift MF0
+
+`MF0` fecha apenas governance/kickoff: plano, responsabilidades, backlog, DoD, calendário e reunião de alinhamento. Este BK não cria backend, frontend, base de dados, streaming, catálogo, endpoints, componentes ou funcionalidade real. O backlog pode referir BKs técnicos futuros, mas a implementação desses BKs começa apenas em `MF1` e fases seguintes.
+
 #### BK-MF0-03 - Publicar backlog atomico inicial
 
 ##### O que vamos fazer neste BK

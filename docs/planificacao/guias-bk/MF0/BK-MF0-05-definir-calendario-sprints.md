@@ -27,6 +27,10 @@ Este BK ensina que um calendário de sprints não é só uma tabela de datas: é
 
 O trabalho operacional é validar `docs/planificacao/sprints/PLANO-SPRINTS.md`, garantindo que os 55 BK estão distribuídos por 12 sprints, com carga máxima controlada e gates claros.
 
+#### Nota anti-drift MF0
+
+`MF0` fecha apenas governance/kickoff: plano, responsabilidades, backlog, DoD, calendário e reunião de alinhamento. Este BK não cria backend, frontend, base de dados, streaming, catálogo, endpoints, componentes ou funcionalidade real. O calendário pode posicionar `BK-MF1-01` e `BK-MF1-02`, mas isso é handoff de planeamento, não implementação em `MF0`.
+
 #### BK-MF0-05 - Definir calendario de sprints
 
 ##### O que vamos fazer neste BK

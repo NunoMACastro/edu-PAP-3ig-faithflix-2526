@@ -27,6 +27,10 @@ Este BK ensina a fechar uma fase de governance com alinhamento real da equipa. A
 
 O trabalho operacional é preparar, conduzir e registar a reunião de alinhamento inicial, deixando a equipa pronta para iniciar `BK-MF1-01` e `BK-MF1-02` sem reabrir decisões de MF0.
 
+#### Nota anti-drift MF0
+
+`MF0` fecha apenas governance/kickoff: plano, responsabilidades, backlog, DoD, calendário e reunião de alinhamento. Este BK não cria backend, frontend, base de dados, streaming, catálogo, endpoints, componentes ou funcionalidade real. O handoff para `MF1` deve levar contratos documentais, não código pronto.
+
 #### BK-MF0-06 - Reuniao de alinhamento inicial
 
 ##### O que vamos fazer neste BK
@@ -107,6 +111,13 @@ A fase foi detalhada sem mockup e sem código de app. Isso deve ficar registado 
 - Impacto em frontend/backend/dados: não cria código, mas confirma que MF1 vai criar estrutura inicial antes de funcionalidades.
 - Impacto em segurança/testes/UI: reforça RNF de segurança, DoD/evidence e decisão de não inventar UI sem mockup.
 - Handoff para o próximo BK: entregar a `BK-MF1-01` stack derivada, responsabilidades, DoD e limites de escopo.
+
+#### Handoff explicito para MF1 (DERIVADO):
+
+- Para `BK-MF1-01`: levar `RNF27`, decisão documental de backend modular, ownership `Matheus`/apoio `Davi`, DoD/evidence e aviso de que o BK deve criar fundação técnica, não autenticação completa, catálogo ou streaming.
+- Para `BK-MF1-02`: levar `RNF28`, decisão documental de frontend por componentes, ownership `Mateus`/apoio `Kaue`, DoD/evidence e aviso de que o BK deve criar estrutura base, não UI final nem fluxos funcionais completos.
+- Para ambos: confirmar que comandos, pastas e ficheiros reais só são definidos/executados nos BKs da `MF1`; em `MF0` ficam apenas contratos, assunções e blockers.
+- Para a equipa: manter `pr/proof/neg`, política de negativos P0, registo de blockers e proibição de segredos no repositório como regras desde o primeiro commit técnico.
 
 #### Pre-leitura minima (10-15 min) (DERIVADO):
 
