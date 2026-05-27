@@ -17,169 +17,362 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF1-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF1/BK-MF1-05-health-check-e-logging-estruturado.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-05-27`
 
 ## Bloco pedagogico (obrigatorio)
 
-### Objetivo pedagogico
+Este BK ensina a preparar operacao minima do backend: saber se a API esta viva e gerar logs que ajudem a diagnosticar problemas. Sem health-check e logs, uma app pode falhar silenciosamente e tornar a defesa tecnica mais dificil.
 
-- Consolidar a entrega de `Health-check e logging estruturado` com rastreabilidade explicita para `RNF31`.
-- Executar o BK `BK-MF1-05` no contexto da macro `MF1` e da sprint `S02`.
-
-### Tempo estimado
-
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
-
-### Erros comuns
-
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
-
-### Check de compreensao
-
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
-
-
-## O que vamos fazer neste BK
-
-Entregar `Health-check e logging estruturado` cobrindo `RNF31` na `MF1`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
-
-## Porque isto e importante
-
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF1-06`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+O objetivo pedagogico e perceber a diferenca entre "a app corre no meu computador" e "a app consegue ser observada". Health-check serve para sistemas e equipa confirmarem disponibilidade. Logging estruturado serve para perceber o que aconteceu, quando, com que rota, status e contexto.
 
 ## Bloco operacional (obrigatorio)
 
-### Pre-condicoes
+O trabalho operacional e adicionar `GET /health`, criar um logger JSON simples com niveis `info`, `warn` e `error`, adicionar request id e registar pedidos HTTP sem expor dados sensiveis. Este BK nao cria monitorizacao externa nem dashboards.
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+#### BK-MF1-05 - Health-check e logging estruturado
 
-### Execucao
+##### O que vamos fazer neste BK
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+Neste BK vamos criar o endpoint `GET /health`, exigido por `RNF31`, e uma base de logging estruturado alinhada com `RNF30`, mesmo que o mapeamento canonico deste BK seja `RNF31`. O health-check deve responder rapidamente e indicar que a API esta viva.
 
-### Outputs
+Tambem vamos criar um logger simples baseado em JSON. Cada log deve ter pelo menos `timestamp`, `level`, `message` e contexto. Para pedidos HTTP, vamos incluir metodo, path, status code, duracao e request id. Isto prepara debugging para as fases seguintes.
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+Como ainda nao ha base de dados, streaming ou integracoes externas, o health-check nao deve fingir verificacoes que nao existem. Deve declarar apenas checks reais, por exemplo `api: ok`.
 
-### Validacao
+##### Porque e que isto e importante
 
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
+- Permite confirmar se o backend esta disponivel.
+- Ajuda a diagnosticar erros durante MF2 e fases seguintes.
+- Prepara evidencia objetiva para deploy/defesa.
+- Cria disciplina de nao expor cookies, passwords ou tokens em logs.
+- Desbloqueia smoke tests mais robustos em `BK-MF1-06`.
 
-### Handoff
+##### O que entra (scope)
 
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
+- Criar `GET /health`.
+- Criar service/controller/route para health.
+- Criar logger JSON simples.
+- Criar middleware de request logging.
+- Criar request id por pedido e header `x-request-id`.
+- Atualizar error handler para usar logger.
+- Validar que cookies e headers sensiveis nao sao logados.
 
+##### O que nao entra (scope-out)
 
-## Pre-condicoes de entrada
+- Nao entra Prometheus, Grafana, Sentry, Datadog ou servico externo.
+- Nao entra health-check de MongoDB, pagamentos ou streaming, porque ainda nao existem.
+- Nao entra metricas de performance formais.
+- Nao entra tracing distribuido.
+- Nao entra logs de auditoria funcional de utilizadores.
 
-- Dependencias declaradas: `BK-MF1-01`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+##### Como saber que isto ficou bem
 
-## O que entra (scope)
+- `GET /health` responde 200 com JSON.
+- Cada pedido gera um log estruturado.
+- Pedidos com erro geram log `error` sem stack trace ao utilizador.
+- O header `x-request-id` aparece na resposta.
+- Logs nao incluem cookies, passwords ou tokens.
 
-- Entrega funcional de `Health-check e logging estruturado` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
+#### Metadados do BK (CANONICO/DERIVADO):
 
-## O que nao entra (scope-out)
+- Prioridade: `P1` (CANONICO, `BACKLOG-MVP.md`)
+- Estado: `TODO` (CANONICO, `BACKLOG-MVP.md`)
+- Esforco: `S` (CANONICO, `BACKLOG-MVP.md`)
+- macro: `MF1` (CANONICO, `BACKLOG-MVP.md`)
+- Owner: `Kaue` (CANONICO, `BACKLOG-MVP.md`)
+- Apoio: `Davi` (CANONICO, `BACKLOG-MVP.md`)
+- Dependencias (BK IDs): `BK-MF1-01` (CANONICO, `BACKLOG-MVP.md`)
+- Pre-condicoes: backend modular existe; se `BK-MF1-04` ja estiver feito, logs devem mascarar cookies (DERIVADO)
+- Ref. Plano: `MF-VIEWS > MF1`, `PLANO-SPRINTS > Sprint 2`, `MATRIZ-CANONICA-BK > RNF31` (CANONICO)
+- Flow ID: `MF1-backend-health-logging-05` (DERIVADO)
+- Fonte de verdade: `docs/RNF.md`
+- Fonte de verdade: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- Fonte de verdade: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
+- Descricao: adicionar health-check e logging estruturado minimo ao backend, sem monitorizacao externa (DERIVADO)
 
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
+#### O que vamos fazer neste BK (DERIVADO):
 
-## Como saber que isto ficou bem
+- Criar modulo/rota `health`.
+- Criar `health.service.js` com checks reais e simples.
+- Criar `logger.js` com niveis.
+- Criar middleware `requestLogger`.
+- Criar request id e devolve-lo em `x-request-id`.
+- Integrar logger no middleware de erro.
+- Documentar exemplos de logs e comandos.
 
-- Fluxo principal de `BK-MF1-05` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P1`.
-- Evidence documentada e pronta para auditoria de gate.
+#### Estado, ficheiros e impacto (DERIVADO):
 
-## Pre-leitura minima (10-15 min)
+- Estado esperado antes do BK: backend arranca e tem rotas base, mas nao tem health-check nem logs consistentes.
+- Estado esperado depois do BK: backend expõe `/health`, gera logs JSON e inclui request id nas respostas.
+- Ficheiros a criar: `backend/src/modules/system/health.routes.js`, `backend/src/modules/system/health.controller.js`, `backend/src/modules/system/health.service.js`, `backend/src/utils/logger.js`, `backend/src/middlewares/request-logger.middleware.js`.
+- Ficheiros a editar: `backend/src/app.js`, `backend/src/middlewares/error.middleware.js`, `backend/README.md`.
+- Ficheiros a rever: `backend/src/config/env.js`, `backend/src/modules/auth/` se ja existir, `docs/RNF.md`.
+- Dependencias de BK anteriores e uso: reutiliza estrutura Express de `BK-MF1-01`; se `BK-MF1-04` ja foi executado, respeita a regra de nao logar cookies.
+- Impacto na arquitetura da app: adiciona observabilidade tecnica transversal.
+- Impacto frontend: `BK-MF1-03` pode chamar health no futuro se necessario, mas nao deve depender dele para renderizar a app.
+- Impacto backend: cria health/logging e melhora erro.
+- Impacto dados: nenhum.
+- Impacto seguranca: evita expor dados sensiveis nos logs.
+- Impacto testes: fornece alvo principal para smoke tests de `BK-MF1-06`.
+- Impacto UI: nenhum.
+- Handoff para o proximo BK: `BK-MF1-06` deve testar `/health`, request id, 404 e 401 quando aplicavel.
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RNF31`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF1-05`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
+#### Pre-leitura minima (10-15 min) (DERIVADO):
 
-## Guia de execucao (passo-a-passo)
+- `docs/RNF.md`: `RNF30` e `RNF31`.
+- Guia `BK-MF1-01`: estrutura backend e middleware de erro.
+- Guia `BK-MF1-04`: cookies e dados sensiveis, se ja executado.
+- `backend/src/app.js`: ordem dos middlewares.
+- `backend/src/middlewares/error.middleware.js`: ponto de integracao com logger.
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Health-check e logging estruturado`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P1`.
-6. Atualizar evidence e preparar handoff para `BK-MF1-06`.
+#### Glossario (rapido) (DERIVADO):
 
-## Outputs esperados
+- Health-check: endpoint que indica se o servico esta vivo.
+- Observabilidade: capacidade de perceber o estado interno da app por logs, metricas e traces.
+- Log estruturado: log em formato consistente, normalmente JSON.
+- Level: gravidade do log, como `info`, `warn` ou `error`.
+- Request id: identificador unico de um pedido.
+- Duration: tempo que o pedido demorou.
+- Middleware de logging: codigo que regista informacao antes/depois da resposta.
+- Dados sensiveis: passwords, cookies, tokens, dados pessoais ou segredos.
+- 5xx: erro do servidor.
 
-- Output funcional de `BK-MF1-05` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
+#### Conceitos teoricos essenciais (DERIVADO):
+
+**Health-check.** Um health-check nao e uma pagina bonita. E um endpoint rapido, previsivel e usado por humanos, scripts ou deploy para saber se a API responde.
+
+**Logs estruturados.** Logs em texto livre sao dificeis de pesquisar. JSON permite filtrar por `level`, `path`, `statusCode` ou `requestId`.
+
+**Request id.** Quando o frontend recebe erro, pode guardar o `x-request-id`. Depois a equipa procura esse id nos logs do backend. Isto liga sintoma a causa.
+
+**Nao logar dados sensiveis.** Cookies e passwords nunca devem aparecer em logs. Logs vivem mais tempo do que um pedido e podem ser vistos por mais pessoas.
+
+**Ordem de middlewares.** O logger deve correr cedo para apanhar pedidos. O error handler deve correr no fim para apanhar erros gerados por rotas anteriores.
+
+**Erros comuns.** Fazer health-check depender de servicos que ainda nao existem, logar `req.headers.cookie`, mostrar stack trace ao utilizador, ou usar `console.log('erro')` sem contexto.
+
+#### Guia de execucao (passo-a-passo) (DERIVADO):
+
+0. **Objetivo (~10 min): Confirmar backend modular**
+   - Descricao detalhada do objetivo: verificar que `BK-MF1-01` esta executado.
+   - Justificacao: este BK adiciona observabilidade a uma app existente.
+   - Como fazer (0.1): abrir `backend/src/app.js`.
+   - Como fazer (0.2): confirmar que existe `src/modules/system/`.
+   - Ficheiro a rever: `backend/src/app.js`
+   - Ficheiro alvo: nenhum ainda.
+   - Snippet de referencia: `app.use('/api', systemRouter)`
+   - O que verificar: existe local claro para montar `/health`.
+
+1. **Objetivo (~20 min): Criar service de health**
+   - Descricao detalhada do objetivo: construir uma resposta com checks reais.
+   - Justificacao: health nao deve fingir BD ou streaming enquanto nao existem.
+   - Como fazer (1.1): criar `health.service.js`.
+   - Como fazer (1.2): devolver `status`, `service`, `timestamp` e `checks`.
+   - Ficheiro a rever: `backend/src/config/env.js`
+   - Ficheiro alvo: `backend/src/modules/system/health.service.js`
+   - Snippet de referencia:
+     ```js
+     export function getHealthStatus() {
+       return { status: 'ok', checks: { api: 'ok' }, timestamp: new Date().toISOString() };
+     }
+     ```
+   - O que verificar: nao ha checks inventados para MongoDB/pagamentos.
+
+2. **Objetivo (~20 min): Criar controller e route `/health`**
+   - Descricao detalhada do objetivo: expor health-check no backend.
+   - Justificacao: `RNF31` pede endpoint de health-check, por exemplo `/health`.
+   - Como fazer (2.1): criar `health.controller.js`.
+   - Como fazer (2.2): criar `health.routes.js` e montar em `app.use('/health', healthRouter)` ou `app.get('/health', ...)`.
+   - Ficheiro a rever: `docs/RNF.md`
+   - Ficheiro alvo: `backend/src/modules/system/health.routes.js`
+   - Snippet de referencia:
+     ```js
+     router.get('/', getHealth);
+     ```
+   - O que verificar: `GET /health` responde 200 JSON.
+
+3. **Objetivo (~25 min): Criar logger estruturado**
+   - Descricao detalhada do objetivo: criar funcoes `info`, `warn`, `error` que imprimem JSON.
+   - Justificacao: logs consistentes sao mais faceis de filtrar e defender tecnicamente.
+   - Como fazer (3.1): criar `backend/src/utils/logger.js`.
+   - Como fazer (3.2): normalizar payload com `timestamp`, `level`, `message` e `context`.
+   - Ficheiro a rever: `docs/RNF.md`
+   - Ficheiro alvo: `backend/src/utils/logger.js`
+   - Snippet de referencia:
+     ```js
+     export function log(level, message, context = {}) {
+       console.log(JSON.stringify({ timestamp: new Date().toISOString(), level, message, context }));
+     }
+     ```
+   - O que verificar: logger nao recebe cookies/passwords como contexto.
+
+4. **Objetivo (~30 min): Adicionar request id e logging de pedidos**
+   - Descricao detalhada do objetivo: registar cada pedido com metodo, path, status e duracao.
+   - Justificacao: isto permite diagnosticar rotas lentas ou erros.
+   - Como fazer (4.1): criar `request-logger.middleware.js` usando `crypto.randomUUID()`.
+   - Como fazer (4.2): adicionar header `x-request-id` e logar no evento `finish`.
+   - Ficheiro a rever: `backend/src/app.js`
+   - Ficheiro alvo: `backend/src/middlewares/request-logger.middleware.js`
+   - Snippet de referencia:
+     ```js
+     res.setHeader('x-request-id', requestId);
+     res.on('finish', () => logger.info('http_request', { method: req.method, path: req.path, statusCode: res.statusCode }));
+     ```
+   - O que verificar: logs nao incluem `req.headers.cookie`.
+
+5. **Objetivo (~20 min): Integrar logger no error handler**
+   - Descricao detalhada do objetivo: registar erros com contexto e responder sem detalhes sensiveis.
+   - Justificacao: erro sem log e dificil de diagnosticar; erro com stack no cliente e risco.
+   - Como fazer (5.1): importar logger em `error.middleware.js`.
+   - Como fazer (5.2): logar `statusCode`, `message`, `path`, `requestId`.
+   - Ficheiro a rever: `backend/src/middlewares/error.middleware.js`
+   - Ficheiro alvo: `backend/src/middlewares/error.middleware.js`
+   - Snippet de referencia:
+     ```js
+     logger.error('request_error', { statusCode, path: req.path, requestId: req.id });
+     ```
+   - O que verificar: response ao cliente nao inclui `err.stack` em producao.
+
+6. **Objetivo (~20 min): Atualizar documentacao operacional**
+   - Descricao detalhada do objetivo: documentar health, request id e exemplos de log.
+   - Justificacao: Kaue/Davi precisam conseguir validar sem conhecer todo o codigo.
+   - Como fazer (6.1): atualizar `backend/README.md`.
+   - Como fazer (6.2): incluir comandos `curl -i /health` e exemplo de log JSON.
+   - Ficheiro a rever: `backend/README.md`
+   - Ficheiro alvo: `backend/README.md`
+   - Snippet de referencia:
+     ```md
+     `GET /health` devolve estado tecnico da API, sem verificar BD enquanto a BD nao existir.
+     ```
+   - O que verificar: README nao promete monitorizacao externa.
+
+7. **Objetivo (~25 min): Validar health, logs e negativos**
+   - Descricao detalhada do objetivo: provar que health e logs funcionam e nao expõem dados sensiveis.
+   - Justificacao: este BK e operacional; evidencia deve incluir outputs objetivos.
+   - Como fazer (7.1): correr `npm run dev` e executar `curl -i http://localhost:3000/health`.
+   - Como fazer (7.2): chamar rota inexistente e uma rota de sessao com cookie falso, se existir.
+   - Ficheiro a rever: `backend/src/utils/logger.js`
+   - Ficheiro alvo: evidence do PR/defesa
+   - Snippet de referencia:
+     ```bash
+     curl -i http://localhost:3000/health
+     curl -i http://localhost:3000/api/nao-existe
+     ```
+   - O que verificar: resposta tem `x-request-id`, logs sao JSON e nao contêm cookies.
+
+#### Checklist de validacao (DERIVADO):
+
+**Smoke**
+- [ ] `GET /health` responde 200 JSON.
+- [ ] Resposta inclui ou permite correlacionar `x-request-id`.
+- [ ] Pedido normal gera log `info`.
+- [ ] Erro/404 gera log com contexto.
+
+**Negativos**
+- [ ] Passo: 7; input/acao: `GET /api/nao-existe`; resultado esperado: 404 JSON + log estruturado; risco que cobre: erro sem diagnostico.
+- [ ] Passo: 7; input/acao: enviar cookie falso numa rota de sessao; resultado esperado: log sem valor do cookie; risco que cobre: exposicao de credenciais.
+- [ ] Passo: 1; input/acao: procurar checks de BD/pagamento no health; resultado esperado: nao existem enquanto os servicos nao existem; risco que cobre: health enganador.
+
+**Tecnico**
+- [ ] Logger tem niveis `info`, `warn`, `error`.
+- [ ] Middleware usa `finish` para saber status final.
+- [ ] Error handler usa logger.
+- [ ] Health-check e rapido e sem dependencias externas.
+
+**Regressao das fases anteriores**
+- [ ] Nao altera rotas base de `BK-MF1-01`.
+- [ ] Nao expõe cookies de `BK-MF1-04`.
+- [ ] Nao altera metadados canonicos.
+
+**UI/mockup**
+- [ ] Nao aplicavel.
+
+**Seguranca**
+- [ ] Cookies, passwords e tokens nao aparecem em logs.
+- [ ] Stack trace nao e enviado ao cliente em producao.
+- [ ] Request id nao revela dados pessoais.
+
+#### Criterios de aceite:
+
+**Outputs:**
+- Endpoint `/health` criado.
+- Logger JSON criado.
+- Middleware de request logging criado.
+- Error handler integrado com logger.
+
+**Verificacoes:**
+- `curl -i /health` devolve 200.
+- Rota inexistente gera 404 e log.
+- Logs incluem level, message, timestamp e contexto.
+
+**Qualidade:**
+- Sem servicos externos desnecessarios.
+- Health-check nao inventa dependencias.
+- Logs nao expõem dados sensiveis.
+
+**Continuidade:**
+- `BK-MF1-06` consegue testar `/health`.
+- `MF2` pode acrescentar checks de BD quando a BD existir.
+- Fases futuras podem trocar logger interno por ferramenta externa sem mudar controllers.
+
+**Evidencia:**
+- Output de `/health`.
+- Exemplo de log `info`.
+- Exemplo de log `error`/404.
+- Prova de que cookie nao aparece no log.
+
+#### Evidence (para o PR/defesa):
+
+- `pr`: `A preencher no fecho do BK`
+- `proof`: `A preencher apos validacao`
+- `neg`: `A preencher apos testes negativos`
+- `files`: `backend/src/modules/system/health.*`, `backend/src/utils/logger.js`, `backend/src/middlewares/request-logger.middleware.js`, `backend/src/middlewares/error.middleware.js`, `backend/src/app.js`
+- `commands`: `npm run dev`, `curl -i http://localhost:3000/health`, `curl -i http://localhost:3000/api/nao-existe`
+- `screenshots`: `Nao aplicavel; usar output de terminal/log`
+- `notes`: `Sem monitorizacao externa nesta fase`
+
+#### TODOs
+
+- TODO: adicionar checks de MongoDB apenas quando a base de dados existir.
+- TODO: decidir ferramenta externa de observabilidade se for necessária em deploy.
+- TODO: definir politica de retencao de logs se houver dados pessoais em fases futuras.
+- TODO (BLOCKER): se o ambiente de producao nao permitir ler logs, planear alternativa antes da defesa.
+- FOLLOW-UP: `BK-MF1-06` deve transformar `/health` e 404 em smoke automatizado.
+- FOLLOW-UP: fases de admin/auditoria devem distinguir logs tecnicos de logs de auditoria funcional.
+- Assuncao tecnica: logger JSON simples com `console.log` e suficiente para MVP PAP.
+- Decisoes dependentes de mockup: nenhuma.
+- Decisoes dependentes de app/codigo ainda inexistente: checks de BD, pagamentos e streaming.
 
 ## Snippet tecnico aplicavel
 
-```text
-# pseudo-checklist BK-MF1-05
-precondicoes_ok = validar_dependencias(["BK-MF1-01"])
-assert precondicoes_ok == true
+```js
+// backend/src/middlewares/request-logger.middleware.js
+import { randomUUID } from 'node:crypto';
+import { logger } from '../utils/logger.js';
 
-resultado = executar_fluxo_principal("Health-check e logging estruturado")
-assert resultado.status == "OK"
+export function requestLogger(req, res, next) {
+  const startedAt = Date.now();
+  req.id = req.headers['x-request-id'] ?? randomUUID();
+  res.setHeader('x-request-id', req.id);
 
-negativos = executar_negativos(prioridade="P1", minimo=3)
-assert negativos.passados >= 3
+  res.on('finish', () => {
+    logger.info('http_request', {
+      requestId: req.id,
+      method: req.method,
+      path: req.path,
+      statusCode: res.statusCode,
+      durationMs: Date.now() - startedAt,
+    });
+  });
 
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
+  next();
+}
 ```
-
-## Checklist de validacao
-
-### Smoke
-
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
-
-### Negativos
-
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
-### Tecnico
-
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
-
-## Criterios de aceite (mensuraveis)
-
-- Condicao: fluxo principal de `BK-MF1-05` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P1`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
-
-## Evidence para PR/defesa
-
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
 
 ## Proximo BK recomendado
 
-`BK-MF1-06`
+`BK-MF1-06`, que deve automatizar smoke tests para backend, frontend, cliente API, sessao base e health-check.
 
 ## Changelog
 
-- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+- `2026-05-27`: refinado para guia executavel de health-check e logging estruturado, com negativos de seguranca e operacao.
