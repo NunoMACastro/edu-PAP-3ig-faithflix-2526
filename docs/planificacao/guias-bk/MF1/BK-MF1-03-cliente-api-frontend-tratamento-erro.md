@@ -69,10 +69,10 @@ Este guia usa `fetch` nativo para reduzir dependencias e manter o codigo transpa
 Definir onde o frontend encontra o backend, sem escrever URLs fixas dentro dos componentes.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `frontend/.env.example`
-   - CRIAR: `frontend/src/config/env.js`
-   - LOCALIZACAO: `frontend/` e `frontend/src/config/`
-   - REVER: `backend/README.md`
+    - CRIAR: `frontend/.env.example`
+    - CRIAR: `frontend/src/config/env.js`
+    - LOCALIZACAO: `frontend/` e `frontend/src/config/`
+    - REVER: `backend/README.md`
 
 3. Instrucoes concretas.
 
@@ -84,21 +84,22 @@ Cria a pasta `frontend/src/config/`. O ficheiro `.env.example` mostra a variavel
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 Em Vite, variaveis expostas ao frontend precisam de comecar por `VITE_`. Aqui guardamos apenas a origem da API. Nao guardamos passwords nem tokens, porque tudo o que vai para o frontend pode ser visto pelo utilizador.
 
 6. Codigo do ficheiro `frontend/src/config/env.js`.
 
 ```js
-const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+const rawApiBaseUrl =
+    import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000";
 
 export const env = {
-  apiBaseUrl: rawApiBaseUrl.replace(/\/$/, ''),
+    apiBaseUrl: rawApiBaseUrl.replace(/\/$/, ""),
 };
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `apiBaseUrl` remove a barra final, se existir. Assim, `http://localhost:3000/` e `http://localhost:3000` funcionam da mesma forma. Isto evita URLs duplicadas como `http://localhost:3000//api`.
 
@@ -121,10 +122,10 @@ Erro comum: colocar a URL da API diretamente dentro de cada pagina. Quando a API
 Criar um cliente API reutilizavel, com erros normalizados e cookies incluidos em todos os pedidos.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `frontend/src/services/api/apiErrors.js`
-   - CRIAR: `frontend/src/services/api/apiClient.js`
-   - LOCALIZACAO: `frontend/src/services/api/`
-   - REVER: `RNF05`, `RNF15`, `RNF25`, `RNF30`
+    - CRIAR: `frontend/src/services/api/apiErrors.js`
+    - CRIAR: `frontend/src/services/api/apiClient.js`
+    - LOCALIZACAO: `frontend/src/services/api/`
+    - REVER: `RNF05`, `RNF15`, `RNF25`, `RNF30`
 
 3. Instrucoes concretas.
 
@@ -134,132 +135,144 @@ Substitui o README temporario de `services/api/` por ficheiros reais, mantendo o
 
 ```js
 export class ApiError extends Error {
-  constructor({ status, message, details = undefined, requestId = undefined }) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-    this.details = details;
-    this.requestId = requestId;
-  }
+    constructor({
+        status,
+        message,
+        details = undefined,
+        requestId = undefined,
+    }) {
+        super(message);
+        this.name = "ApiError";
+        this.status = status;
+        this.details = details;
+        this.requestId = requestId;
+    }
 }
 
 export function getDefaultApiErrorMessage(status) {
-  if (status === 0) {
-    return 'Nao foi possivel contactar o servidor. Confirma a ligacao e tenta novamente.';
-  }
+    if (status === 0) {
+        return "Nao foi possivel contactar o servidor. Confirma a ligacao e tenta novamente.";
+    }
 
-  if (status === 401) {
-    return 'Sessao nao autenticada. Entra novamente na tua conta.';
-  }
+    if (status === 401) {
+        return "Sessao nao autenticada. Entra novamente na tua conta.";
+    }
 
-  if (status === 403) {
-    return 'Nao tens permissao para executar esta acao.';
-  }
+    if (status === 403) {
+        return "Nao tens permissao para executar esta acao.";
+    }
 
-  if (status === 404) {
-    return 'O recurso pedido nao foi encontrado.';
-  }
+    if (status === 404) {
+        return "O recurso pedido nao foi encontrado.";
+    }
 
-  if (status >= 500) {
-    return 'O servidor teve um problema. Tenta novamente dentro de momentos.';
-  }
+    if (status >= 500) {
+        return "O servidor teve um problema. Tenta novamente dentro de momentos.";
+    }
 
-  return 'O pedido nao foi concluido. Verifica os dados e tenta novamente.';
+    return "O pedido nao foi concluido. Verifica os dados e tenta novamente.";
 }
 
 export function toUserMessage(error) {
-  if (error instanceof ApiError) {
-    return error.message;
-  }
+    if (error instanceof ApiError) {
+        return error.message;
+    }
 
-  return 'Ocorreu um erro inesperado. Tenta novamente.';
+    return "Ocorreu um erro inesperado. Tenta novamente.";
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `ApiError` guarda informacao util para a UI: codigo HTTP, mensagem, detalhes e `requestId`. A funcao `getDefaultApiErrorMessage` evita mensagens tecnicas como `Failed to fetch`, que nao ajudam o utilizador. `toUserMessage` garante que a UI tem sempre uma mensagem segura.
 
 6. Codigo do ficheiro `frontend/src/services/api/apiClient.js`.
 
 ```js
-import { env } from '../../config/env.js';
-import { ApiError, getDefaultApiErrorMessage } from './apiErrors.js';
+import { env } from "../../config/env.js";
+import { ApiError, getDefaultApiErrorMessage } from "./apiErrors.js";
 
 function buildUrl(path) {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  return `${env.apiBaseUrl}${normalizedPath}`;
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    return `${env.apiBaseUrl}${normalizedPath}`;
 }
 
 async function parseResponseBody(response) {
-  if (response.status === 204) {
-    return null;
-  }
+    if (response.status === 204) {
+        return null;
+    }
 
-  const contentType = response.headers.get('content-type') ?? '';
+    const contentType = response.headers.get("content-type") ?? "";
 
-  if (contentType.includes('application/json')) {
-    return response.json();
-  }
+    if (contentType.includes("application/json")) {
+        return response.json();
+    }
 
-  const text = await response.text();
-  return text ? { message: text } : null;
+    const text = await response.text();
+    return text ? { message: text } : null;
 }
 
-async function request(path, { method = 'GET', body, headers = {}, ...options } = {}) {
-  const requestHeaders = {
-    Accept: 'application/json',
-    ...headers,
-  };
+async function request(
+    path,
+    { method = "GET", body, headers = {}, ...options } = {},
+) {
+    const requestHeaders = {
+        Accept: "application/json",
+        ...headers,
+    };
 
-  const requestOptions = {
-    method,
-    credentials: 'include',
-    headers: requestHeaders,
-    ...options,
-  };
+    const requestOptions = {
+        method,
+        credentials: "include",
+        headers: requestHeaders,
+        ...options,
+    };
 
-  if (body !== undefined) {
-    requestHeaders['Content-Type'] = 'application/json';
-    requestOptions.body = JSON.stringify(body);
-  }
+    if (body !== undefined) {
+        requestHeaders["Content-Type"] = "application/json";
+        requestOptions.body = JSON.stringify(body);
+    }
 
-  let response;
+    let response;
 
-  try {
-    response = await fetch(buildUrl(path), requestOptions);
-  } catch (error) {
-    throw new ApiError({
-      status: 0,
-      message: getDefaultApiErrorMessage(0),
-      details: { cause: error.message },
-    });
-  }
+    try {
+        response = await fetch(buildUrl(path), requestOptions);
+    } catch (error) {
+        throw new ApiError({
+            status: 0,
+            message: getDefaultApiErrorMessage(0),
+            details: { cause: error.message },
+        });
+    }
 
-  const data = await parseResponseBody(response);
+    const data = await parseResponseBody(response);
 
-  if (!response.ok) {
-    throw new ApiError({
-      status: response.status,
-      message: data?.message ?? getDefaultApiErrorMessage(response.status),
-      details: data?.details,
-      requestId: response.headers.get('x-request-id') ?? undefined,
-    });
-  }
+    if (!response.ok) {
+        throw new ApiError({
+            status: response.status,
+            message:
+                data?.message ?? getDefaultApiErrorMessage(response.status),
+            details: data?.details,
+            requestId: response.headers.get("x-request-id") ?? undefined,
+        });
+    }
 
-  return data;
+    return data;
 }
 
 export const apiClient = {
-  get: (path, options) => request(path, { ...options, method: 'GET' }),
-  post: (path, body, options) => request(path, { ...options, method: 'POST', body }),
-  put: (path, body, options) => request(path, { ...options, method: 'PUT', body }),
-  patch: (path, body, options) => request(path, { ...options, method: 'PATCH', body }),
-  del: (path, options) => request(path, { ...options, method: 'DELETE' }),
+    get: (path, options) => request(path, { ...options, method: "GET" }),
+    post: (path, body, options) =>
+        request(path, { ...options, method: "POST", body }),
+    put: (path, body, options) =>
+        request(path, { ...options, method: "PUT", body }),
+    patch: (path, body, options) =>
+        request(path, { ...options, method: "PATCH", body }),
+    del: (path, options) => request(path, { ...options, method: "DELETE" }),
 };
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `buildUrl` junta a origem da API ao caminho. `parseResponseBody` lida com respostas JSON, respostas vazias e respostas de texto. `credentials: 'include'` e essencial para o futuro login: permite que cookies HttpOnly enviados pelo backend sejam incluidos nos pedidos. O `try/catch` transforma falhas de rede num `ApiError` com `status: 0`, mais facil de mostrar na UI.
 
@@ -282,10 +295,10 @@ Erro comum: guardar tokens no browser para "resolver" auth. Este BK prepara cook
 Usar o cliente API para verificar se o backend responde, mostrando uma mensagem simples na home.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `frontend/src/services/api/systemApi.js`
-   - CRIAR: `frontend/src/components/system/ApiStatusBadge.jsx`
-   - LOCALIZACAO: `frontend/src/services/api/` e `frontend/src/components/system/`
-   - REVER: `BK-MF1-01`, rota `GET /api`
+    - CRIAR: `frontend/src/services/api/systemApi.js`
+    - CRIAR: `frontend/src/components/system/ApiStatusBadge.jsx`
+    - LOCALIZACAO: `frontend/src/services/api/` e `frontend/src/components/system/`
+    - REVER: `BK-MF1-01`, rota `GET /api`
 
 3. Instrucoes concretas.
 
@@ -294,70 +307,73 @@ Cria a pasta `components/system/`. O componente deve ser pequeno e tecnico: ele 
 4. Codigo do ficheiro `frontend/src/services/api/systemApi.js`.
 
 ```js
-import { apiClient } from './apiClient.js';
+import { apiClient } from "./apiClient.js";
 
 export function getApiStatus() {
-  return apiClient.get('/api');
+    return apiClient.get("/api");
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 Mesmo sendo uma chamada pequena, criamos um service. Assim, as paginas nao precisam de saber caminhos da API. No futuro podem existir services como `authApi`, `catalogApi` e `subscriptionApi`.
 
 6. Codigo do ficheiro `frontend/src/components/system/ApiStatusBadge.jsx`.
 
 ```jsx
-import { useEffect, useState } from 'react';
-import { toUserMessage } from '../../services/api/apiErrors.js';
-import { getApiStatus } from '../../services/api/systemApi.js';
+import { useEffect, useState } from "react";
+import { toUserMessage } from "../../services/api/apiErrors.js";
+import { getApiStatus } from "../../services/api/systemApi.js";
 
 export function ApiStatusBadge() {
-  const [state, setState] = useState({
-    status: 'checking',
-    message: 'A verificar ligacao ao backend...',
-  });
+    const [state, setState] = useState({
+        status: "checking",
+        message: "A verificar ligacao ao backend...",
+    });
 
-  useEffect(() => {
-    let isActive = true;
+    useEffect(() => {
+        let isActive = true;
 
-    getApiStatus()
-      .then((data) => {
-        if (!isActive) {
-          return;
-        }
+        getApiStatus()
+            .then((data) => {
+                if (!isActive) {
+                    return;
+                }
 
-        setState({
-          status: 'online',
-          message: `${data.name} ligada (${data.status}).`,
-        });
-      })
-      .catch((error) => {
-        if (!isActive) {
-          return;
-        }
+                setState({
+                    status: "online",
+                    message: `${data.name} ligada (${data.status}).`,
+                });
+            })
+            .catch((error) => {
+                if (!isActive) {
+                    return;
+                }
 
-        setState({
-          status: 'offline',
-          message: toUserMessage(error),
-        });
-      });
+                setState({
+                    status: "offline",
+                    message: toUserMessage(error),
+                });
+            });
 
-    return () => {
-      isActive = false;
-    };
-  }, []);
+        return () => {
+            isActive = false;
+        };
+    }, []);
 
-  return (
-    <aside className={`api-status api-status-${state.status}`} aria-live="polite">
-      <strong>Estado API</strong>
-      <span>{state.message}</span>
-    </aside>
-  );
+    return (
+        <aside
+            className={`api-status api-status-${state.status}`}
+            aria-live="polite"
+        >
+            <strong>Estado API</strong>
+            <span>{state.message}</span>
+        </aside>
+    );
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `useEffect` corre quando o componente aparece no ecra. A variavel `isActive` evita tentar atualizar estado depois de o componente desmontar. `aria-live="polite"` permite que leitores de ecra recebam a atualizacao sem interromper o utilizador.
 
@@ -376,10 +392,10 @@ Erro comum: fazer o componente assumir que a resposta existe sempre. O `.catch()
 Mostrar o estado tecnico na pagina inicial sem alterar o escopo funcional da home.
 
 2. Ficheiros envolvidos:
-   - EDITAR: `frontend/src/pages/pages.jsx`
-   - EDITAR: `frontend/src/styles/global.css`
-   - LOCALIZACAO: substituir o ficheiro `pages.jsx` pelo conteudo abaixo e acrescentar o CSS no fim de `global.css`
-   - REVER: `BK-MF1-02`
+    - EDITAR: `frontend/src/pages/pages.jsx`
+    - EDITAR: `frontend/src/styles/global.css`
+    - LOCALIZACAO: substituir o ficheiro `pages.jsx` pelo conteudo abaixo e acrescentar o CSS no fim de `global.css`
+    - REVER: `BK-MF1-02`
 
 3. Instrucoes concretas.
 
@@ -388,123 +404,145 @@ Substitui `frontend/src/pages/pages.jsx` pelo ficheiro completo abaixo. Depois a
 4. Codigo do ficheiro `frontend/src/pages/pages.jsx`.
 
 ```jsx
-import { Link } from 'react-router-dom';
-import { ApiStatusBadge } from '../components/system/ApiStatusBadge.jsx';
-import { BaseButton } from '../components/ui/BaseButton.jsx';
-import { ContentCard } from '../components/ui/ContentCard.jsx';
-import { EmptyState } from '../components/ui/EmptyState.jsx';
-import { TextField } from '../components/ui/TextField.jsx';
+import { Link } from "react-router-dom";
+import { ApiStatusBadge } from "../components/system/ApiStatusBadge.jsx";
+import { BaseButton } from "../components/ui/BaseButton.jsx";
+import { ContentCard } from "../components/ui/ContentCard.jsx";
+import { EmptyState } from "../components/ui/EmptyState.jsx";
+import { TextField } from "../components/ui/TextField.jsx";
 
 export function HomePage() {
-  return (
-    <section className="page-section hero-section">
-      <div className="hero-copy">
-        <p className="section-kicker">Streaming cristao com impacto social</p>
-        <h1>FaithFlix</h1>
-        <p>
-          Base inicial da experiencia web. Catalogo, streaming, perfis, subscricoes
-          e pool solidaria entram nos BKs seguintes.
-        </p>
-        <Link className="button-link" to="/catalogo">Ver estrutura do catalogo</Link>
-      </div>
-      <ApiStatusBadge />
-    </section>
-  );
+    return (
+        <section className="page-section hero-section">
+            <div className="hero-copy">
+                <p className="section-kicker">
+                    Streaming cristao com impacto social
+                </p>
+                <h1>FaithFlix</h1>
+                <p>
+                    Base inicial da experiencia web. Catalogo, streaming,
+                    perfis, subscricoes e pool solidaria entram nos BKs
+                    seguintes.
+                </p>
+                <Link className="button-link" to="/catalogo">
+                    Ver estrutura do catalogo
+                </Link>
+            </div>
+            <ApiStatusBadge />
+        </section>
+    );
 }
 
 export function CatalogPage() {
-  return (
-    <section className="page-section">
-      <p className="section-kicker">Catalogo</p>
-      <h1>Catalogo FaithFlix</h1>
-      <div className="card-grid">
-        <ContentCard
-          eyebrow="MF2"
-          title="Metadados de conteudo"
-          description="O CRUD de catalogo e taxonomias sera implementado nos BKs de core streaming."
-        />
-        <ContentCard
-          eyebrow="MF2"
-          title="Detalhe e reproducao"
-          description="A separacao entre metadados e reproducao sera tratada antes do player."
-        />
-      </div>
-    </section>
-  );
+    return (
+        <section className="page-section">
+            <p className="section-kicker">Catalogo</p>
+            <h1>Catalogo FaithFlix</h1>
+            <div className="card-grid">
+                <ContentCard
+                    eyebrow="MF2"
+                    title="Metadados de conteudo"
+                    description="O CRUD de catalogo e taxonomias sera implementado nos BKs de core streaming."
+                />
+                <ContentCard
+                    eyebrow="MF2"
+                    title="Detalhe e reproducao"
+                    description="A separacao entre metadados e reproducao sera tratada antes do player."
+                />
+            </div>
+        </section>
+    );
 }
 
 export function LoginPage() {
-  return (
-    <section className="page-section narrow-section">
-      <p className="section-kicker">Identidade</p>
-      <h1>Entrada na conta</h1>
-      <form className="form-preview" aria-label="Formulario de login ainda inativo">
-        <TextField id="email-preview" label="Email" type="email" disabled placeholder="Ativado em MF2" />
-        <TextField id="password-preview" label="Password" type="password" disabled placeholder="Ativado em MF2" />
-        <BaseButton disabled>Login disponivel em MF2</BaseButton>
-      </form>
-    </section>
-  );
+    return (
+        <section className="page-section narrow-section">
+            <p className="section-kicker">Identidade</p>
+            <h1>Entrada na conta</h1>
+            <form
+                className="form-preview"
+                aria-label="Formulario de login ainda inativo"
+            >
+                <TextField
+                    id="email-preview"
+                    label="Email"
+                    type="email"
+                    disabled
+                    placeholder="Ativado em MF2"
+                />
+                <TextField
+                    id="password-preview"
+                    label="Password"
+                    type="password"
+                    disabled
+                    placeholder="Ativado em MF2"
+                />
+                <BaseButton disabled>Login disponivel em MF2</BaseButton>
+            </form>
+        </section>
+    );
 }
 
 export function AssociationsPage() {
-  return (
-    <EmptyState
-      title="Associacoes"
-      description="A candidatura e a pool solidaria entram na macrofase de monetizacao solidaria."
-    />
-  );
+    return (
+        <EmptyState
+            title="Associacoes"
+            description="A candidatura e a pool solidaria entram na macrofase de monetizacao solidaria."
+        />
+    );
 }
 
 export function PlansPage() {
-  return (
-    <EmptyState
-      title="Planos"
-      description="Os planos e a subscricao serao definidos sem inventar pagamentos reais nesta fase."
-    />
-  );
+    return (
+        <EmptyState
+            title="Planos"
+            description="Os planos e a subscricao serao definidos sem inventar pagamentos reais nesta fase."
+        />
+    );
 }
 
 export function AccountPage() {
-  return (
-    <EmptyState
-      title="Conta"
-      description="Perfil, consentimentos e dados pessoais dependem de autenticacao segura."
-    />
-  );
+    return (
+        <EmptyState
+            title="Conta"
+            description="Perfil, consentimentos e dados pessoais dependem de autenticacao segura."
+        />
+    );
 }
 
 export function NotificationsPage() {
-  return (
-    <EmptyState
-      title="Notificacoes"
-      description="As notificacoes transacionais entram depois dos fluxos principais estarem definidos."
-    />
-  );
+    return (
+        <EmptyState
+            title="Notificacoes"
+            description="As notificacoes transacionais entram depois dos fluxos principais estarem definidos."
+        />
+    );
 }
 
 export function SearchPage() {
-  return (
-    <EmptyState
-      title="Pesquisa"
-      description="A pesquisa unificada sera ligada ao catalogo quando existirem conteudos persistidos."
-    />
-  );
+    return (
+        <EmptyState
+            title="Pesquisa"
+            description="A pesquisa unificada sera ligada ao catalogo quando existirem conteudos persistidos."
+        />
+    );
 }
 
 export function NotFoundPage() {
-  return (
-    <EmptyState
-      title="Pagina nao encontrada"
-      description="Confirma o endereco ou volta ao inicio."
-    >
-      <Link className="button-link" to="/">Voltar ao inicio</Link>
-    </EmptyState>
-  );
+    return (
+        <EmptyState
+            title="Pagina nao encontrada"
+            description="Confirma o endereco ou volta ao inicio."
+        >
+            <Link className="button-link" to="/">
+                Voltar ao inicio
+            </Link>
+        </EmptyState>
+    );
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 A unica mudanca funcional face ao BK anterior e a entrada de `ApiStatusBadge` na home. Isto mostra conectividade tecnica sem criar login, catalogo ou dados falsos. O resto das paginas mantem o mesmo contrato para os BKs futuros.
 
@@ -512,34 +550,34 @@ A unica mudanca funcional face ao BK anterior e a entrada de `ApiStatusBadge` na
 
 ```css
 .api-status {
-  display: grid;
-  gap: 0.25rem;
-  max-width: 420px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  padding: 1rem;
-  box-shadow: var(--shadow-soft);
+    display: grid;
+    gap: 0.25rem;
+    max-width: 420px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    padding: 1rem;
+    box-shadow: var(--shadow-soft);
 }
 
 .api-status strong {
-  color: var(--color-brand-strong);
+    color: var(--color-brand-strong);
 }
 
 .api-status-checking {
-  border-color: var(--color-border);
+    border-color: var(--color-border);
 }
 
 .api-status-online {
-  border-color: #66a88f;
+    border-color: #66a88f;
 }
 
 .api-status-offline {
-  border-color: #c85d5d;
+    border-color: #c85d5d;
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 O CSS diferencia visualmente os estados sem usar texto tecnico complexo. Verde indica ligacao, vermelho indica falha. Mantemos a mesma linguagem visual do frontend base.
 
@@ -558,9 +596,9 @@ Erro comum: transformar a home num painel tecnico cheio de detalhes internos. O 
 Garantir que o cliente API se comporta bem quando tudo corre certo e quando algo falha.
 
 2. Ficheiros envolvidos:
-   - EDITAR: nenhum, se os passos anteriores estiverem corretos
-   - LOCALIZACAO: executar comandos em `backend/` e `frontend/`
-   - REVER: `apiClient.js`, `apiErrors.js`, `ApiStatusBadge.jsx`
+    - EDITAR: nenhum, se os passos anteriores estiverem corretos
+    - LOCALIZACAO: executar comandos em `backend/` e `frontend/`
+    - REVER: `apiClient.js`, `apiErrors.js`, `ApiStatusBadge.jsx`
 
 3. Instrucoes concretas.
 
@@ -570,10 +608,10 @@ Testa os tres cenarios abaixo e guarda outputs/capturas.
 
 ```json
 {
-  "service": "faithflix-api",
-  "name": "FaithFlix API",
-  "version": "0.1.0",
-  "status": "ok"
+    "service": "faithflix-api",
+    "name": "FaithFlix API",
+    "version": "0.1.0",
+    "status": "ok"
 }
 ```
 
@@ -585,10 +623,10 @@ Este caso prova que o frontend consegue contactar a API base criada no `BK-MF1-0
 
 ```json
 {
-  "message": "Recurso nao encontrado.",
-  "details": {
-    "path": "/api/nao-existe"
-  }
+    "message": "Recurso nao encontrado.",
+    "details": {
+        "path": "/api/nao-existe"
+    }
 }
 ```
 

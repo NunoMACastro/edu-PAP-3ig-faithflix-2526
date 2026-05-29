@@ -63,11 +63,11 @@ Para alunos do 12.º ano, a ideia principal e esta: antes de criar funcionalidad
 Criar a pasta `backend/`, declarar a app Node.js como projeto independente e preparar variaveis de ambiente sem guardar segredos reais no repositorio.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `backend/package.json`
-   - CRIAR: `backend/.env.example`
-   - CRIAR: `backend/src/config/env.js`
-   - LOCALIZACAO: raiz do repositorio FaithFlix, dentro da nova pasta `backend/`
-   - REVER: `docs/RNF.md`, seccoes `RNF17` e `RNF27`
+    - CRIAR: `backend/package.json`
+    - CRIAR: `backend/.env.example`
+    - CRIAR: `backend/src/config/env.js`
+    - LOCALIZACAO: raiz do repositorio FaithFlix, dentro da nova pasta `backend/`
+    - REVER: `docs/RNF.md`, seccoes `RNF17` e `RNF27`
 
 3. Instrucoes concretas.
 
@@ -77,25 +77,25 @@ Cria a pasta `backend/` e depois cria os ficheiros abaixo. O ficheiro `.env.exam
 
 ```json
 {
-  "name": "faithflix-backend",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
-    "test": "node --test"
-  },
-  "dependencies": {
-    "express": "^4.19.2"
-  },
-  "engines": {
-    "node": ">=20"
-  }
+    "name": "faithflix-backend",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "node --watch src/server.js",
+        "start": "node src/server.js",
+        "test": "node --test"
+    },
+    "dependencies": {
+        "express": "^4.19.2"
+    },
+    "engines": {
+        "node": ">=20"
+    }
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 - `private: true` evita publicacao acidental no npm.
 - `type: module` permite usar `import` e `export`, que e a sintaxe moderna de JavaScript.
@@ -112,7 +112,7 @@ PORT=3000
 SERVICE_NAME=faithflix-api
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `NODE_ENV` indica o ambiente. `PORT` define a porta local. `SERVICE_NAME` identifica a API nos logs e respostas tecnicas. Estes valores sao seguros para exemplo; quando existirem credenciais reais, ficam num `.env` local e nunca entram no Git.
 
@@ -122,29 +122,29 @@ SERVICE_NAME=faithflix-api
 const DEFAULT_PORT = 3000;
 
 function parsePort(value) {
-  if (value === undefined || value === '') {
-    return DEFAULT_PORT;
-  }
+    if (value === undefined || value === "") {
+        return DEFAULT_PORT;
+    }
 
-  const parsed = Number(value);
+    const parsed = Number(value);
 
-  if (!Number.isInteger(parsed) || parsed <= 0 || parsed > 65535) {
-    throw new Error('PORT deve ser um numero inteiro entre 1 e 65535.');
-  }
+    if (!Number.isInteger(parsed) || parsed <= 0 || parsed > 65535) {
+        throw new Error("PORT deve ser um numero inteiro entre 1 e 65535.");
+    }
 
-  return parsed;
+    return parsed;
 }
 
 export const env = {
-  nodeEnv: process.env.NODE_ENV ?? 'development',
-  port: parsePort(process.env.PORT),
-  serviceName: process.env.SERVICE_NAME ?? 'faithflix-api',
+    nodeEnv: process.env.NODE_ENV ?? "development",
+    port: parsePort(process.env.PORT),
+    serviceName: process.env.SERVICE_NAME ?? "faithflix-api",
 };
 
-export const isProduction = env.nodeEnv === 'production';
+export const isProduction = env.nodeEnv === "production";
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 Este ficheiro concentra a leitura de variaveis de ambiente. Em vez de chamar `process.env.PORT` em muitos ficheiros, a app passa a usar `env.port`. Isto evita duplicacao e torna erros mais faceis de diagnosticar. A funcao `parsePort` valida a porta antes do servidor arrancar; assim, `PORT=abc` falha logo com uma mensagem clara.
 
@@ -176,11 +176,11 @@ Resultado esperado depois de criares o servidor nos passos seguintes: a app deve
 Criar uma primeira rota tecnica `GET /api`, com resposta JSON previsivel, e um utilitario de erro reutilizavel pelos BKs seguintes.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `backend/src/utils/http-error.js`
-   - CRIAR: `backend/src/modules/system/system.controller.js`
-   - CRIAR: `backend/src/modules/system/system.routes.js`
-   - LOCALIZACAO: `backend/src/utils/` e `backend/src/modules/system/`
-   - REVER: `BK-MF1-03`, porque o frontend vai consumir respostas e erros desta API
+    - CRIAR: `backend/src/utils/http-error.js`
+    - CRIAR: `backend/src/modules/system/system.controller.js`
+    - CRIAR: `backend/src/modules/system/system.routes.js`
+    - LOCALIZACAO: `backend/src/utils/` e `backend/src/modules/system/`
+    - REVER: `BK-MF1-03`, porque o frontend vai consumir respostas e erros desta API
 
 3. Instrucoes concretas.
 
@@ -190,54 +190,54 @@ Cria primeiro `utils/`, depois `modules/system/`. O nome `system` e usado para e
 
 ```js
 export class HttpError extends Error {
-  constructor(statusCode, message, details = undefined) {
-    super(message);
-    this.name = 'HttpError';
-    this.statusCode = statusCode;
-    this.details = details;
-  }
+    constructor(statusCode, message, details = undefined) {
+        super(message);
+        this.name = "HttpError";
+        this.statusCode = statusCode;
+        this.details = details;
+    }
 }
 
 export function notFound(path) {
-  return new HttpError(404, 'Recurso nao encontrado.', { path });
+    return new HttpError(404, "Recurso nao encontrado.", { path });
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `HttpError` e uma classe propria para erros HTTP. Em Express, um erro precisa de duas informacoes importantes: o codigo HTTP e a mensagem para devolver ao cliente. Ao guardar `statusCode`, o error handler consegue responder `404`, `400` ou `500` sem adivinhar. A funcao `notFound` cria um erro padronizado para rotas inexistentes.
 
 6. Codigo do ficheiro `backend/src/modules/system/system.controller.js`.
 
 ```js
-import { env } from '../../config/env.js';
+import { env } from "../../config/env.js";
 
 export function getApiInfo(_req, res) {
-  return res.status(200).json({
-    service: env.serviceName,
-    name: 'FaithFlix API',
-    version: '0.1.0',
-    status: 'ok',
-  });
+    return res.status(200).json({
+        service: env.serviceName,
+        name: "FaithFlix API",
+        version: "0.1.0",
+        status: "ok",
+    });
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 Um controller recebe o pedido e decide a resposta. Aqui devolvemos apenas informacao tecnica basica. Isto nao e catalogo nem streaming; e um ponto simples para provar que a API esta viva e que o frontend consegue falar com ela em `BK-MF1-03`.
 
 8. Codigo do ficheiro `backend/src/modules/system/system.routes.js`.
 
 ```js
-import { Router } from 'express';
-import { getApiInfo } from './system.controller.js';
+import { Router } from "express";
+import { getApiInfo } from "./system.controller.js";
 
 export const systemRouter = Router();
 
-systemRouter.get('/', getApiInfo);
+systemRouter.get("/", getApiInfo);
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 `Router()` permite agrupar rotas de um modulo. Como este router sera montado em `/api`, a rota `systemRouter.get('/')` fica disponivel como `GET /api`. Esta separacao evita que `app.js` fique cheio de endpoints misturados.
 
@@ -256,10 +256,10 @@ Erro comum: escrever `import { getApiInfo } from './system.controller'` sem `.js
 Criar a aplicacao Express reutilizavel pelos testes, montar a rota `/api` e garantir respostas JSON tambem quando ha erro.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `backend/src/middlewares/error.middleware.js`
-   - CRIAR: `backend/src/app.js`
-   - LOCALIZACAO: `backend/src/middlewares/` e `backend/src/`
-   - REVER: `BK-MF1-04`, `BK-MF1-05` e `BK-MF1-06`, porque todos vao reutilizar `createApp()`
+    - CRIAR: `backend/src/middlewares/error.middleware.js`
+    - CRIAR: `backend/src/app.js`
+    - LOCALIZACAO: `backend/src/middlewares/` e `backend/src/`
+    - REVER: `BK-MF1-04`, `BK-MF1-05` e `BK-MF1-06`, porque todos vao reutilizar `createApp()`
 
 3. Instrucoes concretas.
 
@@ -268,54 +268,61 @@ Cria a pasta `middlewares/` e adiciona o error handler. Depois cria `app.js`. A 
 4. Codigo do ficheiro `backend/src/middlewares/error.middleware.js`.
 
 ```js
-import { notFound } from '../utils/http-error.js';
+import { notFound } from "../utils/http-error.js";
 
 export function notFoundHandler(req, _res, next) {
-  next(notFound(req.originalUrl));
+    next(notFound(req.originalUrl));
 }
 
 export function errorHandler(error, _req, res, _next) {
-  const statusCode = error.statusCode ?? error.status ?? 500;
-  const safeStatusCode = statusCode >= 400 && statusCode <= 599 ? statusCode : 500;
+    const statusCode = error.statusCode ?? error.status ?? 500;
+    const safeStatusCode =
+        statusCode >= 400 && statusCode <= 599 ? statusCode : 500;
 
-  const response = {
-    message: safeStatusCode === 500 ? 'Erro interno do servidor.' : error.message,
-  };
+    const response = {
+        message:
+            safeStatusCode === 500
+                ? "Erro interno do servidor."
+                : error.message,
+    };
 
-  if (error.details !== undefined) {
-    response.details = error.details;
-  }
+    if (error.details !== undefined) {
+        response.details = error.details;
+    }
 
-  return res.status(safeStatusCode).json(response);
+    return res.status(safeStatusCode).json(response);
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `notFoundHandler` e executado quando nenhuma rota respondeu. Em vez de deixar Express devolver HTML, criamos um erro 404 em JSON. `errorHandler` e o ultimo middleware da app; ele transforma erros em respostas previsiveis. Para erros internos, a mensagem e generica, porque detalhes tecnicos podem revelar informacao sensivel.
 
 6. Codigo do ficheiro `backend/src/app.js`.
 
 ```js
-import express from 'express';
-import { systemRouter } from './modules/system/system.routes.js';
-import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
+import express from "express";
+import { systemRouter } from "./modules/system/system.routes.js";
+import {
+    errorHandler,
+    notFoundHandler,
+} from "./middlewares/error.middleware.js";
 
 export function createApp() {
-  const app = express();
+    const app = express();
 
-  app.use(express.json({ limit: '1mb' }));
+    app.use(express.json({ limit: "1mb" }));
 
-  app.use('/api', systemRouter);
+    app.use("/api", systemRouter);
 
-  app.use(notFoundHandler);
-  app.use(errorHandler);
+    app.use(notFoundHandler);
+    app.use(errorHandler);
 
-  return app;
+    return app;
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `createApp()` devolve uma app Express pronta a usar. A linha `express.json({ limit: '1mb' })` permite receber JSON e limita o tamanho do body para reduzir abuso. Montar `systemRouter` em `/api` faz com que `GET /api` funcione. Os middlewares de erro ficam no fim, porque so devem correr depois das rotas.
 
@@ -340,10 +347,10 @@ Erro comum: chamar `app.listen()` dentro de `app.js`. Isso dificulta testes, por
 Criar o ponto de entrada que abre a porta e deixar um README curto para qualquer colega conseguir arrancar o backend.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `backend/src/server.js`
-   - CRIAR: `backend/README.md`
-   - LOCALIZACAO: `backend/src/` e `backend/`
-   - REVER: `docs/planificacao/guias-bk/MF1/BK-MF1-04-sessao-segura-backend-cookies-auth-base.md`
+    - CRIAR: `backend/src/server.js`
+    - CRIAR: `backend/README.md`
+    - LOCALIZACAO: `backend/src/` e `backend/`
+    - REVER: `docs/planificacao/guias-bk/MF1/BK-MF1-04-sessao-segura-backend-cookies-auth-base.md`
 
 3. Instrucoes concretas.
 
@@ -352,22 +359,24 @@ Cria `server.js` apenas depois de `app.js`. Depois cria o README com comandos e 
 4. Codigo do ficheiro `backend/src/server.js`.
 
 ```js
-import { createApp } from './app.js';
-import { env } from './config/env.js';
+import { createApp } from "./app.js";
+import { env } from "./config/env.js";
 
 const app = createApp();
 
 app.listen(env.port, () => {
-  console.log(JSON.stringify({
-    level: 'info',
-    message: 'FaithFlix API started',
-    service: env.serviceName,
-    port: env.port,
-  }));
+    console.log(
+        JSON.stringify({
+            level: "info",
+            message: "FaithFlix API started",
+            service: env.serviceName,
+            port: env.port,
+        }),
+    );
 });
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `server.js` importa a app ja montada e abre a porta. O log em JSON prepara o caminho para logging estruturado em `BK-MF1-05`. Nesta fase usamos `console.log`, mas ja com campos organizados: `level`, `message`, `service` e `port`.
 
@@ -397,7 +406,7 @@ Backend Node.js/Express da app FaithFlix.
 - Sem pagamentos.
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 O README evita que cada aluno tenha de adivinhar como arrancar o backend. Tambem deixa claro o que ainda nao existe. Isto protege o projeto contra funcionalidades falsas, como inventar catalogo ou login antes dos BKs certos.
 
@@ -428,9 +437,9 @@ Erro comum: colocar rotas funcionais de catalogo ou auth neste BK. Isso cria dri
 Confirmar que a base backend funciona, que erros usam JSON e que a estrutura esta pronta para os BKs seguintes.
 
 2. Ficheiros envolvidos:
-   - EDITAR: nenhum ficheiro novo se os passos anteriores estiverem corretos
-   - LOCALIZACAO: executar comandos dentro de `backend/`
-   - REVER: `backend/src/app.js`, `backend/src/middlewares/error.middleware.js`, `backend/README.md`
+    - EDITAR: nenhum ficheiro novo se os passos anteriores estiverem corretos
+    - LOCALIZACAO: executar comandos dentro de `backend/`
+    - REVER: `backend/src/app.js`, `backend/src/middlewares/error.middleware.js`, `backend/README.md`
 
 3. Instrucoes concretas.
 
@@ -445,14 +454,14 @@ Content-Type: application/json; charset=utf-8
 
 ```json
 {
-  "service": "faithflix-api",
-  "name": "FaithFlix API",
-  "version": "0.1.0",
-  "status": "ok"
+    "service": "faithflix-api",
+    "name": "FaithFlix API",
+    "version": "0.1.0",
+    "status": "ok"
 }
 ```
 
-5. Explicacao didatica da resposta.
+5. Explicacao da resposta.
 
 Esta resposta prova que a API arrancou, que Express esta a devolver JSON e que o frontend pode usar este endpoint para validar conectividade em `BK-MF1-03`.
 
@@ -465,14 +474,14 @@ Content-Type: application/json; charset=utf-8
 
 ```json
 {
-  "message": "Recurso nao encontrado.",
-  "details": {
-    "path": "/api/nao-existe"
-  }
+    "message": "Recurso nao encontrado.",
+    "details": {
+        "path": "/api/nao-existe"
+    }
 }
 ```
 
-7. Explicacao didatica da resposta.
+7. Explicacao da resposta.
 
 Uma API profissional nao deve devolver uma pagina HTML confusa quando o frontend espera JSON. O 404 em JSON permite ao cliente API mostrar uma mensagem clara ao utilizador.
 

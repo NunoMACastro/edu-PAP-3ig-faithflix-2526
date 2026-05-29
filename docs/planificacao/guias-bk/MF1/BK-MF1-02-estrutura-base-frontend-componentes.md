@@ -68,11 +68,11 @@ Este guia usa `React + Vite`, alinhado com o mockup existente em `mockup/`. O `R
 Criar a app frontend como projeto independente, com React, Vite e React Router.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `frontend/package.json`
-   - CRIAR: `frontend/vite.config.js`
-   - CRIAR: `frontend/index.html`
-   - LOCALIZACAO: nova pasta `frontend/` na raiz do repositorio
-   - REVER: `mockup/package.json` e `mockup/vite.config.ts`
+    - CRIAR: `frontend/package.json`
+    - CRIAR: `frontend/vite.config.js`
+    - CRIAR: `frontend/index.html`
+    - LOCALIZACAO: nova pasta `frontend/` na raiz do repositorio
+    - REVER: `mockup/package.json` e `mockup/vite.config.ts`
 
 3. Instrucoes concretas.
 
@@ -82,42 +82,42 @@ Cria a pasta `frontend/` e adiciona os tres ficheiros seguintes. Estes ficheiros
 
 ```json
 {
-  "name": "faithflix-frontend",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.4.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.1"
-  },
-  "devDependencies": {}
+    "name": "faithflix-frontend",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@vitejs/plugin-react": "^4.3.1",
+        "vite": "^5.4.2",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-router-dom": "^6.26.1"
+    },
+    "devDependencies": {}
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `vite` e a ferramenta que arranca e compila o frontend. `react` e `react-dom` permitem construir a interface. `react-router-dom` permite ter URLs como `/catalogo`, `/login` e `/planos` sem criar paginas HTML separadas. `private: true` evita publicacao acidental.
 
 6. Codigo do ficheiro `frontend/vite.config.js`.
 
 ```js
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [react()],
+    plugins: [react()],
 });
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 Este ficheiro diz ao Vite que a app usa React. Sem este plugin, JSX como `<App />` nao seria transformado corretamente durante o desenvolvimento e o build.
 
@@ -126,19 +126,19 @@ Este ficheiro diz ao Vite que a app usa React. Sem este plugin, JSX como `<App /
 ```html
 <!doctype html>
 <html lang="pt-PT">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FaithFlix</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>FaithFlix</title>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.jsx"></script>
+    </body>
 </html>
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 O HTML tem apenas o ponto de montagem `root`. A interface React e criada dentro desse elemento. O atributo `lang="pt-PT"` ajuda acessibilidade e leitores de ecra, porque a app esta em portugues de Portugal.
 
@@ -164,11 +164,11 @@ Erro comum: copiar diretamente o `mockup/` para `frontend/`. O mockup e referenc
 Montar a aplicacao React no browser e definir as rotas principais do FaithFlix.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `frontend/src/main.jsx`
-   - CRIAR: `frontend/src/App.jsx`
-   - CRIAR: `frontend/src/routes/AppRoutes.jsx`
-   - LOCALIZACAO: `frontend/src/` e `frontend/src/routes/`
-   - REVER: `MF-VIEWS.md`, para confirmar que esta e apenas fundacao tecnica
+    - CRIAR: `frontend/src/main.jsx`
+    - CRIAR: `frontend/src/App.jsx`
+    - CRIAR: `frontend/src/routes/AppRoutes.jsx`
+    - LOCALIZACAO: `frontend/src/` e `frontend/src/routes/`
+    - REVER: `MF-VIEWS.md`, para confirmar que esta e apenas fundacao tecnica
 
 3. Instrucoes concretas.
 
@@ -177,77 +177,77 @@ Cria a pasta `src/`, depois `src/routes/`. O router inclui rotas que serao preen
 4. Codigo do ficheiro `frontend/src/main.jsx`.
 
 ```jsx
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { App } from './App.jsx';
-import './styles/tokens.css';
-import './styles/global.css';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { App } from "./App.jsx";
+import "./styles/tokens.css";
+import "./styles/global.css";
 
-createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>,
+createRoot(document.getElementById("root")).render(
+    <React.StrictMode>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </React.StrictMode>,
 );
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `createRoot` liga React ao `div#root` do HTML. `BrowserRouter` ativa navegação por URLs. Os ficheiros CSS entram aqui porque devem afetar a app toda. `React.StrictMode` ajuda a detetar problemas durante desenvolvimento.
 
 6. Codigo do ficheiro `frontend/src/App.jsx`.
 
 ```jsx
-import { AppRoutes } from './routes/AppRoutes.jsx';
+import { AppRoutes } from "./routes/AppRoutes.jsx";
 
 export function App() {
-  return <AppRoutes />;
+    return <AppRoutes />;
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `App` fica pequeno de proposito. A sua responsabilidade e apontar para o sistema de rotas. Isto evita misturar layout, paginas e configuracao num unico ficheiro.
 
 8. Codigo do ficheiro `frontend/src/routes/AppRoutes.jsx`.
 
 ```jsx
-import { Route, Routes } from 'react-router-dom';
-import { AppLayout } from '../layouts/AppLayout.jsx';
+import { Route, Routes } from "react-router-dom";
+import { AppLayout } from "../layouts/AppLayout.jsx";
 import {
-  AccountPage,
-  AssociationsPage,
-  CatalogPage,
-  HomePage,
-  LoginPage,
-  NotFoundPage,
-  NotificationsPage,
-  PlansPage,
-  SearchPage,
-} from '../pages/pages.jsx';
+    AccountPage,
+    AssociationsPage,
+    CatalogPage,
+    HomePage,
+    LoginPage,
+    NotFoundPage,
+    NotificationsPage,
+    PlansPage,
+    SearchPage,
+} from "../pages/pages.jsx";
 
 export function AppRoutes() {
-  return (
-    <AppLayout>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/catalogo" element={<CatalogPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/associacoes" element={<AssociationsPage />} />
-        <Route path="/planos" element={<PlansPage />} />
-        <Route path="/conta" element={<AccountPage />} />
-        <Route path="/notificacoes" element={<NotificationsPage />} />
-        <Route path="/pesquisa" element={<SearchPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </AppLayout>
-  );
+    return (
+        <AppLayout>
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/catalogo" element={<CatalogPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/associacoes" element={<AssociationsPage />} />
+                <Route path="/planos" element={<PlansPage />} />
+                <Route path="/conta" element={<AccountPage />} />
+                <Route path="/notificacoes" element={<NotificationsPage />} />
+                <Route path="/pesquisa" element={<SearchPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+        </AppLayout>
+    );
 }
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 Cada `Route` associa uma URL a uma pagina. As rotas refletem dominios reais do FaithFlix, mas nao implementam regras de negocio. Por exemplo, `/catalogo` existe para preparar a navegacao, mas o catalogo real so entra em `MF2`.
 
@@ -266,11 +266,11 @@ Erro comum: criar rotas que parecem funcionalidades completas, como `/checkout-r
 Criar uma moldura comum para todas as paginas, com header, navegacao e footer.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `frontend/src/layouts/AppLayout.jsx`
-   - CRIAR: `frontend/src/components/layout/AppHeader.jsx`
-   - CRIAR: `frontend/src/components/layout/AppFooter.jsx`
-   - LOCALIZACAO: `frontend/src/layouts/` e `frontend/src/components/layout/`
-   - REVER: `RNF01`, `RNF02`, `RNF04` e `RNF38`
+    - CRIAR: `frontend/src/layouts/AppLayout.jsx`
+    - CRIAR: `frontend/src/components/layout/AppHeader.jsx`
+    - CRIAR: `frontend/src/components/layout/AppFooter.jsx`
+    - LOCALIZACAO: `frontend/src/layouts/` e `frontend/src/components/layout/`
+    - REVER: `RNF01`, `RNF02`, `RNF04` e `RNF38`
 
 3. Instrucoes concretas.
 
@@ -279,63 +279,71 @@ Cria as pastas `layouts/` e `components/layout/`. O layout deve ser comum a toda
 4. Codigo do ficheiro `frontend/src/layouts/AppLayout.jsx`.
 
 ```jsx
-import { AppFooter } from '../components/layout/AppFooter.jsx';
-import { AppHeader } from '../components/layout/AppHeader.jsx';
+import { AppFooter } from "../components/layout/AppFooter.jsx";
+import { AppHeader } from "../components/layout/AppHeader.jsx";
 
 export function AppLayout({ children }) {
-  return (
-    <div className="app-shell">
-      <AppHeader />
-      <main className="app-main">{children}</main>
-      <AppFooter />
-    </div>
-  );
+    return (
+        <div className="app-shell">
+            <AppHeader />
+            <main className="app-main">{children}</main>
+            <AppFooter />
+        </div>
+    );
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `children` representa a pagina atual. Assim, o header e o footer aparecem sempre, e o conteudo muda conforme a rota. Isto evita repetir header e footer em todas as paginas.
 
 6. Codigo do ficheiro `frontend/src/components/layout/AppHeader.jsx`.
 
 ```jsx
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
 const navItems = [
-  { to: '/', label: 'Inicio' },
-  { to: '/catalogo', label: 'Catalogo' },
-  { to: '/pesquisa', label: 'Pesquisa' },
-  { to: '/associacoes', label: 'Associacoes' },
-  { to: '/planos', label: 'Planos' },
-  { to: '/conta', label: 'Conta' },
+    { to: "/", label: "Inicio" },
+    { to: "/catalogo", label: "Catalogo" },
+    { to: "/pesquisa", label: "Pesquisa" },
+    { to: "/associacoes", label: "Associacoes" },
+    { to: "/planos", label: "Planos" },
+    { to: "/conta", label: "Conta" },
 ];
 
 export function AppHeader() {
-  return (
-    <header className="app-header">
-      <NavLink className="brand-link" to="/" aria-label="FaithFlix - inicio">
-        <span className="brand-mark" aria-hidden="true">F</span>
-        <span className="brand-name">FaithFlix</span>
-      </NavLink>
+    return (
+        <header className="app-header">
+            <NavLink
+                className="brand-link"
+                to="/"
+                aria-label="FaithFlix - inicio"
+            >
+                <span className="brand-mark" aria-hidden="true">
+                    F
+                </span>
+                <span className="brand-name">FaithFlix</span>
+            </NavLink>
 
-      <nav className="main-nav" aria-label="Navegacao principal">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
-            to={item.to}
-          >
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
-    </header>
-  );
+            <nav className="main-nav" aria-label="Navegacao principal">
+                {navItems.map((item) => (
+                    <NavLink
+                        key={item.to}
+                        className={({ isActive }) =>
+                            isActive ? "nav-link nav-link-active" : "nav-link"
+                        }
+                        to={item.to}
+                    >
+                        {item.label}
+                    </NavLink>
+                ))}
+            </nav>
+        </header>
+    );
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `navItems` e um array para evitar repetir codigo. `NavLink` sabe quando uma rota esta ativa, permitindo aplicar uma classe visual. Isto melhora orientacao do utilizador e cumpre a ideia de navegacao clara do `RNF01`.
 
@@ -343,16 +351,16 @@ export function AppHeader() {
 
 ```jsx
 export function AppFooter() {
-  return (
-    <footer className="app-footer">
-      <span>FaithFlix PAP 2025/2026</span>
-      <span>Conteudo, comunidade e impacto solidario.</span>
-    </footer>
-  );
+    return (
+        <footer className="app-footer">
+            <span>FaithFlix PAP 2025/2026</span>
+            <span>Conteudo, comunidade e impacto solidario.</span>
+        </footer>
+    );
 }
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 O footer e simples porque a app ainda esta na fundacao. Ele identifica o projeto e reforca o dominio, sem acrescentar funcionalidades falsas.
 
@@ -371,12 +379,12 @@ Erro comum: usar `<a href>` para navegacao interna principal. Isso recarrega a p
 Criar pequenos blocos de UI para botoes, campos, cards e estados vazios, que serao reutilizados em MF2+.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `frontend/src/components/ui/BaseButton.jsx`
-   - CRIAR: `frontend/src/components/ui/TextField.jsx`
-   - CRIAR: `frontend/src/components/ui/ContentCard.jsx`
-   - CRIAR: `frontend/src/components/ui/EmptyState.jsx`
-   - LOCALIZACAO: `frontend/src/components/ui/`
-   - REVER: `RNF02`, `RNF04`, `RNF05`
+    - CRIAR: `frontend/src/components/ui/BaseButton.jsx`
+    - CRIAR: `frontend/src/components/ui/TextField.jsx`
+    - CRIAR: `frontend/src/components/ui/ContentCard.jsx`
+    - CRIAR: `frontend/src/components/ui/EmptyState.jsx`
+    - LOCALIZACAO: `frontend/src/components/ui/`
+    - REVER: `RNF02`, `RNF04`, `RNF05`
 
 3. Instrucoes concretas.
 
@@ -386,50 +394,57 @@ Cria a pasta `components/ui/` e adiciona os componentes. Eles devem ser generico
 
 ```jsx
 export function BaseButton({
-  children,
-  type = 'button',
-  variant = 'primary',
-  disabled = false,
-  onClick,
+    children,
+    type = "button",
+    variant = "primary",
+    disabled = false,
+    onClick,
 }) {
-  return (
-    <button
-      className={`base-button base-button-${variant}`}
-      disabled={disabled}
-      onClick={onClick}
-      type={type}
-    >
-      {children}
-    </button>
-  );
+    return (
+        <button
+            className={`base-button base-button-${variant}`}
+            disabled={disabled}
+            onClick={onClick}
+            type={type}
+        >
+            {children}
+        </button>
+    );
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 Este componente evita repetir classes e propriedades em todos os botoes. `type="button"` por defeito previne submissao acidental em formularios. `disabled` permite mostrar acoes ainda indisponiveis sem as tornar clicaveis.
 
 6. Codigo do ficheiro `frontend/src/components/ui/TextField.jsx`.
 
 ```jsx
-export function TextField({ id, label, type = 'text', value = '', placeholder = '', disabled = false }) {
-  return (
-    <label className="text-field" htmlFor={id}>
-      <span>{label}</span>
-      <input
-        disabled={disabled}
-        id={id}
-        placeholder={placeholder}
-        type={type}
-        value={value}
-        readOnly
-      />
-    </label>
-  );
+export function TextField({
+    id,
+    label,
+    type = "text",
+    value = "",
+    placeholder = "",
+    disabled = false,
+}) {
+    return (
+        <label className="text-field" htmlFor={id}>
+            <span>{label}</span>
+            <input
+                disabled={disabled}
+                id={id}
+                placeholder={placeholder}
+                type={type}
+                value={value}
+                readOnly
+            />
+        </label>
+    );
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 O `label` ligado ao `input` melhora acessibilidade. O campo esta `readOnly` porque, nesta fase, nao vamos submeter formularios reais. Em `MF2`, os formularios funcionais podem evoluir este componente.
 
@@ -437,39 +452,43 @@ O `label` ligado ao `input` melhora acessibilidade. O campo esta `readOnly` porq
 
 ```jsx
 export function ContentCard({ eyebrow, title, description }) {
-  return (
-    <article className="content-card">
-      {eyebrow ? <span className="content-card-eyebrow">{eyebrow}</span> : null}
-      <h3>{title}</h3>
-      <p>{description}</p>
-    </article>
-  );
+    return (
+        <article className="content-card">
+            {eyebrow ? (
+                <span className="content-card-eyebrow">{eyebrow}</span>
+            ) : null}
+            <h3>{title}</h3>
+            <p>{description}</p>
+        </article>
+    );
 }
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 `ContentCard` mostra informacao textual curta. Ainda nao representa um filme real vindo da base de dados. Serve para validar estrutura visual sem inventar catalogo.
 
 10. Codigo do ficheiro `frontend/src/components/ui/EmptyState.jsx`.
 
 ```jsx
-import { useId } from 'react';
+import { useId } from "react";
 
 export function EmptyState({ title, description, children }) {
-  const headingId = useId();
+    const headingId = useId();
 
-  return (
-    <section className="empty-state" aria-labelledby={headingId}>
-      <h2 id={headingId}>{title}</h2>
-      <p>{description}</p>
-      {children ? <div className="empty-state-actions">{children}</div> : null}
-    </section>
-  );
+    return (
+        <section className="empty-state" aria-labelledby={headingId}>
+            <h2 id={headingId}>{title}</h2>
+            <p>{description}</p>
+            {children ? (
+                <div className="empty-state-actions">{children}</div>
+            ) : null}
+        </section>
+    );
 }
 ```
 
-11. Explicacao didatica do codigo.
+11. Explicacao do codigo.
 
 Um estado vazio explica ao utilizador porque uma pagina ainda nao tem conteudo. `useId()` cria um identificador unico para ligar a seccao ao seu titulo, ajudando leitores de ecra.
 
@@ -488,9 +507,9 @@ Erro comum: componentes com nomes vagos como `Thing` ou `Box`. Nomes claros ajud
 Criar paginas para as rotas principais, deixando claro o que cada pagina vai receber nas fases futuras.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `frontend/src/pages/pages.jsx`
-   - LOCALIZACAO: `frontend/src/pages/`
-   - REVER: `docs/RF.md`, dominios de identidade, catalogo, pesquisa, subscricoes, associacoes e notificacoes
+    - CRIAR: `frontend/src/pages/pages.jsx`
+    - LOCALIZACAO: `frontend/src/pages/`
+    - REVER: `docs/RF.md`, dominios de identidade, catalogo, pesquisa, subscricoes, associacoes e notificacoes
 
 3. Instrucoes concretas.
 
@@ -499,121 +518,143 @@ Cria a pasta `pages/` e adiciona o ficheiro abaixo. As paginas devem ser honesta
 4. Codigo do ficheiro `frontend/src/pages/pages.jsx`.
 
 ```jsx
-import { Link } from 'react-router-dom';
-import { BaseButton } from '../components/ui/BaseButton.jsx';
-import { ContentCard } from '../components/ui/ContentCard.jsx';
-import { EmptyState } from '../components/ui/EmptyState.jsx';
-import { TextField } from '../components/ui/TextField.jsx';
+import { Link } from "react-router-dom";
+import { BaseButton } from "../components/ui/BaseButton.jsx";
+import { ContentCard } from "../components/ui/ContentCard.jsx";
+import { EmptyState } from "../components/ui/EmptyState.jsx";
+import { TextField } from "../components/ui/TextField.jsx";
 
 export function HomePage() {
-  return (
-    <section className="page-section hero-section">
-      <div className="hero-copy">
-        <p className="section-kicker">Streaming cristao com impacto social</p>
-        <h1>FaithFlix</h1>
-        <p>
-          Base inicial da experiencia web. Catalogo, streaming, perfis, subscricoes
-          e pool solidaria entram nos BKs seguintes.
-        </p>
-        <Link className="button-link" to="/catalogo">Ver estrutura do catalogo</Link>
-      </div>
-    </section>
-  );
+    return (
+        <section className="page-section hero-section">
+            <div className="hero-copy">
+                <p className="section-kicker">
+                    Streaming cristao com impacto social
+                </p>
+                <h1>FaithFlix</h1>
+                <p>
+                    Base inicial da experiencia web. Catalogo, streaming,
+                    perfis, subscricoes e pool solidaria entram nos BKs
+                    seguintes.
+                </p>
+                <Link className="button-link" to="/catalogo">
+                    Ver estrutura do catalogo
+                </Link>
+            </div>
+        </section>
+    );
 }
 
 export function CatalogPage() {
-  return (
-    <section className="page-section">
-      <p className="section-kicker">Catalogo</p>
-      <h1>Catalogo FaithFlix</h1>
-      <div className="card-grid">
-        <ContentCard
-          eyebrow="MF2"
-          title="Metadados de conteudo"
-          description="O CRUD de catalogo e taxonomias sera implementado nos BKs de core streaming."
-        />
-        <ContentCard
-          eyebrow="MF2"
-          title="Detalhe e reproducao"
-          description="A separacao entre metadados e reproducao sera tratada antes do player."
-        />
-      </div>
-    </section>
-  );
+    return (
+        <section className="page-section">
+            <p className="section-kicker">Catalogo</p>
+            <h1>Catalogo FaithFlix</h1>
+            <div className="card-grid">
+                <ContentCard
+                    eyebrow="MF2"
+                    title="Metadados de conteudo"
+                    description="O CRUD de catalogo e taxonomias sera implementado nos BKs de core streaming."
+                />
+                <ContentCard
+                    eyebrow="MF2"
+                    title="Detalhe e reproducao"
+                    description="A separacao entre metadados e reproducao sera tratada antes do player."
+                />
+            </div>
+        </section>
+    );
 }
 
 export function LoginPage() {
-  return (
-    <section className="page-section narrow-section">
-      <p className="section-kicker">Identidade</p>
-      <h1>Entrada na conta</h1>
-      <form className="form-preview" aria-label="Formulario de login ainda inativo">
-        <TextField id="email-preview" label="Email" type="email" disabled placeholder="Ativado em MF2" />
-        <TextField id="password-preview" label="Password" type="password" disabled placeholder="Ativado em MF2" />
-        <BaseButton disabled>Login disponivel em MF2</BaseButton>
-      </form>
-    </section>
-  );
+    return (
+        <section className="page-section narrow-section">
+            <p className="section-kicker">Identidade</p>
+            <h1>Entrada na conta</h1>
+            <form
+                className="form-preview"
+                aria-label="Formulario de login ainda inativo"
+            >
+                <TextField
+                    id="email-preview"
+                    label="Email"
+                    type="email"
+                    disabled
+                    placeholder="Ativado em MF2"
+                />
+                <TextField
+                    id="password-preview"
+                    label="Password"
+                    type="password"
+                    disabled
+                    placeholder="Ativado em MF2"
+                />
+                <BaseButton disabled>Login disponivel em MF2</BaseButton>
+            </form>
+        </section>
+    );
 }
 
 export function AssociationsPage() {
-  return (
-    <EmptyState
-      title="Associacoes"
-      description="A candidatura e a pool solidaria entram na macrofase de monetizacao solidaria."
-    />
-  );
+    return (
+        <EmptyState
+            title="Associacoes"
+            description="A candidatura e a pool solidaria entram na macrofase de monetizacao solidaria."
+        />
+    );
 }
 
 export function PlansPage() {
-  return (
-    <EmptyState
-      title="Planos"
-      description="Os planos e a subscricao serao definidos sem inventar pagamentos reais nesta fase."
-    />
-  );
+    return (
+        <EmptyState
+            title="Planos"
+            description="Os planos e a subscricao serao definidos sem inventar pagamentos reais nesta fase."
+        />
+    );
 }
 
 export function AccountPage() {
-  return (
-    <EmptyState
-      title="Conta"
-      description="Perfil, consentimentos e dados pessoais dependem de autenticacao segura."
-    />
-  );
+    return (
+        <EmptyState
+            title="Conta"
+            description="Perfil, consentimentos e dados pessoais dependem de autenticacao segura."
+        />
+    );
 }
 
 export function NotificationsPage() {
-  return (
-    <EmptyState
-      title="Notificacoes"
-      description="As notificacoes transacionais entram depois dos fluxos principais estarem definidos."
-    />
-  );
+    return (
+        <EmptyState
+            title="Notificacoes"
+            description="As notificacoes transacionais entram depois dos fluxos principais estarem definidos."
+        />
+    );
 }
 
 export function SearchPage() {
-  return (
-    <EmptyState
-      title="Pesquisa"
-      description="A pesquisa unificada sera ligada ao catalogo quando existirem conteudos persistidos."
-    />
-  );
+    return (
+        <EmptyState
+            title="Pesquisa"
+            description="A pesquisa unificada sera ligada ao catalogo quando existirem conteudos persistidos."
+        />
+    );
 }
 
 export function NotFoundPage() {
-  return (
-    <EmptyState
-      title="Pagina nao encontrada"
-      description="Confirma o endereco ou volta ao inicio."
-    >
-      <Link className="button-link" to="/">Voltar ao inicio</Link>
-    </EmptyState>
-  );
+    return (
+        <EmptyState
+            title="Pagina nao encontrada"
+            description="Confirma o endereco ou volta ao inicio."
+        >
+            <Link className="button-link" to="/">
+                Voltar ao inicio
+            </Link>
+        </EmptyState>
+    );
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 As paginas usam os componentes criados antes. `HomePage` apresenta o produto, mas nao promete funcionalidades prontas. `CatalogPage` prepara espaco para metadados e detalhe. `LoginPage` mostra campos desativados para evitar login falso. As outras paginas usam `EmptyState` para explicar o estado atual de forma clara.
 
@@ -642,11 +683,11 @@ Erro comum: preencher cards com filmes inventados como se fossem catalogo real. 
 Dar uma base visual consistente, responsiva e acessivel ao frontend.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `frontend/src/styles/tokens.css`
-   - CRIAR: `frontend/src/styles/global.css`
-   - CRIAR: `frontend/src/services/api/README.md`
-   - LOCALIZACAO: `frontend/src/styles/` e `frontend/src/services/api/`
-   - REVER: `RNF01`, `RNF02`, `RNF03`, `RNF04`, `RNF05`, `RNF28`, `RNF38`
+    - CRIAR: `frontend/src/styles/tokens.css`
+    - CRIAR: `frontend/src/styles/global.css`
+    - CRIAR: `frontend/src/services/api/README.md`
+    - LOCALIZACAO: `frontend/src/styles/` e `frontend/src/services/api/`
+    - REVER: `RNF01`, `RNF02`, `RNF03`, `RNF04`, `RNF05`, `RNF28`, `RNF38`
 
 3. Instrucoes concretas.
 
@@ -656,23 +697,30 @@ Cria as pastas `styles/` e `services/api/`. A pasta `services/api/` ainda so rec
 
 ```css
 :root {
-  color-scheme: light;
-  --color-bg: #f7f8fa;
-  --color-surface: #ffffff;
-  --color-text: #18202b;
-  --color-muted: #5f6b7a;
-  --color-brand: #1f7a5f;
-  --color-brand-strong: #13513f;
-  --color-border: #d8dee8;
-  --color-focus: #0b5fff;
-  --shadow-soft: 0 12px 30px rgba(24, 32, 43, 0.08);
-  --radius-md: 8px;
-  --space-page: clamp(1rem, 4vw, 3rem);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color-scheme: light;
+    --color-bg: #f7f8fa;
+    --color-surface: #ffffff;
+    --color-text: #18202b;
+    --color-muted: #5f6b7a;
+    --color-brand: #1f7a5f;
+    --color-brand-strong: #13513f;
+    --color-border: #d8dee8;
+    --color-focus: #0b5fff;
+    --shadow-soft: 0 12px 30px rgba(24, 32, 43, 0.08);
+    --radius-md: 8px;
+    --space-page: clamp(1rem, 4vw, 3rem);
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 Tokens sao variaveis CSS usadas para cores, espacamentos e raios. Isto evita espalhar cores soltas por muitos ficheiros. A paleta usa verde como acento, mas mantem fundo claro e texto escuro para legibilidade.
 
@@ -680,212 +728,212 @@ Tokens sao variaveis CSS usadas para cores, espacamentos e raios. Isto evita esp
 
 ```css
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
 }
 
 a {
-  color: inherit;
+    color: inherit;
 }
 
 button,
 input {
-  font: inherit;
+    font: inherit;
 }
 
 :focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 3px;
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
 }
 
 .app-shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .app-header,
 .app-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem var(--space-page);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem var(--space-page);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .app-footer {
-  margin-top: auto;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 0;
-  color: var(--color-muted);
-  flex-wrap: wrap;
+    margin-top: auto;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 0;
+    color: var(--color-muted);
+    flex-wrap: wrap;
 }
 
 .brand-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  text-decoration: none;
-  font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    font-weight: 800;
 }
 
 .brand-mark {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  border-radius: var(--radius-md);
-  background: var(--color-brand);
-  color: white;
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border-radius: var(--radius-md);
+    background: var(--color-brand);
+    color: white;
 }
 
 .main-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
 }
 
 .nav-link,
 .button-link,
 .base-button {
-  min-height: 2.5rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  font-weight: 700;
+    min-height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 700;
 }
 
 .nav-link {
-  padding: 0.45rem 0.7rem;
-  color: var(--color-muted);
+    padding: 0.45rem 0.7rem;
+    color: var(--color-muted);
 }
 
 .nav-link-active {
-  background: #e7f3ee;
-  color: var(--color-brand-strong);
+    background: #e7f3ee;
+    color: var(--color-brand-strong);
 }
 
 .app-main {
-  width: min(1120px, 100%);
-  margin: 0 auto;
-  padding: 2rem var(--space-page);
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    padding: 2rem var(--space-page);
 }
 
 .page-section,
 .empty-state {
-  display: grid;
-  gap: 1rem;
+    display: grid;
+    gap: 1rem;
 }
 
 .hero-section {
-  min-height: 360px;
-  align-items: center;
+    min-height: 360px;
+    align-items: center;
 }
 
 .hero-copy {
-  max-width: 720px;
+    max-width: 720px;
 }
 
 .section-kicker,
 .content-card-eyebrow {
-  margin: 0;
-  color: var(--color-brand-strong);
-  font-weight: 800;
-  text-transform: uppercase;
+    margin: 0;
+    color: var(--color-brand-strong);
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
 h1,
 h2,
 h3,
 p {
-  margin-top: 0;
+    margin-top: 0;
 }
 
 h1 {
-  font-size: 2.5rem;
-  line-height: 1.1;
+    font-size: 2.5rem;
+    line-height: 1.1;
 }
 
 .card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
 }
 
 .content-card,
 .empty-state,
 .form-preview {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-soft);
-  padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-soft);
+    padding: 1rem;
 }
 
 .narrow-section {
-  max-width: 520px;
+    max-width: 520px;
 }
 
 .form-preview,
 .text-field {
-  display: grid;
-  gap: 0.5rem;
+    display: grid;
+    gap: 0.5rem;
 }
 
 .text-field input {
-  min-height: 2.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0 0.75rem;
+    min-height: 2.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 0 0.75rem;
 }
 
 .base-button,
 .button-link {
-  border: 0;
-  padding: 0.7rem 1rem;
-  background: var(--color-brand);
-  color: white;
-  cursor: pointer;
+    border: 0;
+    padding: 0.7rem 1rem;
+    background: var(--color-brand);
+    color: white;
+    cursor: pointer;
 }
 
 .base-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
+    cursor: not-allowed;
+    opacity: 0.65;
 }
 
 .empty-state-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
 }
 
 @media (max-width: 720px) {
-  .app-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
+    .app-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
 
-  .main-nav {
-    justify-content: flex-start;
-  }
+    .main-nav {
+        justify-content: flex-start;
+    }
 
-  h1 {
-    font-size: 2rem;
-  }
+    h1 {
+        font-size: 2rem;
+    }
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 O CSS cria uma base simples, responsiva e legivel. `box-sizing: border-box` torna tamanhos mais previsiveis. `:focus-visible` ajuda quem navega por teclado. `.card-grid` adapta o numero de colunas ao espaco disponivel. As classes de botao e link partilham dimensoes para evitar saltos visuais.
 
@@ -899,7 +947,7 @@ Esta pasta fica reservada para o BK-MF1-03.
 Neste BK ainda nao existe integracao com backend. Nao colocar fetch direto nas paginas antes do cliente API central estar criado.
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 O README impede um erro comum: cada pagina chamar `fetch` diretamente. O proximo BK vai criar um cliente API centralizado para manter erros, cookies e mensagens consistentes.
 

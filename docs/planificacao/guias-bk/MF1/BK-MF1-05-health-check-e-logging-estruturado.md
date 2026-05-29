@@ -64,11 +64,11 @@ Para alunos do 12.º ano, a ideia principal e: uma aplicacao nao basta "funciona
 Criar `GET /health`, uma resposta tecnica simples para deployment, smoke tests e diagnostico.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `backend/src/modules/system/health.service.js`
-   - CRIAR: `backend/src/modules/system/health.controller.js`
-   - CRIAR: `backend/src/modules/system/health.routes.js`
-   - LOCALIZACAO: `backend/src/modules/system/`
-   - REVER: `backend/src/config/env.js`
+    - CRIAR: `backend/src/modules/system/health.service.js`
+    - CRIAR: `backend/src/modules/system/health.controller.js`
+    - CRIAR: `backend/src/modules/system/health.routes.js`
+    - LOCALIZACAO: `backend/src/modules/system/`
+    - REVER: `backend/src/config/env.js`
 
 3. Instrucoes concretas.
 
@@ -77,54 +77,54 @@ Cria os ficheiros no modulo `system`, porque `/health` e uma rota tecnica da apl
 4. Codigo do ficheiro `backend/src/modules/system/health.service.js`.
 
 ```js
-import { env } from '../../config/env.js';
+import { env } from "../../config/env.js";
 
 export function getHealthStatus() {
-  return {
-    status: 'ok',
-    service: env.serviceName,
-    timestamp: new Date().toISOString(),
-    uptimeSeconds: Math.round(process.uptime()),
-    dependencies: {
-      api: 'ok',
-      database: 'not_configured',
-      streaming: 'not_configured',
-      payments: 'not_configured',
-    },
-  };
+    return {
+        status: "ok",
+        service: env.serviceName,
+        timestamp: new Date().toISOString(),
+        uptimeSeconds: Math.round(process.uptime()),
+        dependencies: {
+            api: "ok",
+            database: "not_configured",
+            streaming: "not_configured",
+            payments: "not_configured",
+        },
+    };
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `status: 'ok'` indica que a API Node esta a responder. `uptimeSeconds` mostra ha quanto tempo o processo esta ligado. As dependencias inexistentes aparecem como `not_configured`, para nao fingir que MongoDB, streaming ou pagamentos ja existem.
 
 6. Codigo do ficheiro `backend/src/modules/system/health.controller.js`.
 
 ```js
-import { getHealthStatus } from './health.service.js';
+import { getHealthStatus } from "./health.service.js";
 
 export function getHealth(_req, res) {
-  return res.status(200).json(getHealthStatus());
+    return res.status(200).json(getHealthStatus());
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 O controller fica pequeno porque a regra esta no service. Isto segue a arquitetura modular: controller responde HTTP; service calcula dados.
 
 8. Codigo do ficheiro `backend/src/modules/system/health.routes.js`.
 
 ```js
-import { Router } from 'express';
-import { getHealth } from './health.controller.js';
+import { Router } from "express";
+import { getHealth } from "./health.controller.js";
 
 export const healthRouter = Router();
 
-healthRouter.get('/', getHealth);
+healthRouter.get("/", getHealth);
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 Quando este router for montado em `/health`, a rota final sera `GET /health`.
 
@@ -143,9 +143,9 @@ Erro comum: devolver `database: ok` antes de existir base de dados. Isso seria u
 Criar um logger em JSON que evita escrever dados sensiveis nos logs.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `backend/src/utils/logger.js`
-   - LOCALIZACAO: `backend/src/utils/`
-   - REVER: `RNF17`, `RNF30`
+    - CRIAR: `backend/src/utils/logger.js`
+    - LOCALIZACAO: `backend/src/utils/`
+    - REVER: `RNF17`, `RNF30`
 
 3. Instrucoes concretas.
 
@@ -154,63 +154,72 @@ Cria o ficheiro abaixo. O logger usa `console`, mas sempre com JSON estruturado.
 4. Codigo do ficheiro `backend/src/utils/logger.js`.
 
 ```js
-import { env } from '../config/env.js';
+import { env } from "../config/env.js";
 
-const SENSITIVE_KEYS = ['authorization', 'cookie', 'password', 'token', 'secret', 'set-cookie'];
+const SENSITIVE_KEYS = [
+    "authorization",
+    "cookie",
+    "password",
+    "token",
+    "secret",
+    "set-cookie",
+];
 
 function shouldRedact(key) {
-  return SENSITIVE_KEYS.some((sensitiveKey) => key.toLowerCase().includes(sensitiveKey));
+    return SENSITIVE_KEYS.some((sensitiveKey) =>
+        key.toLowerCase().includes(sensitiveKey),
+    );
 }
 
 function redact(value) {
-  if (Array.isArray(value)) {
-    return value.map((item) => redact(item));
-  }
+    if (Array.isArray(value)) {
+        return value.map((item) => redact(item));
+    }
 
-  if (value !== null && typeof value === 'object') {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [
-        key,
-        shouldRedact(key) ? '[REDACTED]' : redact(item),
-      ]),
-    );
-  }
+    if (value !== null && typeof value === "object") {
+        return Object.fromEntries(
+            Object.entries(value).map(([key, item]) => [
+                key,
+                shouldRedact(key) ? "[REDACTED]" : redact(item),
+            ]),
+        );
+    }
 
-  return value;
+    return value;
 }
 
 function writeLog(level, message, context = {}) {
-  const entry = {
-    timestamp: new Date().toISOString(),
-    level,
-    service: env.serviceName,
-    message,
-    ...redact(context),
-  };
+    const entry = {
+        timestamp: new Date().toISOString(),
+        level,
+        service: env.serviceName,
+        message,
+        ...redact(context),
+    };
 
-  const line = JSON.stringify(entry);
+    const line = JSON.stringify(entry);
 
-  if (level === 'error') {
-    console.error(line);
-    return;
-  }
+    if (level === "error") {
+        console.error(line);
+        return;
+    }
 
-  if (level === 'warn') {
-    console.warn(line);
-    return;
-  }
+    if (level === "warn") {
+        console.warn(line);
+        return;
+    }
 
-  console.log(line);
+    console.log(line);
 }
 
 export const logger = {
-  info: (message, context) => writeLog('info', message, context),
-  warn: (message, context) => writeLog('warn', message, context),
-  error: (message, context) => writeLog('error', message, context),
+    info: (message, context) => writeLog("info", message, context),
+    warn: (message, context) => writeLog("warn", message, context),
+    error: (message, context) => writeLog("error", message, context),
 };
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 Logs estruturados sao objetos JSON por linha. Isso facilita pesquisa e leitura por ferramentas de observabilidade. A funcao `redact` percorre objetos e troca valores sensiveis por `[REDACTED]`. Mesmo que alguem passe um objeto com `password` ou `cookie`, o logger nao escreve o valor real.
 
@@ -235,9 +244,9 @@ Erro comum: fazer `console.log(req.headers)`. Isso pode gravar cookies e tokens 
 Registar cada pedido com metodo, caminho, status, duracao e `requestId`.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `backend/src/middlewares/request-logger.middleware.js`
-   - LOCALIZACAO: `backend/src/middlewares/`
-   - REVER: `backend/src/app.js`
+    - CRIAR: `backend/src/middlewares/request-logger.middleware.js`
+    - LOCALIZACAO: `backend/src/middlewares/`
+    - REVER: `backend/src/app.js`
 
 3. Instrucoes concretas.
 
@@ -246,34 +255,35 @@ Cria o middleware abaixo. Ele deve ser montado cedo em `app.js`, antes das rotas
 4. Codigo do ficheiro `backend/src/middlewares/request-logger.middleware.js`.
 
 ```js
-import { randomUUID } from 'node:crypto';
-import { logger } from '../utils/logger.js';
+import { randomUUID } from "node:crypto";
+import { logger } from "../utils/logger.js";
 
 export function requestLogger(req, res, next) {
-  const startedAt = Date.now();
-  const incomingRequestId = req.headers['x-request-id'];
+    const startedAt = Date.now();
+    const incomingRequestId = req.headers["x-request-id"];
 
-  req.id = typeof incomingRequestId === 'string' && incomingRequestId.trim() !== ''
-    ? incomingRequestId
-    : randomUUID();
+    req.id =
+        typeof incomingRequestId === "string" && incomingRequestId.trim() !== ""
+            ? incomingRequestId
+            : randomUUID();
 
-  res.setHeader('x-request-id', req.id);
+    res.setHeader("x-request-id", req.id);
 
-  res.on('finish', () => {
-    logger.info('http_request', {
-      requestId: req.id,
-      method: req.method,
-      path: req.path,
-      statusCode: res.statusCode,
-      durationMs: Date.now() - startedAt,
+    res.on("finish", () => {
+        logger.info("http_request", {
+            requestId: req.id,
+            method: req.method,
+            path: req.path,
+            statusCode: res.statusCode,
+            durationMs: Date.now() - startedAt,
+        });
     });
-  });
 
-  next();
+    next();
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `requestId` e um identificador unico por pedido. Se um erro aparece no frontend com esse ID, a equipa consegue procurar o pedido nos logs. O middleware nao grava headers completos, evitando fuga de cookies.
 
@@ -292,11 +302,11 @@ Erro comum: usar o mesmo request id para todos os pedidos. Cada pedido precisa d
 Ligar `/health`, request logging e logs de erro na app Express.
 
 2. Ficheiros envolvidos:
-   - EDITAR: `backend/src/middlewares/error.middleware.js`
-   - EDITAR: `backend/src/app.js`
-   - EDITAR: `backend/README.md`
-   - LOCALIZACAO: substituir os dois ficheiros JS pelo conteudo abaixo e acrescentar seccao ao README
-   - REVER: `BK-MF1-04`, se a sessao ja estiver montada
+    - EDITAR: `backend/src/middlewares/error.middleware.js`
+    - EDITAR: `backend/src/app.js`
+    - EDITAR: `backend/README.md`
+    - LOCALIZACAO: substituir os dois ficheiros JS pelo conteudo abaixo e acrescentar seccao ao README
+    - REVER: `BK-MF1-04`, se a sessao ja estiver montada
 
 3. Instrucoes concretas.
 
@@ -305,85 +315,91 @@ Substitui `error.middleware.js` e `app.js`. O `app.js` abaixo assume que `BK-MF1
 4. Codigo do ficheiro `backend/src/middlewares/error.middleware.js`.
 
 ```js
-import { notFound } from '../utils/http-error.js';
-import { logger } from '../utils/logger.js';
+import { notFound } from "../utils/http-error.js";
+import { logger } from "../utils/logger.js";
 
 export function notFoundHandler(req, _res, next) {
-  next(notFound(req.originalUrl));
+    next(notFound(req.originalUrl));
 }
 
 export function errorHandler(error, req, res, _next) {
-  const statusCode = error.statusCode ?? error.status ?? 500;
-  const safeStatusCode = statusCode >= 400 && statusCode <= 599 ? statusCode : 500;
+    const statusCode = error.statusCode ?? error.status ?? 500;
+    const safeStatusCode =
+        statusCode >= 400 && statusCode <= 599 ? statusCode : 500;
 
-  const logContext = {
-    requestId: req.id,
-    method: req.method,
-    path: req.path,
-    statusCode: safeStatusCode,
-    errorName: error.name,
-    errorMessage: error.message,
-  };
+    const logContext = {
+        requestId: req.id,
+        method: req.method,
+        path: req.path,
+        statusCode: safeStatusCode,
+        errorName: error.name,
+        errorMessage: error.message,
+    };
 
-  if (safeStatusCode >= 500) {
-    logger.error('http_error', logContext);
-  } else {
-    logger.warn('http_error', logContext);
-  }
+    if (safeStatusCode >= 500) {
+        logger.error("http_error", logContext);
+    } else {
+        logger.warn("http_error", logContext);
+    }
 
-  const response = {
-    message: safeStatusCode === 500 ? 'Erro interno do servidor.' : error.message,
-  };
+    const response = {
+        message:
+            safeStatusCode === 500
+                ? "Erro interno do servidor."
+                : error.message,
+    };
 
-  if (error.details !== undefined) {
-    response.details = error.details;
-  }
+    if (error.details !== undefined) {
+        response.details = error.details;
+    }
 
-  return res.status(safeStatusCode).json(response);
+    return res.status(safeStatusCode).json(response);
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 O error handler continua a devolver JSON, mas agora tambem escreve logs. Erros 4xx sao `warn`, porque normalmente resultam de pedidos invalidos. Erros 5xx sao `error`, porque indicam problema no servidor. Nao escrevemos body, cookies nem headers completos.
 
 6. Codigo do ficheiro `backend/src/app.js`.
 
 ```js
-import express from 'express';
-import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
-import { requestLogger } from './middlewares/request-logger.middleware.js';
-import { attachSession } from './middlewares/session.middleware.js';
-import { authRouter } from './modules/auth/auth.routes.js';
-import { healthRouter } from './modules/system/health.routes.js';
-import { systemRouter } from './modules/system/system.routes.js';
+import express from "express";
+import {
+    errorHandler,
+    notFoundHandler,
+} from "./middlewares/error.middleware.js";
+import { requestLogger } from "./middlewares/request-logger.middleware.js";
+import { attachSession } from "./middlewares/session.middleware.js";
+import { authRouter } from "./modules/auth/auth.routes.js";
+import { healthRouter } from "./modules/system/health.routes.js";
+import { systemRouter } from "./modules/system/system.routes.js";
 
 export function createApp() {
-  const app = express();
+    const app = express();
 
-  app.use(requestLogger);
-  app.use(express.json({ limit: '1mb' }));
-  app.use(attachSession);
+    app.use(requestLogger);
+    app.use(express.json({ limit: "1mb" }));
+    app.use(attachSession);
 
-  app.use('/health', healthRouter);
-  app.use('/api', systemRouter);
-  app.use('/api/session', authRouter);
+    app.use("/health", healthRouter);
+    app.use("/api", systemRouter);
+    app.use("/api/session", authRouter);
 
-  app.use(notFoundHandler);
-  app.use(errorHandler);
+    app.use(notFoundHandler);
+    app.use(errorHandler);
 
-  return app;
+    return app;
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `requestLogger` fica antes de tudo para medir todos os pedidos. `/health` fica ao lado de `/api`, porque e uma rota operacional. `/api/session` continua preservado para a base de sessao. Os handlers de erro continuam no fim.
 
 8. Codigo a acrescentar ao fim de `backend/README.md`.
 
 ```md
-
 ## Health-check e logs
 
 - `GET /health` devolve estado tecnico da API.
@@ -392,7 +408,7 @@ export function createApp() {
 - Cookies, tokens e passwords nao devem aparecer nos logs.
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 O README passa a explicar como provar operacao basica. Isto ajuda a defesa PAP porque mostra preocupacao com monitorizacao e privacidade.
 
@@ -416,9 +432,9 @@ Erro comum: montar `/health` dentro de `/api/session` ou exigir login para healt
 Provar que `/health` responde, logs existem e dados sensiveis nao aparecem.
 
 2. Ficheiros envolvidos:
-   - EDITAR: nenhum, se os passos anteriores estiverem corretos
-   - LOCALIZACAO: executar comandos em `backend/`
-   - REVER: `logger.js`, `request-logger.middleware.js`, `error.middleware.js`
+    - EDITAR: nenhum, se os passos anteriores estiverem corretos
+    - LOCALIZACAO: executar comandos em `backend/`
+    - REVER: `logger.js`, `request-logger.middleware.js`, `error.middleware.js`
 
 3. Instrucoes concretas.
 
@@ -428,16 +444,16 @@ Arranca o backend, executa os pedidos e guarda output.
 
 ```json
 {
-  "status": "ok",
-  "service": "faithflix-api",
-  "timestamp": "2026-05-30T00:00:00.000Z",
-  "uptimeSeconds": 10,
-  "dependencies": {
-    "api": "ok",
-    "database": "not_configured",
-    "streaming": "not_configured",
-    "payments": "not_configured"
-  }
+    "status": "ok",
+    "service": "faithflix-api",
+    "timestamp": "2026-05-30T00:00:00.000Z",
+    "uptimeSeconds": 10,
+    "dependencies": {
+        "api": "ok",
+        "database": "not_configured",
+        "streaming": "not_configured",
+        "payments": "not_configured"
+    }
 }
 ```
 
@@ -448,7 +464,17 @@ Arranca o backend, executa os pedidos e guarda output.
 6. Exemplo esperado de log.
 
 ```json
-{"timestamp":"2026-05-30T00:00:00.000Z","level":"info","service":"faithflix-api","message":"http_request","requestId":"...","method":"GET","path":"/health","statusCode":200,"durationMs":3}
+{
+    "timestamp": "2026-05-30T00:00:00.000Z",
+    "level": "info",
+    "service": "faithflix-api",
+    "message": "http_request",
+    "requestId": "...",
+    "method": "GET",
+    "path": "/health",
+    "statusCode": 200,
+    "durationMs": 3
+}
 ```
 
 7. Explicacao didatica.

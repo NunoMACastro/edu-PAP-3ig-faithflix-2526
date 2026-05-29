@@ -65,10 +65,10 @@ Para alunos do 12.º ano, a ideia principal e: uma sessao e a forma de o servido
 Definir como o cookie de sessao se chama e que flags de seguranca deve ter.
 
 2. Ficheiros envolvidos:
-   - EDITAR: `backend/.env.example`
-   - CRIAR: `backend/src/config/session.js`
-   - LOCALIZACAO: `backend/` e `backend/src/config/`
-   - REVER: `backend/src/config/env.js`, `RNF13`, `RNF15`
+    - EDITAR: `backend/.env.example`
+    - CRIAR: `backend/src/config/session.js`
+    - LOCALIZACAO: `backend/` e `backend/src/config/`
+    - REVER: `backend/src/config/env.js`, `RNF13`, `RNF15`
 
 3. Instrucoes concretas.
 
@@ -83,35 +83,35 @@ SERVICE_NAME=faithflix-api
 SESSION_COOKIE_NAME=faithflix_session
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `SESSION_COOKIE_NAME` evita espalhar o nome do cookie pelo codigo. Se o nome mudar, muda num sitio. O valor nao e segredo; e apenas o nome do cookie.
 
 6. Codigo do ficheiro `backend/src/config/session.js`.
 
 ```js
-import { isProduction } from './env.js';
+import { isProduction } from "./env.js";
 
 const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 export const sessionConfig = {
-  cookieName: process.env.SESSION_COOKIE_NAME ?? 'faithflix_session',
-  cookieMaxAgeMs: ONE_DAY_IN_MS,
+    cookieName: process.env.SESSION_COOKIE_NAME ?? "faithflix_session",
+    cookieMaxAgeMs: ONE_DAY_IN_MS,
 };
 
 export function getSessionCookieOptions(overrides = {}) {
-  return {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: sessionConfig.cookieMaxAgeMs,
-    ...overrides,
-  };
+    return {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: "lax",
+        path: "/",
+        maxAge: sessionConfig.cookieMaxAgeMs,
+        ...overrides,
+    };
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `httpOnly: true` impede JavaScript no browser de ler o cookie. `secure: isProduction` exige HTTPS em producao. `sameSite: 'lax'` reduz risco de alguns ataques CSRF sem bloquear navegacao normal. `path: '/'` permite que o cookie seja enviado para toda a API.
 
@@ -136,10 +136,10 @@ Erro comum: criar cookie sem `HttpOnly`. Isso permitiria que scripts no browser 
 Ler cookies de forma defensiva e criar um service que, nesta fase, nunca autentica cookies falsos.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `backend/src/utils/cookies.js`
-   - CRIAR: `backend/src/modules/auth/session.service.js`
-   - LOCALIZACAO: `backend/src/utils/` e `backend/src/modules/auth/`
-   - REVER: `BK-MF2-01`, porque login real vai substituir a resolucao de sessao
+    - CRIAR: `backend/src/utils/cookies.js`
+    - CRIAR: `backend/src/modules/auth/session.service.js`
+    - LOCALIZACAO: `backend/src/utils/` e `backend/src/modules/auth/`
+    - REVER: `BK-MF2-01`, porque login real vai substituir a resolucao de sessao
 
 3. Instrucoes concretas.
 
@@ -148,43 +148,47 @@ Cria a pasta `backend/src/modules/auth/`. O service fica intencionalmente conser
 4. Codigo do ficheiro `backend/src/utils/cookies.js`.
 
 ```js
-import { getSessionCookieOptions, sessionConfig } from '../config/session.js';
+import { getSessionCookieOptions, sessionConfig } from "../config/session.js";
 
-export function parseCookies(cookieHeader = '') {
-  return cookieHeader
-    .split(';')
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .reduce((cookies, part) => {
-      const separatorIndex = part.indexOf('=');
+export function parseCookies(cookieHeader = "") {
+    return cookieHeader
+        .split(";")
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .reduce((cookies, part) => {
+            const separatorIndex = part.indexOf("=");
 
-      if (separatorIndex === -1) {
-        return cookies;
-      }
+            if (separatorIndex === -1) {
+                return cookies;
+            }
 
-      const key = part.slice(0, separatorIndex);
-      const value = part.slice(separatorIndex + 1);
+            const key = part.slice(0, separatorIndex);
+            const value = part.slice(separatorIndex + 1);
 
-      try {
-        cookies[key] = decodeURIComponent(value);
-      } catch {
-        cookies[key] = value;
-      }
+            try {
+                cookies[key] = decodeURIComponent(value);
+            } catch {
+                cookies[key] = value;
+            }
 
-      return cookies;
-    }, {});
+            return cookies;
+        }, {});
 }
 
 export function readCookie(req, name) {
-  return parseCookies(req.headers.cookie)[name];
+    return parseCookies(req.headers.cookie)[name];
 }
 
 export function clearSessionCookie(res) {
-  res.cookie(sessionConfig.cookieName, '', getSessionCookieOptions({ maxAge: 0 }));
+    res.cookie(
+        sessionConfig.cookieName,
+        "",
+        getSessionCookieOptions({ maxAge: 0 }),
+    );
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `parseCookies` transforma o header `Cookie` num objeto JavaScript. O `try/catch` evita que um cookie mal codificado parta a API. `clearSessionCookie` usa as mesmas flags de seguranca do cookie original, garantindo que o browser sabe qual cookie deve expirar.
 
@@ -192,15 +196,15 @@ export function clearSessionCookie(res) {
 
 ```js
 export async function resolveSession(sessionToken) {
-  if (!sessionToken) {
-    return null;
-  }
+    if (!sessionToken) {
+        return null;
+    }
 
-  return null;
+    return null;
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 Este service parece pequeno, mas e uma decisao de seguranca. Como ainda nao existe login nem base de dados, qualquer token recebido deve ser tratado como invalido. Em `BK-MF2-01`, este ficheiro pode passar a validar tokens assinados ou tokens opacos guardados no servidor.
 
@@ -219,11 +223,11 @@ Erro comum: aceitar qualquer cookie como utilizador autenticado para "testar mai
 Anexar informacao de sessao a cada pedido e expor endpoints tecnicos para verificar e terminar sessao.
 
 2. Ficheiros envolvidos:
-   - CRIAR: `backend/src/middlewares/session.middleware.js`
-   - CRIAR: `backend/src/modules/auth/session.controller.js`
-   - CRIAR: `backend/src/modules/auth/auth.routes.js`
-   - LOCALIZACAO: `backend/src/middlewares/` e `backend/src/modules/auth/`
-   - REVER: `apiClient.js`, porque o frontend envia cookies com `credentials: 'include'`
+    - CRIAR: `backend/src/middlewares/session.middleware.js`
+    - CRIAR: `backend/src/modules/auth/session.controller.js`
+    - CRIAR: `backend/src/modules/auth/auth.routes.js`
+    - LOCALIZACAO: `backend/src/middlewares/` e `backend/src/modules/auth/`
+    - REVER: `apiClient.js`, porque o frontend envia cookies com `credentials: 'include'`
 
 3. Instrucoes concretas.
 
@@ -232,68 +236,68 @@ Cria o middleware primeiro, depois controller e routes. O endpoint `me` deve dev
 4. Codigo do ficheiro `backend/src/middlewares/session.middleware.js`.
 
 ```js
-import { sessionConfig } from '../config/session.js';
-import { resolveSession } from '../modules/auth/session.service.js';
-import { readCookie } from '../utils/cookies.js';
+import { sessionConfig } from "../config/session.js";
+import { resolveSession } from "../modules/auth/session.service.js";
+import { readCookie } from "../utils/cookies.js";
 
 export async function attachSession(req, _res, next) {
-  try {
-    const token = readCookie(req, sessionConfig.cookieName);
-    const user = await resolveSession(token);
+    try {
+        const token = readCookie(req, sessionConfig.cookieName);
+        const user = await resolveSession(token);
 
-    req.session = {
-      token,
-      user,
-      isAuthenticated: Boolean(user),
-    };
+        req.session = {
+            token,
+            user,
+            isAuthenticated: Boolean(user),
+        };
 
-    next();
-  } catch (error) {
-    next(error);
-  }
+        next();
+    } catch (error) {
+        next(error);
+    }
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 O middleware corre antes das rotas. Ele procura o cookie, tenta resolver a sessao e guarda o resultado em `req.session`. Mesmo quando nao existe utilizador, a rota fica com uma estrutura previsivel: `isAuthenticated` sera `false`.
 
 6. Codigo do ficheiro `backend/src/modules/auth/session.controller.js`.
 
 ```js
-import { clearSessionCookie } from '../../utils/cookies.js';
+import { clearSessionCookie } from "../../utils/cookies.js";
 
 export function getCurrentSession(req, res) {
-  if (!req.session?.isAuthenticated) {
-    return res.status(401).json({ message: 'Sessao nao autenticada.' });
-  }
+    if (!req.session?.isAuthenticated) {
+        return res.status(401).json({ message: "Sessao nao autenticada." });
+    }
 
-  return res.status(200).json({ user: req.session.user });
+    return res.status(200).json({ user: req.session.user });
 }
 
 export function logout(_req, res) {
-  clearSessionCookie(res);
-  return res.status(200).json({ message: 'Sessao terminada.' });
+    clearSessionCookie(res);
+    return res.status(200).json({ message: "Sessao terminada." });
 }
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 `getCurrentSession` protege dados do utilizador: se nao ha sessao valida, devolve `401`. `logout` limpa o cookie, mesmo que a sessao ja estivesse invalida. Isto torna o logout seguro e idempotente.
 
 8. Codigo do ficheiro `backend/src/modules/auth/auth.routes.js`.
 
 ```js
-import { Router } from 'express';
-import { getCurrentSession, logout } from './session.controller.js';
+import { Router } from "express";
+import { getCurrentSession, logout } from "./session.controller.js";
 
 export const authRouter = Router();
 
-authRouter.get('/me', getCurrentSession);
-authRouter.post('/logout', logout);
+authRouter.get("/me", getCurrentSession);
+authRouter.post("/logout", logout);
 ```
 
-9. Explicacao didatica do codigo.
+9. Explicacao do codigo.
 
 As rotas ficam agrupadas no modulo `auth`. Quando montadas em `/api/session`, os endpoints finais ficam `GET /api/session/me` e `POST /api/session/logout`.
 
@@ -312,10 +316,10 @@ Erro comum: devolver dados de exemplo em `GET /api/session/me`. Isso faria o fro
 Integrar o middleware de sessao e as rotas no backend criado em `BK-MF1-01`.
 
 2. Ficheiros envolvidos:
-   - EDITAR: `backend/src/app.js`
-   - EDITAR: `backend/README.md`
-   - LOCALIZACAO: substituir `app.js` pelo conteudo abaixo e acrescentar a seccao ao README
-   - REVER: `BK-MF1-01`
+    - EDITAR: `backend/src/app.js`
+    - EDITAR: `backend/README.md`
+    - LOCALIZACAO: substituir `app.js` pelo conteudo abaixo e acrescentar a seccao ao README
+    - REVER: `BK-MF1-01`
 
 3. Instrucoes concretas.
 
@@ -324,36 +328,38 @@ Substitui `backend/src/app.js` pelo ficheiro completo abaixo. Depois acrescenta 
 4. Codigo do ficheiro `backend/src/app.js`.
 
 ```js
-import express from 'express';
-import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
-import { attachSession } from './middlewares/session.middleware.js';
-import { authRouter } from './modules/auth/auth.routes.js';
-import { systemRouter } from './modules/system/system.routes.js';
+import express from "express";
+import {
+    errorHandler,
+    notFoundHandler,
+} from "./middlewares/error.middleware.js";
+import { attachSession } from "./middlewares/session.middleware.js";
+import { authRouter } from "./modules/auth/auth.routes.js";
+import { systemRouter } from "./modules/system/system.routes.js";
 
 export function createApp() {
-  const app = express();
+    const app = express();
 
-  app.use(express.json({ limit: '1mb' }));
-  app.use(attachSession);
+    app.use(express.json({ limit: "1mb" }));
+    app.use(attachSession);
 
-  app.use('/api', systemRouter);
-  app.use('/api/session', authRouter);
+    app.use("/api", systemRouter);
+    app.use("/api/session", authRouter);
 
-  app.use(notFoundHandler);
-  app.use(errorHandler);
+    app.use(notFoundHandler);
+    app.use(errorHandler);
 
-  return app;
+    return app;
 }
 ```
 
-5. Explicacao didatica do codigo.
+5. Explicacao do codigo.
 
 `attachSession` fica antes das rotas para que qualquer controller possa consultar `req.session`. A rota `/api` continua a existir. A rota `/api/session` acrescenta apenas endpoints de sessao base, sem criar login real.
 
 6. Codigo a acrescentar ao fim de `backend/README.md`.
 
 ```md
-
 ## Sessao base
 
 - `GET /api/session/me` devolve `401` enquanto nao existir login real.
@@ -361,7 +367,7 @@ export function createApp() {
 - Tokens em `localStorage` ou `sessionStorage` continuam fora de scope.
 ```
 
-7. Explicacao didatica do codigo.
+7. Explicacao do codigo.
 
 O README deixa claro que este BK nao autentica utilizadores. Isto evita confusao na defesa e no handoff para `BK-MF2-01`.
 
@@ -386,9 +392,9 @@ Erro comum: montar `authRouter` antes de `attachSession`. Nesse caso, as rotas d
 Provar que a base de sessao nao aceita cookies falsos e nao expoe tokens.
 
 2. Ficheiros envolvidos:
-   - EDITAR: nenhum, se os passos anteriores estiverem corretos
-   - LOCALIZACAO: executar comandos dentro de `backend/`
-   - REVER: `session.controller.js`, `session.middleware.js`, `cookies.js`
+    - EDITAR: nenhum, se os passos anteriores estiverem corretos
+    - LOCALIZACAO: executar comandos dentro de `backend/`
+    - REVER: `session.controller.js`, `session.middleware.js`, `cookies.js`
 
 3. Instrucoes concretas.
 
@@ -403,7 +409,7 @@ Content-Type: application/json; charset=utf-8
 
 ```json
 {
-  "message": "Sessao nao autenticada."
+    "message": "Sessao nao autenticada."
 }
 ```
 
@@ -416,7 +422,7 @@ curl -i http://localhost:3000/api/session/me \
 
 ```json
 {
-  "message": "Sessao nao autenticada."
+    "message": "Sessao nao autenticada."
 }
 ```
 
@@ -429,7 +435,7 @@ Set-Cookie: faithflix_session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax
 
 ```json
 {
-  "message": "Sessao terminada."
+    "message": "Sessao terminada."
 }
 ```
 
