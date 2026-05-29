@@ -14,382 +14,236 @@
 - `rf_rnf`: `RNF05, RNF30`
 - `fase_documental`: `Fase 1`
 - `sprint`: `S02`
-- `core_or_reforco`: `Reforco`
+- `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF1-04`
 - `guia_path`: `docs/planificacao/guias-bk/MF1/BK-MF1-03-cliente-api-frontend-tratamento-erro.md`
-- `last_updated`: `2026-05-27`
+- `last_updated`: `2026-05-30`
 
 ## Bloco pedagogico (obrigatorio)
 
-Este BK ensina a criar uma fronteira limpa entre frontend e backend. Em vez de cada pagina chamar `fetch` diretamente, a app passa a ter um cliente API centralizado, com mensagens de erro em portugues, suporte a cookies HttpOnly futuros e tratamento previsivel de loading/error/success.
+Este BK cria a camada que permite ao frontend falar com o backend de forma organizada. Em vez de cada pagina usar `fetch` diretamente, a app passa a ter um cliente API central, com mensagens de erro em portugues de Portugal, envio de cookies e formato previsivel para erros.
 
-O objetivo pedagogico e perceber que erros de rede, respostas 400/401/404/500 e respostas JSON invalidas sao casos normais numa aplicacao real. O frontend deve tratar esses casos de forma controlada, sem crashar e sem expor detalhes tecnicos ao utilizador.
+Para alunos do 12.º ano, a ideia principal e simples: quando muitas paginas precisam de chamar a API, nao queremos repetir a mesma logica em todas. Criamos uma "porta de entrada" para pedidos HTTP. Assim, erros, cookies e URLs ficam num unico sitio.
+
+### Decisao tecnica deste guia
+
+Este guia usa `fetch` nativo para reduzir dependencias e manter o codigo transparente para aprendizagem. O `RNF.md` sugere Axios, mas nao obriga a sua utilizacao. Se a equipa decidir usar Axios, deve substituir este cliente de forma coordenada, sem alterar contratos de erro, cookies ou mensagens.
+
+### O que entra
+
+- Configurar `VITE_API_BASE_URL`.
+- Criar `ApiError` e mensagens de erro.
+- Criar `apiClient` com `get`, `post`, `put`, `patch` e `del`.
+- Criar `systemApi` para validar `GET /api`.
+- Mostrar estado tecnico da API na home sem transformar a home em dashboard.
+
+### O que nao entra
+
+- Login real.
+- Catalogo real.
+- Streaming.
+- Persistencia de tokens em `localStorage` ou `sessionStorage`.
+- Regras financeiras, subscricoes ou pool solidaria.
+
+### Check de compreensao
+
+- [ ] Sei explicar porque nao devemos espalhar `fetch` por todas as paginas.
+- [ ] Sei explicar porque `credentials: 'include'` e importante para cookies HttpOnly.
+- [ ] Sei testar sucesso, 404 e backend offline.
 
 ## Bloco operacional (obrigatorio)
 
-O trabalho operacional e criar `frontend/src/services/api/`, implementar um `apiClient`, normalizar erros, preparar mensagens de UI e criar um pequeno componente de estado tecnico que permita validar a ligacao ao backend base quando ele estiver disponivel.
+### Pre-condicoes
 
-#### BK-MF1-03 - Cliente API frontend com tratamento de erro
+- `BK-MF1-02` executado, com `frontend/` criado.
+- Backend de `BK-MF1-01` disponivel para testar `GET /api`.
+- Confirmar que a app frontend usa `frontend/src/pages/pages.jsx`, `frontend/src/styles/global.css` e `frontend/src/services/api/`.
+- Confirmar que nao existem chamadas `fetch` diretas em paginas.
 
-##### O que vamos fazer neste BK
+### Guia de execucao (passo-a-passo)
 
-Neste BK vamos criar o cliente API do frontend FaithFlix. Ele sera usado por paginas e features futuras para fazer chamadas HTTP ao backend sem repetir configuracao, headers, parsing de JSON, credenciais e tratamento de erros.
+### Passo 1 - Configurar a origem da API
 
-O cliente API deve usar `credentials: 'include'` desde ja, porque `BK-MF1-04` vai preparar sessao segura com cookies HttpOnly. Isto nao implementa login nem guarda tokens no frontend; apenas deixa o contrato pronto para cookies seguros.
+1. Objetivo do passo.
 
-Tambem vamos preparar mensagens de erro claras em PT-PT, alinhadas com `RNF05`, e contexto minimo para diagnostico, alinhado com `RNF30`. Logs estruturados completos entram no backend em `BK-MF1-05`; aqui o frontend apenas preserva informacao util como status, path e request id quando existir.
+Definir onde o frontend encontra o backend, sem escrever URLs fixas dentro dos componentes.
 
-##### Porque e que isto e importante
+2. Ficheiros envolvidos:
+   - CRIAR: `frontend/.env.example`
+   - CRIAR: `frontend/src/config/env.js`
+   - LOCALIZACAO: `frontend/` e `frontend/src/config/`
+   - REVER: `backend/README.md`
 
-- Evita chamadas API espalhadas por paginas e componentes.
-- Prepara autenticação por cookies sem usar `localStorage`.
-- Garante mensagens de erro consistentes para o utilizador.
-- Facilita testes negativos de backend offline, 401 e 500.
-- Dá ao backend um contrato previsivel para respostas de erro.
+3. Instrucoes concretas.
 
-##### O que entra (scope)
+Cria a pasta `frontend/src/config/`. O ficheiro `.env.example` mostra a variavel esperada; cada ambiente real pode ter o seu `.env`, sem o colocar no Git.
 
-- Criar `apiClient` baseado em `fetch` nativo.
-- Criar classe/estrutura `ApiError`.
-- Criar mapeamento de mensagens de erro em PT-PT.
-- Criar helpers `get`, `post`, `put`, `patch`, `del`.
-- Criar configuracao `VITE_API_BASE_URL`.
-- Criar componente simples para testar estado da API base.
-- Documentar formato esperado de erro.
+4. Codigo do ficheiro `frontend/.env.example`.
 
-##### O que nao entra (scope-out)
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
 
-- Nao entra login, registo, recuperacao de password ou refresh token.
-- Nao entra guardar JWT em `localStorage`, `sessionStorage` ou variaveis globais.
-- Nao entra criar endpoints de negocio.
-- Nao entra substituir a API backend por mocks permanentes.
-- Nao entra observabilidade completa; logging backend fica em `BK-MF1-05`.
+5. Explicacao didatica do codigo.
 
-##### Como saber que isto ficou bem
+Em Vite, variaveis expostas ao frontend precisam de comecar por `VITE_`. Aqui guardamos apenas a origem da API. Nao guardamos passwords nem tokens, porque tudo o que vai para o frontend pode ser visto pelo utilizador.
 
-- O frontend compila sem erros.
-- Uma chamada valida a `/api` e tratada como sucesso quando o backend esta ligado.
-- Backend offline mostra erro amigavel, sem crash.
-- 401, 404 e 500 sao normalizados para mensagens previsiveis.
-- O cliente API fica reutilizavel por `MF2` sem reescrita.
-
-#### Metadados do BK (CANONICO/DERIVADO):
-
-- Prioridade: `P0` (CANONICO, `BACKLOG-MVP.md`)
-- Estado: `TODO` (CANONICO, `BACKLOG-MVP.md`)
-- Esforco: `M` (CANONICO, `BACKLOG-MVP.md`)
-- macro: `MF1` (CANONICO, `BACKLOG-MVP.md`)
-- Owner: `Mateus` (CANONICO, `BACKLOG-MVP.md`)
-- Apoio: `Matheus` (CANONICO, `BACKLOG-MVP.md`)
-- Dependencias (BK IDs): `BK-MF1-02` (CANONICO, `BACKLOG-MVP.md`)
-- Pre-condicoes: frontend componentizado criado; backend base de `BK-MF1-01` recomendado para smoke, mas nao declarado como dependencia canónica (DERIVADO)
-- Ref. Plano: `MF-VIEWS > MF1`, `PLANO-SPRINTS > Sprint 2`, `MATRIZ-CANONICA-BK > RNF05/RNF30` (CANONICO)
-- Flow ID: `MF1-frontend-api-client-03` (DERIVADO)
-- Fonte de verdade: `docs/RNF.md`
-- Fonte de verdade: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-- Fonte de verdade: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
-- Descricao: criar cliente API frontend com tratamento de erro, mensagens claras e preparacao para cookies HttpOnly (DERIVADO)
-
-#### O que vamos fazer neste BK (DERIVADO):
-
-- Criar `frontend/src/services/api/apiClient.js`.
-- Criar `frontend/src/services/api/apiErrors.js`.
-- Criar `frontend/src/config/env.js` para `VITE_API_BASE_URL`.
-- Criar `frontend/src/components/system/ApiStatusBadge.jsx` ou equivalente para smoke.
-- Atualizar uma pagina tecnica/placeholder para mostrar estado da API sem prometer funcionalidade.
-- Documentar contrato esperado de erro e headers.
-- Garantir que todos os pedidos usam `credentials: 'include'`.
-
-#### Estado, ficheiros e impacto (DERIVADO):
-
-- Estado esperado antes do BK: frontend base existe com rotas e componentes, mas sem cliente API central.
-- Estado esperado depois do BK: frontend tem cliente API reutilizavel, mensagens de erro normalizadas e smoke de ligacao ao backend base.
-- Ficheiros a criar: `frontend/src/services/api/apiClient.js`, `frontend/src/services/api/apiErrors.js`, `frontend/src/config/env.js`, `frontend/src/components/system/ApiStatusBadge.jsx`, `frontend/.env.example`.
-- Ficheiros a editar: `frontend/src/pages/HomePage.jsx` ou outra pagina placeholder para incluir o estado tecnico se a equipa decidir mostrar em dev.
-- Ficheiros a rever: `frontend/src/routes/AppRoutes.jsx`, `backend/src/modules/system/system.routes.js`, `docs/RNF.md`.
-- Dependencias de BK anteriores e uso: depende de `BK-MF1-02` para estrutura frontend; reutiliza a rota `/api` de `BK-MF1-01` apenas como smoke tecnico se existir.
-- Impacto na arquitetura da app: cria uma fronteira unica para HTTP no frontend.
-- Impacto frontend: centraliza chamadas e estados de erro.
-- Impacto backend: estabiliza expectativa de respostas JSON e codigos HTTP.
-- Impacto dados: nenhum.
-- Impacto seguranca: prepara cookies HttpOnly via `credentials: 'include'` e evita tokens no browser storage.
-- Impacto testes: cria cenarios negativos para `BK-MF1-06`.
-- Impacto UI: define estados loading/error/success simples e mensagens em PT-PT.
-- Handoff para o proximo BK: `BK-MF1-04` deve emitir cookies compativeis com o cliente API; `MF2` deve criar services por dominio reutilizando este cliente.
-
-#### Pre-leitura minima (10-15 min) (DERIVADO):
-
-- `docs/RNF.md`: `RNF05`, `RNF15`, `RNF30`.
-- Guia `BK-MF1-02`: estrutura frontend e pasta `services/api`.
-- Guia `BK-MF1-01`: endpoint tecnico `GET /api`, se ja executado.
-- `mockup/src/app/pages/LoginPage.tsx`: apenas para perceber mensagens e estados visuais, sem implementar login.
-- `frontend/src/components/ui/`: componentes de estado criados no BK anterior.
-
-#### Glossario (rapido) (DERIVADO):
-
-- API client: modulo frontend que concentra chamadas HTTP.
-- Fetch: API nativa do browser para fazer pedidos HTTP.
-- HTTP status: codigo de resposta, como 200, 400, 401, 404 ou 500.
-- `credentials: include`: opcao que permite enviar/receber cookies em chamadas cross-origin controladas.
-- HttpOnly: cookie inacessivel a JavaScript, mais seguro para sessao.
-- Loading state: estado enquanto o pedido ainda nao terminou.
-- Error state: estado quando a chamada falha.
-- Success state: estado quando a chamada termina bem.
-- Request id: identificador opcional para cruzar erro do frontend com log do backend.
-- Fallback: comportamento seguro quando algo falha.
-
-#### Conceitos teoricos essenciais (DERIVADO):
-
-**Porque centralizar chamadas API.** Se cada pagina fizer `fetch` manual, cada uma trata erros de forma diferente. Um cliente API cria uma regra unica para base URL, JSON, cookies e mensagens.
-
-**Fetch e JSON.** `fetch` nao lança erro automaticamente para status 400/500. A equipa deve verificar `response.ok` e transformar respostas de erro em `ApiError`.
-
-**Cookies HttpOnly no frontend.** Um cookie HttpOnly nao pode ser lido por JavaScript. Por isso, o frontend nao deve procurar tokens. Deve enviar pedidos com `credentials: 'include'` e deixar o browser gerir cookies.
-
-**Mensagens para utilizador vs detalhes tecnicos.** O utilizador deve ver "Nao foi possivel ligar ao servidor". O developer pode registar status, endpoint e request id. Nao mostrar stack traces nem mensagens internas.
-
-**Logs estruturados.** `RNF30` pede logs com nivel e contexto. O frontend pode preservar contexto de erro, mas os logs estruturados principais entram no backend em `BK-MF1-05`.
-
-**Erros comuns.** Guardar JWT em `localStorage`, assumir que todo erro tem JSON, mostrar `Cannot read properties of undefined`, ou criar clients diferentes para cada feature.
-
-#### Guia de execucao (passo-a-passo) (DERIVADO):
-
-0. **Objetivo (~10 min): Confirmar estrutura frontend existente**
-   - Descricao detalhada do objetivo: garantir que `BK-MF1-02` criou `frontend/` e pastas para componentes/paginas.
-   - Justificacao: este BK nao deve reorganizar o frontend inteiro.
-   - Como fazer (0.1): abrir `frontend/src/` e identificar `pages`, `components`, `layouts`.
-   - Como fazer (0.2): confirmar onde fica `services/api/`.
-   - Ficheiro a rever: `frontend/src/App.jsx`
-   - Ficheiro alvo: nenhum ainda.
-   - Snippet de referencia: `frontend/src/services/api/`
-   - O que verificar: a estrutura existe e nao precisa de refatoracao ampla.
-
-1. **Objetivo (~15 min): Definir configuracao da API**
-   - Descricao detalhada do objetivo: criar uma fonte unica para `VITE_API_BASE_URL`.
-   - Justificacao: URLs hardcoded espalhadas dificultam ambiente local/deploy.
-   - Como fazer (1.1): criar `frontend/.env.example`.
-   - Como fazer (1.2): criar `frontend/src/config/env.js`.
-   - Ficheiro a rever: `backend/src/config/env.js`
-   - Ficheiro alvo: `frontend/src/config/env.js`
-   - Snippet de referencia:
-     ```js
-     export const env = {
-       apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000',
-     };
-     ```
-   - O que verificar: `.env.example` nao contem segredos.
-
-2. **Objetivo (~25 min): Criar `ApiError` e mensagens PT-PT**
-   - Descricao detalhada do objetivo: transformar erros tecnicos em objetos previsiveis e mensagens claras.
-   - Justificacao: `RNF05` exige feedback claro; o utilizador nao deve ver mensagens internas.
-   - Como fazer (2.1): criar `apiErrors.js` com `ApiError`.
-   - Como fazer (2.2): criar `getUserFriendlyErrorMessage(error)`.
-   - Ficheiro a rever: `docs/RNF.md`
-   - Ficheiro alvo: `frontend/src/services/api/apiErrors.js`
-   - Snippet de referencia:
-     ```js
-     export class ApiError extends Error {
-       constructor({ status, message, details, requestId }) {
-         super(message);
-         this.status = status;
-         this.details = details;
-         this.requestId = requestId;
-       }
-     }
-     ```
-   - O que verificar: 401, 404, 500 e erro de rede têm mensagens diferentes.
-
-3. **Objetivo (~35 min): Implementar `apiClient` com fetch**
-   - Descricao detalhada do objetivo: criar funcoes HTTP reutilizaveis.
-   - Justificacao: as features futuras devem importar o cliente, nao repetir `fetch`.
-   - Como fazer (3.1): criar funcao `request(path, options)`.
-   - Como fazer (3.2): expor `apiClient.get`, `post`, `put`, `patch`, `del`.
-   - Ficheiro a rever: `frontend/src/services/api/README.md`
-   - Ficheiro alvo: `frontend/src/services/api/apiClient.js`
-   - Snippet de referencia:
-     ```js
-     const response = await fetch(`${env.apiBaseUrl}${path}`, {
-       credentials: 'include',
-       headers: { 'Content-Type': 'application/json', ...headers },
-       ...options,
-     });
-     ```
-   - O que verificar: todos os pedidos incluem `credentials: 'include'`.
-
-4. **Objetivo (~25 min): Tratar respostas sem body e JSON invalido**
-   - Descricao detalhada do objetivo: garantir que o cliente nao crasha quando a API responde 204 ou texto inesperado.
-   - Justificacao: APIs reais nem sempre devolvem JSON em todos os cenarios.
-   - Como fazer (4.1): criar helper `parseJsonResponse(response)`.
-   - Como fazer (4.2): se JSON for invalido, lançar `ApiError` controlado.
-   - Ficheiro a rever: `backend/src/middlewares/error.middleware.js`
-   - Ficheiro alvo: `frontend/src/services/api/apiClient.js`
-   - Snippet de referencia:
-     ```js
-     if (response.status === 204) return null;
-     ```
-   - O que verificar: erro de parsing nao aparece como crash visual.
-
-5. **Objetivo (~25 min): Criar service tecnico de sistema**
-   - Descricao detalhada do objetivo: criar uma chamada pequena para validar o backend base.
-   - Justificacao: permite smoke sem inventar endpoints de negocio.
-   - Como fazer (5.1): criar `frontend/src/services/api/systemApi.js`.
-   - Como fazer (5.2): implementar `getApiInfo()` chamando `GET /api`.
-   - Ficheiro a rever: `backend/src/modules/system/system.routes.js`
-   - Ficheiro alvo: `frontend/src/services/api/systemApi.js`
-   - Snippet de referencia:
-     ```js
-     import { apiClient } from './apiClient.js';
-     export const systemApi = { getApiInfo: () => apiClient.get('/api') };
-     ```
-   - O que verificar: nao sao criadas chamadas para login, catalogo ou pagamentos.
-
-6. **Objetivo (~30 min): Criar componente de estado da API**
-   - Descricao detalhada do objetivo: mostrar loading, sucesso e erro de forma controlada.
-   - Justificacao: os alunos precisam ver como ligar service e UI sem duplicar logica.
-   - Como fazer (6.1): criar `ApiStatusBadge.jsx` ou componente equivalente.
-   - Como fazer (6.2): usar mensagens de `apiErrors.js` quando a chamada falhar.
-   - Ficheiro a rever: `frontend/src/components/ui/EmptyState.jsx`
-   - Ficheiro alvo: `frontend/src/components/system/ApiStatusBadge.jsx`
-   - Snippet de referencia:
-     ```jsx
-     if (state.status === 'error') {
-       return <p role="status">{getUserFriendlyErrorMessage(state.error)}</p>;
-     }
-     ```
-   - O que verificar: backend offline nao deixa a pagina em branco.
-
-7. **Objetivo (~20 min): Adicionar contexto tecnico sem poluir a UI**
-   - Descricao detalhada do objetivo: registar contexto util para debug apenas em desenvolvimento.
-   - Justificacao: `RNF30` pede contexto suficiente, mas a UI nao deve expor detalhes internos.
-   - Como fazer (7.1): criar helper `reportClientApiError(error, context)`.
-   - Como fazer (7.2): em `development`, usar `console.warn(JSON.stringify(...))`; em producao, deixar TODO para observabilidade futura.
-   - Ficheiro a rever: `docs/RNF.md`
-   - Ficheiro alvo: `frontend/src/services/api/apiErrors.js`
-   - Snippet de referencia:
-     ```js
-     if (import.meta.env.DEV) {
-       console.warn(JSON.stringify({ level: 'warn', message: error.message, context }));
-     }
-     ```
-   - O que verificar: dados sensiveis, passwords e cookies nunca sao logados.
-
-8. **Objetivo (~25 min): Validar negativos e handoff**
-   - Descricao detalhada do objetivo: testar sucesso, backend offline e respostas de erro.
-   - Justificacao: um API client sem negativos costuma falhar logo no primeiro erro real.
-   - Como fazer (8.1): correr frontend com backend ligado e testar `GET /api`.
-   - Como fazer (8.2): desligar backend e confirmar mensagem amigavel.
-   - Ficheiro a rever: `frontend/src/services/api/apiClient.js`
-   - Ficheiro alvo: evidence do PR/defesa
-   - Snippet de referencia:
-     ```bash
-     npm run build
-     ```
-   - O que verificar: build passa, erro offline e controlado, e `BK-MF1-04` recebe contrato de cookies preparado.
-
-#### Checklist de validacao (DERIVADO):
-
-**Smoke**
-- [ ] `npm run build` no frontend passa.
-- [ ] `apiClient.get('/api')` funciona quando backend esta ligado.
-- [ ] Com backend desligado, aparece mensagem amigavel.
-- [ ] Todos os pedidos usam `credentials: 'include'`.
-
-**Negativos**
-- [ ] Passo: 8; input/acao: desligar backend e recarregar componente; resultado esperado: mensagem "Nao foi possivel ligar ao servidor"; risco que cobre: crash por rede indisponivel.
-- [ ] Passo: 8; input/acao: chamar endpoint inexistente; resultado esperado: mensagem 404 controlada; risco que cobre: rota errada sem feedback.
-- [ ] Passo: 4; input/acao: simular resposta sem JSON valido; resultado esperado: `ApiError` controlado; risco que cobre: erro de parsing quebrar UI.
-
-**Tecnico**
-- [ ] Nao ha `fetch` direto em paginas, salvo exemplos temporarios removidos.
-- [ ] Base URL vem de configuracao.
-- [ ] Erros têm estrutura consistente.
-- [ ] Sem dependencia nova quando `fetch` nativo e suficiente.
-
-**Regressao das fases anteriores**
-- [ ] Mantem estrutura criada em `BK-MF1-02`.
-- [ ] Nao altera metadados canonicos.
-- [ ] Usa DoD/evidence da MF0.
-
-**UI/mockup**
-- [ ] Mensagens sao claras e discretas, alinhadas com a linguagem simples do mockup.
-- [ ] O componente tecnico nao transforma a home numa pagina de diagnostico.
-
-**Seguranca**
-- [ ] Sem tokens em `localStorage` ou `sessionStorage`.
-- [ ] Cookies enviados por browser via `credentials: 'include'`.
-- [ ] Logs frontend nao incluem passwords, cookies, tokens ou dados sensiveis.
-
-#### Criterios de aceite:
-
-**Outputs:**
-- `apiClient.js`, `apiErrors.js`, `env.js` e `.env.example` criados.
-- Service tecnico `systemApi.getApiInfo()` criado sem inventar feature.
-- Componente de estado API criado ou documentado para smoke.
-
-**Verificacoes:**
-- Build frontend executa sem erro.
-- Backend offline mostra erro controlado.
-- 404 e JSON invalido sao tratados.
-
-**Qualidade:**
-- Chamadas HTTP centralizadas.
-- Mensagens em PT-PT e adequadas ao utilizador.
-- Sem dependencias novas injustificadas.
-
-**Continuidade:**
-- `BK-MF1-04` pode usar cookies HttpOnly sem mudar o cliente.
-- `MF2` pode criar `authApi`, `catalogApi` e outros services sobre o mesmo cliente.
-- `BK-MF1-06` pode testar cenarios de erro com base neste cliente.
-
-**Evidencia:**
-- PR/commit com cliente API.
-- Output de `npm run build`.
-- Captura ou log de sucesso e erro offline.
-- Registo dos 3 negativos.
-
-#### Evidence (para o PR/defesa):
-
-- `pr`: `A preencher no fecho do BK`
-- `proof`: `A preencher apos validacao`
-- `neg`: `A preencher apos testes negativos`
-- `files`: `frontend/src/services/api/apiClient.js`, `frontend/src/services/api/apiErrors.js`, `frontend/src/services/api/systemApi.js`, `frontend/src/config/env.js`, `frontend/.env.example`
-- `commands`: `npm run build`, `npm run dev`
-- `screenshots`: `A preencher com sucesso API e erro offline`
-- `notes`: `Fetch nativo escolhido para reduzir dependencias; Axios fica como TODO se orientador exigir`
-
-#### TODOs
-
-- TODO: confirmar se a equipa quer manter `fetch` nativo ou usar Axios conforme sugestao tecnica em `RNF.md`.
-- TODO: alinhar formato definitivo de erro backend quando `BK-MF1-05` adicionar request id/logging.
-- TODO (BLOCKER): se o frontend ainda nao existir, executar `BK-MF1-02` antes.
-- FOLLOW-UP: `BK-MF1-04` deve garantir cookies compativeis com `credentials: 'include'`.
-- FOLLOW-UP: `MF2` deve criar services por dominio, nao chamadas API dentro das paginas.
-- Assuncao tecnica: cliente API com `fetch` nativo e JavaScript ES Modules.
-- Decisoes dependentes de mockup: estilo final de mensagens e badges.
-- Decisoes dependentes de app/codigo ainda inexistente: nomes finais das paginas onde o estado tecnico aparecera.
-
-## Snippet tecnico aplicavel
+6. Codigo do ficheiro `frontend/src/config/env.js`.
 
 ```js
-// frontend/src/services/api/apiClient.js
+const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+
+export const env = {
+  apiBaseUrl: rawApiBaseUrl.replace(/\/$/, ''),
+};
+```
+
+7. Explicacao didatica do codigo.
+
+`apiBaseUrl` remove a barra final, se existir. Assim, `http://localhost:3000/` e `http://localhost:3000` funcionam da mesma forma. Isto evita URLs duplicadas como `http://localhost:3000//api`.
+
+8. Validacao do passo.
+
+Executar dentro de `frontend/`:
+
+```bash
+npm run build
+```
+
+9. Caso negativo ou erro comum.
+
+Erro comum: colocar a URL da API diretamente dentro de cada pagina. Quando a API mudar de ambiente, seria preciso editar muitos ficheiros.
+
+### Passo 2 - Criar erros API e cliente HTTP central
+
+1. Objetivo do passo.
+
+Criar um cliente API reutilizavel, com erros normalizados e cookies incluidos em todos os pedidos.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `frontend/src/services/api/apiErrors.js`
+   - CRIAR: `frontend/src/services/api/apiClient.js`
+   - LOCALIZACAO: `frontend/src/services/api/`
+   - REVER: `RNF05`, `RNF15`, `RNF25`, `RNF30`
+
+3. Instrucoes concretas.
+
+Substitui o README temporario de `services/api/` por ficheiros reais, mantendo o README se quiseres documentacao extra. Todos os pedidos ao backend devem passar por `apiClient`.
+
+4. Codigo do ficheiro `frontend/src/services/api/apiErrors.js`.
+
+```js
+export class ApiError extends Error {
+  constructor({ status, message, details = undefined, requestId = undefined }) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.details = details;
+    this.requestId = requestId;
+  }
+}
+
+export function getDefaultApiErrorMessage(status) {
+  if (status === 0) {
+    return 'Nao foi possivel contactar o servidor. Confirma a ligacao e tenta novamente.';
+  }
+
+  if (status === 401) {
+    return 'Sessao nao autenticada. Entra novamente na tua conta.';
+  }
+
+  if (status === 403) {
+    return 'Nao tens permissao para executar esta acao.';
+  }
+
+  if (status === 404) {
+    return 'O recurso pedido nao foi encontrado.';
+  }
+
+  if (status >= 500) {
+    return 'O servidor teve um problema. Tenta novamente dentro de momentos.';
+  }
+
+  return 'O pedido nao foi concluido. Verifica os dados e tenta novamente.';
+}
+
+export function toUserMessage(error) {
+  if (error instanceof ApiError) {
+    return error.message;
+  }
+
+  return 'Ocorreu um erro inesperado. Tenta novamente.';
+}
+```
+
+5. Explicacao didatica do codigo.
+
+`ApiError` guarda informacao util para a UI: codigo HTTP, mensagem, detalhes e `requestId`. A funcao `getDefaultApiErrorMessage` evita mensagens tecnicas como `Failed to fetch`, que nao ajudam o utilizador. `toUserMessage` garante que a UI tem sempre uma mensagem segura.
+
+6. Codigo do ficheiro `frontend/src/services/api/apiClient.js`.
+
+```js
 import { env } from '../../config/env.js';
-import { ApiError } from './apiErrors.js';
+import { ApiError, getDefaultApiErrorMessage } from './apiErrors.js';
 
-async function request(path, options = {}) {
-  const response = await fetch(`${env.apiBaseUrl}${path}`, {
+function buildUrl(path) {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${env.apiBaseUrl}${normalizedPath}`;
+}
+
+async function parseResponseBody(response) {
+  if (response.status === 204) {
+    return null;
+  }
+
+  const contentType = response.headers.get('content-type') ?? '';
+
+  if (contentType.includes('application/json')) {
+    return response.json();
+  }
+
+  const text = await response.text();
+  return text ? { message: text } : null;
+}
+
+async function request(path, { method = 'GET', body, headers = {}, ...options } = {}) {
+  const requestHeaders = {
+    Accept: 'application/json',
+    ...headers,
+  };
+
+  const requestOptions = {
+    method,
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...(options.headers ?? {}) },
+    headers: requestHeaders,
     ...options,
-  });
+  };
 
-  const data = response.status === 204 ? null : await response.json().catch(() => null);
+  if (body !== undefined) {
+    requestHeaders['Content-Type'] = 'application/json';
+    requestOptions.body = JSON.stringify(body);
+  }
+
+  let response;
+
+  try {
+    response = await fetch(buildUrl(path), requestOptions);
+  } catch (error) {
+    throw new ApiError({
+      status: 0,
+      message: getDefaultApiErrorMessage(0),
+      details: { cause: error.message },
+    });
+  }
+
+  const data = await parseResponseBody(response);
 
   if (!response.ok) {
     throw new ApiError({
       status: response.status,
-      message: data?.message ?? 'Pedido API falhou.',
+      message: data?.message ?? getDefaultApiErrorMessage(response.status),
       details: data?.details,
-      requestId: response.headers.get('x-request-id'),
+      requestId: response.headers.get('x-request-id') ?? undefined,
     });
   }
 
@@ -397,15 +251,408 @@ async function request(path, options = {}) {
 }
 
 export const apiClient = {
-  get: (path) => request(path),
-  post: (path, body) => request(path, { method: 'POST', body: JSON.stringify(body) }),
+  get: (path, options) => request(path, { ...options, method: 'GET' }),
+  post: (path, body, options) => request(path, { ...options, method: 'POST', body }),
+  put: (path, body, options) => request(path, { ...options, method: 'PUT', body }),
+  patch: (path, body, options) => request(path, { ...options, method: 'PATCH', body }),
+  del: (path, options) => request(path, { ...options, method: 'DELETE' }),
 };
 ```
 
-## Proximo BK recomendado
+7. Explicacao didatica do codigo.
 
-`BK-MF1-04`, que deve preparar sessao segura backend com cookies HttpOnly compativeis com este cliente API.
+`buildUrl` junta a origem da API ao caminho. `parseResponseBody` lida com respostas JSON, respostas vazias e respostas de texto. `credentials: 'include'` e essencial para o futuro login: permite que cookies HttpOnly enviados pelo backend sejam incluidos nos pedidos. O `try/catch` transforma falhas de rede num `ApiError` com `status: 0`, mais facil de mostrar na UI.
+
+8. Validacao do passo.
+
+Executar:
+
+```bash
+npm run build
+```
+
+9. Caso negativo ou erro comum.
+
+Erro comum: guardar tokens no browser para "resolver" auth. Este BK prepara cookies seguros; nao deve criar `localStorage.setItem('token', ...)`.
+
+### Passo 3 - Criar service tecnico e componente de estado da API
+
+1. Objetivo do passo.
+
+Usar o cliente API para verificar se o backend responde, mostrando uma mensagem simples na home.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `frontend/src/services/api/systemApi.js`
+   - CRIAR: `frontend/src/components/system/ApiStatusBadge.jsx`
+   - LOCALIZACAO: `frontend/src/services/api/` e `frontend/src/components/system/`
+   - REVER: `BK-MF1-01`, rota `GET /api`
+
+3. Instrucoes concretas.
+
+Cria a pasta `components/system/`. O componente deve ser pequeno e tecnico: ele mostra conectividade, nao conteudo de negocio.
+
+4. Codigo do ficheiro `frontend/src/services/api/systemApi.js`.
+
+```js
+import { apiClient } from './apiClient.js';
+
+export function getApiStatus() {
+  return apiClient.get('/api');
+}
+```
+
+5. Explicacao didatica do codigo.
+
+Mesmo sendo uma chamada pequena, criamos um service. Assim, as paginas nao precisam de saber caminhos da API. No futuro podem existir services como `authApi`, `catalogApi` e `subscriptionApi`.
+
+6. Codigo do ficheiro `frontend/src/components/system/ApiStatusBadge.jsx`.
+
+```jsx
+import { useEffect, useState } from 'react';
+import { toUserMessage } from '../../services/api/apiErrors.js';
+import { getApiStatus } from '../../services/api/systemApi.js';
+
+export function ApiStatusBadge() {
+  const [state, setState] = useState({
+    status: 'checking',
+    message: 'A verificar ligacao ao backend...',
+  });
+
+  useEffect(() => {
+    let isActive = true;
+
+    getApiStatus()
+      .then((data) => {
+        if (!isActive) {
+          return;
+        }
+
+        setState({
+          status: 'online',
+          message: `${data.name} ligada (${data.status}).`,
+        });
+      })
+      .catch((error) => {
+        if (!isActive) {
+          return;
+        }
+
+        setState({
+          status: 'offline',
+          message: toUserMessage(error),
+        });
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  return (
+    <aside className={`api-status api-status-${state.status}`} aria-live="polite">
+      <strong>Estado API</strong>
+      <span>{state.message}</span>
+    </aside>
+  );
+}
+```
+
+7. Explicacao didatica do codigo.
+
+`useEffect` corre quando o componente aparece no ecra. A variavel `isActive` evita tentar atualizar estado depois de o componente desmontar. `aria-live="polite"` permite que leitores de ecra recebam a atualizacao sem interromper o utilizador.
+
+8. Validacao do passo.
+
+Com backend ligado, o componente deve mostrar API online. Com backend desligado, deve mostrar uma mensagem clara de erro.
+
+9. Caso negativo ou erro comum.
+
+Erro comum: fazer o componente assumir que a resposta existe sempre. O `.catch()` e obrigatorio porque redes falham.
+
+### Passo 4 - Integrar o estado da API na home e no CSS
+
+1. Objetivo do passo.
+
+Mostrar o estado tecnico na pagina inicial sem alterar o escopo funcional da home.
+
+2. Ficheiros envolvidos:
+   - EDITAR: `frontend/src/pages/pages.jsx`
+   - EDITAR: `frontend/src/styles/global.css`
+   - LOCALIZACAO: substituir o ficheiro `pages.jsx` pelo conteudo abaixo e acrescentar o CSS no fim de `global.css`
+   - REVER: `BK-MF1-02`
+
+3. Instrucoes concretas.
+
+Substitui `frontend/src/pages/pages.jsx` pelo ficheiro completo abaixo. Depois acrescenta o bloco CSS no fim de `global.css`.
+
+4. Codigo do ficheiro `frontend/src/pages/pages.jsx`.
+
+```jsx
+import { Link } from 'react-router-dom';
+import { ApiStatusBadge } from '../components/system/ApiStatusBadge.jsx';
+import { BaseButton } from '../components/ui/BaseButton.jsx';
+import { ContentCard } from '../components/ui/ContentCard.jsx';
+import { EmptyState } from '../components/ui/EmptyState.jsx';
+import { TextField } from '../components/ui/TextField.jsx';
+
+export function HomePage() {
+  return (
+    <section className="page-section hero-section">
+      <div className="hero-copy">
+        <p className="section-kicker">Streaming cristao com impacto social</p>
+        <h1>FaithFlix</h1>
+        <p>
+          Base inicial da experiencia web. Catalogo, streaming, perfis, subscricoes
+          e pool solidaria entram nos BKs seguintes.
+        </p>
+        <Link className="button-link" to="/catalogo">Ver estrutura do catalogo</Link>
+      </div>
+      <ApiStatusBadge />
+    </section>
+  );
+}
+
+export function CatalogPage() {
+  return (
+    <section className="page-section">
+      <p className="section-kicker">Catalogo</p>
+      <h1>Catalogo FaithFlix</h1>
+      <div className="card-grid">
+        <ContentCard
+          eyebrow="MF2"
+          title="Metadados de conteudo"
+          description="O CRUD de catalogo e taxonomias sera implementado nos BKs de core streaming."
+        />
+        <ContentCard
+          eyebrow="MF2"
+          title="Detalhe e reproducao"
+          description="A separacao entre metadados e reproducao sera tratada antes do player."
+        />
+      </div>
+    </section>
+  );
+}
+
+export function LoginPage() {
+  return (
+    <section className="page-section narrow-section">
+      <p className="section-kicker">Identidade</p>
+      <h1>Entrada na conta</h1>
+      <form className="form-preview" aria-label="Formulario de login ainda inativo">
+        <TextField id="email-preview" label="Email" type="email" disabled placeholder="Ativado em MF2" />
+        <TextField id="password-preview" label="Password" type="password" disabled placeholder="Ativado em MF2" />
+        <BaseButton disabled>Login disponivel em MF2</BaseButton>
+      </form>
+    </section>
+  );
+}
+
+export function AssociationsPage() {
+  return (
+    <EmptyState
+      title="Associacoes"
+      description="A candidatura e a pool solidaria entram na macrofase de monetizacao solidaria."
+    />
+  );
+}
+
+export function PlansPage() {
+  return (
+    <EmptyState
+      title="Planos"
+      description="Os planos e a subscricao serao definidos sem inventar pagamentos reais nesta fase."
+    />
+  );
+}
+
+export function AccountPage() {
+  return (
+    <EmptyState
+      title="Conta"
+      description="Perfil, consentimentos e dados pessoais dependem de autenticacao segura."
+    />
+  );
+}
+
+export function NotificationsPage() {
+  return (
+    <EmptyState
+      title="Notificacoes"
+      description="As notificacoes transacionais entram depois dos fluxos principais estarem definidos."
+    />
+  );
+}
+
+export function SearchPage() {
+  return (
+    <EmptyState
+      title="Pesquisa"
+      description="A pesquisa unificada sera ligada ao catalogo quando existirem conteudos persistidos."
+    />
+  );
+}
+
+export function NotFoundPage() {
+  return (
+    <EmptyState
+      title="Pagina nao encontrada"
+      description="Confirma o endereco ou volta ao inicio."
+    >
+      <Link className="button-link" to="/">Voltar ao inicio</Link>
+    </EmptyState>
+  );
+}
+```
+
+5. Explicacao didatica do codigo.
+
+A unica mudanca funcional face ao BK anterior e a entrada de `ApiStatusBadge` na home. Isto mostra conectividade tecnica sem criar login, catalogo ou dados falsos. O resto das paginas mantem o mesmo contrato para os BKs futuros.
+
+6. Codigo a acrescentar no fim de `frontend/src/styles/global.css`.
+
+```css
+.api-status {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 420px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  padding: 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.api-status strong {
+  color: var(--color-brand-strong);
+}
+
+.api-status-checking {
+  border-color: var(--color-border);
+}
+
+.api-status-online {
+  border-color: #66a88f;
+}
+
+.api-status-offline {
+  border-color: #c85d5d;
+}
+```
+
+7. Explicacao didatica do codigo.
+
+O CSS diferencia visualmente os estados sem usar texto tecnico complexo. Verde indica ligacao, vermelho indica falha. Mantemos a mesma linguagem visual do frontend base.
+
+8. Validacao do passo.
+
+Executar `npm run build`. Depois arrancar backend e frontend e abrir `/`.
+
+9. Caso negativo ou erro comum.
+
+Erro comum: transformar a home num painel tecnico cheio de detalhes internos. O estado da API deve ser curto e util.
+
+### Passo 5 - Validar sucesso, 404 e backend offline
+
+1. Objetivo do passo.
+
+Garantir que o cliente API se comporta bem quando tudo corre certo e quando algo falha.
+
+2. Ficheiros envolvidos:
+   - EDITAR: nenhum, se os passos anteriores estiverem corretos
+   - LOCALIZACAO: executar comandos em `backend/` e `frontend/`
+   - REVER: `apiClient.js`, `apiErrors.js`, `ApiStatusBadge.jsx`
+
+3. Instrucoes concretas.
+
+Testa os tres cenarios abaixo e guarda outputs/capturas.
+
+4. Resposta esperada em sucesso `GET /api`.
+
+```json
+{
+  "service": "faithflix-api",
+  "name": "FaithFlix API",
+  "version": "0.1.0",
+  "status": "ok"
+}
+```
+
+5. Explicacao didatica.
+
+Este caso prova que o frontend consegue contactar a API base criada no `BK-MF1-01`.
+
+6. Resposta esperada em erro 404.
+
+```json
+{
+  "message": "Recurso nao encontrado.",
+  "details": {
+    "path": "/api/nao-existe"
+  }
+}
+```
+
+7. Explicacao didatica.
+
+O cliente API deve transformar esta resposta num `ApiError`, preservando a mensagem e o codigo HTTP.
+
+8. Resultado esperado com backend offline.
+
+```text
+Nao foi possivel contactar o servidor. Confirma a ligacao e tenta novamente.
+```
+
+9. Explicacao didatica.
+
+Quando o servidor esta desligado, nao existe resposta HTTP. Por isso usamos `status: 0` no `ApiError`. A UI continua a mostrar uma mensagem segura e compreensivel.
+
+10. Validacao do passo.
+
+- `npm run build` passa.
+- Com backend ligado, a home mostra API online.
+- Com backend desligado, a home mostra erro claro.
+- Nenhuma pagina usa `fetch` diretamente.
+- Nenhum token e guardado em `localStorage` ou `sessionStorage`.
+
+11. Caso negativo ou erro comum.
+
+Erro comum: mostrar `TypeError: Failed to fetch` ao utilizador. Isso e linguagem tecnica e falha o `RNF05`.
+
+## Criterios de aceite (mensuraveis)
+
+- `frontend/.env.example`, `frontend/src/config/env.js`, `apiErrors.js`, `apiClient.js`, `systemApi.js` e `ApiStatusBadge.jsx` existem.
+- `apiClient` expoe `get`, `post`, `put`, `patch` e `del`.
+- Todos os pedidos usam `credentials: 'include'`.
+- `npm run build` passa dentro de `frontend/`.
+- A home mostra estado online com backend ligado e mensagem clara com backend desligado.
+- Nenhum token e guardado em storage do browser.
+
+## Validacao final
+
+Executar:
+
+```bash
+npm --prefix frontend run build
+npm --prefix backend run dev
+npm --prefix frontend run dev
+```
+
+Abrir a home, testar backend ligado/desligado e confirmar a ausencia de `fetch` direto nas paginas.
+
+## Evidence para PR/defesa
+
+- `pr`: referencia do PR/commit com cliente API.
+- `proof`: output de `npm run build` e captura da home com API ligada.
+- `neg`: captura/log de API offline, 404 e confirmacao de ausencia de tokens no storage.
+
+## Handoff
+
+- `BK-MF1-04` deve emitir cookies HttpOnly compativeis com `credentials: 'include'`.
+- `MF2` deve criar services por dominio, como `authApi` e `catalogApi`, reutilizando `apiClient`.
+- `BK-MF1-05` deve fornecer `x-request-id` para enriquecer erros e logs sem expor dados sensiveis.
 
 ## Changelog
 
+- `2026-05-30`: reestruturado como tutorial linear, com codigo movido para passos executaveis e sem anexo tecnico no fim.
+- `2026-05-29`: acrescentada versao detalhada com cliente API, erros normalizados, componente de estado, payloads/respostas esperadas e negativos.
 - `2026-05-27`: refinado para guia executavel de cliente API frontend, preservando metadados canonicos e preparando contrato de cookies sem implementar auth funcional.

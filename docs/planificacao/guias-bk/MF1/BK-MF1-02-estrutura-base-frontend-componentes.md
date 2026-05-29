@@ -14,382 +14,219 @@
 - `rf_rnf`: `RNF28`
 - `fase_documental`: `Fase 1`
 - `sprint`: `S01`
-- `core_or_reforco`: `Reforco`
+- `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF1-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF1/BK-MF1-02-estrutura-base-frontend-componentes.md`
-- `last_updated`: `2026-05-27`
+- `last_updated`: `2026-05-30`
 
 ## Bloco pedagogico (obrigatorio)
 
-Este BK ensina a construir a primeira fundacao tecnica real do frontend FaithFlix. A equipa vai criar uma aplicacao React organizada por componentes, paginas, layout, estilos base e rotas, usando o mockup apenas como referencia de fluxo e linguagem visual.
+Este BK cria a primeira base real do frontend FaithFlix. O objetivo e montar uma app React organizada por componentes, rotas, layout, paginas e estilos globais. Esta base sera usada por login, catalogo, detalhe de conteudo, streaming, favoritos, subscricoes, associacoes e privacidade nas macrofases seguintes.
 
-O objetivo pedagogico e perceber a diferenca entre pagina, layout, componente, props e estado. A app ainda nao tera catalogo real, login funcional, streaming ou dados vindos da API. Vai ter placeholders controlados, para que os BKs seguintes possam ligar backend, auth e catalogo sem refazer a estrutura.
+Para alunos do 12.º ano, a ideia principal e aprender a separar responsabilidades: uma pagina representa uma rota, um layout organiza a estrutura comum, um componente reutilizavel evita repeticao e os estilos globais dao consistencia visual.
+
+### Decisao tecnica deste guia
+
+Este guia usa `React + Vite`, alinhado com o mockup existente em `mockup/`. O `RNF.md` sugere `Next.js`, mas apresenta a stack como recomendacao, nao como contrato canonico fechado. Se o orientador decidir que a app final deve ser obrigatoriamente `Next.js`, este BK deve parar antes da criacao do frontend e registar a decisao. Sem essa decisao contraria, seguir estes passos.
+
+### O que entra
+
+- Criar a pasta `frontend/`.
+- Criar app React com Vite.
+- Criar router, layout, componentes reutilizaveis, paginas base e estilos.
+- Criar paginas controladas para rotas do produto, sem fingir dados reais.
+
+### O que nao entra
+
+- Login funcional.
+- Catalogo real.
+- Streaming ou player real.
+- Integração API.
+- Subscricoes, pagamentos, pool solidaria ou recomendacoes.
+
+### Check de compreensao
+
+- [ ] Sei distinguir pagina, layout e componente.
+- [ ] Sei explicar porque a UI desta fase ainda nao tem dados reais.
+- [ ] Sei abrir as rotas principais e confirmar que nao ha erros de render.
 
 ## Bloco operacional (obrigatorio)
 
-O trabalho operacional e criar a pasta `frontend/`, configurar React, definir rotas principais inspiradas no mockup, criar componentes reutilizaveis e uma base visual simples. Nao se deve copiar a pilha pesada do mockup; ele serve para orientar navegacao, hierarquia de ecras e nomes visiveis.
+### Pre-condicoes
 
-#### BK-MF1-02 - Estrutura base frontend por componentes
+- `BK-MF0-06` concluido ou com handoff registado.
+- Confirmar em `BACKLOG-MVP.md` que este BK continua com owner `Mateus`, apoio `Kaue`, prioridade `P0`, dependencia `BK-MF0-06` e `rf_rnf` `RNF28`.
+- Rever `mockup/` apenas como referencia visual e de rotas, nao como codigo final obrigatorio.
+- Confirmar que ainda nao existe pasta real `frontend/`. Se existir, adaptar os passos sem apagar trabalho existente.
 
-##### O que vamos fazer neste BK
+### Guia de execucao (passo-a-passo)
 
-Neste BK vamos criar o frontend inicial da FaithFlix com React. A estrutura vai separar `pages`, `components`, `layouts`, `styles` e `services`, deixando espaco para o cliente API de `BK-MF1-03`.
+### Passo 1 - Criar o pacote frontend e a configuracao Vite
 
-O mockup existente em `mockup/` indica rotas e ecras esperados: home, login, catalogo, instituicoes, planos, minha conta, notificacoes e busca. Neste BK essas rotas podem existir como paginas placeholder, sem regras de negocio reais. O objetivo e criar navegação e estrutura, nao finalizar UI nem implementar features.
+1. Objetivo do passo.
 
-Como a stack nao esta fechada num contrato unico, a opcao mais simples para alunos de 12.º ano e usar React com Vite e JavaScript moderno. Isto e uma assuncao tecnica derivada do mockup e dos RNF; se o orientador exigir Next.js como sugerido em `RNF.md`, a equipa deve adaptar a estrutura antes de executar.
+Criar a app frontend como projeto independente, com React, Vite e React Router.
 
-##### Porque e que isto e importante
+2. Ficheiros envolvidos:
+   - CRIAR: `frontend/package.json`
+   - CRIAR: `frontend/vite.config.js`
+   - CRIAR: `frontend/index.html`
+   - LOCALIZACAO: nova pasta `frontend/` na raiz do repositorio
+   - REVER: `mockup/package.json` e `mockup/vite.config.ts`
 
-- Cria uma base visual e estrutural para todo o produto FaithFlix.
-- Evita paginas duplicadas e componentes criados ao acaso em BKs futuros.
-- Prepara `BK-MF1-03`, que vai ligar o frontend ao backend com tratamento de erro.
-- Permite testar cedo navegacao, responsividade minima e consistencia visual.
-- Ensina a construir UI de forma modular, sem ficar preso ao mockup como pixel-perfect.
+3. Instrucoes concretas.
 
-##### O que entra (scope)
+Cria a pasta `frontend/` e adiciona os tres ficheiros seguintes. Estes ficheiros ainda nao criam ecras; apenas preparam a app para arrancar.
 
-- Criar `frontend/` com React e Vite.
-- Definir rotas base da app.
-- Criar layout principal com header, main e footer.
-- Criar componentes base: botao, campo de formulario, card e estado vazio.
-- Criar tokens simples de cor, espacamento e tipografia derivados do mockup.
-- Criar paginas placeholder para os fluxos principais.
-- Garantir build local sem erros.
+4. Codigo do ficheiro `frontend/package.json`.
 
-##### O que nao entra (scope-out)
+```json
+{
+  "name": "faithflix-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.1"
+  },
+  "devDependencies": {}
+}
+```
 
-- Nao entra login funcional, registo, recuperacao de password ou sessao.
-- Nao entra catalogo real, favoritos, historico, streaming ou player.
-- Nao entra subscricoes funcionais, pagamentos ou pool solidaria.
-- Nao entra copiar dependencias do mockup como MUI, Radix, shadcn ou bibliotecas de icones sem decisao.
-- Nao entra identidade visual definitiva nem pixel-perfect.
+5. Explicacao didatica do codigo.
 
-##### Como saber que isto ficou bem
+`vite` e a ferramenta que arranca e compila o frontend. `react` e `react-dom` permitem construir a interface. `react-router-dom` permite ter URLs como `/catalogo`, `/login` e `/planos` sem criar paginas HTML separadas. `private: true` evita publicacao acidental.
 
-- `npm run dev` abre a app frontend.
-- `npm run build` termina sem erros.
-- As rotas principais mostram paginas placeholder claras e coerentes.
-- Header e footer aparecem de forma consistente.
-- Os componentes base sao reutilizados, nao duplicados.
+6. Codigo do ficheiro `frontend/vite.config.js`.
 
-#### Metadados do BK (CANONICO/DERIVADO):
+```js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-- Prioridade: `P0` (CANONICO, `BACKLOG-MVP.md`)
-- Estado: `TODO` (CANONICO, `BACKLOG-MVP.md`)
-- Esforco: `M` (CANONICO, `BACKLOG-MVP.md`)
-- macro: `MF1` (CANONICO, `BACKLOG-MVP.md`)
-- Owner: `Mateus` (CANONICO, `BACKLOG-MVP.md`)
-- Apoio: `Kaue` (CANONICO, `BACKLOG-MVP.md`)
-- Dependencias (BK IDs): `BK-MF0-06` (CANONICO, `BACKLOG-MVP.md`)
-- Pre-condicoes: MF0 encerrada, mockup inspecionado e decisao de criar fundacao tecnica frontend sem UI final (DERIVADO)
-- Ref. Plano: `PLANO-IMPLEMENTACAO-TOTAL > MF1`, `MF-VIEWS > MF1`, `PLANO-SPRINTS > Sprint 1` (CANONICO)
-- Flow ID: `MF1-foundation-frontend-02` (DERIVADO)
-- Fonte de verdade: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-- Fonte de verdade: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
-- Fonte de verdade: `mockup/src/app/FAITHFLIX_INTERFACE_SPECS.md`
-- Descricao: criar a estrutura base do frontend por componentes, alinhada com `RNF28`, usando o mockup como referencia nao final (DERIVADO)
+export default defineConfig({
+  plugins: [react()],
+});
+```
 
-#### O que vamos fazer neste BK (DERIVADO):
+7. Explicacao didatica do codigo.
 
-- Criar app React em `frontend/`.
-- Definir rotas principais da experiencia FaithFlix.
-- Criar layout reutilizavel com header e footer.
-- Criar componentes atomicos simples e sem dependencias pesadas.
-- Criar paginas placeholder com estados controlados.
-- Aplicar tokens visuais simples derivados do mockup.
-- Preparar pasta `services/api/` para `BK-MF1-03`.
+Este ficheiro diz ao Vite que a app usa React. Sem este plugin, JSX como `<App />` nao seria transformado corretamente durante o desenvolvimento e o build.
 
-#### Estado, ficheiros e impacto (DERIVADO):
+8. Codigo do ficheiro `frontend/index.html`.
 
-- Estado esperado antes do BK: existe mockup, mas nao existe frontend real da app.
-- Estado esperado depois do BK: existe frontend React executavel com rotas, layout e componentes base.
-- Ficheiros a criar: `frontend/package.json`, `frontend/index.html`, `frontend/src/main.jsx`, `frontend/src/App.jsx`, `frontend/src/routes/AppRoutes.jsx`, `frontend/src/layouts/AppLayout.jsx`, `frontend/src/components/ui/`, `frontend/src/pages/`, `frontend/src/styles/tokens.css`, `frontend/src/styles/global.css`.
-- Ficheiros a editar: nenhum ficheiro canónico de planificacao, salvo evidence.
-- Ficheiros a rever: `mockup/src/app/App.tsx`, `mockup/src/app/components/Header.tsx`, `mockup/src/app/FAITHFLIX_INTERFACE_SPECS.md`, `docs/RNF.md`.
-- Dependencias de BK anteriores e uso: reutiliza `BK-MF0-06` para confirmar que MF1 e a primeira fase tecnica real e que este BK nao deve fechar UI final.
-- Impacto na arquitetura da app: define convencao frontend componentizada para todos os BKs de UI.
-- Impacto frontend: cria base real da aplicacao.
-- Impacto backend: nenhum direto; a ligacao vem em `BK-MF1-03`.
-- Impacto dados: apenas placeholders; sem dados persistentes.
-- Impacto seguranca: nao guardar tokens no frontend; sem localStorage para sessao.
-- Impacto testes: `npm run build` fica como smoke inicial.
-- Impacto UI: cria linguagem visual inicial, nao definitiva.
-- Handoff para o proximo BK: `BK-MF1-03` deve reutilizar `services/api/`, estados de UI e mensagens PT-PT.
+```html
+<!doctype html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FaithFlix</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+```
 
-#### Pre-leitura minima (10-15 min) (DERIVADO):
+9. Explicacao didatica do codigo.
 
-- `docs/RNF.md`: `RNF28`, `RNF05` como contexto futuro de mensagens.
-- `docs/planificacao/guias-bk/MF0/BK-MF0-06-reuniao-alinhamento-inicial.md`: handoff para frontend.
-- `docs/planificacao/backlogs/BACKLOG-MVP.md`: linha `BK-MF1-02`.
-- `mockup/src/app/App.tsx`: rotas e paginas propostas.
-- `mockup/src/app/components/Header.tsx`: navegacao principal.
-- `mockup/src/app/FAITHFLIX_INTERFACE_SPECS.md`: cores, componentes e notas de responsividade.
-- Codigo: confirmar que nao existe `frontend/` real antes de criar a app.
+O HTML tem apenas o ponto de montagem `root`. A interface React e criada dentro desse elemento. O atributo `lang="pt-PT"` ajuda acessibilidade e leitores de ecra, porque a app esta em portugues de Portugal.
 
-#### Glossario (rapido) (DERIVADO):
+10. Validacao do passo.
 
-- Frontend: parte da app que o utilizador ve e usa no browser.
-- React: biblioteca para criar UI com componentes.
-- Vite: ferramenta simples para criar e correr apps frontend modernas.
-- Componente: bloco reutilizavel de UI, como botao ou card.
-- Props: dados que um componente recebe de fora.
-- State: dados internos que mudam durante a interacao.
-- Page: componente que representa um ecra/rota.
-- Layout: estrutura comum a varias paginas.
-- Router: sistema que decide que pagina aparece para cada URL.
-- Placeholder: versao temporaria controlada de um ecra ainda sem funcionalidade.
-- Token visual: valor reutilizavel de cor, tamanho ou espacamento.
+Executar dentro de `frontend/`:
 
-#### Conceitos teoricos essenciais (DERIVADO):
+```bash
+npm install
+npm run dev
+```
 
-**React components.** Em React, a interface e composta por funcoes que devolvem UI. Um `BaseButton` pode ser usado em varias paginas sem copiar CSS e markup.
+Ainda podem aparecer erros enquanto os ficheiros React nao existirem. Isso e esperado ate concluir os passos seguintes.
 
-**Props vs state.** Props entram no componente a partir do pai. State vive dentro do componente e muda com interacoes. Neste BK quase tudo deve ser estatico; estados mais ricos aparecem quando o cliente API for ligado.
+11. Caso negativo ou erro comum.
 
-**Rotas frontend.** Rotas como `/catalogo` e `/login` permitem mapear URLs para paginas. Neste BK as paginas sao placeholders porque as funcionalidades chegam em `MF2+`.
+Erro comum: copiar diretamente o `mockup/` para `frontend/`. O mockup e referencia; a app final precisa de estrutura propria e evolutiva.
 
-**Mockup como referencia.** O mockup ajuda a perceber fluxo, labels e hierarquia, mas nao e contrato pixel-perfect. Nao se copiam bibliotecas pesadas so porque aparecem no mockup.
+### Passo 2 - Criar o ponto de entrada React e o router
 
-**Acessibilidade basica.** Links e botoes devem ter texto claro; formularios placeholder devem ter `label`; o foco de teclado nao deve desaparecer. Isto evita uma UI bonita mas dificil de usar.
+1. Objetivo do passo.
 
-**Erros comuns.** Criar um componente para cada pagina sem reutilizacao, misturar CSS global com estilos aleatorios, implementar login falso e guardar tokens em `localStorage` antes de existir sessao segura.
+Montar a aplicacao React no browser e definir as rotas principais do FaithFlix.
 
-#### Guia de execucao (passo-a-passo) (DERIVADO):
+2. Ficheiros envolvidos:
+   - CRIAR: `frontend/src/main.jsx`
+   - CRIAR: `frontend/src/App.jsx`
+   - CRIAR: `frontend/src/routes/AppRoutes.jsx`
+   - LOCALIZACAO: `frontend/src/` e `frontend/src/routes/`
+   - REVER: `MF-VIEWS.md`, para confirmar que esta e apenas fundacao tecnica
 
-0. **Objetivo (~15 min): Inspecionar mockup e limitar scope**
-   - Descricao detalhada do objetivo: identificar rotas, layout e componentes principais sem transformar o mockup em UI final.
-   - Justificacao: o mockup orienta, mas a fundacao tecnica deve ser simples e extensivel.
-   - Como fazer (0.1): rever `mockup/src/app/App.tsx` para listar rotas.
-   - Como fazer (0.2): rever `FAITHFLIX_INTERFACE_SPECS.md` para extrair cores e componentes, sem copiar dependencias.
-   - Ficheiro a rever: `mockup/src/app/FAITHFLIX_INTERFACE_SPECS.md`
-   - Ficheiro alvo: notas de implementacao do PR
-   - Snippet de referencia: rotas `/`, `/login`, `/catalogo`, `/instituicoes`, `/planos`, `/minha-conta`, `/notificacoes`, `/busca`
-   - O que verificar: equipa sabe que catalogo/login sao placeholders nesta fase.
+3. Instrucoes concretas.
 
-1. **Objetivo (~20 min): Criar aplicacao React**
-   - Descricao detalhada do objetivo: criar `frontend/` com React e scripts de desenvolvimento.
-   - Justificacao: o frontend precisa de uma base propria para evoluir sem depender do mockup.
-   - Como fazer (1.1): executar `npm create vite@latest frontend -- --template react`.
-   - Como fazer (1.2): entrar em `frontend/`, executar `npm install` e confirmar scripts `dev`, `build`, `preview`.
-   - Ficheiro a rever: `frontend/package.json`
-   - Ficheiro alvo: `frontend/package.json`
-   - Snippet de referencia:
-     ```json
-     {
-       "scripts": {
-         "dev": "vite",
-         "build": "vite build",
-         "preview": "vite preview"
-       }
-     }
-     ```
-   - O que verificar: nao foram copiadas dependencias pesadas do mockup.
+Cria a pasta `src/`, depois `src/routes/`. O router inclui rotas que serao preenchidas em BKs futuros, mas nesta fase mostram paginas controladas.
 
-2. **Objetivo (~15 min): Adicionar routing minimo**
-   - Descricao detalhada do objetivo: instalar e configurar o router para as paginas principais.
-   - Justificacao: a app tem varios ecras previstos; o router evita navegação manual por estado global improvisado.
-   - Como fazer (2.1): instalar `react-router-dom`.
-   - Como fazer (2.2): criar `src/routes/AppRoutes.jsx` e montar no `App.jsx`.
-   - Ficheiro a rever: `mockup/src/app/App.tsx`
-   - Ficheiro alvo: `frontend/src/routes/AppRoutes.jsx`
-   - Snippet de referencia:
-     ```jsx
-     <Route path="/catalogo" element={<CatalogPage />} />
-     <Route path="*" element={<NotFoundPage />} />
-     ```
-   - O que verificar: cada rota abre uma pagina placeholder sem erro.
-
-3. **Objetivo (~25 min): Criar layout principal**
-   - Descricao detalhada do objetivo: criar header, area principal e footer reutilizaveis.
-   - Justificacao: layout comum evita repetir navegacao em todas as paginas.
-   - Como fazer (3.1): criar `src/layouts/AppLayout.jsx`.
-   - Como fazer (3.2): criar `src/components/layout/AppHeader.jsx` e `AppFooter.jsx`.
-   - Ficheiro a rever: `mockup/src/app/components/Header.tsx`
-   - Ficheiro alvo: `frontend/src/layouts/AppLayout.jsx`
-   - Snippet de referencia:
-     ```jsx
-     export function AppLayout({ children }) {
-       return (
-         <>
-           <AppHeader />
-           <main>{children}</main>
-           <AppFooter />
-         </>
-       );
-     }
-     ```
-   - O que verificar: header aparece em todas as paginas e links usam `NavLink`.
-
-4. **Objetivo (~25 min): Criar tokens e estilos base**
-   - Descricao detalhada do objetivo: definir cores, tipografia, spacing e estados de foco em CSS.
-   - Justificacao: tokens mantem consistencia e facilitam ajustes futuros de design.
-   - Como fazer (4.1): criar `src/styles/tokens.css` com variaveis CSS.
-   - Como fazer (4.2): importar `tokens.css` e `global.css` em `main.jsx`.
-   - Ficheiro a rever: `mockup/src/app/FAITHFLIX_INTERFACE_SPECS.md`
-   - Ficheiro alvo: `frontend/src/styles/tokens.css`
-   - Snippet de referencia:
-     ```css
-     :root {
-       --color-bg: #F9F7F3;
-       --color-primary: #8DA385;
-       --color-accent: #F0CD95;
-       --color-text: #4B4B4B;
-     }
-     ```
-   - O que verificar: UI nao fica presa a uma paleta de mockup impossivel de alterar.
-
-5. **Objetivo (~35 min): Criar paginas placeholder controladas**
-   - Descricao detalhada do objetivo: criar paginas para as rotas principais, com texto curto e sem funcionalidade falsa.
-   - Justificacao: rotas precisam existir para a equipa validar navegacao, mas nao devem prometer features ainda nao feitas.
-   - Como fazer (5.1): criar `HomePage`, `LoginPage`, `CatalogPage`, `PlansPage`, `InstitutionsPage`, `AccountPage`, `NotificationsPage`, `SearchPage`, `NotFoundPage`.
-   - Como fazer (5.2): usar um componente comum `PageShell` ou `EmptyState` para reduzir duplicacao.
-   - Ficheiro a rever: `mockup/src/app/pages/`
-   - Ficheiro alvo: `frontend/src/pages/CatalogPage.jsx`
-   - Snippet de referencia:
-     ```jsx
-     export function CatalogPage() {
-       return <EmptyState title="Catalogo" description="Conteudos reais entram na MF2." />;
-     }
-     ```
-   - O que verificar: nenhum placeholder cria dados falsos de filmes, pagamentos ou utilizadores.
-
-6. **Objetivo (~30 min): Criar componentes UI base**
-   - Descricao detalhada do objetivo: criar componentes pequenos e reutilizaveis para botoes, campos e cards.
-   - Justificacao: `RNF28` exige frontend componentizado, nao paginas com HTML duplicado.
-   - Como fazer (6.1): criar `src/components/ui/BaseButton.jsx`, `TextField.jsx`, `ContentCard.jsx`, `EmptyState.jsx`.
-   - Como fazer (6.2): usar pelo menos dois componentes em paginas diferentes.
-   - Ficheiro a rever: `mockup/src/app/components/`
-   - Ficheiro alvo: `frontend/src/components/ui/BaseButton.jsx`
-   - Snippet de referencia:
-     ```jsx
-     export function BaseButton({ children, type = 'button', ...props }) {
-       return <button type={type} className="base-button" {...props}>{children}</button>;
-     }
-     ```
-   - O que verificar: componentes nao fazem chamadas API nem guardam sessao.
-
-7. **Objetivo (~25 min): Validar responsividade e acessibilidade minima**
-   - Descricao detalhada do objetivo: garantir que a app e usavel em mobile/desktop e por teclado.
-   - Justificacao: problemas de layout cedo ficam caros quando as paginas ficarem funcionais.
-   - Como fazer (7.1): testar largura pequena no browser e verificar quebra do header.
-   - Como fazer (7.2): navegar com teclado pelos links e botoes.
-   - Ficheiro a rever: `frontend/src/styles/global.css`
-   - Ficheiro alvo: `frontend/src/styles/global.css`
-   - Snippet de referencia:
-     ```css
-     :focus-visible {
-       outline: 3px solid var(--color-accent);
-       outline-offset: 2px;
-     }
-     ```
-   - O que verificar: texto nao sobrepoe, links sao clicaveis e foco e visivel.
-
-8. **Objetivo (~20 min): Validar build e handoff para API client**
-   - Descricao detalhada do objetivo: confirmar que o frontend compila e que `BK-MF1-03` tem uma pasta clara para cliente API.
-   - Justificacao: o proximo BK precisa ligar chamadas HTTP sem reorganizar o frontend.
-   - Como fazer (8.1): executar `npm run build` em `frontend/`.
-   - Como fazer (8.2): criar `src/services/api/README.md` com nota de que o cliente API sera implementado no BK seguinte.
-   - Ficheiro a rever: `frontend/package.json`
-   - Ficheiro alvo: `frontend/src/services/api/README.md`
-   - Snippet de referencia:
-     ```md
-     # API client
-     Implementado em BK-MF1-03. Nao guardar tokens em localStorage.
-     ```
-   - O que verificar: build passa e o handoff para `BK-MF1-03` esta explicito.
-
-#### Checklist de validacao (DERIVADO):
-
-**Smoke**
-- [ ] `npm run dev` abre o frontend.
-- [ ] `npm run build` termina sem erros.
-- [ ] Rotas principais renderizam placeholders.
-- [ ] Header e footer aparecem nas paginas.
-
-**Negativos**
-- [ ] Passo: 2; input/acao: abrir rota inexistente `/rota-errada`; resultado esperado: pagina 404 controlada; risco que cobre: experiencia quebrada.
-- [ ] Passo: 5; input/acao: procurar dados reais de catalogo nos placeholders; resultado esperado: nao existem dados inventados; risco que cobre: requisitos falsos.
-- [ ] Passo: 7; input/acao: navegar so com teclado; resultado esperado: foco visivel e links acessiveis; risco que cobre: UI inacessivel.
-
-**Tecnico**
-- [ ] Estrutura separa `pages`, `components`, `layouts`, `styles` e `services`.
-- [ ] Componentes base sao reutilizados.
-- [ ] Mockup nao foi copiado como dependencia pesada.
-
-**Regressao das fases anteriores**
-- [ ] Mantem a decisao de que MF0 nao implementou UI.
-- [ ] Respeita owner, apoio, prioridade, dependencias e `RNF28`.
-- [ ] Evidence segue DoD definido em MF0.
-
-**UI/mockup**
-- [ ] Rotas refletem o mockup como referencia.
-- [ ] Cores/tokens sao derivados, nao identidade final.
-- [ ] Sem pixel-perfect obrigatório.
-
-**Seguranca**
-- [ ] Nao ha tokens em `localStorage`.
-- [ ] Login e conta sao placeholders, sem autenticacao falsa.
-- [ ] Nenhum segredo foi colocado no frontend.
-
-#### Criterios de aceite:
-
-**Outputs:**
-- `frontend/` criado com React, routing, layout, paginas e componentes base.
-- Rotas principais existem como placeholders controlados.
-- Tokens visuais base estao definidos.
-
-**Verificacoes:**
-- `npm run dev` executa.
-- `npm run build` executa sem erro.
-- Rota inexistente mostra 404 controlado.
-
-**Qualidade:**
-- UI organizada por componentes.
-- Mockup usado como referencia, nao como copia cega.
-- Sem funcionalidades falsas ou dados inventados.
-
-**Continuidade:**
-- `BK-MF1-03` consegue criar API client em `src/services/api/`.
-- `MF2` consegue substituir placeholders por paginas funcionais sem mudar o router todo.
-- Componentes base podem ser reutilizados em auth, catalogo e planos.
-
-**Evidencia:**
-- PR/commit com ficheiros frontend.
-- Screenshot ou captura curta das rotas principais.
-- Output de `npm run build`.
-
-#### Evidence (para o PR/defesa):
-
-- `pr`: `A preencher no fecho do BK`
-- `proof`: `A preencher apos validacao`
-- `neg`: `A preencher apos testes negativos`
-- `files`: `frontend/package.json`, `frontend/src/App.jsx`, `frontend/src/routes/`, `frontend/src/layouts/`, `frontend/src/components/`, `frontend/src/pages/`, `frontend/src/styles/`
-- `commands`: `npm install`, `npm run dev`, `npm run build`
-- `screenshots`: `A preencher com home, catalogo placeholder, login placeholder e 404`
-- `notes`: `Mockup usado como referencia de fluxo; UI final fica para evolucao posterior`
-
-#### TODOs
-
-- TODO: confirmar com o orientador se o frontend final deve manter Vite/React ou migrar para Next.js conforme sugestao em `RNF.md`.
-- TODO: decidir se o logo do mockup pode ser reutilizado como asset oficial ou se deve ficar apenas como referencia visual.
-- TODO (BLOCKER): se ja existir frontend real, parar e adaptar sem sobrescrever.
-- FOLLOW-UP: `BK-MF1-03` deve implementar o cliente API usando `fetch` ou Axios conforme decisao final.
-- FOLLOW-UP: `MF2` deve substituir placeholders por fluxos reais de auth, catalogo e reproducao.
-- Assuncao tecnica: usar React + Vite para simplicidade pedagogica e alinhamento com mockup.
-- Decisoes dependentes de mockup: identidade visual final, iconografia e detalhe de layout.
-- Decisoes dependentes de app/codigo ainda inexistente: estrutura pode ajustar se a equipa criar base antes deste BK.
-
-## Snippet tecnico aplicavel
+4. Codigo do ficheiro `frontend/src/main.jsx`.
 
 ```jsx
-// frontend/src/routes/AppRoutes.jsx
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { App } from './App.jsx';
+import './styles/tokens.css';
+import './styles/global.css';
+
+createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>,
+);
+```
+
+5. Explicacao didatica do codigo.
+
+`createRoot` liga React ao `div#root` do HTML. `BrowserRouter` ativa navegação por URLs. Os ficheiros CSS entram aqui porque devem afetar a app toda. `React.StrictMode` ajuda a detetar problemas durante desenvolvimento.
+
+6. Codigo do ficheiro `frontend/src/App.jsx`.
+
+```jsx
+import { AppRoutes } from './routes/AppRoutes.jsx';
+
+export function App() {
+  return <AppRoutes />;
+}
+```
+
+7. Explicacao didatica do codigo.
+
+`App` fica pequeno de proposito. A sua responsabilidade e apontar para o sistema de rotas. Isto evita misturar layout, paginas e configuracao num unico ficheiro.
+
+8. Codigo do ficheiro `frontend/src/routes/AppRoutes.jsx`.
+
+```jsx
 import { Route, Routes } from 'react-router-dom';
 import { AppLayout } from '../layouts/AppLayout.jsx';
-import { HomePage } from '../pages/HomePage.jsx';
-import { CatalogPage } from '../pages/CatalogPage.jsx';
-import { LoginPage } from '../pages/LoginPage.jsx';
-import { NotFoundPage } from '../pages/NotFoundPage.jsx';
+import {
+  AccountPage,
+  AssociationsPage,
+  CatalogPage,
+  HomePage,
+  LoginPage,
+  NotFoundPage,
+  NotificationsPage,
+  PlansPage,
+  SearchPage,
+} from '../pages/pages.jsx';
 
 export function AppRoutes() {
   return (
@@ -398,6 +235,11 @@ export function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/catalogo" element={<CatalogPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/associacoes" element={<AssociationsPage />} />
+        <Route path="/planos" element={<PlansPage />} />
+        <Route path="/conta" element={<AccountPage />} />
+        <Route path="/notificacoes" element={<NotificationsPage />} />
+        <Route path="/pesquisa" element={<SearchPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AppLayout>
@@ -405,10 +247,709 @@ export function AppRoutes() {
 }
 ```
 
-## Proximo BK recomendado
+9. Explicacao didatica do codigo.
 
-`BK-MF1-03`, que deve ligar esta estrutura frontend a um cliente API com tratamento de erros e mensagens em PT-PT.
+Cada `Route` associa uma URL a uma pagina. As rotas refletem dominios reais do FaithFlix, mas nao implementam regras de negocio. Por exemplo, `/catalogo` existe para preparar a navegacao, mas o catalogo real so entra em `MF2`.
+
+10. Validacao do passo.
+
+Depois de criares layout e paginas nos passos seguintes, abrir `/`, `/catalogo`, `/login` e `/rota-errada`.
+
+11. Caso negativo ou erro comum.
+
+Erro comum: criar rotas que parecem funcionalidades completas, como `/checkout-real` ou `/streaming-drm`. Isso inventaria escopo fora dos RF e RNF.
+
+### Passo 3 - Criar layout e navegacao principal
+
+1. Objetivo do passo.
+
+Criar uma moldura comum para todas as paginas, com header, navegacao e footer.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `frontend/src/layouts/AppLayout.jsx`
+   - CRIAR: `frontend/src/components/layout/AppHeader.jsx`
+   - CRIAR: `frontend/src/components/layout/AppFooter.jsx`
+   - LOCALIZACAO: `frontend/src/layouts/` e `frontend/src/components/layout/`
+   - REVER: `RNF01`, `RNF02`, `RNF04` e `RNF38`
+
+3. Instrucoes concretas.
+
+Cria as pastas `layouts/` e `components/layout/`. O layout deve ser comum a todas as rotas para manter consistencia.
+
+4. Codigo do ficheiro `frontend/src/layouts/AppLayout.jsx`.
+
+```jsx
+import { AppFooter } from '../components/layout/AppFooter.jsx';
+import { AppHeader } from '../components/layout/AppHeader.jsx';
+
+export function AppLayout({ children }) {
+  return (
+    <div className="app-shell">
+      <AppHeader />
+      <main className="app-main">{children}</main>
+      <AppFooter />
+    </div>
+  );
+}
+```
+
+5. Explicacao didatica do codigo.
+
+`children` representa a pagina atual. Assim, o header e o footer aparecem sempre, e o conteudo muda conforme a rota. Isto evita repetir header e footer em todas as paginas.
+
+6. Codigo do ficheiro `frontend/src/components/layout/AppHeader.jsx`.
+
+```jsx
+import { NavLink } from 'react-router-dom';
+
+const navItems = [
+  { to: '/', label: 'Inicio' },
+  { to: '/catalogo', label: 'Catalogo' },
+  { to: '/pesquisa', label: 'Pesquisa' },
+  { to: '/associacoes', label: 'Associacoes' },
+  { to: '/planos', label: 'Planos' },
+  { to: '/conta', label: 'Conta' },
+];
+
+export function AppHeader() {
+  return (
+    <header className="app-header">
+      <NavLink className="brand-link" to="/" aria-label="FaithFlix - inicio">
+        <span className="brand-mark" aria-hidden="true">F</span>
+        <span className="brand-name">FaithFlix</span>
+      </NavLink>
+
+      <nav className="main-nav" aria-label="Navegacao principal">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            className={({ isActive }) => (isActive ? 'nav-link nav-link-active' : 'nav-link')}
+            to={item.to}
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+    </header>
+  );
+}
+```
+
+7. Explicacao didatica do codigo.
+
+`navItems` e um array para evitar repetir codigo. `NavLink` sabe quando uma rota esta ativa, permitindo aplicar uma classe visual. Isto melhora orientacao do utilizador e cumpre a ideia de navegacao clara do `RNF01`.
+
+8. Codigo do ficheiro `frontend/src/components/layout/AppFooter.jsx`.
+
+```jsx
+export function AppFooter() {
+  return (
+    <footer className="app-footer">
+      <span>FaithFlix PAP 2025/2026</span>
+      <span>Conteudo, comunidade e impacto solidario.</span>
+    </footer>
+  );
+}
+```
+
+9. Explicacao didatica do codigo.
+
+O footer e simples porque a app ainda esta na fundacao. Ele identifica o projeto e reforca o dominio, sem acrescentar funcionalidades falsas.
+
+10. Validacao do passo.
+
+Ao abrir qualquer rota, header e footer devem aparecer uma unica vez. A rota ativa deve ter destaque visual depois de criares o CSS.
+
+11. Caso negativo ou erro comum.
+
+Erro comum: usar `<a href>` para navegacao interna principal. Isso recarrega a pagina inteira. Com React Router, usamos `NavLink` ou `Link`.
+
+### Passo 4 - Criar componentes reutilizaveis
+
+1. Objetivo do passo.
+
+Criar pequenos blocos de UI para botoes, campos, cards e estados vazios, que serao reutilizados em MF2+.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `frontend/src/components/ui/BaseButton.jsx`
+   - CRIAR: `frontend/src/components/ui/TextField.jsx`
+   - CRIAR: `frontend/src/components/ui/ContentCard.jsx`
+   - CRIAR: `frontend/src/components/ui/EmptyState.jsx`
+   - LOCALIZACAO: `frontend/src/components/ui/`
+   - REVER: `RNF02`, `RNF04`, `RNF05`
+
+3. Instrucoes concretas.
+
+Cria a pasta `components/ui/` e adiciona os componentes. Eles devem ser genericos: nao devem saber ainda sobre base de dados, auth, streaming ou subscricoes.
+
+4. Codigo do ficheiro `frontend/src/components/ui/BaseButton.jsx`.
+
+```jsx
+export function BaseButton({
+  children,
+  type = 'button',
+  variant = 'primary',
+  disabled = false,
+  onClick,
+}) {
+  return (
+    <button
+      className={`base-button base-button-${variant}`}
+      disabled={disabled}
+      onClick={onClick}
+      type={type}
+    >
+      {children}
+    </button>
+  );
+}
+```
+
+5. Explicacao didatica do codigo.
+
+Este componente evita repetir classes e propriedades em todos os botoes. `type="button"` por defeito previne submissao acidental em formularios. `disabled` permite mostrar acoes ainda indisponiveis sem as tornar clicaveis.
+
+6. Codigo do ficheiro `frontend/src/components/ui/TextField.jsx`.
+
+```jsx
+export function TextField({ id, label, type = 'text', value = '', placeholder = '', disabled = false }) {
+  return (
+    <label className="text-field" htmlFor={id}>
+      <span>{label}</span>
+      <input
+        disabled={disabled}
+        id={id}
+        placeholder={placeholder}
+        type={type}
+        value={value}
+        readOnly
+      />
+    </label>
+  );
+}
+```
+
+7. Explicacao didatica do codigo.
+
+O `label` ligado ao `input` melhora acessibilidade. O campo esta `readOnly` porque, nesta fase, nao vamos submeter formularios reais. Em `MF2`, os formularios funcionais podem evoluir este componente.
+
+8. Codigo do ficheiro `frontend/src/components/ui/ContentCard.jsx`.
+
+```jsx
+export function ContentCard({ eyebrow, title, description }) {
+  return (
+    <article className="content-card">
+      {eyebrow ? <span className="content-card-eyebrow">{eyebrow}</span> : null}
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </article>
+  );
+}
+```
+
+9. Explicacao didatica do codigo.
+
+`ContentCard` mostra informacao textual curta. Ainda nao representa um filme real vindo da base de dados. Serve para validar estrutura visual sem inventar catalogo.
+
+10. Codigo do ficheiro `frontend/src/components/ui/EmptyState.jsx`.
+
+```jsx
+import { useId } from 'react';
+
+export function EmptyState({ title, description, children }) {
+  const headingId = useId();
+
+  return (
+    <section className="empty-state" aria-labelledby={headingId}>
+      <h2 id={headingId}>{title}</h2>
+      <p>{description}</p>
+      {children ? <div className="empty-state-actions">{children}</div> : null}
+    </section>
+  );
+}
+```
+
+11. Explicacao didatica do codigo.
+
+Um estado vazio explica ao utilizador porque uma pagina ainda nao tem conteudo. `useId()` cria um identificador unico para ligar a seccao ao seu titulo, ajudando leitores de ecra.
+
+12. Validacao do passo.
+
+Confirmar que cada componente e importado por pelo menos uma pagina no passo seguinte.
+
+13. Caso negativo ou erro comum.
+
+Erro comum: componentes com nomes vagos como `Thing` ou `Box`. Nomes claros ajudam colegas a perceber onde reutilizar cada parte.
+
+### Passo 5 - Criar paginas base sem funcionalidades falsas
+
+1. Objetivo do passo.
+
+Criar paginas para as rotas principais, deixando claro o que cada pagina vai receber nas fases futuras.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `frontend/src/pages/pages.jsx`
+   - LOCALIZACAO: `frontend/src/pages/`
+   - REVER: `docs/RF.md`, dominios de identidade, catalogo, pesquisa, subscricoes, associacoes e notificacoes
+
+3. Instrucoes concretas.
+
+Cria a pasta `pages/` e adiciona o ficheiro abaixo. As paginas devem ser honestas: mostram estrutura e intencao, mas nao apresentam dados reais inventados.
+
+4. Codigo do ficheiro `frontend/src/pages/pages.jsx`.
+
+```jsx
+import { Link } from 'react-router-dom';
+import { BaseButton } from '../components/ui/BaseButton.jsx';
+import { ContentCard } from '../components/ui/ContentCard.jsx';
+import { EmptyState } from '../components/ui/EmptyState.jsx';
+import { TextField } from '../components/ui/TextField.jsx';
+
+export function HomePage() {
+  return (
+    <section className="page-section hero-section">
+      <div className="hero-copy">
+        <p className="section-kicker">Streaming cristao com impacto social</p>
+        <h1>FaithFlix</h1>
+        <p>
+          Base inicial da experiencia web. Catalogo, streaming, perfis, subscricoes
+          e pool solidaria entram nos BKs seguintes.
+        </p>
+        <Link className="button-link" to="/catalogo">Ver estrutura do catalogo</Link>
+      </div>
+    </section>
+  );
+}
+
+export function CatalogPage() {
+  return (
+    <section className="page-section">
+      <p className="section-kicker">Catalogo</p>
+      <h1>Catalogo FaithFlix</h1>
+      <div className="card-grid">
+        <ContentCard
+          eyebrow="MF2"
+          title="Metadados de conteudo"
+          description="O CRUD de catalogo e taxonomias sera implementado nos BKs de core streaming."
+        />
+        <ContentCard
+          eyebrow="MF2"
+          title="Detalhe e reproducao"
+          description="A separacao entre metadados e reproducao sera tratada antes do player."
+        />
+      </div>
+    </section>
+  );
+}
+
+export function LoginPage() {
+  return (
+    <section className="page-section narrow-section">
+      <p className="section-kicker">Identidade</p>
+      <h1>Entrada na conta</h1>
+      <form className="form-preview" aria-label="Formulario de login ainda inativo">
+        <TextField id="email-preview" label="Email" type="email" disabled placeholder="Ativado em MF2" />
+        <TextField id="password-preview" label="Password" type="password" disabled placeholder="Ativado em MF2" />
+        <BaseButton disabled>Login disponivel em MF2</BaseButton>
+      </form>
+    </section>
+  );
+}
+
+export function AssociationsPage() {
+  return (
+    <EmptyState
+      title="Associacoes"
+      description="A candidatura e a pool solidaria entram na macrofase de monetizacao solidaria."
+    />
+  );
+}
+
+export function PlansPage() {
+  return (
+    <EmptyState
+      title="Planos"
+      description="Os planos e a subscricao serao definidos sem inventar pagamentos reais nesta fase."
+    />
+  );
+}
+
+export function AccountPage() {
+  return (
+    <EmptyState
+      title="Conta"
+      description="Perfil, consentimentos e dados pessoais dependem de autenticacao segura."
+    />
+  );
+}
+
+export function NotificationsPage() {
+  return (
+    <EmptyState
+      title="Notificacoes"
+      description="As notificacoes transacionais entram depois dos fluxos principais estarem definidos."
+    />
+  );
+}
+
+export function SearchPage() {
+  return (
+    <EmptyState
+      title="Pesquisa"
+      description="A pesquisa unificada sera ligada ao catalogo quando existirem conteudos persistidos."
+    />
+  );
+}
+
+export function NotFoundPage() {
+  return (
+    <EmptyState
+      title="Pagina nao encontrada"
+      description="Confirma o endereco ou volta ao inicio."
+    >
+      <Link className="button-link" to="/">Voltar ao inicio</Link>
+    </EmptyState>
+  );
+}
+```
+
+5. Explicacao didatica do codigo.
+
+As paginas usam os componentes criados antes. `HomePage` apresenta o produto, mas nao promete funcionalidades prontas. `CatalogPage` prepara espaco para metadados e detalhe. `LoginPage` mostra campos desativados para evitar login falso. As outras paginas usam `EmptyState` para explicar o estado atual de forma clara.
+
+6. Validacao do passo.
+
+Abrir as rotas:
+
+- `/`
+- `/catalogo`
+- `/login`
+- `/associacoes`
+- `/planos`
+- `/conta`
+- `/notificacoes`
+- `/pesquisa`
+- `/rota-errada`
+
+7. Caso negativo ou erro comum.
+
+Erro comum: preencher cards com filmes inventados como se fossem catalogo real. Isso pode contaminar os BKs de catalogo e streaming com dados sem origem.
+
+### Passo 6 - Criar estilos globais e validar a UI base
+
+1. Objetivo do passo.
+
+Dar uma base visual consistente, responsiva e acessivel ao frontend.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `frontend/src/styles/tokens.css`
+   - CRIAR: `frontend/src/styles/global.css`
+   - CRIAR: `frontend/src/services/api/README.md`
+   - LOCALIZACAO: `frontend/src/styles/` e `frontend/src/services/api/`
+   - REVER: `RNF01`, `RNF02`, `RNF03`, `RNF04`, `RNF05`, `RNF28`, `RNF38`
+
+3. Instrucoes concretas.
+
+Cria as pastas `styles/` e `services/api/`. A pasta `services/api/` ainda so recebe README, porque o cliente API entra no proximo BK.
+
+4. Codigo do ficheiro `frontend/src/styles/tokens.css`.
+
+```css
+:root {
+  color-scheme: light;
+  --color-bg: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-text: #18202b;
+  --color-muted: #5f6b7a;
+  --color-brand: #1f7a5f;
+  --color-brand-strong: #13513f;
+  --color-border: #d8dee8;
+  --color-focus: #0b5fff;
+  --shadow-soft: 0 12px 30px rgba(24, 32, 43, 0.08);
+  --radius-md: 8px;
+  --space-page: clamp(1rem, 4vw, 3rem);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+```
+
+5. Explicacao didatica do codigo.
+
+Tokens sao variaveis CSS usadas para cores, espacamentos e raios. Isto evita espalhar cores soltas por muitos ficheiros. A paleta usa verde como acento, mas mantem fundo claro e texto escuro para legibilidade.
+
+6. Codigo do ficheiro `frontend/src/styles/global.css`.
+
+```css
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header,
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem var(--space-page);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 0;
+  color: var(--color-muted);
+  flex-wrap: wrap;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.brand-mark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--color-brand);
+  color: white;
+}
+
+.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.nav-link,
+.button-link,
+.base-button {
+  min-height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.nav-link {
+  padding: 0.45rem 0.7rem;
+  color: var(--color-muted);
+}
+
+.nav-link-active {
+  background: #e7f3ee;
+  color: var(--color-brand-strong);
+}
+
+.app-main {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 2rem var(--space-page);
+}
+
+.page-section,
+.empty-state {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-section {
+  min-height: 360px;
+  align-items: center;
+}
+
+.hero-copy {
+  max-width: 720px;
+}
+
+.section-kicker,
+.content-card-eyebrow {
+  margin: 0;
+  color: var(--color-brand-strong);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 2.5rem;
+  line-height: 1.1;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.content-card,
+.empty-state,
+.form-preview {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
+}
+
+.narrow-section {
+  max-width: 520px;
+}
+
+.form-preview,
+.text-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.text-field input {
+  min-height: 2.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0 0.75rem;
+}
+
+.base-button,
+.button-link {
+  border: 0;
+  padding: 0.7rem 1rem;
+  background: var(--color-brand);
+  color: white;
+  cursor: pointer;
+}
+
+.base-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .app-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .main-nav {
+    justify-content: flex-start;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}
+```
+
+7. Explicacao didatica do codigo.
+
+O CSS cria uma base simples, responsiva e legivel. `box-sizing: border-box` torna tamanhos mais previsiveis. `:focus-visible` ajuda quem navega por teclado. `.card-grid` adapta o numero de colunas ao espaco disponivel. As classes de botao e link partilham dimensoes para evitar saltos visuais.
+
+8. Codigo do ficheiro `frontend/src/services/api/README.md`.
+
+```md
+# Cliente API FaithFlix
+
+Esta pasta fica reservada para o BK-MF1-03.
+
+Neste BK ainda nao existe integracao com backend. Nao colocar fetch direto nas paginas antes do cliente API central estar criado.
+```
+
+9. Explicacao didatica do codigo.
+
+O README impede um erro comum: cada pagina chamar `fetch` diretamente. O proximo BK vai criar um cliente API centralizado para manter erros, cookies e mensagens consistentes.
+
+10. Validacao do passo.
+
+Executar dentro de `frontend/`:
+
+```bash
+npm run build
+```
+
+Resultado esperado: build Vite concluido sem erros.
+
+11. Caso negativo ou erro comum.
+
+Erro comum: guardar tokens em `localStorage` ou `sessionStorage` nesta fase. A sessao segura sera tratada com cookies HttpOnly no backend.
+
+## Criterios de aceite (mensuraveis)
+
+- `frontend/` existe com `package.json`, `vite.config.js`, `index.html` e `src/`.
+- `npm install` e `npm run build` terminam sem erro dentro de `frontend/`.
+- As rotas `/`, `/catalogo`, `/login`, `/associacoes`, `/planos`, `/conta`, `/notificacoes`, `/pesquisa` e rota inexistente renderizam sem crash.
+- Header, footer, layout, componentes UI e estilos globais existem e sao reutilizados.
+- Login e catalogo aparecem como estados controlados, sem autenticacao falsa nem dados reais inventados.
+
+## Validacao final
+
+Executar dentro de `frontend/`:
+
+```bash
+npm install
+npm run dev
+npm run build
+```
+
+Abrir no browser as rotas principais e confirmar que nao ha erros na consola.
+
+## Evidence para PR/defesa
+
+- `pr`: referencia do PR/commit com `frontend/`.
+- `proof`: output de `npm run build` e capturas das rotas `/`, `/catalogo`, `/login` e `/rota-errada`.
+- `neg`: rota inexistente, login desativado e ausencia de tokens no storage.
+
+## Handoff
+
+- `BK-MF1-03` deve criar o cliente API em `frontend/src/services/api/` sem espalhar `fetch` pelas paginas.
+- `BK-MF2-01` pode substituir o login desativado por fluxo real quando a autenticacao existir.
+- `BK-MF2-03` e `BK-MF2-04` podem substituir o catalogo controlado por dados reais, mantendo rotas e layout.
 
 ## Changelog
 
-- `2026-05-27`: refinado para guia executavel de fundacao frontend, usando mockup como referencia nao final e mantendo metadados canonicos.
+- `2026-05-30`: reestruturado como tutorial linear, com codigo movido para passos executaveis e sem anexo tecnico no fim.
+- `2026-05-29`: acrescentada versao detalhada para frontend React/Vite, rotas, layout, componentes, estilos, validacao e evidence.

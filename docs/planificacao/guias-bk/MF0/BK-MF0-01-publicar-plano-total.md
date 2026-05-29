@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF0-02`
 - `guia_path`: `docs/planificacao/guias-bk/MF0/BK-MF0-01-publicar-plano-total.md`
-- `last_updated`: `2026-05-25`
+- `last_updated`: `2026-05-29`
 
 ## Bloco pedagogico (obrigatorio)
 
@@ -48,6 +48,10 @@ A fase foi detalhada sem mockup de UI, porque `MOCKUP_PATH` está definido como 
 - Cria uma fonte de verdade para decidir se uma alteração futura é correção, melhoria ou mudança de contrato.
 - Desbloqueia `BK-MF0-02`, porque responsabilidades só fazem sentido depois de existir um plano total aceite.
 - Prepara `MF1`, onde a stack derivada dos documentos será aplicada: Node.js LTS, Express modular, frontend React/Next.js e MongoDB Atlas, sem criar dependências novas nesta fase.
+
+##### Papel deste BK no produto final
+
+Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas as funcionalidades futuras. O catálogo, o streaming, os perfis, a subscrição, a pool solidária, a privacidade e as evidências PAP só devem avançar depois de a equipa saber em que macrofase cada domínio entra, que documentos mandam e que gates validam o trabalho.
 
 ##### O que entra (scope)
 
@@ -111,6 +115,12 @@ A fase foi detalhada sem mockup de UI, porque `MOCKUP_PATH` está definido como 
 - Impacto em segurança/testes/UI: preserva RNF de segurança e gates; UI fica sem decisão final por falta de mockup.
 - Handoff para o próximo BK: entregar a `BK-MF0-02` lista de macro fases, contratos canónicos e critérios de saída.
 
+#### Verificacao de scaffold/codigo real (DERIVADO):
+
+- Resultado esperado nesta fase: nao existe `backend/`, `frontend/`, `apps/api`, `apps/web`, `server/`, `client/` ou outro scaffold real da app final criado por este BK.
+- O diretorio `mockup/` pode existir como referencia visual/documental, mas nao e a aplicacao final nem deve ser alterado neste BK.
+- Se a equipa encontrar scaffold real antes de executar este BK, deve apenas registar o facto em evidence e abrir `Bloqueio / decisao necessaria` para o orientador decidir se esse scaffold e valido. Nao se deve apagar, reestruturar ou reaproveitar codigo em `MF0`.
+
 #### Pre-leitura minima (10-15 min) (DERIVADO):
 
 - `README.md`: visão geral, domínio FaithFlix e stack recomendada.
@@ -150,7 +160,7 @@ A fase foi detalhada sem mockup de UI, porque `MOCKUP_PATH` está definido como 
 0. **Objetivo (~10 min): Confirmar ponto de partida**
    - Descricao detalhada do objetivo: abrir o repositório e confirmar que este BK é o primeiro da `MF0`.
    - Justificacao: um BK sem dependências deve estabelecer baseline antes de qualquer outro trabalho.
-   - Como fazer (0.0): criar a estrutura inicial do projeto com duas áreas principais: `apps/api` para o backend/API e `apps/web` para o frontend. Esta separação ajuda a manter claro o que corre no servidor e o que pertence à interface do utilizador.
+   - Como fazer (0.0): confirmar que a criacao de estrutura real da aplicacao fica reservada para `BK-MF1-01` e `BK-MF1-02`. Neste BK nao criar `apps/api`, `apps/web`, `backend/`, `frontend/`, `server/`, `client/` nem qualquer pasta tecnica da app.
    - Como fazer (0.1): rever a linha `BK-MF0-01` em `BACKLOG-MVP.md`.
    - Como fazer (0.2): confirmar que `MF-VIEWS.md` lista `BK-MF0-01` como primeiro item da sequência.
    - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
@@ -249,6 +259,7 @@ A fase foi detalhada sem mockup de UI, porque `MOCKUP_PATH` está definido como 
 - [ ] Passo: 2; input/acao: comparar contagem de BK no plano e backlog; resultado esperado: ambos indicam `55/55`; risco que cobre: planeamento com universo errado.
 - [ ] Passo: 3; input/acao: procurar `MF0` tratada como produto funcional; resultado esperado: `MF0` aparece como kickoff/governance; risco que cobre: alunos começarem implementação fora de ordem.
 - [ ] Passo: 4; input/acao: verificar caminhos de contratos canónicos; resultado esperado: todos existem; risco que cobre: fonte de verdade quebrada.
+- [ ] Passo: 0; input/acao: procurar instrucoes para criar `apps/api`, `apps/web`, `backend/`, `frontend/` ou comandos de scaffold em `MF0`; resultado esperado: nenhuma instrucao de criacao tecnica; risco que cobre: implementacao antecipada antes de `MF1`.
 
 **Tecnico**
 - [ ] O plano mantém a stack apenas como decisão/assunção de alto nível, sem comandos de instalação.
@@ -275,6 +286,7 @@ A fase foi detalhada sem mockup de UI, porque `MOCKUP_PATH` está definido como 
 - Plano e backlog indicam `55/55` BK ativos.
 - `MF0` aparece como kickoff/governance.
 - Gates `S4/S8/S12` existem e têm critérios.
+- Nao ha criacao de scaffold tecnico no fecho deste BK.
 
 **Qualidade:**
 - Nenhum RF/RNF, owner, prioridade ou dependência é alterado neste BK.
@@ -326,3 +338,4 @@ CHECK BK-MF0-01
 
 - `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
 - `2026-05-25`: refinado para guia executável de governance da MF0, sem tratar FaithFlix MF0 como produto funcional.
+- `2026-05-29`: removida instrucao indevida de scaffold tecnico em `MF0` e adicionada verificacao explicita para reservar criacao de app para `MF1`.

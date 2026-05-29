@@ -14,389 +14,477 @@
 - `rf_rnf`: `RNF13, RNF15`
 - `fase_documental`: `Fase 1`
 - `sprint`: `S02`
-- `core_or_reforco`: `Reforco`
+- `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF1-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF1/BK-MF1-04-sessao-segura-backend-cookies-auth-base.md`
-- `last_updated`: `2026-05-27`
+- `last_updated`: `2026-05-30`
 
 ## Bloco pedagogico (obrigatorio)
 
-Este BK ensina a preparar a base de sessao segura no backend FaithFlix. A equipa vai criar helpers de cookies, middleware de sessao e rotas tecnicas minimas para verificar o estado da sessao, sem implementar ainda registo, login, passwords ou roles.
+Este BK prepara a base de sessao segura no backend. Ainda nao cria registo, login, passwords ou utilizadores reais. O objetivo e deixar a app pronta para, em `BK-MF2-01`, criar autenticacao funcional usando cookies HttpOnly em vez de guardar tokens no browser.
 
-O objetivo pedagogico e perceber porque cookies HttpOnly sao mais seguros do que guardar tokens em `localStorage`, e como o backend deve preparar a sessao antes de construir autenticação funcional em `MF2`.
+Para alunos do 12.º ano, a ideia principal e: uma sessao e a forma de o servidor reconhecer um utilizador depois do login. Mas nesta fase ainda nao ha login. Por isso, criamos o caminho seguro, devolvemos `401` quando nao ha sessao valida e garantimos que cookies falsos nao autenticam ninguem.
+
+### O que entra
+
+- Configuracao de cookie de sessao.
+- Parser simples de cookies.
+- Middleware `attachSession`.
+- Endpoints `GET /api/session/me` e `POST /api/session/logout`.
+- Integracao com `createApp()` do backend.
+
+### O que nao entra
+
+- Registo, login ou recuperacao de password.
+- Hash de passwords.
+- JWT definitivo ou token opaco definitivo.
+- Base de dados de utilizadores.
+- Perfis reais, papeis administrativos ou consentimentos.
+
+### Check de compreensao
+
+- [ ] Sei explicar porque cookies HttpOnly sao mais seguros que tokens em `localStorage`.
+- [ ] Sei explicar porque cookie falso deve devolver `401`.
+- [ ] Sei onde `BK-MF2-01` vai reutilizar esta base.
 
 ## Bloco operacional (obrigatorio)
 
-O trabalho operacional e adicionar ao backend a estrutura `auth/session`, com configuracao de cookie, leitura segura do cookie de sessao, resposta 401 controlada e logout idempotente. O BK fecha contratos para `BK-MF2-01`, mas nao entrega login real.
+### Pre-condicoes
 
-#### BK-MF1-04 - Sessao segura backend (cookies e auth base)
+- `BK-MF1-01` executado, com `backend/src/app.js` e `createApp()` disponiveis.
+- `BK-MF1-03` deve usar `credentials: 'include'` no frontend.
+- Confirmar `RNF13` e `RNF15` em `docs/RNF.md`.
+- Confirmar que nao existe autenticacao real no backend. Se ja existir, adaptar sem apagar.
 
-##### O que vamos fazer neste BK
+### Guia de execucao (passo-a-passo)
 
-Neste BK vamos preparar a base de sessao autenticada do backend. A aplicacao passara a saber qual e o nome do cookie de sessao, que flags deve usar, como ler o cookie recebido e como responder quando nao existe sessao valida.
+### Passo 1 - Adicionar configuracao de cookie de sessao
 
-Tambem vamos criar rotas tecnicas de sessao: `GET /api/session/me`, que devolve 401 enquanto nao houver sessao real, e `POST /api/session/logout`, que limpa o cookie de forma segura. Estes endpoints sao derivados de `RNF15` e da preparacao para `RF01/RF02`, mas nao implementam registo nem login.
+1. Objetivo do passo.
 
-`RNF13` exige comunicacao segura. Em local pode usar `http://localhost`, mas em producao os cookies devem usar `Secure` e o deploy deve estar atras de HTTPS. Este BK documenta e prepara essa diferenca.
+Definir como o cookie de sessao se chama e que flags de seguranca deve ter.
 
-##### Porque e que isto e importante
+2. Ficheiros envolvidos:
+   - EDITAR: `backend/.env.example`
+   - CRIAR: `backend/src/config/session.js`
+   - LOCALIZACAO: `backend/` e `backend/src/config/`
+   - REVER: `backend/src/config/env.js`, `RNF13`, `RNF15`
 
-- Evita que a equipa guarde tokens no frontend.
-- Cria contrato de sessao para `BK-MF2-01`.
-- Permite ao cliente API de `BK-MF1-03` enviar cookies com `credentials: include`.
-- Define comportamento claro para utilizador nao autenticado.
-- Reduz risco de XSS roubar tokens de sessao.
+3. Instrucoes concretas.
 
-##### O que entra (scope)
+Substitui `backend/.env.example` pelo conteudo abaixo para incluir `SESSION_COOKIE_NAME`. Depois cria `session.js`.
 
-- Configurar nome e flags do cookie de sessao.
-- Criar helper `getSessionCookieOptions()`.
-- Criar middleware para ler cookie de sessao.
-- Criar `GET /api/session/me` com resposta 401 quando nao autenticado.
-- Criar `POST /api/session/logout` para limpar cookie.
-- Documentar contrato para login futuro.
-- Validar negativos de cookie ausente, falso e configuracao insegura.
+4. Codigo do ficheiro `backend/.env.example`.
 
-##### O que nao entra (scope-out)
+```env
+NODE_ENV=development
+PORT=3000
+SERVICE_NAME=faithflix-api
+SESSION_COOKIE_NAME=faithflix_session
+```
 
-- Nao entra registo de utilizadores.
-- Nao entra login com email/password.
-- Nao entra hashing de passwords.
-- Nao entra base de dados de sessoes ou utilizadores.
-- Nao entra roles `admin`, `editor`, `moderador` ou `utilizador`.
-- Nao entra CSRF completo, embora fique registado como follow-up de seguranca.
+5. Explicacao didatica do codigo.
 
-##### Como saber que isto ficou bem
+`SESSION_COOKIE_NAME` evita espalhar o nome do cookie pelo codigo. Se o nome mudar, muda num sitio. O valor nao e segredo; e apenas o nome do cookie.
 
-- Rotas de sessao existem e respondem JSON.
-- Sem cookie, `GET /api/session/me` responde 401.
-- Cookie falso nao autentica utilizador.
-- Logout limpa o cookie com as mesmas flags base.
-- O contrato esta pronto para `BK-MF2-01` criar login real.
-
-#### Metadados do BK (CANONICO/DERIVADO):
-
-- Prioridade: `P0` (CANONICO, `BACKLOG-MVP.md`)
-- Estado: `TODO` (CANONICO, `BACKLOG-MVP.md`)
-- Esforco: `M` (CANONICO, `BACKLOG-MVP.md`)
-- macro: `MF1` (CANONICO, `BACKLOG-MVP.md`)
-- Owner: `Matheus` (CANONICO, `BACKLOG-MVP.md`)
-- Apoio: `Kaue` (CANONICO, `BACKLOG-MVP.md`)
-- Dependencias (BK IDs): `BK-MF1-01` (CANONICO, `BACKLOG-MVP.md`)
-- Pre-condicoes: backend Express modular criado e `src/app.js` disponivel para montar rotas auth (DERIVADO)
-- Ref. Plano: `MF-VIEWS > MF1`, `PLANO-SPRINTS > Sprint 2`, `MATRIZ-CANONICA-BK > RNF13/RNF15` (CANONICO)
-- Flow ID: `MF1-backend-secure-session-04` (DERIVADO)
-- Fonte de verdade: `docs/RNF.md`
-- Fonte de verdade: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-- Fonte de verdade: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
-- Descricao: preparar sessao segura backend com cookies HttpOnly e contrato base de auth, sem autenticação funcional completa (DERIVADO)
-
-#### O que vamos fazer neste BK (DERIVADO):
-
-- Criar configuracao de cookie de sessao.
-- Criar parser simples e controlado para cookies recebidos.
-- Criar middleware `attachSession`.
-- Criar service base de sessao sem persistencia.
-- Criar controller e routes de sessao.
-- Montar rotas `auth/session` em `src/app.js`.
-- Documentar handoff para registo/login em `MF2`.
-
-#### Estado, ficheiros e impacto (DERIVADO):
-
-- Estado esperado antes do BK: backend modular existe, mas nao ha base de sessao.
-- Estado esperado depois do BK: backend sabe lidar com cookie de sessao, responde 401 controlado e consegue limpar cookie.
-- Ficheiros a criar: `backend/src/config/session.js`, `backend/src/utils/cookies.js`, `backend/src/middlewares/session.middleware.js`, `backend/src/modules/auth/auth.routes.js`, `backend/src/modules/auth/session.controller.js`, `backend/src/modules/auth/session.service.js`.
-- Ficheiros a editar: `backend/src/app.js`, `backend/.env.example`, `backend/README.md`.
-- Ficheiros a rever: `frontend/src/services/api/apiClient.js`, `docs/RNF.md`, guia `BK-MF1-03`.
-- Dependencias de BK anteriores e uso: reutiliza `BK-MF1-01` para estrutura Express e middlewares; considera `BK-MF1-03` para compatibilidade de cookies, sem ser dependencia canonica deste BK.
-- Impacto na arquitetura da app: cria modulo `auth` base para `MF2`.
-- Impacto frontend: o cliente API deve continuar com `credentials: include`.
-- Impacto backend: adiciona camada de sessao, cookie options, middleware e rotas.
-- Impacto dados: nenhum armazenamento persistente ainda.
-- Impacto seguranca: melhora postura contra roubo de tokens por XSS; prepara HTTPS/secure cookies.
-- Impacto testes: fornece negativos para `BK-MF1-06`.
-- Impacto UI: nenhum direto.
-- Handoff para o proximo BK: `BK-MF1-05` deve logar pedidos sem expor cookies; `BK-MF2-01` deve criar login reutilizando estes helpers.
-
-#### Pre-leitura minima (10-15 min) (DERIVADO):
-
-- `docs/RNF.md`: `RNF13`, `RNF15`, `RNF30`.
-- Guia `BK-MF1-01`: estrutura backend e middleware de erro.
-- Guia `BK-MF1-03`: cliente API com `credentials: include`.
-- `docs/RF.md`: contexto futuro de registo/login/recuperacao, sem implementar ainda.
-- `backend/src/app.js`: ponto onde as rotas auth serao montadas.
-
-#### Glossario (rapido) (DERIVADO):
-
-- Sessao: estado que identifica um utilizador autenticado entre pedidos.
-- Cookie: pequeno valor guardado pelo browser e enviado ao servidor.
-- HttpOnly: flag que impede JavaScript de ler o cookie.
-- Secure: flag que so envia cookie por HTTPS.
-- SameSite: flag que limita envio de cookies em navegacao cross-site.
-- XSS: ataque em que JavaScript malicioso corre no browser da vitima.
-- CSRF: ataque que tenta usar cookies da vitima para submeter pedidos indesejados.
-- Middleware de sessao: codigo que lê cookie e prepara `req.session`.
-- 401 Unauthorized: resposta para utilizador nao autenticado.
-- Logout idempotente: chamar logout varias vezes tem o mesmo resultado seguro.
-
-#### Conceitos teoricos essenciais (DERIVADO):
-
-**Cookies HttpOnly vs localStorage.** Tokens em `localStorage` podem ser lidos por JavaScript se houver XSS. Cookies HttpOnly nao podem ser lidos por JavaScript, reduzindo o impacto desse ataque. Ainda assim, cookies exigem cuidados com CSRF.
-
-**Flags de cookie.** `httpOnly: true` protege contra leitura por JS. `secure: true` deve estar ativo em producao com HTTPS. `sameSite: 'lax'` e um equilibrio razoavel para apps web sem integrações externas complexas nesta fase.
-
-**Sessao base nao e login.** Este BK prepara o caminho da sessao. Login real precisa validar credenciais, fazer hash de passwords, criar token/sessao e persistir dados, o que pertence a `BK-MF2-01`.
-
-**Middleware de auth.** Um middleware pode ler o cookie antes do controller. Se a sessao for valida, adiciona `req.session`. Se nao for, deixa `req.session = null` e controllers protegidos respondem 401.
-
-**CSRF.** Cookies sao enviados automaticamente pelo browser. Em fases futuras, pedidos que alteram dados devem considerar token CSRF, `SameSite` adequado e validacao de origem.
-
-**Erros comuns.** Criar endpoint `dev-login`, aceitar qualquer cookie como autenticado, colocar segredo de sessao no repo, ou devolver o valor do cookie em logs/respostas.
-
-#### Guia de execucao (passo-a-passo) (DERIVADO):
-
-0. **Objetivo (~10 min): Confirmar backend base**
-   - Descricao detalhada do objetivo: garantir que a app Express modular de `BK-MF1-01` existe.
-   - Justificacao: este BK monta rotas e middlewares nessa base, nao cria backend do zero.
-   - Como fazer (0.1): abrir `backend/src/app.js`.
-   - Como fazer (0.2): confirmar que existem `middlewares/` e `modules/`.
-   - Ficheiro a rever: `backend/src/app.js`
-   - Ficheiro alvo: nenhum ainda.
-   - Snippet de referencia: `export function createApp()`
-   - O que verificar: existe ponto claro para `app.use('/api/session', authRouter)`.
-
-1. **Objetivo (~20 min): Definir configuracao de sessao**
-   - Descricao detalhada do objetivo: centralizar nome do cookie e comportamento por ambiente.
-   - Justificacao: flags de cookie nao devem ser repetidas em controllers.
-   - Como fazer (1.1): atualizar `.env.example` com `SESSION_COOKIE_NAME=faithflix_session`.
-   - Como fazer (1.2): criar `backend/src/config/session.js`.
-   - Ficheiro a rever: `backend/src/config/env.js`
-   - Ficheiro alvo: `backend/src/config/session.js`
-   - Snippet de referencia:
-     ```js
-     export function getSessionCookieOptions() {
-       return {
-         httpOnly: true,
-         secure: env.nodeEnv === 'production',
-         sameSite: 'lax',
-         path: '/',
-       };
-     }
-     ```
-   - O que verificar: `secure` fica true em producao e false apenas em local.
-
-2. **Objetivo (~20 min): Criar utilitario para ler cookies**
-   - Descricao detalhada do objetivo: extrair o valor de um cookie a partir do header `Cookie`.
-   - Justificacao: evitar dependencia nova se o caso e simples e controlado.
-   - Como fazer (2.1): criar `backend/src/utils/cookies.js`.
-   - Como fazer (2.2): implementar `getCookieValue(cookieHeader, cookieName)`.
-   - Ficheiro a rever: nenhum.
-   - Ficheiro alvo: `backend/src/utils/cookies.js`
-   - Snippet de referencia:
-     ```js
-     export function getCookieValue(cookieHeader = '', name) {
-       return cookieHeader.split(';').map((part) => part.trim()).find((part) => part.startsWith(`${name}=`))?.split('=')[1] ?? null;
-     }
-     ```
-   - O que verificar: cookie ausente devolve `null`, nao erro.
-
-3. **Objetivo (~25 min): Criar service base de sessao**
-   - Descricao detalhada do objetivo: preparar funcoes de sessao sem persistencia real.
-   - Justificacao: separa contrato de auth da futura base de dados.
-   - Como fazer (3.1): criar `session.service.js`.
-   - Como fazer (3.2): implementar `getSessionUser(sessionToken)` a devolver `null` ate `MF2`.
-   - Ficheiro a rever: `docs/RF.md`
-   - Ficheiro alvo: `backend/src/modules/auth/session.service.js`
-   - Snippet de referencia:
-     ```js
-     export async function getSessionUser(_sessionToken) {
-       // MF2: validar token/sessao contra store real.
-       return null;
-     }
-     ```
-   - O que verificar: nao ha user fake autenticado.
-
-4. **Objetivo (~30 min): Criar middleware de sessao**
-   - Descricao detalhada do objetivo: ler cookie e anexar resultado ao request.
-   - Justificacao: controllers futuros nao devem parsear cookies manualmente.
-   - Como fazer (4.1): criar `attachSession`.
-   - Como fazer (4.2): montar middleware antes das rotas protegidas.
-   - Ficheiro a rever: `backend/src/middlewares/error.middleware.js`
-   - Ficheiro alvo: `backend/src/middlewares/session.middleware.js`
-   - Snippet de referencia:
-     ```js
-     export async function attachSession(req, _res, next) {
-       const token = getCookieValue(req.headers.cookie, sessionConfig.cookieName);
-       req.session = { token, user: await getSessionUser(token) };
-       next();
-     }
-     ```
-   - O que verificar: cookie falso nao cria `user`.
-
-5. **Objetivo (~30 min): Criar controller de sessao**
-   - Descricao detalhada do objetivo: responder ao estado da sessao e limpar cookie no logout.
-   - Justificacao: o frontend precisa de comportamento previsivel para 401/logout.
-   - Como fazer (5.1): criar `getCurrentSession`.
-   - Como fazer (5.2): criar `logout` usando `res.clearCookie` com as mesmas options.
-   - Ficheiro a rever: `frontend/src/services/api/apiClient.js`
-   - Ficheiro alvo: `backend/src/modules/auth/session.controller.js`
-   - Snippet de referencia:
-     ```js
-     if (!req.session?.user) {
-       return res.status(401).json({ message: 'Sessao nao autenticada.' });
-     }
-     ```
-   - O que verificar: sem cookie responde 401, nao 500.
-
-6. **Objetivo (~25 min): Montar rotas de sessao**
-   - Descricao detalhada do objetivo: expor endpoints tecnicos de sessao.
-   - Justificacao: `MF2` precisa de rotas e nomes estaveis para auth.
-   - Como fazer (6.1): criar `auth.routes.js`.
-   - Como fazer (6.2): montar em `app.use('/api/session', authRouter)`.
-   - Ficheiro a rever: `backend/src/app.js`
-   - Ficheiro alvo: `backend/src/modules/auth/auth.routes.js`
-   - Snippet de referencia:
-     ```js
-     router.get('/me', getCurrentSession);
-     router.post('/logout', logout);
-     ```
-   - O que verificar: `GET /api/session/me` e `POST /api/session/logout` respondem JSON.
-
-7. **Objetivo (~20 min): Documentar contrato para MF2**
-   - Descricao detalhada do objetivo: explicar o que login futuro deve reutilizar.
-   - Justificacao: evita que `BK-MF2-01` crie outro cookie ou outro formato de sessao.
-   - Como fazer (7.1): atualizar `backend/README.md` com secao "Sessao".
-   - Como fazer (7.2): listar cookie name, flags, endpoints e scope-out.
-   - Ficheiro a rever: `backend/README.md`
-   - Ficheiro alvo: `backend/README.md`
-   - Snippet de referencia:
-     ```md
-     Login real entra em BK-MF2-01 e deve reutilizar `getSessionCookieOptions()`.
-     ```
-   - O que verificar: README nao promete autenticação completa.
-
-8. **Objetivo (~25 min): Validar seguranca e handoff**
-   - Descricao detalhada do objetivo: executar smoke e negativos de sessao.
-   - Justificacao: sessao e uma area critica; P0 exige prova e negativos.
-   - Como fazer (8.1): testar `GET /api/session/me` sem cookie e com cookie falso.
-   - Como fazer (8.2): testar `POST /api/session/logout` e registar headers `Set-Cookie`.
-   - Ficheiro a rever: `backend/src/config/session.js`
-   - Ficheiro alvo: evidence do PR/defesa
-   - Snippet de referencia:
-     ```bash
-     curl -i http://localhost:3000/api/session/me
-     curl -i --cookie "faithflix_session=falso" http://localhost:3000/api/session/me
-     ```
-   - O que verificar: 401 controlado, cookie falso rejeitado, flags documentadas, sem logs de cookie.
-
-#### Checklist de validacao (DERIVADO):
-
-**Smoke**
-- [ ] Backend arranca.
-- [ ] `GET /api/session/me` responde 401 sem cookie.
-- [ ] `POST /api/session/logout` responde sucesso/idempotente.
-- [ ] Configuracao de cookie esta centralizada.
-
-**Negativos**
-- [ ] Passo: 8; input/acao: sem cookie em `/api/session/me`; resultado esperado: 401 JSON; risco que cobre: utilizador anonimo tratado como autenticado.
-- [ ] Passo: 8; input/acao: cookie falso `faithflix_session=falso`; resultado esperado: 401 JSON; risco que cobre: confiar em token nao validado.
-- [ ] Passo: 1; input/acao: simular `NODE_ENV=production`; resultado esperado: `secure: true`; risco que cobre: cookie enviado sem HTTPS em producao.
-
-**Tecnico**
-- [ ] Helpers de cookie ficam em `config/session.js` e `utils/cookies.js`.
-- [ ] Controllers nao repetem flags de cookie.
-- [ ] `session.service.js` nao cria utilizador fake.
-- [ ] Nao existem passwords, roles ou BD neste BK.
-
-**Regressao das fases anteriores**
-- [ ] Estrutura de `BK-MF1-01` foi preservada.
-- [ ] Cliente API de `BK-MF1-03` continua compativel com cookies.
-- [ ] Metadados canonicos nao foram alterados.
-
-**UI/mockup**
-- [ ] Nao aplicavel diretamente; login visual do mockup continua placeholder.
-
-**Seguranca**
-- [ ] Cookie configurado com `httpOnly`.
-- [ ] `secure` ativo em producao.
-- [ ] `sameSite` definido.
-- [ ] Logs/respostas nao incluem valor do cookie.
-
-#### Criterios de aceite:
-
-**Outputs:**
-- Modulo `auth/session` criado.
-- Middleware de sessao criado.
-- Rotas `GET /api/session/me` e `POST /api/session/logout` disponiveis.
-- Cookie options centralizadas.
-
-**Verificacoes:**
-- Sem cookie: 401.
-- Cookie falso: 401.
-- Logout: limpa cookie sem erro.
-- Em producao: cookie `secure`.
-
-**Qualidade:**
-- Sem autenticação falsa.
-- Sem segredos no repositorio.
-- Sem armazenamento inseguro no frontend.
-
-**Continuidade:**
-- `BK-MF2-01` reutiliza cookie name, options e middleware.
-- `BK-MF1-05` adiciona logs sem expor cookies.
-- `BK-MF1-06` consegue testar 401 e logout.
-
-**Evidencia:**
-- PR/commit com modulo auth.
-- Outputs `curl` dos casos validos/negativos.
-- Nota de configuracao `NODE_ENV=production`.
-
-#### Evidence (para o PR/defesa):
-
-- `pr`: `A preencher no fecho do BK`
-- `proof`: `A preencher apos validacao`
-- `neg`: `A preencher apos testes negativos`
-- `files`: `backend/src/config/session.js`, `backend/src/utils/cookies.js`, `backend/src/middlewares/session.middleware.js`, `backend/src/modules/auth/`, `backend/src/app.js`
-- `commands`: `npm run dev`, `curl -i http://localhost:3000/api/session/me`, `curl -i --cookie "faithflix_session=falso" http://localhost:3000/api/session/me`
-- `screenshots`: `Nao aplicavel; usar headers/respostas de terminal`
-- `notes`: `Sessao base criada sem login real; login entra em BK-MF2-01`
-
-#### TODOs
-
-- TODO: decidir em `MF2` se a sessao usa JWT assinado ou token opaco guardado no servidor.
-- TODO: implementar hashing de passwords apenas no BK de autenticação funcional.
-- TODO: avaliar protecao CSRF antes de formularios autenticados que alteram dados.
-- TODO (BLOCKER): se o deploy final nao suportar HTTPS, `RNF13/RNF15` ficam bloqueados para producao.
-- FOLLOW-UP: `BK-MF2-01` deve criar login usando `res.cookie(sessionConfig.cookieName, token, getSessionCookieOptions())`.
-- FOLLOW-UP: `BK-MF1-05` deve mascarar cookies em logs.
-- Assuncao tecnica: `SameSite=Lax` e suficiente para MVP sem integrações externas complexas; rever se houver gateway/SSO.
-- Decisoes dependentes de mockup: nenhuma neste BK.
-- Decisoes dependentes de app/codigo ainda inexistente: store real de sessao e modelo de utilizador.
-
-## Snippet tecnico aplicavel
+6. Codigo do ficheiro `backend/src/config/session.js`.
 
 ```js
-// backend/src/modules/auth/session.controller.js
-import { sessionConfig, getSessionCookieOptions } from '../../config/session.js';
+import { isProduction } from './env.js';
 
-export function getCurrentSession(req, res) {
-  if (!req.session?.user) {
-    return res.status(401).json({ message: 'Sessao nao autenticada.' });
-  }
+const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 
-  return res.json({ user: req.session.user });
-}
+export const sessionConfig = {
+  cookieName: process.env.SESSION_COOKIE_NAME ?? 'faithflix_session',
+  cookieMaxAgeMs: ONE_DAY_IN_MS,
+};
 
-export function logout(_req, res) {
-  res.clearCookie(sessionConfig.cookieName, getSessionCookieOptions());
-  return res.json({ message: 'Sessao terminada.' });
+export function getSessionCookieOptions(overrides = {}) {
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: sessionConfig.cookieMaxAgeMs,
+    ...overrides,
+  };
 }
 ```
 
-## Proximo BK recomendado
+7. Explicacao didatica do codigo.
 
-`BK-MF1-05`, para health-check e logging estruturado sem expor cookies ou dados sensiveis. Handoff funcional forte para `BK-MF2-01`.
+`httpOnly: true` impede JavaScript no browser de ler o cookie. `secure: isProduction` exige HTTPS em producao. `sameSite: 'lax'` reduz risco de alguns ataques CSRF sem bloquear navegacao normal. `path: '/'` permite que o cookie seja enviado para toda a API.
+
+8. Validacao do passo.
+
+Executar dentro de `backend/`:
+
+```bash
+node -e "import('./src/config/session.js').then(({ sessionConfig }) => console.log(sessionConfig.cookieName))"
+```
+
+Resultado esperado: `faithflix_session`.
+
+9. Caso negativo ou erro comum.
+
+Erro comum: criar cookie sem `HttpOnly`. Isso permitiria que scripts no browser lessem o token de sessao.
+
+### Passo 2 - Criar utilitarios de cookie e service de sessao base
+
+1. Objetivo do passo.
+
+Ler cookies de forma defensiva e criar um service que, nesta fase, nunca autentica cookies falsos.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `backend/src/utils/cookies.js`
+   - CRIAR: `backend/src/modules/auth/session.service.js`
+   - LOCALIZACAO: `backend/src/utils/` e `backend/src/modules/auth/`
+   - REVER: `BK-MF2-01`, porque login real vai substituir a resolucao de sessao
+
+3. Instrucoes concretas.
+
+Cria a pasta `backend/src/modules/auth/`. O service fica intencionalmente conservador: enquanto nao existir login real, nenhum token deve ser considerado valido.
+
+4. Codigo do ficheiro `backend/src/utils/cookies.js`.
+
+```js
+import { getSessionCookieOptions, sessionConfig } from '../config/session.js';
+
+export function parseCookies(cookieHeader = '') {
+  return cookieHeader
+    .split(';')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce((cookies, part) => {
+      const separatorIndex = part.indexOf('=');
+
+      if (separatorIndex === -1) {
+        return cookies;
+      }
+
+      const key = part.slice(0, separatorIndex);
+      const value = part.slice(separatorIndex + 1);
+
+      try {
+        cookies[key] = decodeURIComponent(value);
+      } catch {
+        cookies[key] = value;
+      }
+
+      return cookies;
+    }, {});
+}
+
+export function readCookie(req, name) {
+  return parseCookies(req.headers.cookie)[name];
+}
+
+export function clearSessionCookie(res) {
+  res.cookie(sessionConfig.cookieName, '', getSessionCookieOptions({ maxAge: 0 }));
+}
+```
+
+5. Explicacao didatica do codigo.
+
+`parseCookies` transforma o header `Cookie` num objeto JavaScript. O `try/catch` evita que um cookie mal codificado parta a API. `clearSessionCookie` usa as mesmas flags de seguranca do cookie original, garantindo que o browser sabe qual cookie deve expirar.
+
+6. Codigo do ficheiro `backend/src/modules/auth/session.service.js`.
+
+```js
+export async function resolveSession(sessionToken) {
+  if (!sessionToken) {
+    return null;
+  }
+
+  return null;
+}
+```
+
+7. Explicacao didatica do codigo.
+
+Este service parece pequeno, mas e uma decisao de seguranca. Como ainda nao existe login nem base de dados, qualquer token recebido deve ser tratado como invalido. Em `BK-MF2-01`, este ficheiro pode passar a validar tokens assinados ou tokens opacos guardados no servidor.
+
+8. Validacao do passo.
+
+Confirmar que `resolveSession('qualquer-coisa')` devolve `null`.
+
+9. Caso negativo ou erro comum.
+
+Erro comum: aceitar qualquer cookie como utilizador autenticado para "testar mais rapido". Isso cria uma falha grave de seguranca.
+
+### Passo 3 - Criar middleware e controller de sessao
+
+1. Objetivo do passo.
+
+Anexar informacao de sessao a cada pedido e expor endpoints tecnicos para verificar e terminar sessao.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `backend/src/middlewares/session.middleware.js`
+   - CRIAR: `backend/src/modules/auth/session.controller.js`
+   - CRIAR: `backend/src/modules/auth/auth.routes.js`
+   - LOCALIZACAO: `backend/src/middlewares/` e `backend/src/modules/auth/`
+   - REVER: `apiClient.js`, porque o frontend envia cookies com `credentials: 'include'`
+
+3. Instrucoes concretas.
+
+Cria o middleware primeiro, depois controller e routes. O endpoint `me` deve devolver `401` enquanto nao existir sessao valida.
+
+4. Codigo do ficheiro `backend/src/middlewares/session.middleware.js`.
+
+```js
+import { sessionConfig } from '../config/session.js';
+import { resolveSession } from '../modules/auth/session.service.js';
+import { readCookie } from '../utils/cookies.js';
+
+export async function attachSession(req, _res, next) {
+  try {
+    const token = readCookie(req, sessionConfig.cookieName);
+    const user = await resolveSession(token);
+
+    req.session = {
+      token,
+      user,
+      isAuthenticated: Boolean(user),
+    };
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+```
+
+5. Explicacao didatica do codigo.
+
+O middleware corre antes das rotas. Ele procura o cookie, tenta resolver a sessao e guarda o resultado em `req.session`. Mesmo quando nao existe utilizador, a rota fica com uma estrutura previsivel: `isAuthenticated` sera `false`.
+
+6. Codigo do ficheiro `backend/src/modules/auth/session.controller.js`.
+
+```js
+import { clearSessionCookie } from '../../utils/cookies.js';
+
+export function getCurrentSession(req, res) {
+  if (!req.session?.isAuthenticated) {
+    return res.status(401).json({ message: 'Sessao nao autenticada.' });
+  }
+
+  return res.status(200).json({ user: req.session.user });
+}
+
+export function logout(_req, res) {
+  clearSessionCookie(res);
+  return res.status(200).json({ message: 'Sessao terminada.' });
+}
+```
+
+7. Explicacao didatica do codigo.
+
+`getCurrentSession` protege dados do utilizador: se nao ha sessao valida, devolve `401`. `logout` limpa o cookie, mesmo que a sessao ja estivesse invalida. Isto torna o logout seguro e idempotente.
+
+8. Codigo do ficheiro `backend/src/modules/auth/auth.routes.js`.
+
+```js
+import { Router } from 'express';
+import { getCurrentSession, logout } from './session.controller.js';
+
+export const authRouter = Router();
+
+authRouter.get('/me', getCurrentSession);
+authRouter.post('/logout', logout);
+```
+
+9. Explicacao didatica do codigo.
+
+As rotas ficam agrupadas no modulo `auth`. Quando montadas em `/api/session`, os endpoints finais ficam `GET /api/session/me` e `POST /api/session/logout`.
+
+10. Validacao do passo.
+
+Ainda falta montar as rotas em `app.js`. Depois do passo seguinte, `GET /api/session/me` deve devolver `401`.
+
+11. Caso negativo ou erro comum.
+
+Erro comum: devolver dados de exemplo em `GET /api/session/me`. Isso faria o frontend pensar que existe utilizador autenticado.
+
+### Passo 4 - Montar sessao na app Express e atualizar README
+
+1. Objetivo do passo.
+
+Integrar o middleware de sessao e as rotas no backend criado em `BK-MF1-01`.
+
+2. Ficheiros envolvidos:
+   - EDITAR: `backend/src/app.js`
+   - EDITAR: `backend/README.md`
+   - LOCALIZACAO: substituir `app.js` pelo conteudo abaixo e acrescentar a seccao ao README
+   - REVER: `BK-MF1-01`
+
+3. Instrucoes concretas.
+
+Substitui `backend/src/app.js` pelo ficheiro completo abaixo. Depois acrescenta a seccao de sessao ao README.
+
+4. Codigo do ficheiro `backend/src/app.js`.
+
+```js
+import express from 'express';
+import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
+import { attachSession } from './middlewares/session.middleware.js';
+import { authRouter } from './modules/auth/auth.routes.js';
+import { systemRouter } from './modules/system/system.routes.js';
+
+export function createApp() {
+  const app = express();
+
+  app.use(express.json({ limit: '1mb' }));
+  app.use(attachSession);
+
+  app.use('/api', systemRouter);
+  app.use('/api/session', authRouter);
+
+  app.use(notFoundHandler);
+  app.use(errorHandler);
+
+  return app;
+}
+```
+
+5. Explicacao didatica do codigo.
+
+`attachSession` fica antes das rotas para que qualquer controller possa consultar `req.session`. A rota `/api` continua a existir. A rota `/api/session` acrescenta apenas endpoints de sessao base, sem criar login real.
+
+6. Codigo a acrescentar ao fim de `backend/README.md`.
+
+```md
+
+## Sessao base
+
+- `GET /api/session/me` devolve `401` enquanto nao existir login real.
+- `POST /api/session/logout` limpa o cookie de sessao.
+- Tokens em `localStorage` ou `sessionStorage` continuam fora de scope.
+```
+
+7. Explicacao didatica do codigo.
+
+O README deixa claro que este BK nao autentica utilizadores. Isto evita confusao na defesa e no handoff para `BK-MF2-01`.
+
+8. Validacao do passo.
+
+Executar dentro de `backend/`:
+
+```bash
+npm run dev
+curl -i http://localhost:3000/api/session/me
+curl -i -X POST http://localhost:3000/api/session/logout
+```
+
+9. Caso negativo ou erro comum.
+
+Erro comum: montar `authRouter` antes de `attachSession`. Nesse caso, as rotas de auth nao recebem `req.session`.
+
+### Passo 5 - Validar negativos de seguranca
+
+1. Objetivo do passo.
+
+Provar que a base de sessao nao aceita cookies falsos e nao expoe tokens.
+
+2. Ficheiros envolvidos:
+   - EDITAR: nenhum, se os passos anteriores estiverem corretos
+   - LOCALIZACAO: executar comandos dentro de `backend/`
+   - REVER: `session.controller.js`, `session.middleware.js`, `cookies.js`
+
+3. Instrucoes concretas.
+
+Executa os pedidos abaixo e guarda outputs.
+
+4. Resultado esperado sem cookie.
+
+```http
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json; charset=utf-8
+```
+
+```json
+{
+  "message": "Sessao nao autenticada."
+}
+```
+
+5. Resultado esperado com cookie falso.
+
+```bash
+curl -i http://localhost:3000/api/session/me \
+  -H "Cookie: faithflix_session=falso"
+```
+
+```json
+{
+  "message": "Sessao nao autenticada."
+}
+```
+
+6. Resultado esperado no logout.
+
+```http
+HTTP/1.1 200 OK
+Set-Cookie: faithflix_session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax
+```
+
+```json
+{
+  "message": "Sessao terminada."
+}
+```
+
+7. Explicacao didatica.
+
+Sem cookie e com cookie falso, a resposta tem de ser igual: `401`. Isto evita fuga de informacao. O logout limpa o cookie mesmo sem sessao valida, para deixar o browser num estado limpo.
+
+8. Validacao do passo.
+
+- Sem cookie devolve `401`.
+- Cookie falso devolve `401`.
+- Logout devolve `200` e header `Set-Cookie`.
+- Em `NODE_ENV=production`, o cookie inclui `Secure`.
+- Nenhum token aparece em respostas JSON.
+
+9. Caso negativo ou erro comum.
+
+Erro comum: devolver informacao como "token invalido" ou "utilizador inexistente". Essas mensagens ajudam atacantes a perceber o estado interno.
+
+## Criterios de aceite (mensuraveis)
+
+- `backend/src/config/session.js`, `cookies.js`, `session.middleware.js`, `session.service.js`, `session.controller.js` e `auth.routes.js` existem.
+- `backend/src/app.js` monta `attachSession` antes de `/api/session`.
+- `GET /api/session/me` devolve `401` sem cookie.
+- `GET /api/session/me` devolve `401` com cookie falso.
+- `POST /api/session/logout` devolve `200` e limpa o cookie.
+- Nenhum token e guardado ou recomendado em `localStorage`/`sessionStorage`.
+
+## Validacao final
+
+Executar dentro de `backend/`:
+
+```bash
+npm run dev
+curl -i http://localhost:3000/api/session/me
+curl -i http://localhost:3000/api/session/me -H "Cookie: faithflix_session=falso"
+curl -i -X POST http://localhost:3000/api/session/logout
+NODE_ENV=production node src/server.js
+```
+
+## Evidence para PR/defesa
+
+- `pr`: referencia do PR/commit com modulo `auth/session`.
+- `proof`: outputs de `GET /api/session/me` e `POST /api/session/logout`.
+- `neg`: sem cookie, cookie falso, `Secure` em producao e ausencia de token no frontend storage.
+
+## Handoff
+
+- `BK-MF1-05` deve logar pedidos sem expor cookies.
+- `BK-MF1-06` deve testar `401` sem cookie e com cookie falso.
+- `BK-MF2-01` deve reutilizar `sessionConfig.cookieName`, `getSessionCookieOptions()` e `attachSession` para criar login real.
+- `BK-MF4-03` pode depender desta base para candidaturas autenticadas quando os utilizadores existirem.
 
 ## Changelog
 
-- `2026-05-27`: refinado para guia executavel de sessao segura base, sem transformar MF1 em autenticação funcional completa.
+- `2026-05-30`: reestruturado como tutorial linear, com codigo movido para passos executaveis e sem anexo tecnico no fim.
+- `2026-05-29`: acrescentada versao detalhada de sessao base, cookies HttpOnly, rotas, app.js, payloads, negativos e handoff para MF2.
+- `2026-05-27`: refinado para guia executavel de sessao segura base, sem transformar MF1 em autenticacao funcional completa.

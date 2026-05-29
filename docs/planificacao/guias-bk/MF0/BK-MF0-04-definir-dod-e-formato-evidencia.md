@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF0-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF0/BK-MF0-04-definir-dod-e-formato-evidencia.md`
-- `last_updated`: `2026-05-25`
+- `last_updated`: `2026-05-29`
 
 ## Bloco pedagogico (obrigatorio)
 
@@ -64,6 +64,7 @@ A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo
 - Alterar backlog, matriz ou plano de sprints.
 - Definir critérios específicos de cada RF futuro em detalhe final.
 - Substituir validação humana do orientador.
+- Criar ou editar um documento canónico novo de DoD sem decisão explícita do orientador.
 
 ##### Como saber que isto ficou bem
 
@@ -72,6 +73,16 @@ A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo
 - O formato de evidence serve tanto para documentação como para código.
 - O DoD inclui smoke, negativos, técnica, regressão, UI/mockup quando aplicável e segurança quando aplicável.
 - O próximo BK pode planear sprints sabendo o custo real de validar e fechar.
+
+##### Papel deste BK no produto final
+
+Este BK não cria funcionalidades do FaithFlix, mas cria a regra de qualidade que vai acompanhar todas elas. Quando a equipa chegar a autenticação, catálogo, streaming, favoritos, recomendações, subscrições, pool solidária, privacidade e evidências PAP, cada entrega terá de provar que funciona, que negativos foram testados e que não quebrou contratos anteriores.
+
+##### Artefacto de DoD nesta execucao
+
+Nao existe no repositorio, nesta data, um ficheiro separado chamado `DOD.md`, `DEFINITION-OF-DONE.md` ou equivalente. Por isso, neste BK o contrato operacional de DoD/evidence fica documentado neste proprio guia, nas secoes `Checklist de validacao`, `Criterios de aceite`, `Evidence (para o PR/defesa)` e `Snippet tecnico aplicavel`.
+
+Se o orientador quiser promover este contrato para artefacto canonico separado, essa decisao deve ser registada antes de editar `_TEMPLATE-BK.md`, `BACKLOG-MVP.md`, `SCORECARD-SPRINTS.md` ou criar novo ficheiro. Ate essa decisao existir, este BK nao altera contratos canonicos fora do proprio guia.
 
 #### Metadados do BK (CANONICO/DERIVADO):
 
@@ -103,13 +114,29 @@ A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo
 - Estado esperado antes do BK: backlog atómico validado, mas ainda sem contrato operacional de fecho.
 - Estado esperado depois do BK: DoD e formato de evidence definidos para BKs documentais e técnicos.
 - Ficheiros a criar: nenhum.
-- Ficheiros a editar: apenas este guia se forem registados ajustes/evidence do BK.
+- Ficheiros a editar: `docs/planificacao/guias-bk/MF0/BK-MF0-04-definir-dod-e-formato-evidencia.md`, apenas nas secoes de DoD/evidence deste guia.
 - Ficheiros a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`, `docs/planificacao/guias-bk/_TEMPLATE-BK.md`, `docs/planificacao/sprints/PLANO-SPRINTS.md`, `docs/planificacao/sprints/SCORECARD-SPRINTS.md`, `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`.
 - Dependencias de BK anteriores e uso: depende de `BK-MF0-03` para saber que BKs e campos o DoD vai avaliar.
 - Impacto na arquitetura da app: cria contrato de qualidade que futuros módulos backend/frontend/dados terão de cumprir.
 - Impacto em frontend/backend/dados: define formato de validação para quando essas camadas forem criadas em `MF1+`.
 - Impacto em segurança/testes/UI: obriga negativos de segurança quando aplicável, regressão, smoke e screenshots em BKs de UI.
 - Handoff para o próximo BK: entregar a `BK-MF0-05` a regra de que sprints devem reservar tempo para validação/evidence.
+
+#### Mapa de ficheiros e localizacao (DERIVADO):
+
+| Acao | Caminho | Localizacao exata | Regra |
+| --- | --- | --- | --- |
+| Criar | `-` | `-` | Este BK nao cria ficheiros novos enquanto nao houver decisao do orientador para artefacto DoD separado. |
+| Editar | `docs/planificacao/guias-bk/MF0/BK-MF0-04-definir-dod-e-formato-evidencia.md` | Secoes `Checklist de validacao`, `Criterios de aceite`, `Evidence (para o PR/defesa)` e `Snippet tecnico aplicavel` | Registar o contrato operacional de DoD/evidence deste BK. |
+| Rever | `docs/planificacao/backlogs/BACKLOG-MVP.md` | `Contrato pedagogico v3` e `Criterios de aceite globais por BK` | Confirmar politica `P0/P1 >= 3`, `P2 >= 1`, trio `pr/proof/neg` e criterios mensuraveis. |
+| Rever | `docs/planificacao/guias-bk/_TEMPLATE-BK.md` | Estrutura de `Bloco operacional`, `Criterios de aceite` e `Evidence` | Confirmar que os guias futuros têm secoes onde aplicar a DoD. |
+| Rever | `docs/planificacao/sprints/PLANO-SPRINTS.md` | `Gates obrigatorios de conformidade` | Confirmar que os gates exigem evidence e criterios mensuraveis. |
+
+#### Bloqueio / decisao necessaria (DERIVADO):
+
+- Falta uma decisao explicita sobre criar um artefacto canonico separado para DoD/evidence, por exemplo `docs/planificacao/DOD-E-EVIDENCIAS.md`, ou sobre promover este contrato para `_TEMPLATE-BK.md`.
+- Ate essa decisao existir, a acao segura e documentar a DoD operacional neste guia e nao alterar outros documentos canonicos.
+- O BK fica bloqueado apenas se a equipa exigir que a DoD esteja num ficheiro separado antes de fechar a `MF0`. Nesse caso, Nuno deve escolher o caminho oficial e autorizar a criacao/edicao desse documento.
 
 #### Pre-leitura minima (10-15 min) (DERIVADO):
 
@@ -173,7 +200,7 @@ A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo
    - Como fazer (2.1): rever template de BK.
    - Como fazer (2.2): complementar com campos pedidos na prompt e no backlog.
    - Ficheiro a rever: `docs/planificacao/guias-bk/_TEMPLATE-BK.md`
-   - Ficheiro alvo: guias BK de cada fase
+   - Ficheiro alvo: `docs/planificacao/guias-bk/MF0/BK-MF0-04-definir-dod-e-formato-evidencia.md`, secao `Evidence (para o PR/defesa)`
    - Snippet de referencia: `Evidence minima por BK: trio pr, proof, neg`
    - O que verificar: os campos aceitam placeholders claros enquanto não há execução.
 
@@ -243,6 +270,7 @@ A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo
 - [ ] DoD exige implementação/entrega concluída pelo owner.
 - [ ] DoD exige critérios mensuráveis e evidence.
 - [ ] DoD distingue smoke, negativos, regressão e segurança.
+- [ ] O local onde a DoD operacional fica registada esta identificado neste guia.
 
 **Negativos**
 - [ ] Passo: 4; input/acao: tentar fechar P0 com apenas 1 negativo; resultado esperado: fecho rejeitado; risco que cobre: validação insuficiente.
@@ -253,6 +281,7 @@ A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo
 - [ ] Campos de evidence cobrem `pr`, `proof`, `neg`, `files`, `commands`, `screenshots`, `notes`.
 - [ ] Política de negativos preserva `P0/P1 >= 3`, `P2 >= 1`.
 - [ ] O próximo BK recomendado é `BK-MF0-05`.
+- [ ] Nenhum ficheiro canonico externo foi alterado sem decisao explicita do orientador.
 
 **Regressao das fases anteriores**
 - [ ] `BK-MF0-03` continua como dependência.
@@ -270,11 +299,13 @@ A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo
 **Outputs:**
 - DoD comum definido para BKs documentais e técnicos.
 - Formato de evidence mínimo definido.
+- Local operacional da DoD identificado: este guia, ate haver decisao para artefacto separado.
 
 **Verificacoes:**
 - Campos `pr`, `proof`, `neg`, `files`, `commands`, `screenshots`, `notes` presentes.
 - Política de negativos por prioridade explícita.
 - Regressão e segurança incluídas quando aplicável.
+- Existe decisao escrita sobre nao criar ficheiro DoD separado nesta fase sem confirmacao do orientador.
 
 **Qualidade:**
 - Critérios mensuráveis e compreensíveis para alunos.
@@ -283,6 +314,7 @@ A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo
 **Continuidade:**
 - `BK-MF0-05` consegue planear sprints sabendo o custo de validação.
 - BKs de `MF1..MF8` podem reutilizar o mesmo padrão.
+- Se Nuno decidir criar artefacto canonico separado, essa acao fica como decisao posterior e nao como suposicao silenciosa.
 
 **Evidencia:**
 - `pr`, `proof` e `neg` preenchidos antes de marcar `DONE`.
@@ -302,6 +334,7 @@ A fase foi detalhada sem mockup. Para BKs de UI futuros, o DoD deve prever campo
 - TODO: preencher evidence real no fecho do BK.
 - TODO: validar com a equipa se todos compreendem diferença entre smoke e negativo.
 - TODO (BLOCKER): se a equipa não aceitar o formato mínimo de evidence, bloquear fecho da MF0.
+- TODO (DECISAO): Nuno decide se a DoD operacional deste guia deve ser promovida para `_TEMPLATE-BK.md` ou para um novo documento canonico.
 - FOLLOW-UP: incorporar tempo de validação no calendário em `BK-MF0-05`.
 - Assuncao a validar com o orientador: este DoD será aplicado a todos os BK, com adaptações por tipo.
 - Decisao dependente de mockup: screenshots e comparação visual só entram em BKs de UI futuros.
@@ -329,3 +362,4 @@ done = (
 
 - `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
 - `2026-05-25`: refinado para guia executável de DoD, evidence, negativos e regressão.
+- `2026-05-29`: hidratado com mapa de ficheiros, local operacional da DoD e bloqueio/decisao necessaria para eventual artefacto canonico separado.

@@ -17,342 +17,246 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF1-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF1/BK-MF1-05-health-check-e-logging-estruturado.md`
-- `last_updated`: `2026-05-27`
+- `last_updated`: `2026-05-30`
 
 ## Bloco pedagogico (obrigatorio)
 
-Este BK ensina a preparar operacao minima do backend: saber se a API esta viva e gerar logs que ajudem a diagnosticar problemas. Sem health-check e logs, uma app pode falhar silenciosamente e tornar a defesa tecnica mais dificil.
+Este BK acrescenta capacidade operacional ao backend: um endpoint `/health` para saber se a API esta viva e logs estruturados para diagnosticar pedidos e erros. Isto nao cria funcionalidades de produto, mas e essencial para operar uma app real.
 
-O objetivo pedagogico e perceber a diferenca entre "a app corre no meu computador" e "a app consegue ser observada". Health-check serve para sistemas e equipa confirmarem disponibilidade. Logging estruturado serve para perceber o que aconteceu, quando, com que rota, status e contexto.
+Para alunos do 12.º ano, a ideia principal e: uma aplicacao nao basta "funcionar no meu computador". Precisamos de sinais simples para saber se esta online, que pedidos recebeu e que erros aconteceram, sem expor dados sensiveis.
+
+### O que entra
+
+- Criar `GET /health`.
+- Criar logger em JSON.
+- Criar middleware de request logging com `x-request-id`.
+- Integrar logs no error handler.
+- Atualizar `app.js` sem remover `/api` nem `/api/session`.
+
+### O que nao entra
+
+- Monitorizacao externa paga.
+- Checks de MongoDB, pagamentos, streaming, CDN ou DRM.
+- Logs com cookies, tokens, passwords ou dados pessoais.
+- Auditoria administrativa completa, que entra em hardening/operacao posterior.
+
+### Check de compreensao
+
+- [ ] Sei explicar para que serve `/health`.
+- [ ] Sei explicar porque logs devem ser JSON.
+- [ ] Sei provar que cookies nao aparecem nos logs.
 
 ## Bloco operacional (obrigatorio)
 
-O trabalho operacional e adicionar `GET /health`, criar um logger JSON simples com niveis `info`, `warn` e `error`, adicionar request id e registar pedidos HTTP sem expor dados sensiveis. Este BK nao cria monitorizacao externa nem dashboards.
+### Pre-condicoes
 
-#### BK-MF1-05 - Health-check e logging estruturado
+- `BK-MF1-01` executado.
+- Se `BK-MF1-04` ja estiver executado, preservar `/api/session`.
+- Confirmar em `RNF.md` que `RNF31` pede endpoint de health-check e `RNF30` pede logs estruturados.
+- Confirmar que ainda nao existem MongoDB, pagamentos ou streaming real; por isso, `/health` nao deve fingir checks desses servicos.
 
-##### O que vamos fazer neste BK
+### Guia de execucao (passo-a-passo)
 
-Neste BK vamos criar o endpoint `GET /health`, exigido por `RNF31`, e uma base de logging estruturado alinhada com `RNF30`, mesmo que o mapeamento canonico deste BK seja `RNF31`. O health-check deve responder rapidamente e indicar que a API esta viva.
+### Passo 1 - Criar health service, controller e routes
 
-Tambem vamos criar um logger simples baseado em JSON. Cada log deve ter pelo menos `timestamp`, `level`, `message` e contexto. Para pedidos HTTP, vamos incluir metodo, path, status code, duracao e request id. Isto prepara debugging para as fases seguintes.
+1. Objetivo do passo.
 
-Como ainda nao ha base de dados, streaming ou integracoes externas, o health-check nao deve fingir verificacoes que nao existem. Deve declarar apenas checks reais, por exemplo `api: ok`.
+Criar `GET /health`, uma resposta tecnica simples para deployment, smoke tests e diagnostico.
 
-##### Porque e que isto e importante
+2. Ficheiros envolvidos:
+   - CRIAR: `backend/src/modules/system/health.service.js`
+   - CRIAR: `backend/src/modules/system/health.controller.js`
+   - CRIAR: `backend/src/modules/system/health.routes.js`
+   - LOCALIZACAO: `backend/src/modules/system/`
+   - REVER: `backend/src/config/env.js`
 
-- Permite confirmar se o backend esta disponivel.
-- Ajuda a diagnosticar erros durante MF2 e fases seguintes.
-- Prepara evidencia objetiva para deploy/defesa.
-- Cria disciplina de nao expor cookies, passwords ou tokens em logs.
-- Desbloqueia smoke tests mais robustos em `BK-MF1-06`.
+3. Instrucoes concretas.
 
-##### O que entra (scope)
+Cria os ficheiros no modulo `system`, porque `/health` e uma rota tecnica da aplicacao, nao pertence a catalogo, auth ou streaming.
 
-- Criar `GET /health`.
-- Criar service/controller/route para health.
-- Criar logger JSON simples.
-- Criar middleware de request logging.
-- Criar request id por pedido e header `x-request-id`.
-- Atualizar error handler para usar logger.
-- Validar que cookies e headers sensiveis nao sao logados.
-
-##### O que nao entra (scope-out)
-
-- Nao entra Prometheus, Grafana, Sentry, Datadog ou servico externo.
-- Nao entra health-check de MongoDB, pagamentos ou streaming, porque ainda nao existem.
-- Nao entra metricas de performance formais.
-- Nao entra tracing distribuido.
-- Nao entra logs de auditoria funcional de utilizadores.
-
-##### Como saber que isto ficou bem
-
-- `GET /health` responde 200 com JSON.
-- Cada pedido gera um log estruturado.
-- Pedidos com erro geram log `error` sem stack trace ao utilizador.
-- O header `x-request-id` aparece na resposta.
-- Logs nao incluem cookies, passwords ou tokens.
-
-#### Metadados do BK (CANONICO/DERIVADO):
-
-- Prioridade: `P1` (CANONICO, `BACKLOG-MVP.md`)
-- Estado: `TODO` (CANONICO, `BACKLOG-MVP.md`)
-- Esforco: `S` (CANONICO, `BACKLOG-MVP.md`)
-- macro: `MF1` (CANONICO, `BACKLOG-MVP.md`)
-- Owner: `Kaue` (CANONICO, `BACKLOG-MVP.md`)
-- Apoio: `Davi` (CANONICO, `BACKLOG-MVP.md`)
-- Dependencias (BK IDs): `BK-MF1-01` (CANONICO, `BACKLOG-MVP.md`)
-- Pre-condicoes: backend modular existe; se `BK-MF1-04` ja estiver feito, logs devem mascarar cookies (DERIVADO)
-- Ref. Plano: `MF-VIEWS > MF1`, `PLANO-SPRINTS > Sprint 2`, `MATRIZ-CANONICA-BK > RNF31` (CANONICO)
-- Flow ID: `MF1-backend-health-logging-05` (DERIVADO)
-- Fonte de verdade: `docs/RNF.md`
-- Fonte de verdade: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-- Fonte de verdade: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
-- Descricao: adicionar health-check e logging estruturado minimo ao backend, sem monitorizacao externa (DERIVADO)
-
-#### O que vamos fazer neste BK (DERIVADO):
-
-- Criar modulo/rota `health`.
-- Criar `health.service.js` com checks reais e simples.
-- Criar `logger.js` com niveis.
-- Criar middleware `requestLogger`.
-- Criar request id e devolve-lo em `x-request-id`.
-- Integrar logger no middleware de erro.
-- Documentar exemplos de logs e comandos.
-
-#### Estado, ficheiros e impacto (DERIVADO):
-
-- Estado esperado antes do BK: backend arranca e tem rotas base, mas nao tem health-check nem logs consistentes.
-- Estado esperado depois do BK: backend expõe `/health`, gera logs JSON e inclui request id nas respostas.
-- Ficheiros a criar: `backend/src/modules/system/health.routes.js`, `backend/src/modules/system/health.controller.js`, `backend/src/modules/system/health.service.js`, `backend/src/utils/logger.js`, `backend/src/middlewares/request-logger.middleware.js`.
-- Ficheiros a editar: `backend/src/app.js`, `backend/src/middlewares/error.middleware.js`, `backend/README.md`.
-- Ficheiros a rever: `backend/src/config/env.js`, `backend/src/modules/auth/` se ja existir, `docs/RNF.md`.
-- Dependencias de BK anteriores e uso: reutiliza estrutura Express de `BK-MF1-01`; se `BK-MF1-04` ja foi executado, respeita a regra de nao logar cookies.
-- Impacto na arquitetura da app: adiciona observabilidade tecnica transversal.
-- Impacto frontend: `BK-MF1-03` pode chamar health no futuro se necessario, mas nao deve depender dele para renderizar a app.
-- Impacto backend: cria health/logging e melhora erro.
-- Impacto dados: nenhum.
-- Impacto seguranca: evita expor dados sensiveis nos logs.
-- Impacto testes: fornece alvo principal para smoke tests de `BK-MF1-06`.
-- Impacto UI: nenhum.
-- Handoff para o proximo BK: `BK-MF1-06` deve testar `/health`, request id, 404 e 401 quando aplicavel.
-
-#### Pre-leitura minima (10-15 min) (DERIVADO):
-
-- `docs/RNF.md`: `RNF30` e `RNF31`.
-- Guia `BK-MF1-01`: estrutura backend e middleware de erro.
-- Guia `BK-MF1-04`: cookies e dados sensiveis, se ja executado.
-- `backend/src/app.js`: ordem dos middlewares.
-- `backend/src/middlewares/error.middleware.js`: ponto de integracao com logger.
-
-#### Glossario (rapido) (DERIVADO):
-
-- Health-check: endpoint que indica se o servico esta vivo.
-- Observabilidade: capacidade de perceber o estado interno da app por logs, metricas e traces.
-- Log estruturado: log em formato consistente, normalmente JSON.
-- Level: gravidade do log, como `info`, `warn` ou `error`.
-- Request id: identificador unico de um pedido.
-- Duration: tempo que o pedido demorou.
-- Middleware de logging: codigo que regista informacao antes/depois da resposta.
-- Dados sensiveis: passwords, cookies, tokens, dados pessoais ou segredos.
-- 5xx: erro do servidor.
-
-#### Conceitos teoricos essenciais (DERIVADO):
-
-**Health-check.** Um health-check nao e uma pagina bonita. E um endpoint rapido, previsivel e usado por humanos, scripts ou deploy para saber se a API responde.
-
-**Logs estruturados.** Logs em texto livre sao dificeis de pesquisar. JSON permite filtrar por `level`, `path`, `statusCode` ou `requestId`.
-
-**Request id.** Quando o frontend recebe erro, pode guardar o `x-request-id`. Depois a equipa procura esse id nos logs do backend. Isto liga sintoma a causa.
-
-**Nao logar dados sensiveis.** Cookies e passwords nunca devem aparecer em logs. Logs vivem mais tempo do que um pedido e podem ser vistos por mais pessoas.
-
-**Ordem de middlewares.** O logger deve correr cedo para apanhar pedidos. O error handler deve correr no fim para apanhar erros gerados por rotas anteriores.
-
-**Erros comuns.** Fazer health-check depender de servicos que ainda nao existem, logar `req.headers.cookie`, mostrar stack trace ao utilizador, ou usar `console.log('erro')` sem contexto.
-
-#### Guia de execucao (passo-a-passo) (DERIVADO):
-
-0. **Objetivo (~10 min): Confirmar backend modular**
-   - Descricao detalhada do objetivo: verificar que `BK-MF1-01` esta executado.
-   - Justificacao: este BK adiciona observabilidade a uma app existente.
-   - Como fazer (0.1): abrir `backend/src/app.js`.
-   - Como fazer (0.2): confirmar que existe `src/modules/system/`.
-   - Ficheiro a rever: `backend/src/app.js`
-   - Ficheiro alvo: nenhum ainda.
-   - Snippet de referencia: `app.use('/api', systemRouter)`
-   - O que verificar: existe local claro para montar `/health`.
-
-1. **Objetivo (~20 min): Criar service de health**
-   - Descricao detalhada do objetivo: construir uma resposta com checks reais.
-   - Justificacao: health nao deve fingir BD ou streaming enquanto nao existem.
-   - Como fazer (1.1): criar `health.service.js`.
-   - Como fazer (1.2): devolver `status`, `service`, `timestamp` e `checks`.
-   - Ficheiro a rever: `backend/src/config/env.js`
-   - Ficheiro alvo: `backend/src/modules/system/health.service.js`
-   - Snippet de referencia:
-     ```js
-     export function getHealthStatus() {
-       return { status: 'ok', checks: { api: 'ok' }, timestamp: new Date().toISOString() };
-     }
-     ```
-   - O que verificar: nao ha checks inventados para MongoDB/pagamentos.
-
-2. **Objetivo (~20 min): Criar controller e route `/health`**
-   - Descricao detalhada do objetivo: expor health-check no backend.
-   - Justificacao: `RNF31` pede endpoint de health-check, por exemplo `/health`.
-   - Como fazer (2.1): criar `health.controller.js`.
-   - Como fazer (2.2): criar `health.routes.js` e montar em `app.use('/health', healthRouter)` ou `app.get('/health', ...)`.
-   - Ficheiro a rever: `docs/RNF.md`
-   - Ficheiro alvo: `backend/src/modules/system/health.routes.js`
-   - Snippet de referencia:
-     ```js
-     router.get('/', getHealth);
-     ```
-   - O que verificar: `GET /health` responde 200 JSON.
-
-3. **Objetivo (~25 min): Criar logger estruturado**
-   - Descricao detalhada do objetivo: criar funcoes `info`, `warn`, `error` que imprimem JSON.
-   - Justificacao: logs consistentes sao mais faceis de filtrar e defender tecnicamente.
-   - Como fazer (3.1): criar `backend/src/utils/logger.js`.
-   - Como fazer (3.2): normalizar payload com `timestamp`, `level`, `message` e `context`.
-   - Ficheiro a rever: `docs/RNF.md`
-   - Ficheiro alvo: `backend/src/utils/logger.js`
-   - Snippet de referencia:
-     ```js
-     export function log(level, message, context = {}) {
-       console.log(JSON.stringify({ timestamp: new Date().toISOString(), level, message, context }));
-     }
-     ```
-   - O que verificar: logger nao recebe cookies/passwords como contexto.
-
-4. **Objetivo (~30 min): Adicionar request id e logging de pedidos**
-   - Descricao detalhada do objetivo: registar cada pedido com metodo, path, status e duracao.
-   - Justificacao: isto permite diagnosticar rotas lentas ou erros.
-   - Como fazer (4.1): criar `request-logger.middleware.js` usando `crypto.randomUUID()`.
-   - Como fazer (4.2): adicionar header `x-request-id` e logar no evento `finish`.
-   - Ficheiro a rever: `backend/src/app.js`
-   - Ficheiro alvo: `backend/src/middlewares/request-logger.middleware.js`
-   - Snippet de referencia:
-     ```js
-     res.setHeader('x-request-id', requestId);
-     res.on('finish', () => logger.info('http_request', { method: req.method, path: req.path, statusCode: res.statusCode }));
-     ```
-   - O que verificar: logs nao incluem `req.headers.cookie`.
-
-5. **Objetivo (~20 min): Integrar logger no error handler**
-   - Descricao detalhada do objetivo: registar erros com contexto e responder sem detalhes sensiveis.
-   - Justificacao: erro sem log e dificil de diagnosticar; erro com stack no cliente e risco.
-   - Como fazer (5.1): importar logger em `error.middleware.js`.
-   - Como fazer (5.2): logar `statusCode`, `message`, `path`, `requestId`.
-   - Ficheiro a rever: `backend/src/middlewares/error.middleware.js`
-   - Ficheiro alvo: `backend/src/middlewares/error.middleware.js`
-   - Snippet de referencia:
-     ```js
-     logger.error('request_error', { statusCode, path: req.path, requestId: req.id });
-     ```
-   - O que verificar: response ao cliente nao inclui `err.stack` em producao.
-
-6. **Objetivo (~20 min): Atualizar documentacao operacional**
-   - Descricao detalhada do objetivo: documentar health, request id e exemplos de log.
-   - Justificacao: Kaue/Davi precisam conseguir validar sem conhecer todo o codigo.
-   - Como fazer (6.1): atualizar `backend/README.md`.
-   - Como fazer (6.2): incluir comandos `curl -i /health` e exemplo de log JSON.
-   - Ficheiro a rever: `backend/README.md`
-   - Ficheiro alvo: `backend/README.md`
-   - Snippet de referencia:
-     ```md
-     `GET /health` devolve estado tecnico da API, sem verificar BD enquanto a BD nao existir.
-     ```
-   - O que verificar: README nao promete monitorizacao externa.
-
-7. **Objetivo (~25 min): Validar health, logs e negativos**
-   - Descricao detalhada do objetivo: provar que health e logs funcionam e nao expõem dados sensiveis.
-   - Justificacao: este BK e operacional; evidencia deve incluir outputs objetivos.
-   - Como fazer (7.1): correr `npm run dev` e executar `curl -i http://localhost:3000/health`.
-   - Como fazer (7.2): chamar rota inexistente e uma rota de sessao com cookie falso, se existir.
-   - Ficheiro a rever: `backend/src/utils/logger.js`
-   - Ficheiro alvo: evidence do PR/defesa
-   - Snippet de referencia:
-     ```bash
-     curl -i http://localhost:3000/health
-     curl -i http://localhost:3000/api/nao-existe
-     ```
-   - O que verificar: resposta tem `x-request-id`, logs sao JSON e nao contêm cookies.
-
-#### Checklist de validacao (DERIVADO):
-
-**Smoke**
-- [ ] `GET /health` responde 200 JSON.
-- [ ] Resposta inclui ou permite correlacionar `x-request-id`.
-- [ ] Pedido normal gera log `info`.
-- [ ] Erro/404 gera log com contexto.
-
-**Negativos**
-- [ ] Passo: 7; input/acao: `GET /api/nao-existe`; resultado esperado: 404 JSON + log estruturado; risco que cobre: erro sem diagnostico.
-- [ ] Passo: 7; input/acao: enviar cookie falso numa rota de sessao; resultado esperado: log sem valor do cookie; risco que cobre: exposicao de credenciais.
-- [ ] Passo: 1; input/acao: procurar checks de BD/pagamento no health; resultado esperado: nao existem enquanto os servicos nao existem; risco que cobre: health enganador.
-
-**Tecnico**
-- [ ] Logger tem niveis `info`, `warn`, `error`.
-- [ ] Middleware usa `finish` para saber status final.
-- [ ] Error handler usa logger.
-- [ ] Health-check e rapido e sem dependencias externas.
-
-**Regressao das fases anteriores**
-- [ ] Nao altera rotas base de `BK-MF1-01`.
-- [ ] Nao expõe cookies de `BK-MF1-04`.
-- [ ] Nao altera metadados canonicos.
-
-**UI/mockup**
-- [ ] Nao aplicavel.
-
-**Seguranca**
-- [ ] Cookies, passwords e tokens nao aparecem em logs.
-- [ ] Stack trace nao e enviado ao cliente em producao.
-- [ ] Request id nao revela dados pessoais.
-
-#### Criterios de aceite:
-
-**Outputs:**
-- Endpoint `/health` criado.
-- Logger JSON criado.
-- Middleware de request logging criado.
-- Error handler integrado com logger.
-
-**Verificacoes:**
-- `curl -i /health` devolve 200.
-- Rota inexistente gera 404 e log.
-- Logs incluem level, message, timestamp e contexto.
-
-**Qualidade:**
-- Sem servicos externos desnecessarios.
-- Health-check nao inventa dependencias.
-- Logs nao expõem dados sensiveis.
-
-**Continuidade:**
-- `BK-MF1-06` consegue testar `/health`.
-- `MF2` pode acrescentar checks de BD quando a BD existir.
-- Fases futuras podem trocar logger interno por ferramenta externa sem mudar controllers.
-
-**Evidencia:**
-- Output de `/health`.
-- Exemplo de log `info`.
-- Exemplo de log `error`/404.
-- Prova de que cookie nao aparece no log.
-
-#### Evidence (para o PR/defesa):
-
-- `pr`: `A preencher no fecho do BK`
-- `proof`: `A preencher apos validacao`
-- `neg`: `A preencher apos testes negativos`
-- `files`: `backend/src/modules/system/health.*`, `backend/src/utils/logger.js`, `backend/src/middlewares/request-logger.middleware.js`, `backend/src/middlewares/error.middleware.js`, `backend/src/app.js`
-- `commands`: `npm run dev`, `curl -i http://localhost:3000/health`, `curl -i http://localhost:3000/api/nao-existe`
-- `screenshots`: `Nao aplicavel; usar output de terminal/log`
-- `notes`: `Sem monitorizacao externa nesta fase`
-
-#### TODOs
-
-- TODO: adicionar checks de MongoDB apenas quando a base de dados existir.
-- TODO: decidir ferramenta externa de observabilidade se for necessária em deploy.
-- TODO: definir politica de retencao de logs se houver dados pessoais em fases futuras.
-- TODO (BLOCKER): se o ambiente de producao nao permitir ler logs, planear alternativa antes da defesa.
-- FOLLOW-UP: `BK-MF1-06` deve transformar `/health` e 404 em smoke automatizado.
-- FOLLOW-UP: fases de admin/auditoria devem distinguir logs tecnicos de logs de auditoria funcional.
-- Assuncao tecnica: logger JSON simples com `console.log` e suficiente para MVP PAP.
-- Decisoes dependentes de mockup: nenhuma.
-- Decisoes dependentes de app/codigo ainda inexistente: checks de BD, pagamentos e streaming.
-
-## Snippet tecnico aplicavel
+4. Codigo do ficheiro `backend/src/modules/system/health.service.js`.
 
 ```js
-// backend/src/middlewares/request-logger.middleware.js
+import { env } from '../../config/env.js';
+
+export function getHealthStatus() {
+  return {
+    status: 'ok',
+    service: env.serviceName,
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.round(process.uptime()),
+    dependencies: {
+      api: 'ok',
+      database: 'not_configured',
+      streaming: 'not_configured',
+      payments: 'not_configured',
+    },
+  };
+}
+```
+
+5. Explicacao didatica do codigo.
+
+`status: 'ok'` indica que a API Node esta a responder. `uptimeSeconds` mostra ha quanto tempo o processo esta ligado. As dependencias inexistentes aparecem como `not_configured`, para nao fingir que MongoDB, streaming ou pagamentos ja existem.
+
+6. Codigo do ficheiro `backend/src/modules/system/health.controller.js`.
+
+```js
+import { getHealthStatus } from './health.service.js';
+
+export function getHealth(_req, res) {
+  return res.status(200).json(getHealthStatus());
+}
+```
+
+7. Explicacao didatica do codigo.
+
+O controller fica pequeno porque a regra esta no service. Isto segue a arquitetura modular: controller responde HTTP; service calcula dados.
+
+8. Codigo do ficheiro `backend/src/modules/system/health.routes.js`.
+
+```js
+import { Router } from 'express';
+import { getHealth } from './health.controller.js';
+
+export const healthRouter = Router();
+
+healthRouter.get('/', getHealth);
+```
+
+9. Explicacao didatica do codigo.
+
+Quando este router for montado em `/health`, a rota final sera `GET /health`.
+
+10. Validacao do passo.
+
+A rota ainda precisa de ser montada em `app.js`. Depois do Passo 4, `curl -i http://localhost:3000/health` deve devolver 200.
+
+11. Caso negativo ou erro comum.
+
+Erro comum: devolver `database: ok` antes de existir base de dados. Isso seria um health-check enganador.
+
+### Passo 2 - Criar logger estruturado com redacao de dados sensiveis
+
+1. Objetivo do passo.
+
+Criar um logger em JSON que evita escrever dados sensiveis nos logs.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `backend/src/utils/logger.js`
+   - LOCALIZACAO: `backend/src/utils/`
+   - REVER: `RNF17`, `RNF30`
+
+3. Instrucoes concretas.
+
+Cria o ficheiro abaixo. O logger usa `console`, mas sempre com JSON estruturado.
+
+4. Codigo do ficheiro `backend/src/utils/logger.js`.
+
+```js
+import { env } from '../config/env.js';
+
+const SENSITIVE_KEYS = ['authorization', 'cookie', 'password', 'token', 'secret', 'set-cookie'];
+
+function shouldRedact(key) {
+  return SENSITIVE_KEYS.some((sensitiveKey) => key.toLowerCase().includes(sensitiveKey));
+}
+
+function redact(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => redact(item));
+  }
+
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [
+        key,
+        shouldRedact(key) ? '[REDACTED]' : redact(item),
+      ]),
+    );
+  }
+
+  return value;
+}
+
+function writeLog(level, message, context = {}) {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    level,
+    service: env.serviceName,
+    message,
+    ...redact(context),
+  };
+
+  const line = JSON.stringify(entry);
+
+  if (level === 'error') {
+    console.error(line);
+    return;
+  }
+
+  if (level === 'warn') {
+    console.warn(line);
+    return;
+  }
+
+  console.log(line);
+}
+
+export const logger = {
+  info: (message, context) => writeLog('info', message, context),
+  warn: (message, context) => writeLog('warn', message, context),
+  error: (message, context) => writeLog('error', message, context),
+};
+```
+
+5. Explicacao didatica do codigo.
+
+Logs estruturados sao objetos JSON por linha. Isso facilita pesquisa e leitura por ferramentas de observabilidade. A funcao `redact` percorre objetos e troca valores sensiveis por `[REDACTED]`. Mesmo que alguem passe um objeto com `password` ou `cookie`, o logger nao escreve o valor real.
+
+6. Validacao do passo.
+
+Executar dentro de `backend/`:
+
+```bash
+node -e "import('./src/utils/logger.js').then(({ logger }) => logger.info('teste', { cookie: 'abc', route: '/api' }))"
+```
+
+Resultado esperado: log JSON com `"cookie":"[REDACTED]"`.
+
+7. Caso negativo ou erro comum.
+
+Erro comum: fazer `console.log(req.headers)`. Isso pode gravar cookies e tokens nos logs.
+
+### Passo 3 - Criar request logger com request id
+
+1. Objetivo do passo.
+
+Registar cada pedido com metodo, caminho, status, duracao e `requestId`.
+
+2. Ficheiros envolvidos:
+   - CRIAR: `backend/src/middlewares/request-logger.middleware.js`
+   - LOCALIZACAO: `backend/src/middlewares/`
+   - REVER: `backend/src/app.js`
+
+3. Instrucoes concretas.
+
+Cria o middleware abaixo. Ele deve ser montado cedo em `app.js`, antes das rotas.
+
+4. Codigo do ficheiro `backend/src/middlewares/request-logger.middleware.js`.
+
+```js
 import { randomUUID } from 'node:crypto';
 import { logger } from '../utils/logger.js';
 
 export function requestLogger(req, res, next) {
   const startedAt = Date.now();
-  req.id = req.headers['x-request-id'] ?? randomUUID();
+  const incomingRequestId = req.headers['x-request-id'];
+
+  req.id = typeof incomingRequestId === 'string' && incomingRequestId.trim() !== ''
+    ? incomingRequestId
+    : randomUUID();
+
   res.setHeader('x-request-id', req.id);
 
   res.on('finish', () => {
@@ -369,10 +273,232 @@ export function requestLogger(req, res, next) {
 }
 ```
 
-## Proximo BK recomendado
+5. Explicacao didatica do codigo.
 
-`BK-MF1-06`, que deve automatizar smoke tests para backend, frontend, cliente API, sessao base e health-check.
+`requestId` e um identificador unico por pedido. Se um erro aparece no frontend com esse ID, a equipa consegue procurar o pedido nos logs. O middleware nao grava headers completos, evitando fuga de cookies.
+
+6. Validacao do passo.
+
+Depois de montar em `app.js`, qualquer resposta deve incluir header `x-request-id`.
+
+7. Caso negativo ou erro comum.
+
+Erro comum: usar o mesmo request id para todos os pedidos. Cada pedido precisa de um identificador diferente, salvo quando o cliente ja envia um.
+
+### Passo 4 - Integrar logging no error handler e montar `/health`
+
+1. Objetivo do passo.
+
+Ligar `/health`, request logging e logs de erro na app Express.
+
+2. Ficheiros envolvidos:
+   - EDITAR: `backend/src/middlewares/error.middleware.js`
+   - EDITAR: `backend/src/app.js`
+   - EDITAR: `backend/README.md`
+   - LOCALIZACAO: substituir os dois ficheiros JS pelo conteudo abaixo e acrescentar seccao ao README
+   - REVER: `BK-MF1-04`, se a sessao ja estiver montada
+
+3. Instrucoes concretas.
+
+Substitui `error.middleware.js` e `app.js`. O `app.js` abaixo assume que `BK-MF1-04` ja criou `attachSession` e `authRouter`. Se `BK-MF1-04` ainda nao tiver sido executado, executa-o antes deste passo para evitar imports partidos.
+
+4. Codigo do ficheiro `backend/src/middlewares/error.middleware.js`.
+
+```js
+import { notFound } from '../utils/http-error.js';
+import { logger } from '../utils/logger.js';
+
+export function notFoundHandler(req, _res, next) {
+  next(notFound(req.originalUrl));
+}
+
+export function errorHandler(error, req, res, _next) {
+  const statusCode = error.statusCode ?? error.status ?? 500;
+  const safeStatusCode = statusCode >= 400 && statusCode <= 599 ? statusCode : 500;
+
+  const logContext = {
+    requestId: req.id,
+    method: req.method,
+    path: req.path,
+    statusCode: safeStatusCode,
+    errorName: error.name,
+    errorMessage: error.message,
+  };
+
+  if (safeStatusCode >= 500) {
+    logger.error('http_error', logContext);
+  } else {
+    logger.warn('http_error', logContext);
+  }
+
+  const response = {
+    message: safeStatusCode === 500 ? 'Erro interno do servidor.' : error.message,
+  };
+
+  if (error.details !== undefined) {
+    response.details = error.details;
+  }
+
+  return res.status(safeStatusCode).json(response);
+}
+```
+
+5. Explicacao didatica do codigo.
+
+O error handler continua a devolver JSON, mas agora tambem escreve logs. Erros 4xx sao `warn`, porque normalmente resultam de pedidos invalidos. Erros 5xx sao `error`, porque indicam problema no servidor. Nao escrevemos body, cookies nem headers completos.
+
+6. Codigo do ficheiro `backend/src/app.js`.
+
+```js
+import express from 'express';
+import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
+import { requestLogger } from './middlewares/request-logger.middleware.js';
+import { attachSession } from './middlewares/session.middleware.js';
+import { authRouter } from './modules/auth/auth.routes.js';
+import { healthRouter } from './modules/system/health.routes.js';
+import { systemRouter } from './modules/system/system.routes.js';
+
+export function createApp() {
+  const app = express();
+
+  app.use(requestLogger);
+  app.use(express.json({ limit: '1mb' }));
+  app.use(attachSession);
+
+  app.use('/health', healthRouter);
+  app.use('/api', systemRouter);
+  app.use('/api/session', authRouter);
+
+  app.use(notFoundHandler);
+  app.use(errorHandler);
+
+  return app;
+}
+```
+
+7. Explicacao didatica do codigo.
+
+`requestLogger` fica antes de tudo para medir todos os pedidos. `/health` fica ao lado de `/api`, porque e uma rota operacional. `/api/session` continua preservado para a base de sessao. Os handlers de erro continuam no fim.
+
+8. Codigo a acrescentar ao fim de `backend/README.md`.
+
+```md
+
+## Health-check e logs
+
+- `GET /health` devolve estado tecnico da API.
+- Todas as respostas incluem `x-request-id`.
+- Logs sao JSON por linha.
+- Cookies, tokens e passwords nao devem aparecer nos logs.
+```
+
+9. Explicacao didatica do codigo.
+
+O README passa a explicar como provar operacao basica. Isto ajuda a defesa PAP porque mostra preocupacao com monitorizacao e privacidade.
+
+10. Validacao do passo.
+
+Executar:
+
+```bash
+curl -i http://localhost:3000/health
+curl -i http://localhost:3000/api/nao-existe -H "Cookie: faithflix_session=falso"
+```
+
+11. Caso negativo ou erro comum.
+
+Erro comum: montar `/health` dentro de `/api/session` ou exigir login para health-check. Health-check deve poder validar a app sem sessao.
+
+### Passo 5 - Validar payloads, logs e negativos
+
+1. Objetivo do passo.
+
+Provar que `/health` responde, logs existem e dados sensiveis nao aparecem.
+
+2. Ficheiros envolvidos:
+   - EDITAR: nenhum, se os passos anteriores estiverem corretos
+   - LOCALIZACAO: executar comandos em `backend/`
+   - REVER: `logger.js`, `request-logger.middleware.js`, `error.middleware.js`
+
+3. Instrucoes concretas.
+
+Arranca o backend, executa os pedidos e guarda output.
+
+4. Resposta esperada de `GET /health`.
+
+```json
+{
+  "status": "ok",
+  "service": "faithflix-api",
+  "timestamp": "2026-05-30T00:00:00.000Z",
+  "uptimeSeconds": 10,
+  "dependencies": {
+    "api": "ok",
+    "database": "not_configured",
+    "streaming": "not_configured",
+    "payments": "not_configured"
+  }
+}
+```
+
+5. Explicacao didatica.
+
+`timestamp` e `uptimeSeconds` mudam a cada execucao. O importante e a estrutura. Dependencias futuras aparecem como `not_configured`, para nao prometer base de dados ou pagamentos antes da fase correta.
+
+6. Exemplo esperado de log.
+
+```json
+{"timestamp":"2026-05-30T00:00:00.000Z","level":"info","service":"faithflix-api","message":"http_request","requestId":"...","method":"GET","path":"/health","statusCode":200,"durationMs":3}
+```
+
+7. Explicacao didatica.
+
+O log tem campos previsiveis. Isto permite filtrar por `requestId`, `statusCode` ou `path`. Nao inclui cookies nem dados pessoais.
+
+8. Validacao do passo.
+
+- `GET /health` devolve 200.
+- Resposta inclui `x-request-id`.
+- Pedido 404 gera log `warn`.
+- Erro 500, quando simulado futuramente, deve gerar log `error`.
+- Cookie falso nao aparece nos logs.
+
+9. Caso negativo ou erro comum.
+
+Erro comum: fazer health-check depender de MongoDB antes de MongoDB existir. Isso faria a MF1 falhar por uma dependencia que pertence a BKs futuros.
+
+## Criterios de aceite (mensuraveis)
+
+- `backend/src/modules/system/health.*`, `backend/src/utils/logger.js` e `backend/src/middlewares/request-logger.middleware.js` existem.
+- `GET /health` devolve HTTP 200 e JSON com `status`, `service`, `timestamp`, `uptimeSeconds` e `dependencies`.
+- Todas as respostas incluem `x-request-id`.
+- Pedidos geram logs JSON com `level`, `message`, `requestId`, `method`, `path`, `statusCode` e `durationMs`.
+- Cookies, tokens, passwords e segredos nao aparecem nos logs.
+
+## Validacao final
+
+Executar dentro de `backend/`:
+
+```bash
+npm run dev
+curl -i http://localhost:3000/health
+curl -i http://localhost:3000/api/nao-existe -H "Cookie: faithflix_session=falso"
+```
+
+## Evidence para PR/defesa
+
+- `pr`: referencia do PR/commit com health/logging.
+- `proof`: output de `/health`, header `x-request-id` e exemplo de log `info`.
+- `neg`: 404 logado, cookie ausente/redigido em logs e health sem checks inventados.
+
+## Handoff
+
+- `BK-MF1-06` deve automatizar `/health`, `x-request-id`, 404 e 401.
+- `BK-MF2-01` deve manter cookies fora dos logs quando criar login real.
+- Fases futuras podem acrescentar checks de MongoDB, streaming ou pagamentos apenas quando essas dependencias existirem.
 
 ## Changelog
 
+- `2026-05-30`: reestruturado como tutorial linear, com codigo movido para passos executaveis e sem anexo tecnico no fim.
+- `2026-05-29`: acrescentada versao detalhada para health-check, logger, request id, error handler, app.js, payloads e negativos.
 - `2026-05-27`: refinado para guia executavel de health-check e logging estruturado, com negativos de seguranca e operacao.
