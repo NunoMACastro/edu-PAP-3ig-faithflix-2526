@@ -202,3 +202,30 @@ h1 {
         font-size: 2rem;
     }
 }
+
+.api-status {
+    display: grid;
+    gap: 0.25rem;
+    max-width: 420px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    padding: 1rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.api-status strong {
+    color: var(--color-brand-strong);
+}
+
+.api-status-checking {
+    border-color: var(--color-border);
+}
+
+.api-status-online {
+    border-color: #66a88f;
+}
+
+.api-status-offline {
+    border-color: #c85d5d;
+}
