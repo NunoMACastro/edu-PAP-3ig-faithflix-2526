@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { ApiStatusBadge } from "../components/system/ApiStatusBadge.jsx";
 import { BaseButton } from "../components/ui/BaseButton.jsx";
 import { ContentCard } from "../components/ui/ContentCard.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
@@ -21,6 +22,7 @@ export function HomePage() {
                     Ver estrutura do catalogo
                 </Link>
             </div>
+            <ApiStatusBadge />
         </section>
     );
 }
