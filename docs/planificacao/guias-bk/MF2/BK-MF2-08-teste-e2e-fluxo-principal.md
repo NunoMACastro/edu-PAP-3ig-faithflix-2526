@@ -23,38 +23,67 @@
 
 ### Objetivo pedagogico
 
-Criar um teste end-to-end do fluxo principal da MF2: login, catalogo, detalhe, favoritos, watchlist, player, progresso e biblioteca pessoal. Este BK valida `RNF07` e `RNF08` com medicoes objetivas.
+Neste BK vais criar um teste end-to-end do fluxo principal da MF2: login, detalhe, favoritos, watchlist, player, progresso e biblioteca pessoal. A entrega valida `RNF07` e `RNF08` com medicoes objetivas.
 
-O aluno deve perceber que um E2E nao substitui testes unitarios, mas prova que as pecas principais funcionam juntas no browser.
+No fim, deves conseguir explicar porque um E2E testa integracao real no browser, como preparar dados previsiveis e como medir tempos relevantes sem depender de observacao manual.
 
-### Tempo estimado
+### Importancia funcional
 
-- Preparar seed e media de teste: 35 min.
-- Configurar Playwright: 35 min.
-- Escrever fluxo E2E: 70 min.
-- Medir RNF07/RNF08 e recolher evidence: 45 min.
+Depois dos BKs 01 a 07, a MF2 ja tem varias pecas ligadas. Este teste confirma que a experiencia principal funciona de ponta a ponta e que uma regressao numa rota, selector, sessao ou player e detetada cedo.
+
+### Scope-in
+
+- Instalar e configurar Playwright.
+- Criar seed de dados para utilizador e conteudo publicado.
+- Garantir seletores estaveis nos componentes principais.
+- Testar login, detalhe, favoritos, watchlist, player, progresso e biblioteca.
+- Medir `RNF07` no detalhe e `RNF08` no arranque do video.
+
+### Scope-out
+
+- Cobertura E2E de todos os fluxos admin.
+- Testes cross-browser completos.
+- Testes de carga.
+- Testes de acessibilidade automatizados completos.
+- Pipeline CI remoto.
+
+### Glossario rapido
+
+- `E2E`: teste que executa o fluxo como um utilizador no browser.
+- `Seed`: dados controlados criados antes do teste.
+- `Selector estavel`: atributo pensado para teste, como `data-testid`.
+- `RNF07`: requisito de carregamento inicial.
+- `RNF08`: requisito de arranque de video.
 
 ### Conceitos essenciais
 
-- E2E testa o sistema como utilizador final.
-- Seed data evita depender de dados manuais.
-- `RNF07` mede carregamento inicial de pagina.
-- `RNF08` mede arranque do video depois da acao de reproducao.
-- O teste deve falhar se o fluxo real estiver partido.
+- O teste deve usar rotas reais: `/login`, `/catalogo/:idOrSlug`, `/ver/:contentId` e `/biblioteca`.
+- Dados de teste devem ser criados por script e nao manualmente.
+- `data-testid` evita testes frageis baseados em layout.
+- O teste deve falhar se o video nao existir ou nao conseguir tocar.
+- O E2E complementa testes unitarios e manuais; nao os substitui.
+
+### Tempo estimado
+
+- Preparar seed e asset de media: 35 min.
+- Configurar Playwright: 35 min.
+- Adicionar seletores estaveis: 30 min.
+- Escrever fluxo E2E: 75 min.
+- Medir RNF07/RNF08 e recolher evidence: 45 min.
 
 ### Erros comuns
 
 - Testar apenas endpoints e chamar isso de E2E.
+- Depender de dados criados manualmente.
 - Medir performance sem guardar o valor observado.
-- Correr o teste com base de dados suja.
-- Depender de cliques em textos instaveis.
-- Ignorar o ficheiro de media necessario para o player.
+- Usar rota `/library` quando a app usa `/biblioteca`.
+- Ignorar o ficheiro de video necessario para `RNF08`.
 
 ### Check de compreensao
 
 - [ ] Sei explicar o que o E2E cobre e o que nao cobre.
 - [ ] Sei executar seed antes do teste.
-- [ ] Sei interpretar uma falha de RNF07 ou RNF08.
+- [ ] Sei interpretar uma falha de `RNF07` ou `RNF08`.
 - [ ] Sei anexar evidence ao PR/defesa.
 
 ## Bloco operacional (obrigatorio)
@@ -65,26 +94,27 @@ O aluno deve perceber que um E2E nao substitui testes unitarios, mas prova que a
 - Backend e frontend arrancam localmente.
 - MongoDB acessivel.
 - Existe `frontend/public/media/piloto.mp4`, com video curto e leve para teste.
-- Existe conteudo publicado com slug `piloto-faithflix`.
+- Existe rota `/login`.
+- Existem seletores `auth-form`, `content-detail`, `faithflix-player` e `my-library`.
 
 ### Contrato tecnico deste BK
 
 | Area | Contrato |
 | --- | --- |
 | Ferramenta | Playwright |
-| Scope | teste browser real Chromium |
+| Browser | Chromium |
 | Seed | `backend/scripts/seed-mf2-e2e.js` |
 | Teste | `tests/e2e/mf2-flow.spec.js` |
-| RNF07 | pagina de detalhe carrega em menos de 3000 ms no ambiente local |
+| RNF07 | detalhe carrega em menos de 3000 ms no ambiente local |
 | RNF08 | video dispara evento `playing` ate 3000 ms depois de `play()` |
-| Evidence | relatorio Playwright + logs de medicoes |
+| Evidence | relatorio Playwright e logs de medicoes |
 
 ### Decisao sobre dependencia
 
-`@playwright/test` e uma devDependency justificada neste BK porque:
+`@playwright/test` e uma `devDependency` justificada neste BK porque:
 
 - `node:test` nao controla browser real;
-- RNF07 e RNF08 precisam de medir interface e video;
+- `RNF07` e `RNF08` precisam de medir interface e video;
 - Playwright e standard para E2E em apps React/Vite;
 - a dependencia fica isolada em testes e nao entra no bundle de producao.
 
@@ -92,7 +122,19 @@ O aluno deve perceber que um E2E nao substitui testes unitarios, mas prova que a
 
 ### Passo 1 - Criar package raiz para E2E
 
-`CRIAR package.json` na raiz, se ainda nao existir.
+1. Objetivo do passo.
+
+Adicionar scripts E2E na raiz do projeto sem misturar dependencias no frontend ou backend.
+
+2. Ficheiros envolvidos.
+    - CRIAR ou EDITAR: `package.json`
+    - LOCALIZACAO: ficheiro raiz
+
+3. Instrucoes concretas.
+
+Se ja existir `package.json` na raiz, acrescenta apenas os scripts e a devDependency.
+
+4. Codigo completo.
 
 ```json
 {
@@ -108,16 +150,38 @@ O aluno deve perceber que um E2E nao substitui testes unitarios, mas prova que a
 }
 ```
 
-Executar:
+5. Explicacao do codigo ou da decisao.
+
+O script `e2e:mf2` cria dados previsiveis antes de abrir o browser.
+
+6. Validacao do passo.
 
 ```bash
 npm install
 npm run e2e:install
 ```
 
+Resultado esperado: Playwright instala Chromium.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Sem browser instalado, o teste falha antes de validar a app.
+
 ### Passo 2 - Criar configuracao Playwright
 
-`CRIAR playwright.config.js`
+1. Objetivo do passo.
+
+Arrancar backend e frontend automaticamente durante o teste.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `playwright.config.js`
+    - LOCALIZACAO: ficheiro completo
+
+3. Instrucoes concretas.
+
+Cria a configuracao abaixo na raiz.
+
+4. Codigo completo.
 
 ```js
 import { defineConfig, devices } from "@playwright/test";
@@ -156,9 +220,40 @@ export default defineConfig({
 });
 ```
 
+5. Explicacao do codigo ou da decisao.
+
+`webServer` garante que o teste usa a app real. `reuseExistingServer` evita conflito se ja estiveres a desenvolver localmente.
+
+6. Validacao do passo.
+
+```bash
+npx playwright test --list
+```
+
+Resultado esperado: o comando lista testes quando o ficheiro do passo 6 existir.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Executar E2E contra servidores arrancados manualmente sem controlo torna resultados pouco repetiveis.
+
 ### Passo 3 - Criar seed MF2
 
-`EDITAR backend/package.json`
+1. Objetivo do passo.
+
+Criar utilizador e conteudo publicado previsiveis para o fluxo E2E.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `backend/package.json`
+    - CRIAR: `backend/scripts/seed-mf2-e2e.js`
+    - LOCALIZACAO: script completo
+
+3. Instrucoes concretas.
+
+Adiciona o script `seed:e2e` ao `backend/package.json` e cria o ficheiro abaixo.
+
+4. Codigo completo.
+
+Trecho esperado em `backend/package.json`:
 
 ```json
 {
@@ -168,7 +263,7 @@ export default defineConfig({
 }
 ```
 
-`CRIAR backend/scripts/seed-mf2-e2e.js`
+`backend/scripts/seed-mf2-e2e.js`
 
 ```js
 import { ObjectId } from "mongodb";
@@ -179,33 +274,25 @@ const db = await getDb();
 const now = new Date();
 const userId = new ObjectId();
 const contentId = new ObjectId();
+const email = "e2e@faithflix.test";
 
-await db.collection("users").deleteMany({ email: { $in: ["e2e@faithflix.test", "admin@faithflix.test"] } });
+await db.collection("sessions").deleteMany({});
+await db.collection("users").deleteMany({ email });
 await db.collection("contents").deleteMany({ slug: "piloto-faithflix" });
-await db.collection("playback_progress").deleteMany({ userId });
-await db.collection("user_content_lists").deleteMany({ userId });
+await db.collection("playback_progress").deleteMany({});
+await db.collection("user_content_lists").deleteMany({});
+await db.collection("media_preferences").deleteMany({});
 
-await db.collection("users").insertMany([
-  {
-    _id: userId,
-    name: "Utilizador E2E",
-    email: "e2e@faithflix.test",
-    passwordHash: await hashPassword("password-segura-123"),
-    role: "user",
-    parentalMaxAgeRating: 18,
-    createdAt: now,
-    updatedAt: now,
-  },
-  {
-    name: "Admin E2E",
-    email: "admin@faithflix.test",
-    passwordHash: await hashPassword("password-segura-123"),
-    role: "admin",
-    parentalMaxAgeRating: 18,
-    createdAt: now,
-    updatedAt: now,
-  },
-]);
+await db.collection("users").insertOne({
+  _id: userId,
+  name: "Utilizador E2E",
+  email,
+  passwordHash: await hashPassword("password-segura-123"),
+  role: "user",
+  parentalMaxAgeRating: 18,
+  createdAt: now,
+  updatedAt: now,
+});
 
 await db.collection("contents").insertOne({
   _id: contentId,
@@ -238,186 +325,271 @@ await db.collection("contents").insertOne({
   updatedAt: now,
 });
 
-console.log("Seed MF2 E2E concluida.");
+console.log(`Seed MF2 E2E concluida: ${email} / ${contentId.toString()}`);
 process.exit(0);
 ```
 
+5. Explicacao do codigo ou da decisao.
+
+O seed limpa apenas dados usados pelo E2E e cria um conteudo publicado com slug conhecido.
+
+6. Validacao do passo.
+
+```bash
+npm --prefix backend run seed:e2e
+```
+
+Resultado esperado: mensagem `Seed MF2 E2E concluida`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Sem seed, o teste pode passar numa maquina e falhar noutra por falta de dados.
+
 ### Passo 4 - Confirmar media de teste
 
-`CRIAR frontend/public/media/piloto.mp4` com um video curto, leve e sem direitos externos. O ficheiro deve:
+1. Objetivo do passo.
 
-- ter menos de 5 MB;
-- iniciar rapidamente em browser local;
-- ter pelo menos 20 segundos;
-- ficar versionado ou documentado como asset do projeto.
+Garantir que o player tem um ficheiro real para medir `RNF08`.
 
-Se este ficheiro nao existir, o E2E deve falhar, porque `RNF08` nao pode ser medido sem media real.
+2. Ficheiros envolvidos.
+    - CRIAR: `frontend/public/media/piloto.mp4`
+    - LOCALIZACAO: asset local
+
+3. Instrucoes concretas.
+
+Adiciona um video curto, leve e sem direitos externos.
+
+4. Codigo completo.
+
+Nao ha codigo JS neste passo. O ficheiro deve cumprir:
+
+- menos de 5 MB;
+- pelo menos 20 segundos;
+- arranque rapido em browser local;
+- caminho final `/media/piloto.mp4`.
+
+5. Explicacao do codigo ou da decisao.
+
+`RNF08` mede o evento `playing`; sem media real, nao ha reproducao a medir.
+
+6. Validacao do passo.
+
+Com o frontend a correr:
+
+```bash
+curl -i http://127.0.0.1:5173/media/piloto.mp4
+```
+
+Resultado esperado: `200`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se o ficheiro nao existir, o E2E deve falhar porque o player nao consegue arrancar.
 
 ### Passo 5 - Acrescentar seletores estaveis
 
-Adicionar `data-testid` nos componentes principais:
+1. Objetivo do passo.
+
+Dar ao E2E pontos de referencia estaveis nos componentes principais.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `frontend/src/components/auth/AuthForms.jsx`
+    - CONFIRMAR: `frontend/src/pages/ContentDetailPage.jsx`
+    - CONFIRMAR: `frontend/src/pages/PlaybackPage.jsx`
+    - CONFIRMAR: `frontend/src/pages/MyLibraryPage.jsx`
+    - LOCALIZACAO: atributos JSX
+
+3. Instrucoes concretas.
+
+Adiciona os atributos abaixo. Os BKs 04, 05 e 07 ja indicaram os restantes seletores.
+
+4. Codigo completo.
+
+Em `AuthForms.jsx`:
 
 ```jsx
-<form data-testid="auth-form">...</form>
-<main data-testid="content-detail">...</main>
-<video data-testid="faithflix-player" ... />
-<main data-testid="my-library">...</main>
+<form data-testid="auth-form" onSubmit={handleSubmit}>
+  <input data-testid="email-input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+  <input data-testid="password-input" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+  <button data-testid="login-submit" type="submit">Entrar</button>
+</form>
 ```
 
-Estes atributos existem apenas para teste e nao alteram a experiencia do utilizador.
+Confirmar que existem:
+
+```jsx
+<main data-testid="content-detail">
+<video data-testid="faithflix-player">
+<main data-testid="my-library">
+```
+
+5. Explicacao do codigo ou da decisao.
+
+`data-testid` reduz fragilidade quando o texto ou layout mudam.
+
+6. Validacao do passo.
+
+Abre `/login` e verifica no DevTools que o formulario tem `data-testid="auth-form"`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Sem seletores estaveis, o teste pode falhar por mudancas visuais sem regressao funcional.
 
 ### Passo 6 - Criar teste E2E
 
-`CRIAR tests/e2e/mf2-flow.spec.js`
+1. Objetivo do passo.
+
+Automatizar o fluxo principal da MF2 no browser real.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `tests/e2e/mf2-flow.spec.js`
+    - LOCALIZACAO: ficheiro completo
+
+3. Instrucoes concretas.
+
+Cria o teste abaixo. Ele usa as rotas e seletores entregues nos BKs anteriores.
+
+4. Codigo completo.
 
 ```js
 import { expect, test } from "@playwright/test";
 
-const USER = {
-  email: "e2e@faithflix.test",
-  password: "password-segura-123",
-};
-
-async function login(page) {
+test("MF2 fluxo principal: login, detalhe, listas, player e biblioteca", async ({ page }) => {
   await page.goto("/login");
-  await page.getByRole("button", { name: "login" }).click();
-  await page.getByLabel("Email").fill(USER.email);
-  await page.getByLabel("Password").fill(USER.password);
-  await page.getByRole("button", { name: "Confirmar" }).click();
-  await expect(page.getByText("Sessao iniciada.")).toBeVisible();
-}
+  await expect(page.getByTestId("auth-form")).toBeVisible();
+  await page.getByTestId("email-input").fill("e2e@faithflix.test");
+  await page.getByTestId("password-input").fill("password-segura-123");
+  await page.getByTestId("login-submit").click();
 
-test("MF2 fluxo principal com performance e player", async ({ page }) => {
-  await login(page);
-
-  await page.goto("/catalog/piloto-faithflix");
+  const detailStart = performance.now();
+  await page.goto("/catalogo/piloto-faithflix");
   await expect(page.getByTestId("content-detail")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Piloto FaithFlix" })).toBeVisible();
-
-  const detailLoadMs = await page.evaluate(() => {
-    const entry = performance.getEntriesByType("navigation").at(-1);
-    return entry.loadEventEnd - entry.startTime;
-  });
-
-  console.log(`RNF07 detailLoadMs=${detailLoadMs}`);
+  const detailLoadMs = performance.now() - detailStart;
+  console.log(`RNF07 detailLoadMs=${Math.round(detailLoadMs)}`);
   expect(detailLoadMs).toBeLessThan(3000);
 
-  await page.getByRole("button", { name: "Favorito" }).click();
-  await page.getByRole("button", { name: "Watchlist" }).click();
-  await page.getByRole("link", { name: "Reproduzir" }).click();
+  await page.getByRole("button", { name: /adicionar aos favoritos/i }).click();
+  await page.getByRole("button", { name: /adicionar a watchlist/i }).click();
+  await page.getByRole("link", { name: /reproduzir/i }).click();
 
   const player = page.getByTestId("faithflix-player");
   await expect(player).toBeVisible();
 
-  const videoStartMs = await player.evaluate(async (video) => {
+  const playStartMs = await player.evaluate(async (video) => {
+    video.muted = true;
     const start = performance.now();
-    const playing = new Promise((resolve, reject) => {
+
+    await video.play();
+
+    if (!video.paused && !video.ended) {
+      return performance.now() - start;
+    }
+
+    await new Promise((resolve, reject) => {
       const timeout = window.setTimeout(() => reject(new Error("Video nao iniciou dentro do limite.")), 3000);
       video.addEventListener("playing", () => {
         window.clearTimeout(timeout);
-        resolve(performance.now() - start);
+        resolve();
       }, { once: true });
     });
 
-    await video.play();
-    return playing;
+    return performance.now() - start;
   });
 
-  console.log(`RNF08 videoStartMs=${videoStartMs}`);
-  expect(videoStartMs).toBeLessThan(3000);
+  console.log(`RNF08 playStartMs=${Math.round(playStartMs)}`);
+  expect(playStartMs).toBeLessThan(3000);
 
-  await player.evaluate((video) => {
-    video.currentTime = Math.min(20, Number.isFinite(video.duration) ? video.duration : 20);
-    video.dispatchEvent(new Event("timeupdate"));
-  });
+  await page.waitForTimeout(16_000);
+  await player.evaluate((video) => video.pause());
 
-  await page.waitForTimeout(750);
-  await page.goto("/library");
+  await page.goto("/biblioteca");
   await expect(page.getByTestId("my-library")).toBeVisible();
   await expect(page.getByText("Piloto FaithFlix")).toBeVisible();
 });
 ```
 
-### Passo 7 - Executar o E2E
+5. Explicacao do codigo ou da decisao.
 
-Executar na raiz:
+O teste mede detalhe e arranque do video com `performance.now()`, guarda logs e valida que a biblioteca mostra o conteudo depois das acoes.
+
+6. Validacao do passo.
 
 ```bash
 npm run e2e:mf2
 ```
 
-Resultado esperado:
+Resultado esperado: teste passa e imprime `RNF07 detailLoadMs` e `RNF08 playStartMs`.
 
-- Playwright arranca backend e frontend.
-- Seed MF2 e carregada.
-- Teste passa em Chromium.
-- O output mostra `RNF07 detailLoadMs=...`.
-- O output mostra `RNF08 videoStartMs=...`.
-- Relatorio HTML fica em `test-results/mf2-html-report`.
+7. Caso negativo, erro comum ou risco que este passo evita.
 
-### Passo 8 - Validar negativos minimos
+Se o teste falhar em `/biblioteca`, confirma primeiro se a rota foi montada no `BK-MF2-07`.
 
-Criar testes adicionais ou registar manualmente:
+### Passo 7 - Recolher evidence e interpretar falhas
 
-- Login com password errada falha.
-- Detalhe de slug inexistente mostra estado de erro.
-- Conteudo acima do limite parental bloqueia player.
-- Sem ficheiro `piloto.mp4`, o teste de RNF08 falha.
-- Sem cookie, `/library` nao mostra dados pessoais.
+1. Objetivo do passo.
+
+Guardar prova objetiva da execucao e transformar falhas em diagnostico acionavel.
+
+2. Ficheiros envolvidos.
+    - LER: `test-results/mf2-html-report`
+    - LER: logs do terminal
+    - VALIDAR: screenshots e traces em falha
+
+3. Instrucoes concretas.
+
+Depois de correr o teste, guarda no registo da tarefa os tempos impressos e o estado do relatorio.
+
+4. Codigo completo.
+
+```bash
+npm run e2e:mf2
+npx playwright show-report test-results/mf2-html-report
+```
+
+5. Explicacao do codigo ou da decisao.
+
+O relatorio HTML permite rever screenshots, traces e videos retidos em falha.
+
+6. Validacao do passo.
+
+Evidence minima:
+
+- estado final do teste;
+- valor observado de `RNF07 detailLoadMs`;
+- valor observado de `RNF08 playStartMs`;
+- screenshot ou trace se falhar.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Sem evidence, uma falha de performance fica dificil de distinguir de falha de seed, media ou rota.
 
 ## Snippet tecnico aplicavel
 
-O trecho central mede o arranque do video:
-
 ```js
-const videoStartMs = await player.evaluate(async (video) => {
-  const start = performance.now();
-  const playing = new Promise((resolve) => {
-    video.addEventListener("playing", () => resolve(performance.now() - start), { once: true });
-  });
-  await video.play();
-  return playing;
-});
+await page.goto("/catalogo/piloto-faithflix");
+await expect(page.getByTestId("content-detail")).toBeVisible();
+await page.getByRole("link", { name: /reproduzir/i }).click();
 ```
 
-## Criterios de aceite (mensuraveis)
+## Criterios de aceitacao
 
-- `npm run e2e:mf2` executa seed e teste.
-- O fluxo login -> detalhe -> favorito -> watchlist -> player -> biblioteca passa.
-- `RNF07` fica abaixo de 3000 ms no ambiente local.
-- `RNF08` fica abaixo de 3000 ms no ambiente local.
-- O relatorio Playwright e gerado.
-- Pelo menos cinco negativos ficam registados.
+- [ ] `npm run e2e:mf2` executa seed antes do teste.
+- [ ] O teste faz login por `/login`.
+- [ ] O teste valida `/catalogo/piloto-faithflix`.
+- [ ] O teste usa `/ver/:contentId` atraves do link de reproducao.
+- [ ] O teste valida favoritos e watchlist.
+- [ ] O teste valida `/biblioteca`.
+- [ ] `RNF07` e `RNF08` sao medidos e registados.
+- [ ] Falhas guardam trace, screenshot ou video.
 
 ## Validacao final
 
-- Confirmar que `test-results/mf2-html-report` existe.
-- Confirmar que o output contem `RNF07 detailLoadMs`.
-- Confirmar que o output contem `RNF08 videoStartMs`.
-- Confirmar que a base de dados foi semeada antes do teste.
-- Confirmar que falhas geram trace, screenshot ou video.
+```bash
+npm run e2e:mf2
+```
 
-## Evidence para PR/defesa
+Regista no PR/defesa os valores de `RNF07` e `RNF08`, juntamente com o estado do relatorio Playwright.
 
-- Output completo de `npm run e2e:mf2`.
-- Relatorio HTML Playwright.
-- Valores medidos de `RNF07` e `RNF08`.
-- Screenshot do player.
-- Trace de falha, se existir.
+## Handoff para a proxima macrofase
 
-## Handoff
-
-Para `BK-MF3-01`, entregar:
-
-- Fluxo MF2 validado em browser.
-- Favoritos, watchlist e historico prontos para ratings e recomendacao.
-- Seed E2E reutilizavel.
-- Medicoes base de performance para comparacao futura.
-
-## Proximo BK recomendado
-
-`BK-MF3-01 - Ratings e agregacao`
-
-## Changelog
-
-- `2026-05-31`: Guia reescrito com Playwright, seed, media de teste, fluxo E2E, medicoes RNF07/RNF08, negativos e evidence.
+A `MF3` pode assumir que existe um fluxo principal autenticado e validado: login, catalogo, detalhe, reproducao, progresso, listas pessoais e biblioteca.

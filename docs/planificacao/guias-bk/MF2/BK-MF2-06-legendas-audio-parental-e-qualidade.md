@@ -23,47 +23,76 @@
 
 ### Objetivo pedagogico
 
-Adicionar ao player selecao de legendas, audio, qualidade e bloqueio parental basico. Este BK cobre `RF13`, `RF14` e `RF15`.
+Neste BK vais acrescentar selecao de legendas, audio, qualidade e controlo parental basico ao player. A entrega cobre `RF13`, `RF14` e `RF15`.
 
-O aluno deve perceber que estes controlos nao sao apenas botoes de interface: precisam de dados no catalogo, preferencia por utilizador e validacao no backend.
+No fim, deves conseguir explicar porque estes controlos nao sao apenas botoes: eles precisam de dados no catalogo, preferencias por utilizador e validacao no backend antes de devolver a URL de reproducao.
 
-### Tempo estimado
+### Importancia funcional
 
-- Rever player e catalogo: 15 min.
-- Campos de media e preferencia: 45 min.
-- Controlo parental backend: 45 min.
-- Controles frontend: 60 min.
-- Negativos e evidence: 30 min.
+Legendas, audio, qualidade e parental tornam a experiencia mais acessivel e segura. Tambem obrigam a separar tres responsabilidades: catalogo descreve opcoes, utilizador guarda preferencias, backend autoriza acesso.
+
+### Scope-in
+
+- Acrescentar `tracks.subtitles`, `tracks.audio` e `qualityOptions` ao catalogo.
+- Acrescentar `parentalMaxAgeRating` ao utilizador.
+- Criar endpoints de preferencias de media.
+- Validar parental no backend antes de devolver playback.
+- Atualizar player com selects de legenda, audio e qualidade.
+- Garantir que qualidade inexistente nao gera URL.
+
+### Scope-out
+
+- Controlo parental por PIN.
+- Perfis infantis completos.
+- Transcodificacao dinamica.
+- Upload de ficheiros `.vtt`.
+- Deteccao automatica de idioma.
+
+### Glossario rapido
+
+- `Subtitle track`: faixa de legendas.
+- `Audio track`: opcao de audio.
+- `Quality option`: URL de reproducao associada a uma qualidade.
+- `Parental max age rating`: limite etario maximo permitido para o utilizador.
+- `Media preferences`: escolhas persistidas por utilizador.
 
 ### Conceitos essenciais
 
-- Legendas e audio sao faixas associadas ao conteudo.
-- Qualidade e uma opcao de reproducao associada a uma URL.
-- Controlo parental no MVP usa `parentalMaxAgeRating` guardado no utilizador.
-- A verificacao parental ocorre no backend antes de devolver `playbackUrl`.
-- Preferencias sao guardadas por utilizador para manter a experiencia entre sessoes.
+- O catalogo declara as opcoes disponiveis; o frontend nao inventa opcoes.
+- O parental e verificado no backend em `GET /api/playback/:contentId`.
+- Uma preferencia guardada pode nao existir num conteudo especifico; nesse caso o player usa a opcao base.
+- `role` nao substitui limite parental.
+- Trocar qualidade deve preservar o tempo atual do video.
+
+### Tempo estimado
+
+- Rever catalogo e player: 20 min.
+- Atualizar validacao de catalogo: 45 min.
+- Backend parental e preferencias: 75 min.
+- Atualizar player React: 70 min.
+- Validacao e evidence: 35 min.
 
 ### Erros comuns
 
 - Bloquear conteudo apenas no frontend.
-- Aceitar uma qualidade que nao existe para o conteudo.
-- Alterar `src` do video sem preservar o tempo atual.
-- Guardar preferencias sem utilizador autenticado.
-- Misturar idade recomendada com role de autorizacao.
+- Aceitar qualquer qualidade e construir uma URL a partir do texto.
+- Perder o tempo atual ao trocar qualidade.
+- Guardar preferencias sem login.
+- Confundir classificacao etaria com role.
 
 ### Check de compreensao
 
 - [ ] Sei onde ficam `subtitles`, `audio` e `qualityOptions`.
-- [ ] Sei porque o parental precisa de validacao backend.
-- [ ] Sei que `role` nao substitui controlo parental.
-- [ ] Sei validar uma opcao de qualidade inexistente.
+- [ ] Sei porque parental precisa de validacao backend.
+- [ ] Sei porque uma qualidade inexistente nao pode gerar URL.
+- [ ] Sei testar troca de qualidade preservando tempo.
 
 ## Bloco operacional (obrigatorio)
 
 ### Pre-condicoes
 
 - `BK-MF2-05` concluido.
-- Player React funcional.
+- Player React funcional em `/ver/:contentId`.
 - Conteudo tem `ageRating`.
 - Utilizador autenticado tem `id`.
 
@@ -71,11 +100,12 @@ O aluno deve perceber que estes controlos nao sao apenas botoes de interface: pr
 
 | Area | Contrato |
 | --- | --- |
-| Catalogo | acrescentar `tracks.subtitles`, `tracks.audio`, `qualityOptions` |
-| Utilizador | acrescentar `parentalMaxAgeRating` e preferencias de media |
-| Preferencias | `GET/PUT /api/playback/preferences` |
+| Catalogo | `tracks.subtitles`, `tracks.audio`, `qualityOptions` |
+| Utilizador | `parentalMaxAgeRating` |
+| Preferencias | `GET /api/playback/preferences`, `PUT /api/playback/preferences` |
 | Parental | `GET /api/playback/:contentId` devolve `403` se `ageRating` exceder limite |
 | Player | selects para legenda, audio e qualidade |
+| Risco bloqueado | qualidade inexistente nao cria URL de media |
 
 ### Modelo de media
 
@@ -96,56 +126,218 @@ O aluno deve perceber que estes controlos nao sao apenas botoes de interface: pr
 }
 ```
 
+### Decisoes tecnicas
+
+- `CANONICO`: parental e validado no backend.
+- `CANONICO`: preferencias pertencem ao utilizador autenticado.
+- `DERIVADO`: `qualityOptions` guarda URLs explicitas; o player nunca calcula caminho de media.
+- `DERIVADO`: se a preferencia de qualidade nao existir no conteudo, usa-se `media.playbackUrl`.
+
 ### Guia de execucao (passo-a-passo)
 
-### Passo 1 - Atualizar validacao de catalogo
+### Passo 1 - Atualizar validacao completa de catalogo
 
-`EDITAR backend/src/modules/catalog/catalog.validation.js`
+1. Objetivo do passo.
 
-Adicionar validadores:
+Adicionar faixas e qualidades ao contrato do catalogo sem quebrar a validacao criada no BK-MF2-03.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `backend/src/modules/catalog/catalog.validation.js`
+    - LOCALIZACAO: substituir o ficheiro pelo conteudo completo abaixo
+
+3. Instrucoes concretas.
+
+Atualiza o ficheiro completo. Esta versao inclui todos os campos anteriores e os novos campos de media.
+
+4. Codigo completo.
 
 ```js
-function mediaTrack(track) {
-  return {
-    language: String(track.language ?? "").trim(),
-    label: String(track.label ?? "").trim(),
-    src: String(track.src ?? "").trim(),
+export const CONTENT_TYPES = ["movie", "series", "episode", "documentary"];
+export const CONTENT_STATUS = ["draft", "published", "archived"];
+
+function requiredText(value, field, min = 2, max = 160) {
+  const text = String(value ?? "").trim();
+
+  if (text.length < min || text.length > max) {
+    const error = new Error(`${field} invalido.`);
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return text;
+}
+
+function optionalText(value, max = 500) {
+  const text = String(value ?? "").trim();
+  return text.length > max ? text.slice(0, max) : text;
+}
+
+function positiveInteger(value, field) {
+  const number = Number(value);
+
+  if (!Number.isInteger(number) || number <= 0) {
+    const error = new Error(`${field} deve ser um inteiro positivo.`);
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return number;
+}
+
+function assertAgeRating(value) {
+  const number = Number(value);
+
+  if (!Number.isInteger(number) || number < 0 || number > 18) {
+    const error = new Error("Classificacao etaria invalida.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return number;
+}
+
+function mediaTrack(track, includeSrc) {
+  const item = {
+    language: requiredText(track.language, "language", 2, 12),
+    label: requiredText(track.label, "label", 2, 80),
   };
+
+  if (includeSrc) {
+    item.src = requiredText(track.src, "src", 1, 500);
+  }
+
+  return item;
 }
 
 function qualityOption(option) {
   return {
-    label: String(option.label ?? "").trim(),
-    value: String(option.value ?? "").trim(),
-    playbackUrl: String(option.playbackUrl ?? "").trim(),
+    label: requiredText(option.label, "label", 2, 40),
+    value: requiredText(option.value, "value", 2, 40),
+    playbackUrl: requiredText(option.playbackUrl, "playbackUrl", 1, 500),
   };
+}
+
+export function slugify(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 export function assertMediaOptions(input) {
   return {
     tracks: {
-      subtitles: Array.isArray(input.tracks?.subtitles) ? input.tracks.subtitles.map(mediaTrack) : [],
-      audio: Array.isArray(input.tracks?.audio) ? input.tracks.audio.map(mediaTrack) : [],
+      subtitles: Array.isArray(input.tracks?.subtitles)
+        ? input.tracks.subtitles.map((track) => mediaTrack(track, true))
+        : [],
+      audio: Array.isArray(input.tracks?.audio)
+        ? input.tracks.audio.map((track) => mediaTrack(track, false))
+        : [],
     },
-    qualityOptions: Array.isArray(input.qualityOptions) ? input.qualityOptions.map(qualityOption) : [],
+    qualityOptions: Array.isArray(input.qualityOptions)
+      ? input.qualityOptions.map(qualityOption)
+      : [],
+  };
+}
+
+export function assertCatalogPayload(input) {
+  const title = requiredText(input.title, "title");
+  const type = String(input.type ?? "").trim();
+
+  if (!CONTENT_TYPES.includes(type)) {
+    const error = new Error("Tipo de conteudo invalido.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const slug = input.slug ? slugify(input.slug) : slugify(title);
+
+  if (!slug) {
+    const error = new Error("Slug invalido.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return {
+    title,
+    slug,
+    synopsis: requiredText(input.synopsis, "synopsis", 20, 1000),
+    type,
+    durationSeconds: positiveInteger(input.durationSeconds, "durationSeconds"),
+    ageRating: assertAgeRating(input.ageRating ?? 0),
+    taxonomyIds: Array.isArray(input.taxonomyIds) ? input.taxonomyIds : [],
+    assets: {
+      posterUrl: optionalText(input.assets?.posterUrl),
+      backdropUrl: optionalText(input.assets?.backdropUrl),
+    },
+    media: {
+      playbackUrl: requiredText(input.media?.playbackUrl, "media.playbackUrl", 1, 500),
+    },
+    ...assertMediaOptions(input),
+  };
+}
+
+export function assertStatus(status) {
+  const normalized = String(status ?? "").trim();
+
+  if (!CONTENT_STATUS.includes(normalized)) {
+    const error = new Error("Estado de conteudo invalido.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return normalized;
+}
+
+export function assertTaxonomyPayload(input) {
+  const name = requiredText(input.name, "name", 2, 80);
+
+  return {
+    name,
+    slug: input.slug ? slugify(input.slug) : slugify(name),
+    description: optionalText(input.description),
   };
 }
 ```
 
-Dentro de `assertCatalogPayload`, juntar:
+5. Explicacao do codigo ou da decisao.
 
-```js
-const mediaOptions = assertMediaOptions(input);
+A funcao `assertCatalogPayload` fica completa e devolve todos os campos do catalogo numa unica estrutura.
 
-return {
-  ...basePayload,
-  ...mediaOptions,
-};
+6. Validacao do passo.
+
+```bash
+node -e "import('./src/modules/catalog/catalog.validation.js').then(({ assertMediaOptions }) => console.log(assertMediaOptions({}).qualityOptions.length))"
 ```
 
-### Passo 2 - Acrescentar limite parental ao perfil
+Resultado esperado: `0`.
 
-`EDITAR backend/src/modules/users/user.validation.js`
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Mostrar apenas um excerto de retorno pode deixar variaveis inexistentes no ficheiro final.
+
+### Passo 2 - Acrescentar limite parental ao utilizador
+
+1. Objetivo do passo.
+
+Permitir configurar o limite etario maximo do utilizador autenticado.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `backend/src/modules/users/user.validation.js`
+    - EDITAR: `backend/src/modules/users/user.service.js`
+    - EDITAR: `backend/src/modules/users/user.controller.js`
+    - EDITAR: `backend/src/modules/users/user.routes.js`
+    - LOCALIZACAO: acrescentar exports e rota
+
+3. Instrucoes concretas.
+
+Adiciona a validacao, servico, controller e rota abaixo.
+
+4. Codigo completo.
+
+Adicionar em `backend/src/modules/users/user.validation.js`:
 
 ```js
 export function assertParentalSettings(input) {
@@ -161,58 +353,82 @@ export function assertParentalSettings(input) {
 }
 ```
 
-`EDITAR backend/src/modules/users/user.service.js`
+Adicionar em `backend/src/modules/users/user.service.js`:
 
 ```js
 import { assertParentalSettings } from "./user.validation.js";
 
 export async function updateParentalSettings(userId, input) {
   const db = await getDb();
-  const result = await db.collection("users").findOneAndUpdate(
-    { _id: assertObjectId(userId) },
+  const user = await db.collection("users").findOneAndUpdate(
+    { _id: asUserObjectId(userId) },
     { $set: { ...assertParentalSettings(input), updatedAt: new Date() } },
     { returnDocument: "after" },
   );
 
-  return toPublicUser(result);
+  if (!user) {
+    const error = new Error("Utilizador nao encontrado.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return toPublicUser(user);
 }
 ```
 
-Adicionar rota:
+Adicionar em `backend/src/modules/users/user.controller.js`:
 
 ```js
-userRouter.patch("/me/parental", requireAuth, asyncHandler(async (req, res) => {
+import { updateParentalSettings } from "./user.service.js";
+
+export async function patchMyParentalSettings(req, res) {
   res.status(200).json({ user: await updateParentalSettings(req.user.id, req.body) });
-}));
-```
-
-### Passo 3 - Validar parental no playback
-
-`EDITAR backend/src/modules/playback/playback.service.js`
-
-No inicio de `getPlayback`, depois de carregar `content`, carregar o utilizador:
-
-```js
-const user = await db.collection("users").findOne({ _id: userObjectId });
-const maxAge = Number.isInteger(user?.parentalMaxAgeRating) ? user.parentalMaxAgeRating : 18;
-
-if (Number(content.ageRating) > maxAge) {
-  const error = new Error("Conteudo bloqueado pelo controlo parental.");
-  error.statusCode = 403;
-  throw error;
 }
 ```
 
-A resposta de playback deve passar a incluir:
+Adicionar em `backend/src/modules/users/user.routes.js` antes das rotas admin:
 
 ```js
-tracks: content.tracks ?? { subtitles: [], audio: [] },
-qualityOptions: content.qualityOptions ?? [],
+import { patchMyParentalSettings } from "./user.controller.js";
+
+userRouter.patch("/me/parental", requireAuth, asyncHandler(patchMyParentalSettings));
 ```
 
-### Passo 4 - Criar preferencias de media
+5. Explicacao do codigo ou da decisao.
 
-`CRIAR backend/src/modules/playback/media-preferences.service.js`
+O limite parental pertence ao utilizador autenticado. A rota usa `/me/parental` porque um utilizador comum so altera a propria configuracao.
+
+6. Validacao do passo.
+
+```bash
+curl -i -b /tmp/faithflix.cookies \
+  -X PATCH \
+  -H "Content-Type: application/json" \
+  -d '{"parentalMaxAgeRating":12}' \
+  http://localhost:3000/api/users/me/parental
+```
+
+Resultado esperado: `200`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se o limite for validado apenas no frontend, um pedido direto a API consegue contornar o bloqueio.
+
+### Passo 3 - Criar servico de preferencias de media
+
+1. Objetivo do passo.
+
+Guardar escolhas de legenda, audio e qualidade por utilizador.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `backend/src/modules/playback/media-preferences.service.js`
+    - LOCALIZACAO: ficheiro completo
+
+3. Instrucoes concretas.
+
+Cria o ficheiro abaixo. As preferencias guardam valores escolhidos; a escolha de URL continua a ser validada contra o conteudo no playback.
+
+4. Codigo completo.
 
 ```js
 import { ObjectId } from "mongodb";
@@ -224,23 +440,38 @@ const DEFAULT_PREFERENCES = {
   quality: "720p",
 };
 
-export async function getMediaPreferences(userId) {
-  const db = await getDb();
-  const preferences = await db.collection("media_preferences").findOne({ userId: new ObjectId(userId) });
-  return preferences?.values ?? DEFAULT_PREFERENCES;
+function asUserObjectId(userId) {
+  if (!ObjectId.isValid(userId)) {
+    const error = new Error("Utilizador invalido.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return new ObjectId(userId);
 }
 
-export async function saveMediaPreferences(userId, input) {
-  const values = {
+function normalizePreferences(input) {
+  return {
     subtitleLanguage: String(input.subtitleLanguage ?? "").trim(),
     audioLanguage: String(input.audioLanguage ?? "pt").trim(),
     quality: String(input.quality ?? "720p").trim(),
   };
+}
 
+export async function getMediaPreferences(userId) {
   const db = await getDb();
+  const preferences = await db.collection("media_preferences").findOne({ userId: asUserObjectId(userId) });
+  return preferences?.values ?? DEFAULT_PREFERENCES;
+}
+
+export async function saveMediaPreferences(userId, input) {
+  const db = await getDb();
+  const now = new Date();
+  const values = normalizePreferences(input);
+
   await db.collection("media_preferences").updateOne(
-    { userId: new ObjectId(userId) },
-    { $set: { values, updatedAt: new Date() }, $setOnInsert: { createdAt: new Date() } },
+    { userId: asUserObjectId(userId) },
+    { $set: { values, updatedAt: now }, $setOnInsert: { userId: asUserObjectId(userId), createdAt: now } },
     { upsert: true },
   );
 
@@ -248,174 +479,449 @@ export async function saveMediaPreferences(userId, input) {
 }
 ```
 
-`EDITAR backend/src/modules/playback/playback.routes.js`
+5. Explicacao do codigo ou da decisao.
+
+Guardar a preferencia nao significa aceitar uma URL. A URL so e escolhida no playback se existir em `qualityOptions` do conteudo.
+
+6. Validacao do passo.
+
+```bash
+node -e "import('./src/modules/playback/media-preferences.service.js').then(({ getMediaPreferences }) => console.log(typeof getMediaPreferences))"
+```
+
+Resultado esperado: `function`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Construir URLs a partir de `quality` permitiria caminhos inexistentes ou inesperados.
+
+### Passo 4 - Atualizar playback com parental e qualidade segura
+
+1. Objetivo do passo.
+
+Bloquear conteudo acima do limite parental e devolver uma URL de media apenas se existir no catalogo.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `backend/src/modules/playback/playback.service.js`
+    - LOCALIZACAO: acrescentar imports e substituir a montagem de `content`
+
+3. Instrucoes concretas.
+
+Importa `getMediaPreferences`, adiciona as funcoes abaixo e usa-as dentro de `getPlayback`.
+
+4. Codigo completo.
+
+```js
+import { getMediaPreferences } from "./media-preferences.service.js";
+
+function resolvePlayableMedia(content, preferences) {
+  const selectedQuality = content.qualityOptions?.find((option) => option.value === preferences.quality);
+
+  return {
+    playbackUrl: selectedQuality?.playbackUrl ?? content.media.playbackUrl,
+    selectedQuality: selectedQuality?.value ?? "",
+  };
+}
+
+function assertParentalAccess(user, content) {
+  const maxAge = Number.isInteger(user?.parentalMaxAgeRating) ? user.parentalMaxAgeRating : 18;
+
+  if (Number(content.ageRating) > maxAge) {
+    const error = new Error("Conteudo bloqueado pelo controlo parental.");
+    error.statusCode = 403;
+    throw error;
+  }
+}
+```
+
+Dentro de `getPlayback`, depois de carregar `content`:
+
+```js
+const user = await db.collection("users").findOne({ _id: userObjectId });
+assertParentalAccess(user, content);
+
+const preferences = await getMediaPreferences(userId);
+const media = resolvePlayableMedia(content, preferences);
+```
+
+E a resposta de `content` deve ficar assim:
+
+```js
+content: {
+  id: String(content._id),
+  title: content.title,
+  durationSeconds: content.durationSeconds,
+  media,
+  tracks: content.tracks ?? { subtitles: [], audio: [] },
+  qualityOptions: content.qualityOptions ?? [],
+  preferences,
+},
+```
+
+5. Explicacao do codigo ou da decisao.
+
+`resolvePlayableMedia` procura a qualidade no array do conteudo. Se nao existir, volta a `content.media.playbackUrl`.
+
+6. Validacao do passo.
+
+Com utilizador limitado a `12` e conteudo `ageRating: 16`:
+
+```bash
+curl -i -b /tmp/faithflix.cookies http://localhost:3000/api/playback/CONTENT_ID
+```
+
+Resultado esperado: `403`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Uma qualidade inventada como `9999p` nao deve produzir `/media/9999p.mp4`.
+
+### Passo 5 - Criar endpoints de preferencias
+
+1. Objetivo do passo.
+
+Permitir ler e guardar preferencias de media do utilizador autenticado.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `backend/src/modules/playback/playback.controller.js`
+    - EDITAR: `backend/src/modules/playback/playback.routes.js`
+    - LOCALIZACAO: exports e rotas antes de `/:contentId`
+
+3. Instrucoes concretas.
+
+Adiciona controllers e monta `/preferences` antes da rota dinamica.
+
+4. Codigo completo.
+
+Adicionar em `backend/src/modules/playback/playback.controller.js`:
 
 ```js
 import { getMediaPreferences, saveMediaPreferences } from "./media-preferences.service.js";
 
-playbackRouter.get("/preferences", requireAuth, asyncHandler(async (req, res) => {
+export async function getPlaybackPreferences(req, res) {
   res.status(200).json({ preferences: await getMediaPreferences(req.user.id) });
-}));
+}
 
-playbackRouter.put("/preferences", requireAuth, asyncHandler(async (req, res) => {
+export async function putPlaybackPreferences(req, res) {
   res.status(200).json({ preferences: await saveMediaPreferences(req.user.id, req.body) });
-}));
+}
 ```
 
-As rotas `/preferences` devem ficar antes de `/:contentId`.
-
-### Passo 5 - Atualizar cliente frontend
-
-`EDITAR frontend/src/services/api/playbackApi.js`
+Trecho final esperado em `backend/src/modules/playback/playback.routes.js`:
 
 ```js
+import { getPlaybackPreferences, putPlaybackPreferences } from "./playback.controller.js";
+
+playbackRouter.use(requireAuth);
+playbackRouter.get("/preferences", asyncHandler(getPlaybackPreferences));
+playbackRouter.put("/preferences", asyncHandler(putPlaybackPreferences));
+playbackRouter.get("/me/continue-watching", asyncHandler(getContinueWatching));
+playbackRouter.get("/:contentId", asyncHandler(getPlaybackByContent));
+playbackRouter.put("/:contentId/progress", asyncHandler(putPlaybackProgress));
+```
+
+5. Explicacao do codigo ou da decisao.
+
+`/preferences` tambem e rota fixa e precisa ficar antes de `/:contentId`.
+
+6. Validacao do passo.
+
+```bash
+curl -i -b /tmp/faithflix.cookies \
+  -X PUT \
+  -H "Content-Type: application/json" \
+  -d '{"subtitleLanguage":"pt","audioLanguage":"pt","quality":"1080p"}' \
+  http://localhost:3000/api/playback/preferences
+```
+
+Resultado esperado: `200`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se `/preferences` ficar depois de `/:contentId`, o backend tenta tratar `preferences` como id de conteudo.
+
+### Passo 6 - Atualizar cliente frontend de playback
+
+1. Objetivo do passo.
+
+Adicionar metodos para preferencias sem alterar os metodos de progresso.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `frontend/src/services/api/playbackApi.js`
+    - LOCALIZACAO: objeto completo
+
+3. Instrucoes concretas.
+
+Mantem os metodos do BK anterior e acrescenta `getPreferences` e `savePreferences`.
+
+4. Codigo completo.
+
+```js
+import { apiClient } from "./apiClient.js";
+
 export const playbackApi = {
   getPlayback(contentId) {
-    return apiClient.get(`/api/playback/${contentId}`);
+    return apiClient.get(`/api/playback/${encodeURIComponent(contentId)}`);
   },
-  saveProgress(contentId, payload) {
-    return apiClient.put(`/api/playback/${contentId}/progress`, payload);
+  saveProgress(contentId, currentTimeSeconds) {
+    return apiClient.put(`/api/playback/${encodeURIComponent(contentId)}/progress`, { currentTimeSeconds });
+  },
+  listContinueWatching() {
+    return apiClient.get("/api/playback/me/continue-watching");
   },
   getPreferences() {
     return apiClient.get("/api/playback/preferences");
   },
-  savePreferences(payload) {
-    return apiClient.put("/api/playback/preferences", payload);
+  savePreferences(input) {
+    return apiClient.put("/api/playback/preferences", input);
   },
 };
 ```
 
-### Passo 6 - Atualizar player com controles
+5. Explicacao do codigo ou da decisao.
 
-`EDITAR frontend/src/pages/PlaybackPage.jsx`
+O cliente continua coerente com `apiClient.put` e nao muda contratos anteriores.
 
-Adicionar estados:
-
-```jsx
-const [preferences, setPreferences] = useState(null);
-const [selectedQuality, setSelectedQuality] = useState("");
-```
-
-Carregar preferencias:
-
-```jsx
-useEffect(() => {
-  playbackApi.getPreferences()
-    .then((response) => {
-      setPreferences(response.preferences);
-      setSelectedQuality(response.preferences.quality);
-    })
-    .catch((requestError) => setError(requestError.message));
-}, []);
-```
-
-Escolher a URL:
-
-```jsx
-const quality = playback.content.qualityOptions.find((option) => option.value === selectedQuality);
-const playbackUrl = quality?.playbackUrl ?? playback.content.media.playbackUrl;
-```
-
-Renderizar o video:
-
-```jsx
-<video ref={videoRef} src={playbackUrl} controls playsInline onTimeUpdate={saveProgress}>
-  {playback.content.tracks.subtitles.map((track) => (
-    <track key={track.language} kind="subtitles" srcLang={track.language} label={track.label} src={track.src} />
-  ))}
-</video>
-```
-
-Renderizar controles:
-
-```jsx
-<label>
-  Qualidade
-  <select
-    value={selectedQuality}
-    onChange={(event) => {
-      setSelectedQuality(event.target.value);
-      playbackApi.savePreferences({ ...preferences, quality: event.target.value });
-    }}
-  >
-    {playback.content.qualityOptions.map((option) => (
-      <option key={option.value} value={option.value}>{option.label}</option>
-    ))}
-  </select>
-</label>
-```
-
-### Passo 7 - Validar backend
-
-Executar:
+6. Validacao do passo.
 
 ```bash
-curl -i http://localhost:3000/api/playback/preferences
-curl -i -X PUT http://localhost:3000/api/playback/preferences \
-  -H "Content-Type: application/json" \
-  -d '{"subtitleLanguage":"pt","audioLanguage":"pt","quality":"720p"}'
-curl -i -X PATCH http://localhost:3000/api/users/me/parental \
-  -H "Content-Type: application/json" \
-  -d '{"parentalMaxAgeRating":12}'
+node -e "import('./src/services/api/playbackApi.js').then(({ playbackApi }) => console.log(typeof playbackApi.savePreferences))"
 ```
 
-### Passo 8 - Validar negativos minimos
+Resultado esperado: `function`.
 
-- Conteudo com `ageRating: 16` bloqueia utilizador com `parentalMaxAgeRating: 12`.
-- Limite parental fora de `0..18` devolve `400`.
-- Preferencia de qualidade inexistente nao deve gerar URL inventada.
-- Sem login, preferencias devolvem `401`.
-- Legenda sem `src` nao deve quebrar o player.
+7. Caso negativo, erro comum ou risco que este passo evita.
 
-## Snippet tecnico aplicavel
+Remover `saveProgress` ao editar este ficheiro quebraria o BK anterior.
 
-O ponto central e a verificacao parental no backend:
+### Passo 7 - Atualizar player com controlos
 
-```js
-if (Number(content.ageRating) > maxAge) {
-  const error = new Error("Conteudo bloqueado pelo controlo parental.");
-  error.statusCode = 403;
-  throw error;
+1. Objetivo do passo.
+
+Mostrar selects de legenda, audio e qualidade, guardando preferencias e preservando tempo ao trocar qualidade.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `frontend/src/pages/PlaybackPage.jsx`
+    - LOCALIZACAO: componente completo atualizado
+
+3. Instrucoes concretas.
+
+Atualiza o componente para gerir `preferences`, `videoSrc` e controlos.
+
+4. Codigo completo.
+
+```jsx
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { playbackApi } from "../services/api/playbackApi.js";
+
+const SAVE_INTERVAL_SECONDS = 15;
+
+export function PlaybackPage() {
+  const { contentId } = useParams();
+  const videoRef = useRef(null);
+  const lastSavedRef = useRef(0);
+  const resumeAtRef = useRef(0);
+  const [playback, setPlayback] = useState(null);
+  const [preferences, setPreferences] = useState({ subtitleLanguage: "", audioLanguage: "pt", quality: "" });
+  const [videoSrc, setVideoSrc] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    playbackApi.getPlayback(contentId)
+      .then((response) => {
+        setPlayback(response);
+        setPreferences(response.content.preferences);
+        setVideoSrc(response.content.media.playbackUrl);
+      })
+      .catch((requestError) => setError(requestError.message));
+  }, [contentId]);
+
+  function handleLoadedMetadata() {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const startAt = resumeAtRef.current || playback?.progress.currentTimeSeconds || 0;
+    if (startAt > 0) video.currentTime = startAt;
+    resumeAtRef.current = 0;
+  }
+
+  function handleTimeUpdate() {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (Math.abs(video.currentTime - lastSavedRef.current) < SAVE_INTERVAL_SECONDS) {
+      return;
+    }
+
+    lastSavedRef.current = video.currentTime;
+    playbackApi.saveProgress(contentId, video.currentTime).catch(() => {});
+  }
+
+  async function handlePause() {
+    const video = videoRef.current;
+    if (video) await playbackApi.saveProgress(contentId, video.currentTime);
+  }
+
+  async function updatePreference(name, value) {
+    const nextPreferences = { ...preferences, [name]: value };
+    setPreferences(nextPreferences);
+    await playbackApi.savePreferences(nextPreferences);
+
+    if (name === "quality" && playback) {
+      const selectedQuality = playback.content.qualityOptions.find((option) => option.value === value);
+      if (!selectedQuality || !videoRef.current) return;
+
+      resumeAtRef.current = videoRef.current.currentTime;
+      setVideoSrc(selectedQuality.playbackUrl);
+    }
+  }
+
+  if (error) {
+    return <main className="page-shell"><p role="alert">{error}</p></main>;
+  }
+
+  if (!playback) {
+    return <main className="page-shell"><p>A carregar player...</p></main>;
+  }
+
+  return (
+    <main className="page-shell">
+      <h1>{playback.content.title}</h1>
+      <div className="player-controls" aria-label="Opcoes de media">
+        <label>
+          Legendas
+          <select value={preferences.subtitleLanguage} onChange={(event) => updatePreference("subtitleLanguage", event.target.value)}>
+            <option value="">Sem legendas</option>
+            {playback.content.tracks.subtitles.map((track) => (
+              <option key={track.language} value={track.language}>{track.label}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Audio
+          <select value={preferences.audioLanguage} onChange={(event) => updatePreference("audioLanguage", event.target.value)}>
+            {playback.content.tracks.audio.map((track) => (
+              <option key={track.language} value={track.language}>{track.label}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Qualidade
+          <select value={preferences.quality} onChange={(event) => updatePreference("quality", event.target.value)}>
+            <option value="">Automatica</option>
+            {playback.content.qualityOptions.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <video
+        ref={videoRef}
+        controls
+        data-testid="faithflix-player"
+        src={videoSrc}
+        onLoadedMetadata={handleLoadedMetadata}
+        onTimeUpdate={handleTimeUpdate}
+        onPause={handlePause}
+      >
+        {playback.content.tracks.subtitles.map((track) => (
+          <track key={track.language} kind="subtitles" srcLang={track.language} label={track.label} src={track.src} />
+        ))}
+        O teu browser nao suporta video HTML5.
+      </video>
+    </main>
+  );
 }
 ```
 
-## Criterios de aceite (mensuraveis)
+5. Explicacao do codigo ou da decisao.
 
-- Conteudos podem ter legendas, audio e qualidades no catalogo.
-- Player mostra opcoes de qualidade disponiveis.
-- Player renderiza tracks de legenda.
-- Preferencias de media ficam guardadas por utilizador.
-- Conteudo acima do limite parental devolve `403`.
-- Negativos de parental, preferencia e login ficam registados.
+Ao trocar qualidade, o componente guarda o tempo atual em `resumeAtRef` e repoe esse tempo quando a nova fonte carrega.
+
+6. Validacao do passo.
+
+Abre `/ver/:contentId`, muda de qualidade aos 20 segundos e confirma que o video continua perto desse tempo.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se o player reiniciar sempre em `0`, a troca de qualidade prejudica a experiencia.
+
+### Passo 8 - Validar parental, preferencias e qualidade
+
+1. Objetivo do passo.
+
+Confirmar os tres contratos principais deste BK.
+
+2. Ficheiros envolvidos.
+    - EXECUTAR: backend e frontend
+    - VALIDAR: API, UI e MongoDB
+
+3. Instrucoes concretas.
+
+Testa limite parental, preferencias e qualidade inexistente.
+
+4. Codigo completo.
+
+```bash
+curl -i -b /tmp/faithflix.cookies \
+  -X PATCH \
+  -H "Content-Type: application/json" \
+  -d '{"parentalMaxAgeRating":6}' \
+  http://localhost:3000/api/users/me/parental
+
+curl -i -b /tmp/faithflix.cookies http://localhost:3000/api/playback/CONTENT_ID
+
+curl -i -b /tmp/faithflix.cookies \
+  -X PUT \
+  -H "Content-Type: application/json" \
+  -d '{"subtitleLanguage":"pt","audioLanguage":"pt","quality":"qualidade-inexistente"}' \
+  http://localhost:3000/api/playback/preferences
+```
+
+5. Explicacao do codigo ou da decisao.
+
+O backend pode guardar a preferencia textual, mas `GET /api/playback/:contentId` so devolve uma URL que venha do catalogo.
+
+6. Validacao do passo.
+
+Resultados esperados:
+
+- Conteudo acima do limite devolve `403`.
+- Preferencias devolvem `200`.
+- Qualidade inexistente nao altera `media.playbackUrl` para uma URL criada artificialmente.
+- Player mostra selects e continua funcional.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se a resposta devolver uma URL construida a partir da qualidade inexistente, a regra de seguranca deste BK falhou.
+
+## Snippet tecnico aplicavel
+
+```js
+const selectedQuality = content.qualityOptions?.find((option) => option.value === preferences.quality);
+const playbackUrl = selectedQuality?.playbackUrl ?? content.media.playbackUrl;
+```
+
+## Criterios de aceitacao
+
+- [ ] Catalogo aceita `tracks.subtitles`, `tracks.audio` e `qualityOptions`.
+- [ ] `PATCH /api/users/me/parental` valida limite entre `0` e `18`.
+- [ ] `GET /api/playback/:contentId` devolve `403` acima do limite parental.
+- [ ] `GET/PUT /api/playback/preferences` exige login.
+- [ ] Player mostra selects de legenda, audio e qualidade.
+- [ ] Troca de qualidade preserva aproximadamente o tempo atual.
+- [ ] Qualidade inexistente nao gera URL.
 
 ## Validacao final
 
-- Confirmar que `BK-MF2-05` continua a guardar progresso.
-- Confirmar que mudar qualidade mantem o player funcional.
-- Confirmar que controlo parental e aplicado no endpoint de playback.
-- Confirmar que a UI nao mostra erro se um conteudo nao tiver legendas.
+```bash
+npm --prefix backend test
+npm --prefix frontend run build
+```
 
-## Evidence para PR/defesa
+Regista evidence com resposta `403`, resposta de preferencias e screenshot do player com controlos.
 
-- Captura do player com seletor de qualidade.
-- Log de `PUT /api/playback/preferences`.
-- Log de `PATCH /api/users/me/parental`.
-- Log de `403` por bloqueio parental.
-- Exemplo de conteudo com `tracks` e `qualityOptions`.
+## Handoff para o proximo BK
 
-## Handoff
-
-Para `BK-MF2-07`, entregar:
-
-- Player com progresso preservado.
-- `playback_progress` intacto.
-- Preferencias por utilizador.
-- Conteudo bloqueado por parental sem criar historico indevido.
-
-## Proximo BK recomendado
-
-`BK-MF2-07 - Favoritos/watchlist/historico`
-
-## Changelog
-
-- `2026-05-31`: Guia reescrito com media tracks, qualidade, preferencias, controlo parental, frontend e negativos.
+O `BK-MF2-07` pode reutilizar `playback_progress` para historico e manter o player como origem dos eventos de visualizacao.

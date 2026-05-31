@@ -23,39 +23,71 @@
 
 ### Objetivo pedagogico
 
-Permitir que um utilizador autenticado edite o proprio perfil (`RF03`) e estabelecer papeis base (`RF04`) para proteger funcionalidades futuras: catalogo, publicacao, administracao e gestao de utilizadores.
+Neste BK vais implementar a edicao do proprio perfil (`RF03`) e os papeis base da FaithFlix (`RF04`).
 
-Este BK ensina a diferenca entre dados editaveis pelo proprio utilizador e dados de autorizacao que so um administrador pode alterar.
+No fim, deves conseguir explicar a diferenca entre autenticar um utilizador, autorizar uma acao e impedir que um utilizador comum altere campos sensiveis como `role`.
 
-### Tempo estimado
+### Importancia funcional
 
-- Revisao do BK anterior: 15 min.
-- Middlewares de autenticacao e role: 35 min.
-- Endpoints de perfil e admin: 70 min.
-- UI de conta e validacao: 45 min.
-- Evidence e negativos: 30 min.
+Perfil e roles sao a primeira camada de autorizacao da aplicacao. O catalogo admin, a gestao de conteudos, o playback autenticado, favoritos, historico e privacidade dependem de `req.user` confiavel e de verificacoes feitas no backend.
+
+### Scope-in
+
+- Criar `requireAuth` e `requireRole`.
+- Permitir leitura e edicao do proprio nome.
+- Bloquear alteracao direta de `email`, `role`, `createdAt` e campos internos.
+- Listar utilizadores apenas para `admin`.
+- Permitir alteracao de role apenas por `admin`.
+- Criar script local para promover o primeiro admin.
+- Criar paginas de conta e gestao simples de utilizadores.
+
+### Scope-out
+
+- Convites para administradores.
+- Auditoria avancada de alteracoes.
+- Gestao de billing.
+- Upload de avatar.
+- Eliminacao de conta.
+
+### Glossario rapido
+
+- `Autenticacao`: confirmar quem esta a fazer o pedido.
+- `Autorizacao`: confirmar se esse utilizador pode executar a acao.
+- `Role`: papel de permissao guardado no servidor.
+- `requireAuth`: middleware que exige login.
+- `requireRole`: middleware que exige uma role permitida.
 
 ### Conceitos essenciais
 
-- Autenticacao responde a pergunta "quem e este utilizador?".
-- Autorizacao responde a pergunta "este utilizador pode fazer esta acao?".
-- `role` e campo de seguranca, nao campo de perfil.
-- Um endpoint admin deve verificar role no servidor, mesmo que a UI esconda botoes.
+- `req.user` foi entregue no `BK-MF2-01` e e a fonte usada para ownership e roles.
+- O frontend pode esconder botoes, mas a seguranca real fica no backend.
+- `PATCH /api/users/me` aceita apenas dados de perfil editaveis.
+- A role inicial de novos utilizadores e `user`.
+- O primeiro admin e criado por script local controlado para desbloquear a area admin.
+
+### Tempo estimado
+
+- Rever autenticacao do BK anterior: 15 min.
+- Middlewares de autenticacao e roles: 30 min.
+- Backend de utilizadores: 70 min.
+- Script admin: 25 min.
+- Frontend de conta e admin: 60 min.
+- Validacao e evidence: 30 min.
 
 ### Erros comuns
 
-- Permitir `PATCH /api/users/me` com `role`.
-- Proteger apenas o frontend e esquecer o backend.
-- Usar valores livres para role.
-- Devolver dados internos de outros utilizadores.
-- Criar admin sem processo auditavel.
+- Aceitar `role` no endpoint de perfil proprio.
+- Proteger apenas componentes React e deixar a API aberta.
+- Usar roles fora da lista `user`, `moderator`, `admin`.
+- Devolver `passwordHash` na listagem.
+- Testar endpoints protegidos sem cookie de sessao.
 
 ### Check de compreensao
 
-- [ ] Sei explicar porque `role` nao entra no formulario de perfil.
-- [ ] Sei distinguir `requireAuth` de `requireRole`.
-- [ ] Sei testar uma tentativa de elevacao de privilegio.
-- [ ] Sei que `BK-MF2-03` precisa de roles para proteger CRUD de catalogo.
+- [ ] Sei explicar a diferenca entre `requireAuth` e `requireRole`.
+- [ ] Sei porque `role` nao pertence ao formulario de perfil.
+- [ ] Sei testar `401`, `403` e sucesso autenticado.
+- [ ] Sei promover um admin sem expor esse poder no frontend publico.
 
 ## Bloco operacional (obrigatorio)
 
@@ -63,8 +95,9 @@ Este BK ensina a diferenca entre dados editaveis pelo proprio utilizador e dados
 
 - `BK-MF2-01` concluido.
 - `GET /api/session/me` devolve `user.id`, `user.name`, `user.email` e `user.role`.
-- Colecao `users` existe com campo `role`.
-- O backend ja aplica `attachSession` antes das rotas protegidas.
+- `req.user` fica preenchido pelo middleware de sessao.
+- `apiClient` da `MF1` usa `credentials: "include"`.
+- MongoDB acessivel.
 
 ### Contrato tecnico deste BK
 
@@ -72,22 +105,35 @@ Este BK ensina a diferenca entre dados editaveis pelo proprio utilizador e dados
 | --- | --- |
 | Roles validas | `user`, `moderator`, `admin` |
 | Perfil proprio | `GET /api/users/me`, `PATCH /api/users/me` |
-| Admin roles | `GET /api/users`, `PATCH /api/users/:id/role` |
+| Admin users | `GET /api/users`, `PATCH /api/users/:id/role` |
 | Campos editaveis pelo proprio utilizador | `name` |
 | Campos bloqueados ao proprio utilizador | `email`, `role`, `createdAt`, `passwordHash` |
-| Frontend | pagina `AccountPage` e painel simples `AdminUsersPage` |
+| Frontend | `AccountPage`, `AdminUsersPage`, rota `/conta`, rota `/admin/utilizadores` |
 
 ### Decisoes tecnicas
 
-- `CANONICO`: usar a sessao criada no `BK-MF2-01`.
-- `DERIVADO`: `moderator` pode gerir catalogo no `BK-MF2-03`, mas nao gere roles.
-- `DERIVADO`: criar script local para promover o primeiro admin, porque ainda nao existe area admin antes deste BK.
+- `CANONICO`: a identidade autenticada vem de `req.user`.
+- `CANONICO`: a role e validada no backend.
+- `DERIVADO`: `moderator` fica reservado para gestao de catalogo no `BK-MF2-03`.
+- `DERIVADO`: o primeiro admin e promovido por script local com email explicito.
 
 ### Guia de execucao (passo-a-passo)
 
-### Passo 1 - Criar middleware de autenticacao
+### Passo 1 - Criar middlewares de autenticacao e role
 
-`CRIAR backend/src/modules/auth/auth.middleware.js`
+1. Objetivo do passo.
+
+Centralizar as verificacoes de login e permissao para que os BKs seguintes usem sempre o mesmo contrato.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `backend/src/modules/auth/auth.middleware.js`
+    - LOCALIZACAO: ficheiro completo
+
+3. Instrucoes concretas.
+
+Cria o ficheiro abaixo. Ele assume que `BK-MF2-01` ja preenche `req.user`.
+
+4. Codigo completo.
 
 ```js
 export function requireAuth(req, res, next) {
@@ -113,9 +159,42 @@ export function requireRole(allowedRoles) {
 }
 ```
 
-### Passo 2 - Criar validacao de perfil e roles
+5. Explicacao do codigo ou da decisao.
 
-`CRIAR backend/src/modules/users/user.validation.js`
+`requireAuth` protege qualquer rota que precise de login. `requireRole` recebe uma lista fechada para evitar duplicar regras de permissao em cada controller.
+
+6. Validacao do passo.
+
+Importa temporariamente o ficheiro num terminal Node:
+
+```bash
+node -e "import('./src/modules/auth/auth.middleware.js').then((m) => console.log(typeof m.requireAuth, typeof m.requireRole))"
+```
+
+Resultado esperado: `function function`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se cada rota verificar roles manualmente, e facil esquecer uma rota admin aberta.
+
+### Passo 2 - Criar validacao e servico de utilizadores
+
+1. Objetivo do passo.
+
+Validar dados de perfil e encapsular o acesso a `users` sem expor campos internos.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `backend/src/modules/users/user.validation.js`
+    - CRIAR: `backend/src/modules/users/user.service.js`
+    - LOCALIZACAO: ficheiros completos
+
+3. Instrucoes concretas.
+
+Cria a validacao primeiro e depois o servico. Mantem `toPublicUser` como unica forma de devolver utilizadores ao frontend.
+
+4. Codigo completo.
+
+`backend/src/modules/users/user.validation.js`
 
 ```js
 export const VALID_ROLES = ["user", "moderator", "admin"];
@@ -145,9 +224,7 @@ export function assertRoleUpdate(input) {
 }
 ```
 
-### Passo 3 - Criar servico de utilizadores
-
-`CRIAR backend/src/modules/users/user.service.js`
+`backend/src/modules/users/user.service.js`
 
 ```js
 import { ObjectId } from "mongodb";
@@ -165,74 +242,117 @@ function toPublicUser(user) {
   };
 }
 
-function assertObjectId(id) {
-  if (!ObjectId.isValid(id)) {
+function asUserObjectId(userId) {
+  if (!ObjectId.isValid(userId)) {
     const error = new Error("Utilizador invalido.");
     error.statusCode = 400;
     throw error;
   }
-  return new ObjectId(id);
+
+  return new ObjectId(userId);
 }
 
 export async function getMyProfile(userId) {
   const db = await getDb();
-  const user = await db.collection("users").findOne({ _id: assertObjectId(userId) });
+  const user = await db.collection("users").findOne({ _id: asUserObjectId(userId) });
+
   if (!user) {
     const error = new Error("Utilizador nao encontrado.");
     error.statusCode = 404;
     throw error;
   }
+
   return toPublicUser(user);
 }
 
 export async function updateMyProfile(userId, input) {
   const update = assertProfileUpdate(input);
   const db = await getDb();
+  const now = new Date();
 
-  const result = await db.collection("users").findOneAndUpdate(
-    { _id: assertObjectId(userId) },
-    { $set: { ...update, updatedAt: new Date() } },
+  const user = await db.collection("users").findOneAndUpdate(
+    { _id: asUserObjectId(userId) },
+    { $set: { ...update, updatedAt: now } },
     { returnDocument: "after" },
   );
 
-  if (!result) {
+  if (!user) {
     const error = new Error("Utilizador nao encontrado.");
     error.statusCode = 404;
     throw error;
   }
 
-  return toPublicUser(result);
+  return toPublicUser(user);
 }
 
 export async function listUsers() {
   const db = await getDb();
-  const users = await db.collection("users").find({}, { projection: { passwordHash: 0 } }).sort({ createdAt: -1 }).toArray();
+  const users = await db
+    .collection("users")
+    .find({}, { projection: { passwordHash: 0 } })
+    .sort({ createdAt: -1 })
+    .toArray();
+
   return users.map(toPublicUser);
 }
 
 export async function updateUserRole(targetUserId, input) {
   const update = assertRoleUpdate(input);
   const db = await getDb();
+  const now = new Date();
 
-  const result = await db.collection("users").findOneAndUpdate(
-    { _id: assertObjectId(targetUserId) },
-    { $set: { ...update, updatedAt: new Date() } },
+  const user = await db.collection("users").findOneAndUpdate(
+    { _id: asUserObjectId(targetUserId) },
+    { $set: { ...update, updatedAt: now } },
     { returnDocument: "after" },
   );
 
-  if (!result) {
+  if (!user) {
     const error = new Error("Utilizador nao encontrado.");
     error.statusCode = 404;
     throw error;
   }
 
-  return toPublicUser(result);
+  return toPublicUser(user);
 }
 ```
 
-### Passo 4 - Criar controller e rotas
+5. Explicacao do codigo ou da decisao.
 
-`CRIAR backend/src/modules/users/user.controller.js`
+O servico nunca devolve `passwordHash`. O endpoint de perfil proprio chama `assertProfileUpdate`, por isso campos enviados a mais pelo browser sao ignorados.
+
+6. Validacao do passo.
+
+Executa:
+
+```bash
+node -e "import('./src/modules/users/user.validation.js').then(({ assertProfileUpdate }) => console.log(assertProfileUpdate({ name: 'Nuno' }).name))"
+```
+
+Resultado esperado: `Nuno`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Uma tentativa de enviar `{ "name": "Nuno", "role": "admin" }` para o perfil proprio nao altera role, porque o servico so aproveita `name`.
+
+### Passo 3 - Criar controller e rotas de utilizadores
+
+1. Objetivo do passo.
+
+Expor os endpoints de perfil e admin com os middlewares corretos.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `backend/src/modules/users/user.controller.js`
+    - CRIAR: `backend/src/modules/users/user.routes.js`
+    - LOCALIZACAO: ficheiros completos
+
+3. Instrucoes concretas.
+
+Cria o controller e a rota. As rotas admin devem ficar depois de `requireRole(["admin"])`.
+
+4. Codigo completo.
+
+`backend/src/modules/users/user.controller.js`
 
 ```js
 import { getMyProfile, listUsers, updateMyProfile, updateUserRole } from "./user.service.js";
@@ -254,7 +374,7 @@ export async function patchUserRole(req, res) {
 }
 ```
 
-`CRIAR backend/src/modules/users/user.routes.js`
+`backend/src/modules/users/user.routes.js`
 
 ```js
 import { Router } from "express";
@@ -270,44 +390,52 @@ userRouter.get("/", requireRole(["admin"]), asyncHandler(getUsers));
 userRouter.patch("/:id/role", requireRole(["admin"]), asyncHandler(patchUserRole));
 ```
 
-`EDITAR backend/src/app.js`
+5. Explicacao do codigo ou da decisao.
+
+As rotas `/me` ficam antes de `/:id/role`, evitando conflito com parametros dinamicos. O backend decide quem pode listar e mudar roles.
+
+6. Validacao do passo.
+
+Sem login:
+
+```bash
+curl -i http://localhost:3000/api/users/me
+```
+
+Resultado esperado: `401`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se a rota `/:id/role` vier antes de `/me`, o Express pode interpretar `me` como parametro e a API fica incoerente.
+
+### Passo 4 - Montar rotas e criar script para primeiro admin
+
+1. Objetivo do passo.
+
+Ligar o modulo de users ao backend e permitir promover um admin inicial de forma explicita.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `backend/src/app.js`
+    - EDITAR: `backend/package.json`
+    - CRIAR: `backend/scripts/promote-admin.js`
+    - LOCALIZACAO: ficheiro completo para o script; linhas de montagem para `app.js`
+
+3. Instrucoes concretas.
+
+Monta `userRouter` depois do middleware de sessao. Depois adiciona o script `promote:admin`.
+
+4. Codigo completo.
+
+Trecho esperado em `backend/src/app.js`:
 
 ```js
 import { userRouter } from "./modules/users/user.routes.js";
 
+app.use(attachSession);
 app.use("/api/users", userRouter);
 ```
 
-### Passo 5 - Criar script de promocao de admin
-
-`CRIAR backend/scripts/promote-admin.js`
-
-```js
-import { getDb } from "../src/config/database.js";
-
-const email = process.argv[2]?.trim().toLowerCase();
-
-if (!email) {
-  console.error("Uso: npm run promote:admin -- email@example.com");
-  process.exit(1);
-}
-
-const db = await getDb();
-const result = await db.collection("users").updateOne(
-  { email },
-  { $set: { role: "admin", updatedAt: new Date() } },
-);
-
-if (result.matchedCount === 0) {
-  console.error("Utilizador nao encontrado.");
-  process.exit(1);
-}
-
-console.log(`Utilizador ${email} promovido para admin.`);
-process.exit(0);
-```
-
-`EDITAR backend/package.json`
+Trecho esperado em `backend/package.json`:
 
 ```json
 {
@@ -317,9 +445,67 @@ process.exit(0);
 }
 ```
 
-### Passo 6 - Criar cliente frontend de utilizadores
+`backend/scripts/promote-admin.js`
 
-`CRIAR frontend/src/services/api/userApi.js`
+```js
+import { getDb } from "../src/config/database.js";
+
+const email = process.argv[2]?.trim().toLowerCase();
+
+if (!email) {
+  console.error("Uso: npm run promote:admin -- email@exemplo.test");
+  process.exit(1);
+}
+
+const db = await getDb();
+const result = await db.collection("users").findOneAndUpdate(
+  { email },
+  { $set: { role: "admin", updatedAt: new Date() } },
+  { returnDocument: "after" },
+);
+
+if (!result) {
+  console.error("Utilizador nao encontrado.");
+  process.exit(1);
+}
+
+console.log(`Admin promovido: ${result.email}`);
+process.exit(0);
+```
+
+5. Explicacao do codigo ou da decisao.
+
+O script exige email na linha de comandos para evitar promocao acidental. A rota fica montada depois de `attachSession`, porque os middlewares precisam de `req.user`.
+
+6. Validacao do passo.
+
+Depois de criar um utilizador:
+
+```bash
+npm run promote:admin -- admin@faithflix.test
+```
+
+Resultado esperado: `Admin promovido: admin@faithflix.test`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Criar um endpoint publico para promover admins seria uma falha critica de seguranca.
+
+### Passo 5 - Criar cliente frontend de users
+
+1. Objetivo do passo.
+
+Dar ao frontend funcoes pequenas e alinhadas com os endpoints deste BK.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `frontend/src/services/api/userApi.js`
+    - LOCALIZACAO: ficheiro completo
+
+3. Instrucoes concretas.
+
+Usa o `apiClient` criado na `MF1`. Nao uses `fetch` direto nos componentes.
+
+4. Codigo completo.
 
 ```js
 import { apiClient } from "./apiClient.js";
@@ -328,29 +514,63 @@ export const userApi = {
   getMe() {
     return apiClient.get("/api/users/me");
   },
-  updateMe(payload) {
-    return apiClient.patch("/api/users/me", payload);
+  updateMe(input) {
+    return apiClient.patch("/api/users/me", input);
   },
   listUsers() {
     return apiClient.get("/api/users");
   },
-  updateRole(userId, payload) {
-    return apiClient.patch(`/api/users/${userId}/role`, payload);
+  updateRole(userId, role) {
+    return apiClient.patch(`/api/users/${encodeURIComponent(userId)}/role`, { role });
   },
 };
 ```
 
-### Passo 7 - Criar pagina de conta
+5. Explicacao do codigo ou da decisao.
 
-`CRIAR frontend/src/pages/AccountPage.jsx`
+O cliente mantem a mesma convencao de `apiClient.get` e `apiClient.patch`, preservando cookies de sessao.
+
+6. Validacao do passo.
+
+Importa o ficheiro:
+
+```bash
+node -e "import('./src/services/api/userApi.js').then(({ userApi }) => console.log(Object.keys(userApi).length))"
+```
+
+Resultado esperado: `4`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se o componente usar `fetch` sem `credentials`, a sessao nao acompanha o pedido e endpoints protegidos devolvem `401`.
+
+### Passo 6 - Criar paginas de conta e admin
+
+1. Objetivo do passo.
+
+Entregar uma UI minima para o utilizador editar o nome e para o admin gerir roles.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `frontend/src/pages/AccountPage.jsx`
+    - CRIAR: `frontend/src/pages/AdminUsersPage.jsx`
+    - EDITAR: `frontend/src/routes/AppRoutes.jsx`
+    - LOCALIZACAO: ficheiros completos para as paginas; trecho de rotas
+
+3. Instrucoes concretas.
+
+Cria as duas paginas. Liga `/conta` e `/admin/utilizadores` no router.
+
+4. Codigo completo.
+
+`frontend/src/pages/AccountPage.jsx`
 
 ```jsx
 import { useEffect, useState } from "react";
 import { userApi } from "../services/api/userApi.js";
 
 export function AccountPage() {
-  const [user, setUser] = useState(null);
   const [name, setName] = useState("");
+  const [user, setUser] = useState(null);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
 
@@ -363,10 +583,10 @@ export function AccountPage() {
       .catch((requestError) => setError(requestError.message));
   }, []);
 
-  async function submit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    setError("");
     setStatus("");
+    setError("");
 
     try {
       const response = await userApi.updateMe({ name });
@@ -377,37 +597,30 @@ export function AccountPage() {
     }
   }
 
-  if (error && !user) return <main className="page-shell"><p>{error}</p></main>;
-  if (!user) return <main className="page-shell"><p>A carregar perfil...</p></main>;
-
   return (
     <main className="page-shell">
       <h1>A minha conta</h1>
-      <form onSubmit={submit} className="account-form">
-        <label>
-          Nome
-          <input name="name" value={name} onChange={(event) => setName(event.target.value)} />
-        </label>
-        <label>
-          Email
-          <input value={user.email} disabled />
-        </label>
-        <label>
-          Role
-          <input value={user.role} disabled />
-        </label>
+      {error && <p role="alert">{error}</p>}
+      {status && <p role="status">{status}</p>}
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="profile-name">Nome</label>
+        <input id="profile-name" value={name} onChange={(event) => setName(event.target.value)} />
         <button type="submit">Guardar</button>
       </form>
-      {status ? <p className="form-status">{status}</p> : null}
-      {error ? <p className="form-error">{error}</p> : null}
+      {user && (
+        <dl>
+          <dt>Email</dt>
+          <dd>{user.email}</dd>
+          <dt>Role</dt>
+          <dd>{user.role}</dd>
+        </dl>
+      )}
     </main>
   );
 }
 ```
 
-### Passo 8 - Criar pagina admin minima
-
-`CRIAR frontend/src/pages/AdminUsersPage.jsx`
+`frontend/src/pages/AdminUsersPage.jsx`
 
 ```jsx
 import { useEffect, useState } from "react";
@@ -428,11 +641,11 @@ export function AdminUsersPage() {
     loadUsers().catch((requestError) => setError(requestError.message));
   }, []);
 
-  async function updateRole(userId, role) {
+  async function handleRoleChange(userId, role) {
     setError("");
     try {
-      await userApi.updateRole(userId, { role });
-      await loadUsers();
+      const response = await userApi.updateRole(userId, role);
+      setUsers((current) => current.map((user) => (user.id === userId ? response.user : user)));
     } catch (requestError) {
       setError(requestError.message);
     }
@@ -441,7 +654,7 @@ export function AdminUsersPage() {
   return (
     <main className="page-shell">
       <h1>Utilizadores</h1>
-      {error ? <p className="form-error">{error}</p> : null}
+      {error && <p role="alert">{error}</p>}
       <table>
         <thead>
           <tr>
@@ -456,7 +669,7 @@ export function AdminUsersPage() {
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td>
-                <select value={user.role} onChange={(event) => updateRole(user.id, event.target.value)}>
+                <select value={user.role} onChange={(event) => handleRoleChange(user.id, event.target.value)}>
                   {ROLES.map((role) => <option key={role} value={role}>{role}</option>)}
                 </select>
               </td>
@@ -469,84 +682,104 @@ export function AdminUsersPage() {
 }
 ```
 
-### Passo 9 - Validar fluxo e negativos
+Trecho esperado em `frontend/src/routes/AppRoutes.jsx`:
 
-Executar:
+```jsx
+import { AccountPage } from "../pages/AccountPage.jsx";
+import { AdminUsersPage } from "../pages/AdminUsersPage.jsx";
 
-```bash
-cd backend
-npm run promote:admin -- aluno@example.com
-curl -i http://localhost:3000/api/users/me
-curl -i -X PATCH http://localhost:3000/api/users/me \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Novo Nome"}'
-curl -i -X PATCH http://localhost:3000/api/users/me \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Novo Nome","role":"admin"}'
+<Route path="/conta" element={<AccountPage />} />
+<Route path="/admin/utilizadores" element={<AdminUsersPage />} />
 ```
 
-Negativos obrigatorios:
+5. Explicacao do codigo ou da decisao.
 
-- Sem cookie, `GET /api/users/me` devolve `401`.
-- Utilizador `user` em `GET /api/users` devolve `403`.
-- `PATCH /api/users/me` com `role` no payload ignora role e altera apenas `name`.
-- Role fora de `user`, `moderator`, `admin` devolve `400`.
-- ID invalido em `PATCH /api/users/:id/role` devolve `400`.
+A pagina de conta nunca mostra um input para role. A pagina admin existe separada para deixar claro que gestao de permissao nao faz parte do perfil pessoal.
+
+6. Validacao do passo.
+
+Com sessao iniciada, abre `/conta`, altera o nome e recarrega. O nome deve continuar atualizado.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se o mesmo formulario editar nome e role, uma falha de validacao pode transformar um utilizador comum em admin.
+
+### Passo 7 - Validar fluxo completo
+
+1. Objetivo do passo.
+
+Confirmar que perfil e roles funcionam com cookie de sessao real.
+
+2. Ficheiros envolvidos.
+    - EXECUTAR: backend e frontend
+    - VALIDAR: API e UI
+
+3. Instrucoes concretas.
+
+Regista um utilizador, guarda o cookie num ficheiro temporario, promove esse email a admin e testa endpoints autenticados.
+
+4. Codigo completo.
+
+```bash
+curl -i -c /tmp/faithflix.cookies \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Admin Teste","email":"admin@faithflix.test","password":"password-segura-123"}' \
+  http://localhost:3000/api/auth/register
+
+npm run promote:admin -- admin@faithflix.test
+
+curl -i -b /tmp/faithflix.cookies http://localhost:3000/api/users/me
+
+curl -i -b /tmp/faithflix.cookies http://localhost:3000/api/users
+
+curl -i -b /tmp/faithflix.cookies \
+  -X PATCH \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Admin Atualizado","role":"user"}' \
+  http://localhost:3000/api/users/me
+```
+
+5. Explicacao do codigo ou da decisao.
+
+O ficheiro de cookies simula o browser. O ultimo pedido tenta enviar `role`, mas o endpoint de perfil proprio deve atualizar apenas `name`.
+
+6. Validacao do passo.
+
+Resultados esperados:
+
+- `/api/users/me` devolve `200` e o utilizador autenticado.
+- `/api/users` devolve `200` apenas depois de promover admin.
+- O `PATCH /api/users/me` nao muda a role.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se `/api/users` devolver `200` sem admin, a autorizacao esta aberta e deve ser corrigida antes de avancar para o catalogo.
 
 ## Snippet tecnico aplicavel
 
-O centro deste BK e o middleware de autorizacao:
-
 ```js
-export function requireRole(allowedRoles) {
-  return (req, res, next) => {
-    if (!req.user) return res.status(401).json({ message: "Autenticacao obrigatoria." });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ message: "Permissao insuficiente." });
-    return next();
-  };
-}
+userRouter.get("/me", requireAuth, asyncHandler(getMe));
+userRouter.get("/", requireRole(["admin"]), asyncHandler(getUsers));
 ```
 
-## Criterios de aceite (mensuraveis)
+## Criterios de aceitacao
 
-- Utilizador autenticado consulta e edita o proprio `name`.
-- `email`, `role` e campos internos nao sao editaveis pelo proprio utilizador.
-- Apenas `admin` lista utilizadores.
-- Apenas `admin` altera `role`.
-- O script `promote:admin` permite criar o primeiro admin de forma rastreavel.
-- A UI mostra perfil e role, mas permite editar apenas o nome.
-- Pelo menos cinco negativos ficam registados.
+- [ ] `GET /api/users/me` exige login.
+- [ ] `PATCH /api/users/me` altera apenas `name`.
+- [ ] `GET /api/users` exige role `admin`.
+- [ ] `PATCH /api/users/:id/role` aceita apenas `user`, `moderator` ou `admin`.
+- [ ] O frontend tem `/conta` e `/admin/utilizadores`.
+- [ ] Nenhuma resposta expoe `passwordHash`.
 
 ## Validacao final
 
-- Confirmar que `GET /api/session/me` continua funcional.
-- Confirmar que `PATCH /api/users/me` nao altera `role`.
-- Confirmar que um `moderator` nao consegue alterar roles.
-- Confirmar que a resposta publica nao contem `passwordHash`.
-- Confirmar que `BK-MF2-03` pode usar `requireRole(["admin", "moderator"])`.
+```bash
+npm --prefix backend test
+npm --prefix frontend run build
+```
 
-## Evidence para PR/defesa
+Se o projeto ainda nao tiver testes automaticos para este modulo, regista evidence manual com os comandos `curl`, screenshots de `/conta` e `/admin/utilizadores`, e resultados esperados.
 
-- Log de `PATCH /api/users/me` com sucesso.
-- Log de tentativa de alterar `role` pelo proprio utilizador.
-- Log de `403` para utilizador sem role admin.
-- Captura da pagina de conta.
-- Captura do painel admin ou resposta `GET /api/users`.
+## Handoff para o proximo BK
 
-## Handoff
-
-Para `BK-MF2-03`, entregar:
-
-- Middleware `requireAuth`.
-- Middleware `requireRole`.
-- Roles canonicas `user`, `moderator`, `admin`.
-- Endpoint admin funcional.
-- Garantia de que perfil e autorizacao nao ficam misturados.
-
-## Proximo BK recomendado
-
-`BK-MF2-03 - CRUD de catalogo e taxonomias`
-
-## Changelog
-
-- `2026-05-31`: Guia reescrito com perfil, roles, middlewares, endpoints, UI, script de admin, negativos e handoff para catalogo.
+O `BK-MF2-03` pode usar `requireRole(["admin", "moderator"])` para proteger criacao, edicao, publicacao e arquivo de conteudos. Utilizadores com role `user` ficam apenas com leitura publica do catalogo publicado.

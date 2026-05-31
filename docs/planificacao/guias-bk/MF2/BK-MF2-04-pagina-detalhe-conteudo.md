@@ -23,36 +23,66 @@
 
 ### Objetivo pedagogico
 
-Criar a pagina de detalhe de um conteudo publicado (`RF08`), usando o contrato real do catalogo. O aluno deve perceber que uma pagina de detalhe nao e apenas uma ficha visual: ela prepara o player, favoritos, watchlist, historico, pesquisa e recomendacao.
+Neste BK vais criar a pagina de detalhe de um conteudo publicado (`RF08`) usando o contrato real do catalogo.
 
-### Tempo estimado
+No fim, deves conseguir explicar como uma rota com `id` ou `slug` encontra um conteudo, porque conteudos `draft` devolvem `404` e como o botao de reproducao prepara a passagem para o player.
 
-- Rever contrato de `BK-MF2-03`: 15 min.
-- Endpoint de detalhe: 40 min.
-- Cliente API e pagina React: 60 min.
-- Estados de UI e negativos: 35 min.
+### Importancia funcional
+
+A pagina de detalhe e a ponte entre catalogo e reproducao. Ela apresenta sinopse, poster, dados de classificacao e o caminho para `/ver/:contentId`, que sera implementado no `BK-MF2-05`.
+
+### Scope-in
+
+- Criar endpoint `GET /api/catalog/:idOrSlug`.
+- Permitir detalhe por `id` ou `slug`.
+- Devolver apenas conteudos `published`.
+- Criar `ContentDetailPage`.
+- Ligar rota frontend `/catalogo/:idOrSlug`.
+- Adicionar `data-testid="content-detail"` para o E2E de `BK-MF2-08`.
+
+### Scope-out
+
+- Construir player.
+- Guardar progresso.
+- Favoritos e watchlist.
+- Conteudos recomendados.
+- Comentarios ou ratings.
+
+### Glossario rapido
+
+- `idOrSlug`: parametro que pode ser ObjectId MongoDB ou slug.
+- `404`: resposta usada quando o conteudo nao existe ou nao esta publicado.
+- `Handoff`: passagem de dados minima para o BK seguinte.
 
 ### Conceitos essenciais
 
-- O detalhe publico mostra apenas conteudo `published`.
-- A rota pode receber `slug` ou `id`, mas a resposta publica tem sempre `id` e `slug`.
-- A pagina deve lidar com `loading`, `success`, `not found` e erro.
-- O botao de reproducao prepara o handoff para `BK-MF2-05`.
+- O detalhe publico nunca deve mostrar `draft` ou `archived`.
+- Rotas fixas como `/admin` e `/taxonomies` precisam ficar antes de `/:idOrSlug`.
+- O frontend nao deve ter dados fixos do conteudo.
+- O link para reproducao usa `content.id`, porque o progresso e o player trabalham por identificador persistente.
+
+### Tempo estimado
+
+- Rever contrato do catalogo: 15 min.
+- Backend de detalhe: 45 min.
+- Cliente API: 15 min.
+- Pagina React e rota: 60 min.
+- Validacao e evidence: 30 min.
 
 ### Erros comuns
 
-- Criar dados fixos no componente.
+- Criar detalhe com dados fixos.
 - Mostrar conteudo `draft`.
-- Chamar um endpoint diferente do que o backend entrega.
-- Construir o player neste BK.
-- Ignorar estados de erro e carregamento.
+- Colocar `/:idOrSlug` antes de `/admin`.
+- Usar `/watch` numa aplicacao que ja adotou `/ver`.
+- Ignorar estados de loading e erro.
 
 ### Check de compreensao
 
-- [ ] Sei dizer que endpoint alimenta a pagina.
-- [ ] Sei porque `draft` devolve `404` no detalhe publico.
-- [ ] Sei que o player entra no BK seguinte.
-- [ ] Sei que o botao "Reproduzir" deve passar `content.id` ou `content.slug`.
+- [ ] Sei que endpoint alimenta a pagina de detalhe.
+- [ ] Sei porque `draft` deve devolver `404`.
+- [ ] Sei porque o player nao e implementado neste BK.
+- [ ] Sei porque o link para reproducao usa `content.id`.
 
 ## Bloco operacional (obrigatorio)
 
@@ -60,8 +90,8 @@ Criar a pagina de detalhe de um conteudo publicado (`RF08`), usando o contrato r
 
 - `BK-MF2-03` concluido.
 - Existe pelo menos um conteudo `published`.
-- `frontend/src/services/api/apiClient.js` existe e usa `credentials: "include"`.
-- O router frontend permite criar uma rota de detalhe.
+- `frontend/src/services/api/apiClient.js` existe.
+- O router frontend permite adicionar rotas.
 
 ### Contrato tecnico deste BK
 
@@ -70,9 +100,10 @@ Criar a pagina de detalhe de um conteudo publicado (`RF08`), usando o contrato r
 | Endpoint | `GET /api/catalog/:idOrSlug` |
 | Visibilidade | apenas `status: "published"` |
 | Sucesso | `200 { content }` |
-| Inexistente/rascunho | `404` |
+| Inexistente, rascunho ou arquivado | `404` |
 | Frontend | `ContentDetailPage` |
-| Handoff | link para `/watch/:id` no `BK-MF2-05` |
+| Rota frontend | `/catalogo/:idOrSlug` |
+| Handoff | link para `/ver/:contentId` no `BK-MF2-05` |
 
 ### Shape minimo de resposta
 
@@ -94,28 +125,44 @@ Criar a pagina de detalhe de um conteudo publicado (`RF08`), usando o contrato r
 }
 ```
 
+### Decisoes tecnicas
+
+- `CANONICO`: detalhe publico le a colecao `contents` criada no BK anterior.
+- `DERIVADO`: `idOrSlug` aceita os dois formatos para suportar links humanos e chamadas tecnicas.
+- `DERIVADO`: a pagina usa `data-testid="content-detail"` para teste E2E estavel.
+
 ### Guia de execucao (passo-a-passo)
 
 ### Passo 1 - Adicionar detalhe ao servico de catalogo
 
-`EDITAR backend/src/modules/catalog/catalog.service.js`
+1. Objetivo do passo.
 
-Adicionar a funcao:
+Criar uma funcao que encontra um conteudo publicado por `id` ou `slug`.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `backend/src/modules/catalog/catalog.service.js`
+    - LOCALIZACAO: acrescentar exports no ficheiro existente
+
+3. Instrucoes concretas.
+
+No ficheiro do `BK-MF2-03`, garante que `publicContent` continua acessivel dentro do modulo e acrescenta as funcoes abaixo.
+
+4. Codigo completo.
 
 ```js
-import { ObjectId } from "mongodb";
+function buildPublishedDetailQuery(idOrSlug) {
+  const value = String(idOrSlug ?? "").trim();
 
-function buildDetailQuery(idOrSlug) {
-  if (ObjectId.isValid(idOrSlug)) {
-    return { _id: new ObjectId(idOrSlug), status: "published" };
+  if (ObjectId.isValid(value)) {
+    return { _id: new ObjectId(value), status: "published" };
   }
 
-  return { slug: String(idOrSlug ?? "").trim(), status: "published" };
+  return { slug: value, status: "published" };
 }
 
 export async function getPublishedContentDetail(idOrSlug) {
   const db = await getDb();
-  const content = await db.collection("contents").findOne(buildDetailQuery(idOrSlug));
+  const content = await db.collection("contents").findOne(buildPublishedDetailQuery(idOrSlug));
 
   if (!content) {
     const error = new Error("Conteudo nao encontrado.");
@@ -127,9 +174,40 @@ export async function getPublishedContentDetail(idOrSlug) {
 }
 ```
 
-### Passo 2 - Adicionar controller de detalhe
+5. Explicacao do codigo ou da decisao.
 
-`EDITAR backend/src/modules/catalog/catalog.controller.js`
+O filtro inclui `status: "published"` dentro da query. Assim, um `draft` com slug valido tem a mesma resposta publica que um conteudo inexistente.
+
+6. Validacao do passo.
+
+```bash
+node -e "import('./src/modules/catalog/catalog.service.js').then(({ getPublishedContentDetail }) => console.log(typeof getPublishedContentDetail))"
+```
+
+Resultado esperado: `function`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se filtrares `status` depois de carregar o documento, podes expor dados de um conteudo privado durante logs ou transformacoes.
+
+### Passo 2 - Adicionar controller e rota de detalhe
+
+1. Objetivo do passo.
+
+Expor `GET /api/catalog/:idOrSlug` sem partir rotas fixas existentes.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `backend/src/modules/catalog/catalog.controller.js`
+    - EDITAR: `backend/src/modules/catalog/catalog.routes.js`
+    - LOCALIZACAO: imports e rota final
+
+3. Instrucoes concretas.
+
+Adiciona o controller e importa-o no router. A rota dinamica deve ser a ultima rota `GET` publica.
+
+4. Codigo completo.
+
+Adicionar em `backend/src/modules/catalog/catalog.controller.js`:
 
 ```js
 import { getPublishedContentDetail } from "./catalog.service.js";
@@ -139,23 +217,56 @@ export async function getCatalogDetail(req, res) {
 }
 ```
 
-### Passo 3 - Adicionar rota de detalhe
-
-`EDITAR backend/src/modules/catalog/catalog.routes.js`
-
-Colocar a rota depois de `/admin` e `/taxonomies`, para evitar conflito de nomes.
+Trecho final esperado em `backend/src/modules/catalog/catalog.routes.js`:
 
 ```js
+import { getCatalogDetail } from "./catalog.controller.js";
+
+catalogRouter.get("/", asyncHandler(getCatalog));
+catalogRouter.get("/admin", canManageCatalog, asyncHandler(getAdminCatalog));
 catalogRouter.get("/taxonomies", asyncHandler(getTaxonomies));
 catalogRouter.post("/taxonomies", canManageCatalog, asyncHandler(postTaxonomy));
+catalogRouter.post("/", canManageCatalog, asyncHandler(postContent));
+catalogRouter.patch("/:id", canManageCatalog, asyncHandler(patchContent));
+catalogRouter.patch("/:id/status", canManageCatalog, asyncHandler(patchContentStatus));
 catalogRouter.get("/:idOrSlug", asyncHandler(getCatalogDetail));
 ```
 
-### Passo 4 - Atualizar cliente frontend
+5. Explicacao do codigo ou da decisao.
 
-`EDITAR frontend/src/services/api/catalogApi.js`
+`/:idOrSlug` vem no fim para nao capturar `admin` ou `taxonomies`.
+
+6. Validacao do passo.
+
+```bash
+curl -i http://localhost:3000/api/catalog/piloto-faithflix
+```
+
+Resultado esperado: `200` para conteudo publicado ou `404` se ainda nao existir.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se `/:idOrSlug` vier antes de `/taxonomies`, o endpoint de taxonomias deixa de ser chamado.
+
+### Passo 3 - Atualizar cliente frontend de catalogo
+
+1. Objetivo do passo.
+
+Adicionar uma funcao para carregar detalhe sem remover os metodos admin criados no BK anterior.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `frontend/src/services/api/catalogApi.js`
+    - LOCALIZACAO: objeto `catalogApi`
+
+3. Instrucoes concretas.
+
+Mantem os metodos existentes e acrescenta `getDetail`.
+
+4. Codigo completo.
 
 ```js
+import { apiClient } from "./apiClient.js";
+
 export const catalogApi = {
   listPublished() {
     return apiClient.get("/api/catalog");
@@ -163,14 +274,58 @@ export const catalogApi = {
   getDetail(idOrSlug) {
     return apiClient.get(`/api/catalog/${encodeURIComponent(idOrSlug)}`);
   },
+  listAdmin() {
+    return apiClient.get("/api/catalog/admin");
+  },
+  createContent(input) {
+    return apiClient.post("/api/catalog", input);
+  },
+  updateContent(contentId, input) {
+    return apiClient.patch(`/api/catalog/${encodeURIComponent(contentId)}`, input);
+  },
+  updateStatus(contentId, status) {
+    return apiClient.patch(`/api/catalog/${encodeURIComponent(contentId)}/status`, { status });
+  },
+  listTaxonomies() {
+    return apiClient.get("/api/catalog/taxonomies");
+  },
+  createTaxonomy(input) {
+    return apiClient.post("/api/catalog/taxonomies", input);
+  },
 };
 ```
 
-Se o ficheiro ja tiver os metodos admin do BK anterior, manter esses metodos e acrescentar apenas `getDetail`.
+5. Explicacao do codigo ou da decisao.
 
-### Passo 5 - Criar pagina de detalhe
+O ficheiro fica completo para evitar perder metodos admin ao adicionar detalhe.
 
-`CRIAR frontend/src/pages/ContentDetailPage.jsx`
+6. Validacao do passo.
+
+```bash
+node -e "import('./src/services/api/catalogApi.js').then(({ catalogApi }) => console.log(typeof catalogApi.getDetail))"
+```
+
+Resultado esperado: `function`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Recriar o objeto com apenas `getDetail` quebraria a pagina admin do catalogo.
+
+### Passo 4 - Criar pagina de detalhe
+
+1. Objetivo do passo.
+
+Mostrar os dados do conteudo e preparar a entrada no player.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `frontend/src/pages/ContentDetailPage.jsx`
+    - LOCALIZACAO: ficheiro completo
+
+3. Instrucoes concretas.
+
+Cria a pagina abaixo. Usa `useParams` para ler `idOrSlug`.
+
+4. Codigo completo.
 
 ```jsx
 import { useEffect, useState } from "react";
@@ -189,24 +344,24 @@ export function ContentDetailPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    let ignore = false;
+    let active = true;
 
     setLoading(true);
     setError("");
 
     catalogApi.getDetail(idOrSlug)
       .then((response) => {
-        if (!ignore) setContent(response.content);
+        if (active) setContent(response.content);
       })
       .catch((requestError) => {
-        if (!ignore) setError(requestError.message);
+        if (active) setError(requestError.message);
       })
       .finally(() => {
-        if (!ignore) setLoading(false);
+        if (active) setLoading(false);
       });
 
     return () => {
-      ignore = true;
+      active = false;
     };
   }, [idOrSlug]);
 
@@ -214,121 +369,143 @@ export function ContentDetailPage() {
     return <main className="page-shell"><p>A carregar conteudo...</p></main>;
   }
 
-  if (error) {
-    return <main className="page-shell"><h1>Conteudo indisponivel</h1><p>{error}</p></main>;
+  if (error || !content) {
+    return (
+      <main className="page-shell">
+        <h1>Conteudo indisponivel</h1>
+        <p>{error || "Conteudo nao encontrado."}</p>
+      </main>
+    );
   }
 
   return (
-    <main className="content-detail">
-      <section className="content-hero">
-        {content.assets?.backdropUrl ? <img src={content.assets.backdropUrl} alt="" /> : null}
-        <div>
-          <p>{content.type}</p>
-          <h1>{content.title}</h1>
-          <p>{content.synopsis}</p>
-          <dl>
-            <div><dt>Duracao</dt><dd>{formatDuration(content.durationSeconds)}</dd></div>
-            <div><dt>Idade</dt><dd>{content.ageRating}+</dd></div>
-          </dl>
-          <Link className="primary-action" to={`/watch/${content.id}`}>Reproduzir</Link>
-        </div>
-      </section>
+    <main className="page-shell" data-testid="content-detail">
+      <img src={content.assets.backdropUrl || content.assets.posterUrl} alt="" />
+      <p>{content.type}</p>
+      <h1>{content.title}</h1>
+      <p>{content.synopsis}</p>
+      <dl>
+        <dt>Duracao</dt>
+        <dd>{formatDuration(content.durationSeconds)}</dd>
+        <dt>Classificacao</dt>
+        <dd>{content.ageRating}+</dd>
+      </dl>
+      <Link to={`/ver/${content.id}`}>Reproduzir</Link>
     </main>
   );
 }
 ```
 
-### Passo 6 - Adicionar rota frontend
+5. Explicacao do codigo ou da decisao.
 
-`EDITAR frontend/src/App.jsx` ou o ficheiro de rotas existente:
+O componente trata loading, erro e sucesso. O `data-testid` torna o E2E estavel sem depender de texto visual.
+
+6. Validacao do passo.
+
+Abre `/catalogo/piloto-faithflix`. Deve aparecer o detalhe e um link para `/ver/<id>`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se o link usar slug para o player, o BK seguinte precisa converter slug para ObjectId antes de guardar progresso.
+
+### Passo 5 - Ligar rota frontend
+
+1. Objetivo do passo.
+
+Permitir navegar de `/catalogo` para `/catalogo/:idOrSlug`.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `frontend/src/routes/AppRoutes.jsx`
+    - LOCALIZACAO: imports e rotas
+
+3. Instrucoes concretas.
+
+Importa a pagina e adiciona a rota de detalhe depois da rota `/catalogo`.
+
+4. Codigo completo.
 
 ```jsx
-import { ContentDetailPage } from "./pages/ContentDetailPage.jsx";
+import { ContentDetailPage } from "../pages/ContentDetailPage.jsx";
 
-<Route path="/catalog/:idOrSlug" element={<ContentDetailPage />} />
+<Route path="/catalogo" element={<CatalogPage />} />
+<Route path="/catalogo/:idOrSlug" element={<ContentDetailPage />} />
 ```
 
-### Passo 7 - Ligar cards de catalogo ao detalhe
+5. Explicacao do codigo ou da decisao.
 
-No componente de card/listagem criado antes, cada item publicado deve apontar para:
+As duas rotas podem coexistir porque React Router distingue caminho exato e parametro.
 
-```jsx
-<Link to={`/catalog/${content.slug || content.id}`}>{content.title}</Link>
-```
+6. Validacao do passo.
 
-### Passo 8 - Validar manualmente
+Clica num card do catalogo. O browser deve navegar para `/catalogo/<slug>` sem recarregar a pagina inteira.
 
-Executar:
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se a rota de detalhe nao existir, o E2E do fluxo principal falha antes de chegar ao player.
+
+### Passo 6 - Validar detalhe publico e casos negativos
+
+1. Objetivo do passo.
+
+Confirmar que apenas conteudos publicados aparecem.
+
+2. Ficheiros envolvidos.
+    - EXECUTAR: backend e frontend
+    - VALIDAR: API e UI
+
+3. Instrucoes concretas.
+
+Testa um conteudo publicado, um slug inexistente e um conteudo ainda em `draft`.
+
+4. Codigo completo.
 
 ```bash
-curl -i http://localhost:3000/api/catalog
 curl -i http://localhost:3000/api/catalog/piloto-faithflix
-curl -i http://localhost:3000/api/catalog/id-inexistente
+curl -i http://localhost:3000/api/catalog/slug-inexistente
+curl -i http://localhost:3000/api/catalog/slug-de-um-draft
 ```
 
-Validar no browser:
+5. Explicacao do codigo ou da decisao.
 
-- abrir `/catalog/piloto-faithflix`;
-- confirmar titulo, sinopse, duracao e idade;
-- confirmar que o botao aponta para `/watch/:id`;
-- confirmar que slug inexistente mostra estado de erro.
+Os dois ultimos casos devem devolver `404`, mesmo que o `draft` exista na base de dados.
 
-### Passo 9 - Validar negativos minimos
+6. Validacao do passo.
 
-- Conteudo inexistente devolve `404`.
-- Conteudo `draft` devolve `404` no endpoint publico.
-- Slug vazio ou estranho nao quebra o servidor.
-- Sem `backdropUrl`, a pagina continua legivel.
-- O botao de reproducao nao tenta iniciar player neste BK.
+Resultados esperados:
+
+- Publicado: `200 { content }`.
+- Inexistente: `404`.
+- Draft: `404`.
+- `/catalogo/:idOrSlug` mostra loading, erro ou detalhe sem quebrar a app.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se o draft devolver `200`, ha exposicao indevida de conteudo nao publicado.
 
 ## Snippet tecnico aplicavel
 
-O ponto central e filtrar detalhe por conteudo publicado:
-
 ```js
-const content = await db.collection("contents").findOne({
-  slug: idOrSlug,
-  status: "published",
-});
+catalogRouter.get("/:idOrSlug", asyncHandler(getCatalogDetail));
 ```
 
-## Criterios de aceite (mensuraveis)
+## Criterios de aceitacao
 
-- `GET /api/catalog/:idOrSlug` devolve `200` para conteudo publicado.
-- O mesmo endpoint devolve `404` para rascunho, arquivado ou inexistente.
-- `ContentDetailPage` mostra titulo, sinopse, tipo, duracao e idade.
-- A pagina tem estados de carregamento e erro.
-- O botao de reproducao aponta para `/watch/:id`.
-- O frontend nao usa dados fixos para o detalhe.
+- [ ] `GET /api/catalog/:idOrSlug` aceita ObjectId ou slug.
+- [ ] Conteudo `draft` e `archived` devolve `404`.
+- [ ] `ContentDetailPage` usa `catalogApi.getDetail`.
+- [ ] A rota `/catalogo/:idOrSlug` esta ligada.
+- [ ] O detalhe tem `data-testid="content-detail"`.
+- [ ] O botao/link de reproducao aponta para `/ver/:contentId`.
 
 ## Validacao final
 
-- Confirmar que `GET /api/catalog` e `GET /api/catalog/:idOrSlug` usam o mesmo modelo.
-- Confirmar que o detalhe nao duplica regras de publicacao.
-- Confirmar que o link para player usa `content.id`.
-- Confirmar que `BK-MF2-05` consegue ler `media.playbackUrl`.
+```bash
+npm --prefix backend test
+npm --prefix frontend run build
+```
 
-## Evidence para PR/defesa
+Regista evidence com respostas `curl` e screenshot de `/catalogo/piloto-faithflix`.
 
-- Resposta `200` do detalhe publicado.
-- Resposta `404` para conteudo inexistente.
-- Captura da pagina de detalhe.
-- Captura do estado de erro.
-- Print do link `/watch/:id`.
+## Handoff para o proximo BK
 
-## Handoff
-
-Para `BK-MF2-05`, entregar:
-
-- Endpoint de detalhe publico.
-- `media.playbackUrl` disponivel.
-- `content.id` usado como chave tecnica do player.
-- UI com CTA de reproducao sem logica de progresso.
-
-## Proximo BK recomendado
-
-`BK-MF2-05 - Reproducao e continuar a ver`
-
-## Changelog
-
-- `2026-05-31`: Guia reescrito com endpoint de detalhe, pagina React, estados de UI, negativos e handoff para player.
+O `BK-MF2-05` recebe `content.id`, `durationSeconds` e `media.playbackUrl` para criar o player, guardar progresso por utilizador e apresentar "continuar a ver".
