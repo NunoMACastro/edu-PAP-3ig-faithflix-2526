@@ -10,7 +10,7 @@
 - `prioridade`: `P1`
 - `estado`: `TODO`
 - `esforco`: `S`
-- `dependencias`: `BK-MF1-01`
+- `dependencias`: `BK-MF1-01,BK-MF1-04`
 - `rf_rnf`: `RNF31`
 - `fase_documental`: `Fase 2`
 - `sprint`: `S02`
@@ -51,7 +51,8 @@ Para alunos do 12.º ano, a ideia principal e: uma aplicacao nao basta "funciona
 ### Pre-condicoes
 
 - `BK-MF1-01` executado.
-- Se `BK-MF1-04` ja estiver executado, preservar `/api/session`.
+- `BK-MF1-04` executado, com sessao base em `/api/session`.
+- Preservar `/api/session` ao acrescentar `/health` e logging.
 - Confirmar em `RNF.md` que `RNF31` pede endpoint de health-check e `RNF30` pede logs estruturados.
 - Confirmar que ainda nao existem MongoDB, pagamentos ou streaming real; por isso, `/health` nao deve fingir checks desses servicos.
 

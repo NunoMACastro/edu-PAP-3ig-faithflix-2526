@@ -34,6 +34,13 @@ Regras obrigatorias:
 
 - Fonte canonica da ordem: `docs/planificacao/sprints/PLANO-SPRINTS.md`.
 - O campo `proximo_bk` e derivado dessa ordem.
+- Dentro da mesma sprint, respeitar a ordem interna obrigatoria definida em `PLANO-SPRINTS.md` antes de integrar PRs dependentes.
+
+## Regra anti-conflito para snippets
+
+- Snippets que editam ficheiros partilhados (`app.js`, `server.js`, `AppRoutes.jsx`, `package.json` ou clientes API) devem ser aditivos.
+- Quando um BK acrescenta funcionalidade a um ficheiro existente, o guia deve dizer explicitamente o que preservar do BK anterior.
+- E proibido substituir um ficheiro completo se isso remover rotas, scripts, middlewares, exports ou metodos entregues em BK anterior.
 
 ## Validacao
 

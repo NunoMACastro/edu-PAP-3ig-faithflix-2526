@@ -484,7 +484,7 @@ NODE_ENV=production node src/server.js
 
 ## Handoff
 
-- `BK-MF1-05` deve logar pedidos sem expor cookies.
+- `BK-MF1-05` deve registar pedidos sem expor cookies.
 - `BK-MF1-06` deve testar `401` sem cookie e com cookie falso.
 - `BK-MF2-01` deve reutilizar `sessionConfig.cookieName`, `getSessionCookieOptions()` e `attachSession` para criar login real.
 - `BK-MF4-03` pode depender desta base para candidaturas autenticadas quando os utilizadores existirem.

@@ -165,3 +165,4 @@ Estes BKs partilham requisitos com outros BKs de base tecnica e, por isso, entra
 - `2026-04-13`: matriz canonica leve criada para rastreabilidade requisito -> BK -> evidencia.
 - `2026-04-14`: reforcada validacao cruzada com backlog e contrato de fecho por gate.
 - `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral de BK/RF fora de escopo da versao PAP.
+- `2026-05-31`: revista apos correcao de dependencias em `BACKLOG-MVP.md`; cobertura requisito -> BK mantida sem alteracoes.

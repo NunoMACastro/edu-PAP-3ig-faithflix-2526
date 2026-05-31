@@ -56,6 +56,18 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 
 > Regra operacional: nenhuma sprint pode ultrapassar `11` pontos.
 
+## Ordem interna obrigatoria nas sprints com dependencias criticas
+
+Mesmo quando varios BK aparecem na mesma sprint, a ordem abaixo deve ser respeitada antes de abrir ou integrar PRs:
+
+| Sprint | Ordem interna obrigatoria | Motivo |
+| --- | --- | --- |
+| `Sprint 2` | `BK-MF1-03` e `BK-MF1-04` -> `BK-MF1-05` -> `BK-MF1-06` -> `BK-MF2-01` | `BK-MF2-01` deve partir de fundacao completa, health/logging e smoke verde. |
+| `Sprint 3` | `BK-MF2-02` -> `BK-MF2-03` -> `BK-MF2-04` | Catalogo usa roles de `BK-MF2-02`; detalhe usa contrato de catalogo. |
+| `Sprint 4` | `BK-MF2-05` -> `BK-MF2-06` e `BK-MF2-07` -> `BK-MF2-08` | E2E fecha apenas depois de player, media controls, favoritos, watchlist e historico. |
+
+PRs de BK dependentes so devem ser integrados depois do PR da dependencia estar merged ou, em alternativa, depois de existir branch de integracao validada pelo owner tecnico.
+
 ## Scorecard oficial por sprint (contrato canonico)
 
 | Criterio                        | Peso      |

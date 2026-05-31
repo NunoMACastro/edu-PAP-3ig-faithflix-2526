@@ -791,7 +791,7 @@ Se o projeto ainda nao tiver testes automaticos para este modulo, regista eviden
 
 ## Handoff
 
-O `BK-MF2-03` pode usar `requireRole(["admin", "moderator"])` para proteger criacao, edicao, publicacao e arquivo de conteudos. Utilizadores com role `user` ficam apenas com leitura publica do catalogo publicado.
+O `BK-MF2-03` pode usar `requireRole(["admin", "moderator"])` para proteger criação, edição, publicação e arquivamento de conteúdos. Utilizadores com role `user` ficam apenas com leitura pública do catálogo publicado.
 
 ## Proximo BK recomendado
 

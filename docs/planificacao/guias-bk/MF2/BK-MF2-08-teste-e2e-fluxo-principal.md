@@ -10,7 +10,7 @@
 - `prioridade`: `P0`
 - `estado`: `TODO`
 - `esforco`: `M`
-- `dependencias`: `BK-MF2-01,BK-MF2-07`
+- `dependencias`: `BK-MF2-06,BK-MF2-07`
 - `rf_rnf`: `RNF07, RNF08`
 - `fase_documental`: `Fase 1`
 - `sprint`: `S04`
@@ -29,13 +29,13 @@ No fim, deves conseguir explicar porque um E2E testa integracao real no browser,
 
 ### Importancia funcional
 
-Depois dos BKs 01 a 07, a MF2 ja tem varias pecas ligadas. Este teste confirma que a experiencia principal funciona de ponta a ponta e que uma regressao numa rota, selector, sessao ou player e detetada cedo.
+Depois dos BKs 01 a 07, a MF2 já tem várias peças ligadas. Este teste confirma que a experiência principal funciona de ponta a ponta e que uma regressão numa rota, seletor, sessão ou player é detetada cedo.
 
 ### Scope-in
 
 - Instalar e configurar Playwright.
 - Criar seed de dados para utilizador e conteudo publicado.
-- Garantir seletores estaveis nos componentes principais.
+- Garantir seletores estáveis nos componentes principais.
 - Testar login, detalhe, favoritos, watchlist, player, progresso e biblioteca.
 - Medir `RNF07` no catalogo principal e `RNF08` no arranque do video.
 
@@ -68,7 +68,7 @@ Depois dos BKs 01 a 07, a MF2 ja tem varias pecas ligadas. Este teste confirma q
 
 - Preparar seed e asset de media: 35 min.
 - Configurar Playwright: 35 min.
-- Adicionar seletores estaveis: 30 min.
+- Adicionar seletores estáveis: 30 min.
 - Escrever fluxo E2E: 75 min.
 - Medir RNF07/RNF08 e recolher evidence: 45 min.
 
@@ -401,7 +401,7 @@ Resultado esperado: `200`.
 
 Se o ficheiro nao existir, o E2E deve falhar porque o player nao consegue arrancar.
 
-### Passo 5 - Acrescentar seletores estaveis
+### Passo 5 - Acrescentar seletores estáveis
 
 1. Objetivo do passo.
 
@@ -416,7 +416,7 @@ Dar ao E2E pontos de referencia estaveis nos componentes principais.
 
 3. Instrucoes concretas.
 
-Adiciona os atributos abaixo. Os BKs 04, 05 e 07 ja indicaram os restantes seletores.
+Adiciona os atributos abaixo. Os BKs 04, 05 e 07 já indicaram os restantes seletores.
 
 4. Codigo completo.
 
@@ -728,4 +728,4 @@ A `MF3` pode assumir que existe um fluxo principal autenticado e validado: login
 ## Changelog
 
 - 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.
-- 2026-05-31: Corrigidos seed E2E, seletores de login e medicao de `RNF07` no catalogo principal.
+- 2026-05-31: Corrigidos seed E2E, seletores de login e medição de `RNF07` no catálogo principal.

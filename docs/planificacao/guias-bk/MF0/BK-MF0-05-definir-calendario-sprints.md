@@ -260,7 +260,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - [ ] DoD de `BK-MF0-04` é considerado no fecho semanal, mesmo sem ser dependência formal.
 
 **UI/mockup**
-- [ ] Sem mockup; calendário não inventa telas nem design final.
+- [ ] Sem mockup; calendário não inventa ecrãs nem design final.
 
 **Seguranca**
 - [ ] Sprints futuras preservam BKs de sessão segura, hardening e RGPD.

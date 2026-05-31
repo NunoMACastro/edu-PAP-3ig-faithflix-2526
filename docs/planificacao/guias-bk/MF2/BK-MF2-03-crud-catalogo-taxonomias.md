@@ -10,7 +10,7 @@
 - `prioridade`: `P0`
 - `estado`: `TODO`
 - `esforco`: `L`
-- `dependencias`: `BK-MF1-01`
+- `dependencias`: `BK-MF2-02`
 - `rf_rnf`: `RF06, RF07, RF09, RF10`
 - `fase_documental`: `Fase 1`
 - `sprint`: `S03`
@@ -95,8 +95,8 @@ O catalogo e o contrato central da experiencia de streaming. A pagina de detalhe
 
 ### Pre-condicoes
 
-- `BK-MF1-01` concluido.
-- Na sequencia MF2, `BK-MF2-01` e `BK-MF2-02` ja foram concluidos para auth e roles.
+- `BK-MF2-02` concluido.
+- Pela cadeia de dependencias, `BK-MF1-01`, `BK-MF2-01` e `BK-MF2-02` ja entregaram backend modular, auth e roles.
 - MongoDB configurado.
 - `requireRole(["admin", "moderator"])` disponivel.
 - Frontend consegue chamar a API com cookie.

@@ -10,7 +10,7 @@
 - `prioridade`: `P0`
 - `estado`: `TODO`
 - `esforco`: `L`
-- `dependencias`: `BK-MF1-04`
+- `dependencias`: `BK-MF1-06`
 - `rf_rnf`: `RF01, RF02, RF05`
 - `fase_documental`: `Fase 1`
 - `sprint`: `S02`
@@ -93,10 +93,12 @@ Identidade e a porta de entrada da aplicacao. Sem esta entrega, os BKs de perfil
 
 ### Pre-condicoes
 
-- `BK-MF1-04` concluido com `sessionConfig`, `getSessionCookieOptions`, `clearSessionCookie`, `readCookie` e `attachSession`.
-- `BK-MF1-03` concluido com `apiClient` e `credentials: "include"`.
+- `BK-MF1-06` concluido, com smoke tests da `MF1` verdes ou blockers registados.
+- Pela cadeia de dependencias, `BK-MF1-04` ja entregou `sessionConfig`, `getSessionCookieOptions`, `clearSessionCookie`, `readCookie` e `attachSession`.
+- Pela cadeia de dependencias, `BK-MF1-03` ja entregou `apiClient` e `credentials: "include"`.
 - Backend Express modular criado em `backend/`.
 - Frontend React + Vite criado em `frontend/`.
+- `/health`, `requestLogger` e scripts `smoke` da `MF1` preservados.
 - MongoDB local ou Atlas acessivel por `MONGODB_URI`.
 
 ### Contrato tecnico deste BK
@@ -133,11 +135,11 @@ Preparar o backend para ligar ao MongoDB e manter o nome do cookie de sessao def
     - EDITAR: `backend/package.json`
     - EDITAR: `backend/.env.example`
     - EDITAR: `backend/src/config/env.js`
-    - LOCALIZACAO: ficheiros completos
+    - LOCALIZACAO: acrescentar `mongodb` e variaveis, preservando scripts e dependencias da `MF1`
 
 3. Instrucoes concretas.
 
-Adiciona a dependencia `mongodb`, atualiza o modelo de ambiente e substitui `env.js` pelo ficheiro completo abaixo.
+Adiciona a dependencia `mongodb`, atualiza o modelo de ambiente e substitui `env.js` pelo ficheiro completo abaixo. No `package.json`, nao removas scripts criados na `MF1`, especialmente `smoke`, nem faças upgrade de `express` neste BK.
 
 4. Codigo completo.
 
@@ -145,15 +147,22 @@ Adiciona a dependencia `mongodb`, atualiza o modelo de ambiente e substitui `env
 
 ```json
 {
+  "name": "faithflix-backend",
+  "version": "0.1.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "smoke": "node --test tests/smoke/*.test.js"
   },
   "dependencies": {
-    "express": "^5.2.1",
+    "express": "^4.19.2",
     "mongodb": "^6.16.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
 ```
@@ -198,7 +207,7 @@ export const isProduction = env.nodeEnv === "production";
 
 5. Explicacao do codigo ou da decisao.
 
-`mongodb` permite persistir utilizadores e sessoes reais. `SESSION_COOKIE_NAME` continua igual ao BK anterior para nao partir `clearSessionCookie`. `parsePort` evita que a API arranque com uma porta invalida.
+`mongodb` permite persistir utilizadores e sessoes reais. `SESSION_COOKIE_NAME` continua igual ao BK anterior para nao partir `clearSessionCookie`. `express` fica na versao da `MF1` para evitar uma alteracao de runtime escondida neste BK. `smoke` fica preservado para a equipa continuar a validar a fundacao tecnica.
 
 6. Validacao do passo.
 
@@ -295,7 +304,7 @@ Validar input de auth, criar hashes de password e criar tokens opacos para sesso
     - CRIAR: `backend/src/modules/auth/auth.validation.js`
     - CRIAR: `backend/src/modules/auth/auth.password.js`
     - CRIAR: `backend/src/modules/auth/token.js`
-    - LOCALIZACAO: ficheiros completos
+    - LOCALIZACAO: ficheiros completos para novos ficheiros; integracao aditiva em `app.js`
 
 3. Instrucoes concretas.
 
@@ -666,11 +675,11 @@ Expor endpoints HTTP reais para o frontend e manter `GET /api/session/me` alinha
     - EDITAR: `backend/src/modules/auth/auth.routes.js`
     - CRIAR: `backend/src/modules/auth/session.routes.js`
     - EDITAR: `backend/src/app.js`
-    - LOCALIZACAO: ficheiros completos
+    - LOCALIZACAO: ficheiros completos para novos ficheiros; integracao aditiva em `app.js`
 
 3. Instrucoes concretas.
 
-Cria ou substitui os ficheiros abaixo. `auth.routes.js` fica para registo/login/reset. `session.routes.js` fica para a sessao atual e logout.
+Cria ou substitui apenas os ficheiros do modulo de auth indicados abaixo. Em `app.js`, acrescenta `/api/auth` e troca a rota de sessao base por `sessionRouter`, preservando `/health`, `requestLogger`, `/api`, `notFoundHandler` e `errorHandler` vindos da `MF1`.
 
 4. Codigo completo.
 
@@ -760,17 +769,21 @@ sessionRouter.post("/logout", asyncHandler(logout));
 ```js
 import express from "express";
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware.js";
+import { requestLogger } from "./middlewares/request-logger.middleware.js";
 import { attachSession } from "./middlewares/session.middleware.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { sessionRouter } from "./modules/auth/session.routes.js";
+import { healthRouter } from "./modules/system/health.routes.js";
 import { systemRouter } from "./modules/system/system.routes.js";
 
 export function createApp() {
   const app = express();
 
+  app.use(requestLogger);
   app.use(express.json({ limit: "1mb" }));
   app.use(attachSession);
 
+  app.use("/health", healthRouter);
   app.use("/api", systemRouter);
   app.use("/api/auth", authRouter);
   app.use("/api/session", sessionRouter);
@@ -784,7 +797,7 @@ export function createApp() {
 
 5. Explicacao do codigo ou da decisao.
 
-O controller nunca devolve campos internos. O cookie e criado so depois de registo ou login validos. `GET /api/session/me` devolve `user: null` sem sessao para que o frontend consiga saber se deve mostrar login sem tratar isso como erro de servidor.
+O controller nunca devolve campos internos. O cookie e criado so depois de registo ou login validos. `GET /api/session/me` devolve `user: null` sem sessao para que o frontend consiga saber se deve mostrar login sem tratar isso como erro de servidor. A montagem preserva `/health` e `requestLogger`, porque a `MF2` deve construir sobre a fundacao validada na `MF1`, nao substitui-la.
 
 6. Validacao do passo.
 
@@ -993,7 +1006,7 @@ Provar que identidade, sessao e recuperacao funcionam e falham de forma controla
 
 3. Instrucoes concretas.
 
-Executa os comandos abaixo e guarda outputs para evidence.
+Executa os comandos abaixo e guarda outputs para evidence. Mantem o script `smoke` da `MF1`; se a semantica de `GET /api/session/me` sem cookie passar de `401` para `200 { user: null }`, atualiza o teste smoke correspondente em vez de apagar a suite.
 
 4. Codigo completo.
 
@@ -1025,6 +1038,7 @@ Resultados esperados:
 - `GET /api/session/me` devolve `200` com `user.id`, `user.name`, `user.email`, `user.role`;
 - login errado devolve `401`;
 - recuperacao devolve `200` com mensagem generica.
+- `npm run smoke` continua executavel e ajustado a nova sessao real.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
@@ -1057,6 +1071,7 @@ req.user = req.session.user;
 ## Validacao final
 
 - Executar `npm test` dentro de `backend`, se existir suite ativa.
+- Executar `npm run smoke` dentro de `backend`, preservando os testes da `MF1` ajustados ao novo contrato de sessao real.
 - Executar backend e frontend em modo desenvolvimento.
 - Validar comandos `curl` do Passo 8.
 - Confirmar que o cookie tem `HttpOnly`.

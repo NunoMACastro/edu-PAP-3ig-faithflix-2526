@@ -203,7 +203,7 @@ Expor `GET /api/catalog/:idOrSlug` sem partir rotas fixas existentes.
 
 3. Instrucoes concretas.
 
-Adiciona o controller e importa-o no router. A rota dinamica deve ser a ultima rota `GET` publica.
+Adiciona o controller e acrescenta `getCatalogDetail` ao import existente do router, sem remover `getContentRevisions` nem `postContentRevisionRevert`. A rota dinamica deve ser a ultima rota `GET` publica.
 
 4. Codigo completo.
 
@@ -220,13 +220,14 @@ export async function getCatalogDetail(req, res) {
 Trecho final esperado em `backend/src/modules/catalog/catalog.routes.js`:
 
 ```js
-import { getCatalogDetail } from "./catalog.controller.js";
-
+// acrescenta getCatalogDetail ao import ja existente de catalog.controller.js
 catalogRouter.get("/", asyncHandler(getCatalog));
 catalogRouter.get("/admin", canManageCatalog, asyncHandler(getAdminCatalog));
 catalogRouter.get("/taxonomies", asyncHandler(getTaxonomies));
 catalogRouter.post("/taxonomies", canManageCatalog, asyncHandler(postTaxonomy));
 catalogRouter.post("/", canManageCatalog, asyncHandler(postContent));
+catalogRouter.get("/:id/revisions", canManageCatalog, asyncHandler(getContentRevisions));
+catalogRouter.post("/:id/revisions/:revisionId/revert", canManageCatalog, asyncHandler(postContentRevisionRevert));
 catalogRouter.patch("/:id", canManageCatalog, asyncHandler(patchContent));
 catalogRouter.patch("/:id/status", canManageCatalog, asyncHandler(patchContentStatus));
 catalogRouter.get("/:idOrSlug", asyncHandler(getCatalogDetail));
@@ -234,7 +235,7 @@ catalogRouter.get("/:idOrSlug", asyncHandler(getCatalogDetail));
 
 5. Explicacao do codigo ou da decisao.
 
-`/:idOrSlug` vem no fim para nao capturar `admin` ou `taxonomies`.
+`/:idOrSlug` vem no fim para nao capturar `admin`, `taxonomies` ou as rotas de revisoes criadas no `BK-MF2-03`.
 
 6. Validacao do passo.
 
@@ -246,7 +247,7 @@ Resultado esperado: `200` para conteudo publicado ou `404` se ainda nao existir.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Se `/:idOrSlug` vier antes de `/taxonomies`, o endpoint de taxonomias deixa de ser chamado.
+Se `/:idOrSlug` vier antes de `/taxonomies` ou `/:id/revisions`, esses endpoints deixam de ser chamados.
 
 ### Passo 3 - Atualizar cliente frontend de catalogo
 
@@ -286,6 +287,14 @@ export const catalogApi = {
   updateStatus(contentId, status) {
     return apiClient.patch(`/api/catalog/${encodeURIComponent(contentId)}/status`, { status });
   },
+  listRevisions(contentId) {
+    return apiClient.get(`/api/catalog/${encodeURIComponent(contentId)}/revisions`);
+  },
+  revertRevision(contentId, revisionId) {
+    return apiClient.post(
+      `/api/catalog/${encodeURIComponent(contentId)}/revisions/${encodeURIComponent(revisionId)}/revert`,
+    );
+  },
   listTaxonomies() {
     return apiClient.get("/api/catalog/taxonomies");
   },
@@ -297,7 +306,7 @@ export const catalogApi = {
 
 5. Explicacao do codigo ou da decisao.
 
-O ficheiro fica completo para evitar perder metodos admin ao adicionar detalhe.
+O ficheiro fica completo para evitar perder metodos admin e metodos de revisoes ao adicionar detalhe.
 
 6. Validacao do passo.
 

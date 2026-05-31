@@ -173,8 +173,8 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF1-02` | Estrutura base frontend por componentes     | Mateus  | Kaue    | P0  | TODO   | M       | `BK-MF0-06`             | RNF28        |
 | `BK-MF1-03` | Cliente API frontend com tratamento de erro | Mateus  | Matheus | P0  | TODO   | M       | `BK-MF1-02`             | RNF05, RNF30 |
 | `BK-MF1-04` | Sessao segura backend (cookies e auth base) | Matheus | Kaue    | P0  | TODO   | M       | `BK-MF1-01`             | RNF13, RNF15 |
-| `BK-MF1-05` | Health-check e logging estruturado          | Kaue    | Davi    | P1  | TODO   | S       | `BK-MF1-01`             | RNF31 |
-| `BK-MF1-06` | Smoke tests FE/BE                           | Kaue    | Mateus  | P1  | TODO   | M       | `BK-MF1-03`,`BK-MF1-04` | RNF29        |
+| `BK-MF1-05` | Health-check e logging estruturado          | Kaue    | Davi    | P1  | TODO   | S       | `BK-MF1-01`,`BK-MF1-04` | RNF31 |
+| `BK-MF1-06` | Smoke tests FE/BE                           | Kaue    | Mateus  | P1  | TODO   | M       | `BK-MF1-03`,`BK-MF1-04`,`BK-MF1-05` | RNF29        |
 
 ---
 
@@ -182,14 +182,14 @@ Estado do guia indica a fase de criacao documental.
 
 | BK          | Titulo                                   | Owner   | Apoio   | Pri | Estado | Esforco | Dependencias            | RF/RNF                 |
 | ----------- | ---------------------------------------- | ------- | ------- | --- | ------ | ------- | ----------------------- | ---------------------- |
-| `BK-MF2-01` | Registo, login e recuperacao de password | Matheus | Mateus  | P0  | TODO   | L       | `BK-MF1-04`             | RF01, RF02, RF05       |
+| `BK-MF2-01` | Registo, login e recuperacao de password | Matheus | Mateus  | P0  | TODO   | L       | `BK-MF1-06`             | RF01, RF02, RF05       |
 | `BK-MF2-02` | Edicao de perfil e papeis base           | Matheus | Kaue    | P0  | TODO   | M       | `BK-MF2-01`             | RF03, RF04             |
-| `BK-MF2-03` | CRUD de catalogo e taxonomias            | Davi    | Matheus | P0  | TODO   | L       | `BK-MF1-01`             | RF06, RF07, RF09, RF10 |
+| `BK-MF2-03` | CRUD de catalogo e taxonomias            | Davi    | Matheus | P0  | TODO   | L       | `BK-MF2-02`             | RF06, RF07, RF09, RF10 |
 | `BK-MF2-04` | Pagina de detalhe de conteudo            | Mateus  | Davi    | P0  | TODO   | M       | `BK-MF2-03`             | RF08                   |
 | `BK-MF2-05` | Reproducao e continuar a ver             | Mateus  | Matheus | P0  | TODO   | L       | `BK-MF2-04`             | RF11, RF12             |
 | `BK-MF2-06` | Legendas/audio, parental e qualidade     | Mateus  | Kaue    | P1  | TODO   | M       | `BK-MF2-05`             | RF13, RF14, RF15       |
 | `BK-MF2-07` | Favoritos/watchlist/historico            | Davi    | Mateus  | P0  | TODO   | M       | `BK-MF2-05`             | RF16, RF17, RF18       |
-| `BK-MF2-08` | Teste E2E do fluxo principal             | Kaue    | Mateus  | P0  | TODO   | M       | `BK-MF2-01`,`BK-MF2-07` | RNF07, RNF08           |
+| `BK-MF2-08` | Teste E2E do fluxo principal             | Kaue    | Mateus  | P0  | TODO   | M       | `BK-MF2-06`,`BK-MF2-07` | RNF07, RNF08           |
 
 ---
 
