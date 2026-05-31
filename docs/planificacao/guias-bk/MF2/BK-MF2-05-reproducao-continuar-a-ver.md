@@ -17,169 +17,446 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF2-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF2/BK-MF2-05-reproducao-continuar-a-ver.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-05-31`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Consolidar a entrega de `Reproducao e continuar a ver` com rastreabilidade explicita para `RF11, RF12`.
-- Executar o BK `BK-MF2-05` no contexto da macro `MF2` e da sprint `S04`.
+Implementar reproducao adaptada ao MVP (`RF11`) e a funcionalidade "continuar a ver" (`RF12`). O aluno deve sair deste BK a perceber como um player frontend conversa com o backend para ler conteudo publicado e guardar progresso por utilizador.
 
 ### Tempo estimado
 
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
+- Rever detalhe e contrato de media: 15 min.
+- Backend de playback/progresso: 75 min.
+- Player React: 75 min.
+- Validacao, negativos e evidence: 45 min.
+
+### Conceitos essenciais
+
+- O player so reproduz conteudo publicado.
+- O progresso pertence ao par `userId + contentId`.
+- `currentTimeSeconds` nunca pode ser negativo nem superior a duracao.
+- O MVP usa URL de media existente no catalogo; CDN, DRM e transcodificacao ficam fora desta entrega.
+- "Continuar a ver" e uma leitura do ultimo progresso guardado.
 
 ### Erros comuns
 
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
+- Guardar progresso apenas no browser.
+- Permitir que um utilizador atualize progresso de outro.
+- Aceitar tempos negativos.
+- Reproduzir conteudo `draft`.
+- Fazer um pedido ao backend a cada segundo sem necessidade.
 
 ### Check de compreensao
 
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
-
-
-## O que vamos fazer neste BK
-
-Entregar `Reproducao e continuar a ver` cobrindo `RF11, RF12` na `MF2`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
-
-## Porque isto e importante
-
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF2-06`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+- [ ] Sei explicar a chave `userId + contentId`.
+- [ ] Sei porque o progresso fica no servidor.
+- [ ] Sei que a URL de media vem de `BK-MF2-03`.
+- [ ] Sei onde `BK-MF2-07` vai buscar historico.
 
 ## Bloco operacional (obrigatorio)
 
 ### Pre-condicoes
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+- `BK-MF2-04` concluido.
+- `media.playbackUrl` existe em pelo menos um conteudo publicado.
+- `requireAuth` esta disponivel.
+- O frontend ja tem rota para `/watch/:contentId`.
 
-### Execucao
+### Contrato tecnico deste BK
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+| Area | Contrato |
+| --- | --- |
+| Colecao | `playback_progress` |
+| Chave unica | `userId + contentId` |
+| Endpoint leitura | `GET /api/playback/:contentId` |
+| Endpoint escrita | `PUT /api/playback/:contentId/progress` |
+| Frontend | `PlaybackPage` com elemento `<video>` |
+| Progresso concluido | `completed: true` quando falta menos de 60s ou passou 95% |
 
-### Outputs
+### Modelo `PlaybackProgress`
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+```js
+{
+  _id,
+  userId,
+  contentId,
+  currentTimeSeconds,
+  durationSeconds,
+  completed,
+  lastWatchedAt,
+  createdAt,
+  updatedAt
+}
+```
 
-### Validacao
+### Guia de execucao (passo-a-passo)
 
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
+### Passo 1 - Criar validacao de progresso
 
-### Handoff
+`CRIAR backend/src/modules/playback/playback.validation.js`
 
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
+```js
+export function assertProgressPayload(input, durationSeconds) {
+  const currentTimeSeconds = Number(input.currentTimeSeconds);
 
+  if (!Number.isFinite(currentTimeSeconds) || currentTimeSeconds < 0) {
+    const error = new Error("Progresso invalido.");
+    error.statusCode = 400;
+    throw error;
+  }
 
-## Pre-condicoes de entrada
+  const safeTime = Math.min(currentTimeSeconds, durationSeconds);
+  const completed = durationSeconds > 0 && (safeTime >= durationSeconds * 0.95 || durationSeconds - safeTime <= 60);
 
-- Dependencias declaradas: `BK-MF2-04`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+  return {
+    currentTimeSeconds: safeTime,
+    durationSeconds,
+    completed,
+  };
+}
+```
 
-## O que entra (scope)
+### Passo 2 - Criar servico de playback
 
-- Entrega funcional de `Reproducao e continuar a ver` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
+`CRIAR backend/src/modules/playback/playback.service.js`
 
-## O que nao entra (scope-out)
+```js
+import { ObjectId } from "mongodb";
+import { getDb } from "../../config/database.js";
+import { assertProgressPayload } from "./playback.validation.js";
 
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
+function asObjectId(id, label) {
+  if (!ObjectId.isValid(id)) {
+    const error = new Error(`${label} invalido.`);
+    error.statusCode = 400;
+    throw error;
+  }
+  return new ObjectId(id);
+}
 
-## Como saber que isto ficou bem
+function publicProgress(progress, durationSeconds) {
+  if (!progress) {
+    return {
+      currentTimeSeconds: 0,
+      durationSeconds,
+      completed: false,
+      lastWatchedAt: null,
+    };
+  }
 
-- Fluxo principal de `BK-MF2-05` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P0`.
-- Evidence documentada e pronta para auditoria de gate.
+  return {
+    currentTimeSeconds: progress.currentTimeSeconds,
+    durationSeconds: progress.durationSeconds,
+    completed: progress.completed,
+    lastWatchedAt: progress.lastWatchedAt,
+  };
+}
 
-## Pre-leitura minima (10-15 min)
+export async function getPlayback(contentId, userId) {
+  const db = await getDb();
+  const contentObjectId = asObjectId(contentId, "Conteudo");
+  const userObjectId = asObjectId(userId, "Utilizador");
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RF11, RF12`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF2-05`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
+  const content = await db.collection("contents").findOne({
+    _id: contentObjectId,
+    status: "published",
+  });
 
-## Guia de execucao (passo-a-passo)
+  if (!content) {
+    const error = new Error("Conteudo nao encontrado.");
+    error.statusCode = 404;
+    throw error;
+  }
 
-1. Definir contratos de leitura/escrita de progresso de reproducao (inicio, pausa, retoma, fim) por `user_id + content_id`.
-2. Implementar arranque de reproducao no player com validacao de permissao e estado do conteudo.
-3. Persistir progresso em momentos-chave (pausa, fecho, heartbeat) para garantir `continuar a ver` fiavel.
-4. Implementar retoma no ultimo timestamp valido e regra de conclusao (conteudo marcado como concluido perto do fim).
-5. Cobrir o fluxo com testes de integracao FE/BE para retoma apos logout/login e apos refresh de pagina.
-6. Atualizar evidence e preparar handoff para `BK-MF2-06`.
+  const progress = await db.collection("playback_progress").findOne({
+    userId: userObjectId,
+    contentId: contentObjectId,
+  });
 
-## Outputs esperados
+  return {
+    content: {
+      id: String(content._id),
+      title: content.title,
+      durationSeconds: content.durationSeconds,
+      media: content.media,
+      tracks: content.tracks ?? { subtitles: [], audio: [] },
+    },
+    progress: publicProgress(progress, content.durationSeconds),
+  };
+}
 
-- Output funcional de `BK-MF2-05` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
+export async function savePlaybackProgress(contentId, userId, input) {
+  const db = await getDb();
+  const contentObjectId = asObjectId(contentId, "Conteudo");
+  const userObjectId = asObjectId(userId, "Utilizador");
+  const content = await db.collection("contents").findOne({ _id: contentObjectId, status: "published" });
+
+  if (!content) {
+    const error = new Error("Conteudo nao encontrado.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const progress = assertProgressPayload(input, content.durationSeconds);
+  const now = new Date();
+
+  await db.collection("playback_progress").updateOne(
+    { userId: userObjectId, contentId: contentObjectId },
+    {
+      $set: { ...progress, lastWatchedAt: now, updatedAt: now },
+      $setOnInsert: { userId: userObjectId, contentId: contentObjectId, createdAt: now },
+    },
+    { upsert: true },
+  );
+
+  return publicProgress({ ...progress, lastWatchedAt: now }, content.durationSeconds);
+}
+```
+
+### Passo 3 - Criar controller e rotas
+
+`CRIAR backend/src/modules/playback/playback.controller.js`
+
+```js
+import { getPlayback, savePlaybackProgress } from "./playback.service.js";
+
+export async function getPlaybackController(req, res) {
+  res.status(200).json(await getPlayback(req.params.contentId, req.user.id));
+}
+
+export async function putProgressController(req, res) {
+  res.status(200).json({
+    progress: await savePlaybackProgress(req.params.contentId, req.user.id, req.body),
+  });
+}
+```
+
+`CRIAR backend/src/modules/playback/playback.routes.js`
+
+```js
+import { Router } from "express";
+import { requireAuth } from "../auth/auth.middleware.js";
+import { asyncHandler } from "../../utils/async-handler.js";
+import { getPlaybackController, putProgressController } from "./playback.controller.js";
+
+export const playbackRouter = Router();
+
+playbackRouter.get("/:contentId", requireAuth, asyncHandler(getPlaybackController));
+playbackRouter.put("/:contentId/progress", requireAuth, asyncHandler(putProgressController));
+```
+
+`EDITAR backend/src/app.js`
+
+```js
+import { playbackRouter } from "./modules/playback/playback.routes.js";
+
+app.use("/api/playback", playbackRouter);
+```
+
+### Passo 4 - Criar cliente frontend de playback
+
+`CRIAR frontend/src/services/api/playbackApi.js`
+
+```js
+import { apiClient } from "./apiClient.js";
+
+export const playbackApi = {
+  getPlayback(contentId) {
+    return apiClient.get(`/api/playback/${contentId}`);
+  },
+  saveProgress(contentId, payload) {
+    return apiClient.put(`/api/playback/${contentId}/progress`, payload);
+  },
+};
+```
+
+### Passo 5 - Criar pagina de reproducao
+
+`CRIAR frontend/src/pages/PlaybackPage.jsx`
+
+```jsx
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { playbackApi } from "../services/api/playbackApi.js";
+
+export function PlaybackPage() {
+  const { contentId } = useParams();
+  const videoRef = useRef(null);
+  const lastSavedRef = useRef(0);
+  const [playback, setPlayback] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    playbackApi.getPlayback(contentId)
+      .then((response) => setPlayback(response))
+      .catch((requestError) => setError(requestError.message));
+  }, [contentId]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !playback) return;
+
+    video.currentTime = playback.progress.currentTimeSeconds;
+  }, [playback]);
+
+  async function saveProgress() {
+    const video = videoRef.current;
+    if (!video || Math.abs(video.currentTime - lastSavedRef.current) < 15) return;
+
+    lastSavedRef.current = video.currentTime;
+    await playbackApi.saveProgress(contentId, {
+      currentTimeSeconds: video.currentTime,
+    });
+  }
+
+  if (error) return <main className="page-shell"><h1>Reproducao indisponivel</h1><p>{error}</p></main>;
+  if (!playback) return <main className="page-shell"><p>A carregar player...</p></main>;
+
+  return (
+    <main className="playback-page">
+      <h1>{playback.content.title}</h1>
+      <video
+        ref={videoRef}
+        src={playback.content.media.playbackUrl}
+        controls
+        playsInline
+        onTimeUpdate={saveProgress}
+        onPause={saveProgress}
+        onEnded={saveProgress}
+      />
+    </main>
+  );
+}
+```
+
+### Passo 6 - Adicionar rota frontend
+
+`EDITAR frontend/src/App.jsx` ou o ficheiro de rotas:
+
+```jsx
+import { PlaybackPage } from "./pages/PlaybackPage.jsx";
+
+<Route path="/watch/:contentId" element={<PlaybackPage />} />
+```
+
+### Passo 7 - Adicionar "continuar a ver" ao catalogo ou home
+
+`CRIAR backend/src/modules/playback/continue.service.js`
+
+```js
+import { ObjectId } from "mongodb";
+import { getDb } from "../../config/database.js";
+
+export async function listContinueWatching(userId) {
+  const db = await getDb();
+  const rows = await db.collection("playback_progress").aggregate([
+    { $match: { userId: new ObjectId(userId), completed: false } },
+    { $sort: { lastWatchedAt: -1 } },
+    { $limit: 12 },
+    {
+      $lookup: {
+        from: "contents",
+        localField: "contentId",
+        foreignField: "_id",
+        as: "content",
+      },
+    },
+    { $unwind: "$content" },
+    { $match: { "content.status": "published" } },
+  ]).toArray();
+
+  return rows.map((row) => ({
+    contentId: String(row.contentId),
+    title: row.content.title,
+    posterUrl: row.content.assets?.posterUrl ?? "",
+    currentTimeSeconds: row.currentTimeSeconds,
+    durationSeconds: row.durationSeconds,
+    lastWatchedAt: row.lastWatchedAt,
+  }));
+}
+```
+
+Adicionar controller/rota:
+
+```js
+playbackRouter.get("/me/continue-watching", requireAuth, asyncHandler(async (req, res) => {
+  res.status(200).json({ items: await listContinueWatching(req.user.id) });
+}));
+```
+
+Esta rota deve ficar antes de `/:contentId`.
+
+### Passo 8 - Validar fluxo principal
+
+1. Iniciar sessao.
+2. Abrir `/catalog/:slug`.
+3. Clicar em `Reproduzir`.
+4. Ver 20 segundos.
+5. Pausar.
+6. Recarregar `/watch/:contentId`.
+7. Confirmar que o video retoma perto do tempo guardado.
+
+### Passo 9 - Validar negativos minimos
+
+- Sem login, `GET /api/playback/:contentId` devolve `401`.
+- Conteudo inexistente devolve `404`.
+- Conteudo `draft` devolve `404`.
+- Progresso negativo devolve `400`.
+- Progresso maior que a duracao e limitado a duracao.
+- Outro utilizador nao ve o progresso do primeiro.
 
 ## Snippet tecnico aplicavel
 
-```text
-# pseudo-checklist BK-MF2-05
-precondicoes_ok = validar_dependencias(["BK-MF2-04"])
-assert precondicoes_ok == true
+O ponto central e o `upsert` por utilizador e conteudo:
 
-resultado = executar_fluxo_principal("Reproducao e continuar a ver")
-assert resultado.status == "OK"
-
-negativos = executar_negativos(prioridade="P0", minimo=3)
-assert negativos.passados >= 3
-
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
+```js
+await db.collection("playback_progress").updateOne(
+  { userId: userObjectId, contentId: contentObjectId },
+  { $set: { currentTimeSeconds, durationSeconds, completed, lastWatchedAt: now } },
+  { upsert: true },
+);
 ```
-
-## Checklist de validacao
-
-### Smoke
-
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
-
-### Negativos
-
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: tentativa de gravar progresso com timestamp invalido (negativo ou acima da duracao) e rejeitada.
-- [ ] Negativo 2: tentativa de aceder/reproduzir conteudo nao publicado ou sem permissao retorna bloqueio funcional.
-- [ ] Negativo 3: tentativa de atualizar progresso de outro utilizador e bloqueada por controlo de acesso.
-### Tecnico
-
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: reproducao e retoma funcionam ponta-a-ponta no fluxo principal.
-- Metrica/Limiar: retoma abre no ultimo progresso com desvio maximo de `<=5s`.
-- Evidencia esperada: `proof` com video curto/capturas antes e depois da retoma.
-- Condicao: persistencia de progresso e consistente e isolada por utilizador.
-- Metrica/Limiar: 100% dos testes de integracao de progresso passam sem escrita cruzada entre contas.
-- Evidencia esperada: `proof` com logs/asserts de `user_id + content_id`.
-- Condicao: politicas negativas e autorizacao aplicadas.
-- Metrica/Limiar: 3/3 negativos obrigatorios executados com resposta previsivel.
-- Evidencia esperada: `neg` com requests/responses dos cenarios de bloqueio.
+- Utilizador autenticado consegue abrir `/watch/:contentId`.
+- Player usa `media.playbackUrl` vindo do backend.
+- Progresso e guardado no backend.
+- Reabrir o player retoma a partir do progresso guardado.
+- "Continuar a ver" lista conteudos incompletos por utilizador.
+- Os negativos obrigatorios ficam registados.
+
+## Validacao final
+
+- Confirmar que o endpoint de playback exige login.
+- Confirmar que conteudo nao publicado nao reproduz.
+- Confirmar que o progresso de dois utilizadores diferentes nao se mistura.
+- Confirmar que o frontend nao guarda progresso como fonte principal.
+- Confirmar que `BK-MF2-06` pode usar `tracks` e `ageRating`.
 
 ## Evidence para PR/defesa
 
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
+- Captura do player aberto.
+- Log de `PUT /api/playback/:contentId/progress` com `200`.
+- Log de retoma apos recarregar pagina.
+- Log de `401` sem login.
+- Log de `404` para conteudo nao publicado.
+
+## Handoff
+
+Para `BK-MF2-06`, entregar:
+
+- Player React com `<video>`.
+- Endpoint `GET /api/playback/:contentId`.
+- Resposta com `tracks`, `media.playbackUrl`, `durationSeconds` e progresso.
+- Colecao `playback_progress` para historico em `BK-MF2-07`.
 
 ## Proximo BK recomendado
 
-`BK-MF2-06`
+`BK-MF2-06 - Legendas/audio, parental e qualidade`
 
 ## Changelog
 
-- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+- `2026-05-31`: Guia reescrito com backend de playback, progresso, player React, continuar a ver, negativos e handoff para media controls.

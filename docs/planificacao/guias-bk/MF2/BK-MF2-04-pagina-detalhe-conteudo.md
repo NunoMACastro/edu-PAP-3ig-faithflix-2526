@@ -17,169 +17,318 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF2-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF2/BK-MF2-04-pagina-detalhe-conteudo.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-05-31`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Consolidar a entrega de `Pagina de detalhe de conteudo` com rastreabilidade explicita para `RF08`.
-- Executar o BK `BK-MF2-04` no contexto da macro `MF2` e da sprint `S03`.
+Criar a pagina de detalhe de um conteudo publicado (`RF08`), usando o contrato real do catalogo. O aluno deve perceber que uma pagina de detalhe nao e apenas uma ficha visual: ela prepara o player, favoritos, watchlist, historico, pesquisa e recomendacao.
 
 ### Tempo estimado
 
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
+- Rever contrato de `BK-MF2-03`: 15 min.
+- Endpoint de detalhe: 40 min.
+- Cliente API e pagina React: 60 min.
+- Estados de UI e negativos: 35 min.
+
+### Conceitos essenciais
+
+- O detalhe publico mostra apenas conteudo `published`.
+- A rota pode receber `slug` ou `id`, mas a resposta publica tem sempre `id` e `slug`.
+- A pagina deve lidar com `loading`, `success`, `not found` e erro.
+- O botao de reproducao prepara o handoff para `BK-MF2-05`.
 
 ### Erros comuns
 
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
+- Criar dados fixos no componente.
+- Mostrar conteudo `draft`.
+- Chamar um endpoint diferente do que o backend entrega.
+- Construir o player neste BK.
+- Ignorar estados de erro e carregamento.
 
 ### Check de compreensao
 
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
-
-
-## O que vamos fazer neste BK
-
-Entregar `Pagina de detalhe de conteudo` cobrindo `RF08` na `MF2`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
-
-## Porque isto e importante
-
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF2-05`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+- [ ] Sei dizer que endpoint alimenta a pagina.
+- [ ] Sei porque `draft` devolve `404` no detalhe publico.
+- [ ] Sei que o player entra no BK seguinte.
+- [ ] Sei que o botao "Reproduzir" deve passar `content.id` ou `content.slug`.
 
 ## Bloco operacional (obrigatorio)
 
 ### Pre-condicoes
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+- `BK-MF2-03` concluido.
+- Existe pelo menos um conteudo `published`.
+- `frontend/src/services/api/apiClient.js` existe e usa `credentials: "include"`.
+- O router frontend permite criar uma rota de detalhe.
 
-### Execucao
+### Contrato tecnico deste BK
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+| Area | Contrato |
+| --- | --- |
+| Endpoint | `GET /api/catalog/:idOrSlug` |
+| Visibilidade | apenas `status: "published"` |
+| Sucesso | `200 { content }` |
+| Inexistente/rascunho | `404` |
+| Frontend | `ContentDetailPage` |
+| Handoff | link para `/watch/:id` no `BK-MF2-05` |
 
-### Outputs
+### Shape minimo de resposta
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+```js
+{
+  content: {
+    id,
+    title,
+    slug,
+    synopsis,
+    type,
+    durationSeconds,
+    ageRating,
+    taxonomyIds,
+    assets: { posterUrl, backdropUrl },
+    media: { playbackUrl },
+    publishedAt
+  }
+}
+```
 
-### Validacao
+### Guia de execucao (passo-a-passo)
 
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
+### Passo 1 - Adicionar detalhe ao servico de catalogo
 
-### Handoff
+`EDITAR backend/src/modules/catalog/catalog.service.js`
 
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
+Adicionar a funcao:
 
+```js
+import { ObjectId } from "mongodb";
 
-## Pre-condicoes de entrada
+function buildDetailQuery(idOrSlug) {
+  if (ObjectId.isValid(idOrSlug)) {
+    return { _id: new ObjectId(idOrSlug), status: "published" };
+  }
 
-- Dependencias declaradas: `BK-MF2-03`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+  return { slug: String(idOrSlug ?? "").trim(), status: "published" };
+}
 
-## O que entra (scope)
+export async function getPublishedContentDetail(idOrSlug) {
+  const db = await getDb();
+  const content = await db.collection("contents").findOne(buildDetailQuery(idOrSlug));
 
-- Entrega funcional de `Pagina de detalhe de conteudo` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
+  if (!content) {
+    const error = new Error("Conteudo nao encontrado.");
+    error.statusCode = 404;
+    throw error;
+  }
 
-## O que nao entra (scope-out)
+  return publicContent(content);
+}
+```
 
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
+### Passo 2 - Adicionar controller de detalhe
 
-## Como saber que isto ficou bem
+`EDITAR backend/src/modules/catalog/catalog.controller.js`
 
-- Fluxo principal de `BK-MF2-04` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P0`.
-- Evidence documentada e pronta para auditoria de gate.
+```js
+import { getPublishedContentDetail } from "./catalog.service.js";
 
-## Pre-leitura minima (10-15 min)
+export async function getCatalogDetail(req, res) {
+  res.status(200).json({ content: await getPublishedContentDetail(req.params.idOrSlug) });
+}
+```
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RF08`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF2-04`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
+### Passo 3 - Adicionar rota de detalhe
 
-## Guia de execucao (passo-a-passo)
+`EDITAR backend/src/modules/catalog/catalog.routes.js`
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Pagina de detalhe de conteudo`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
-6. Atualizar evidence e preparar handoff para `BK-MF2-05`.
+Colocar a rota depois de `/admin` e `/taxonomies`, para evitar conflito de nomes.
 
-## Outputs esperados
+```js
+catalogRouter.get("/taxonomies", asyncHandler(getTaxonomies));
+catalogRouter.post("/taxonomies", canManageCatalog, asyncHandler(postTaxonomy));
+catalogRouter.get("/:idOrSlug", asyncHandler(getCatalogDetail));
+```
 
-- Output funcional de `BK-MF2-04` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
+### Passo 4 - Atualizar cliente frontend
+
+`EDITAR frontend/src/services/api/catalogApi.js`
+
+```js
+export const catalogApi = {
+  listPublished() {
+    return apiClient.get("/api/catalog");
+  },
+  getDetail(idOrSlug) {
+    return apiClient.get(`/api/catalog/${encodeURIComponent(idOrSlug)}`);
+  },
+};
+```
+
+Se o ficheiro ja tiver os metodos admin do BK anterior, manter esses metodos e acrescentar apenas `getDetail`.
+
+### Passo 5 - Criar pagina de detalhe
+
+`CRIAR frontend/src/pages/ContentDetailPage.jsx`
+
+```jsx
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { catalogApi } from "../services/api/catalogApi.js";
+
+function formatDuration(seconds) {
+  const minutes = Math.round(Number(seconds) / 60);
+  return `${minutes} min`;
+}
+
+export function ContentDetailPage() {
+  const { idOrSlug } = useParams();
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+
+    setLoading(true);
+    setError("");
+
+    catalogApi.getDetail(idOrSlug)
+      .then((response) => {
+        if (!ignore) setContent(response.content);
+      })
+      .catch((requestError) => {
+        if (!ignore) setError(requestError.message);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [idOrSlug]);
+
+  if (loading) {
+    return <main className="page-shell"><p>A carregar conteudo...</p></main>;
+  }
+
+  if (error) {
+    return <main className="page-shell"><h1>Conteudo indisponivel</h1><p>{error}</p></main>;
+  }
+
+  return (
+    <main className="content-detail">
+      <section className="content-hero">
+        {content.assets?.backdropUrl ? <img src={content.assets.backdropUrl} alt="" /> : null}
+        <div>
+          <p>{content.type}</p>
+          <h1>{content.title}</h1>
+          <p>{content.synopsis}</p>
+          <dl>
+            <div><dt>Duracao</dt><dd>{formatDuration(content.durationSeconds)}</dd></div>
+            <div><dt>Idade</dt><dd>{content.ageRating}+</dd></div>
+          </dl>
+          <Link className="primary-action" to={`/watch/${content.id}`}>Reproduzir</Link>
+        </div>
+      </section>
+    </main>
+  );
+}
+```
+
+### Passo 6 - Adicionar rota frontend
+
+`EDITAR frontend/src/App.jsx` ou o ficheiro de rotas existente:
+
+```jsx
+import { ContentDetailPage } from "./pages/ContentDetailPage.jsx";
+
+<Route path="/catalog/:idOrSlug" element={<ContentDetailPage />} />
+```
+
+### Passo 7 - Ligar cards de catalogo ao detalhe
+
+No componente de card/listagem criado antes, cada item publicado deve apontar para:
+
+```jsx
+<Link to={`/catalog/${content.slug || content.id}`}>{content.title}</Link>
+```
+
+### Passo 8 - Validar manualmente
+
+Executar:
+
+```bash
+curl -i http://localhost:3000/api/catalog
+curl -i http://localhost:3000/api/catalog/piloto-faithflix
+curl -i http://localhost:3000/api/catalog/id-inexistente
+```
+
+Validar no browser:
+
+- abrir `/catalog/piloto-faithflix`;
+- confirmar titulo, sinopse, duracao e idade;
+- confirmar que o botao aponta para `/watch/:id`;
+- confirmar que slug inexistente mostra estado de erro.
+
+### Passo 9 - Validar negativos minimos
+
+- Conteudo inexistente devolve `404`.
+- Conteudo `draft` devolve `404` no endpoint publico.
+- Slug vazio ou estranho nao quebra o servidor.
+- Sem `backdropUrl`, a pagina continua legivel.
+- O botao de reproducao nao tenta iniciar player neste BK.
 
 ## Snippet tecnico aplicavel
 
-```text
-# pseudo-checklist BK-MF2-04
-precondicoes_ok = validar_dependencias(["BK-MF2-03"])
-assert precondicoes_ok == true
+O ponto central e filtrar detalhe por conteudo publicado:
 
-resultado = executar_fluxo_principal("Pagina de detalhe de conteudo")
-assert resultado.status == "OK"
-
-negativos = executar_negativos(prioridade="P0", minimo=3)
-assert negativos.passados >= 3
-
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
+```js
+const content = await db.collection("contents").findOne({
+  slug: idOrSlug,
+  status: "published",
+});
 ```
-
-## Checklist de validacao
-
-### Smoke
-
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
-
-### Negativos
-
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
-### Tecnico
-
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF2-04` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- `GET /api/catalog/:idOrSlug` devolve `200` para conteudo publicado.
+- O mesmo endpoint devolve `404` para rascunho, arquivado ou inexistente.
+- `ContentDetailPage` mostra titulo, sinopse, tipo, duracao e idade.
+- A pagina tem estados de carregamento e erro.
+- O botao de reproducao aponta para `/watch/:id`.
+- O frontend nao usa dados fixos para o detalhe.
+
+## Validacao final
+
+- Confirmar que `GET /api/catalog` e `GET /api/catalog/:idOrSlug` usam o mesmo modelo.
+- Confirmar que o detalhe nao duplica regras de publicacao.
+- Confirmar que o link para player usa `content.id`.
+- Confirmar que `BK-MF2-05` consegue ler `media.playbackUrl`.
 
 ## Evidence para PR/defesa
 
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
+- Resposta `200` do detalhe publicado.
+- Resposta `404` para conteudo inexistente.
+- Captura da pagina de detalhe.
+- Captura do estado de erro.
+- Print do link `/watch/:id`.
+
+## Handoff
+
+Para `BK-MF2-05`, entregar:
+
+- Endpoint de detalhe publico.
+- `media.playbackUrl` disponivel.
+- `content.id` usado como chave tecnica do player.
+- UI com CTA de reproducao sem logica de progresso.
 
 ## Proximo BK recomendado
 
-`BK-MF2-05`
+`BK-MF2-05 - Reproducao e continuar a ver`
 
 ## Changelog
 
-- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+- `2026-05-31`: Guia reescrito com endpoint de detalhe, pagina React, estados de UI, negativos e handoff para player.
