@@ -7,13 +7,13 @@
 - `macro_fase_auditada`: `MF2`
 - `data`: `2026-05-31`
 - `modo`: `corrigir_apenas`
-- `status`: `bks_corrigidos_validacao_planificacao_bloqueada`
+- `status`: `correcoes_aplicadas_bks_incompletos`
 
 ## Objetivo
 
-Usar o relatorio existente como ponto de partida e corrigir apenas os BKs da `MF2` marcados como `PARCIAL`, sem alterar codigo real da aplicacao.
+Corrigir apenas os guias `BK-MF2-03`, `BK-MF2-06` e `BK-MF2-08`, que estavam classificados como `PARCIAL` ou `CRITICO` na auditoria anterior, sem editar codigo real da app.
 
-A execucao incidiu sobre `BK-MF2-02` a `BK-MF2-08`. O `BK-MF2-01` ja estava `OK` e nao foi editado.
+Esta execucao manteve os restantes BKs da `MF2` intactos e atualizou este relatorio com o antes/depois das correcoes.
 
 ## Documentos consultados
 
@@ -25,7 +25,7 @@ A execucao incidiu sobre `BK-MF2-02` a `BK-MF2-08`. O `BK-MF2-01` ja estava `OK`
 - `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
 - `docs/planificacao/backlogs/BACKLOG-MVP.md`
 - `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
-- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (`DEPRECATED`; usado apenas como compatibilidade)
+- `docs/planificacao/backlogs/MATRIZ-RF-RNF-POR-BK.md` (`DEPRECATED`; usado apenas para confirmar compatibilidade)
 - `docs/planificacao/backlogs/CONTRATO-CAMPOS-BK.md`
 - `docs/planificacao/backlogs/MF-VIEWS.md`
 - `docs/planificacao/sprints/PLANO-SPRINTS.md`
@@ -34,85 +34,124 @@ A execucao incidiu sobre `BK-MF2-02` a `BK-MF2-08`. O `BK-MF2-01` ja estava `OK`
 - `docs/planificacao/guias-bk/README.md`
 - `docs/planificacao/guias-bk/_TEMPLATE-BK.md`
 - `GLOSSARIO-TERMOS-TECNICOS-PAP.md`
-- BKs de `MF0`, `MF1`, `MF2` e BKs posteriores com dependencia direta de `MF2`
-- Relatorios existentes `AUDITORIA-HIDRATACAO-MF0.md`, `AUDITORIA-HIDRATACAO-MF1.md` e `AUDITORIA-HIDRATACAO-MF2.md`
+- Todos os BKs de `MF0`, `MF1` e `MF2`.
+- BKs posteriores com dependencia direta de `MF2`: `BK-MF3-01`, `BK-MF3-03`, `BK-MF3-05`, `BK-MF4-01`, `BK-MF5-01`, `BK-MF5-03`, `BK-MF5-04` e referencias de `MF6`.
+- Relatorios existentes `AUDITORIA-HIDRATACAO-MF0.md`, `AUDITORIA-HIDRATACAO-MF1.md` e versao anterior deste relatorio.
 
 ## Resultado global
 
 | Momento | Fonte | BK analisados | `OK` | `PARCIAL` | `CRITICO` |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Antes desta correcao | Relatorio MF2 existente | 8 | 1 | 7 | 0 |
-| Depois desta correcao | Guias MF2 revistos | 8 | 8 | 0 | 0 |
+| Antes desta correcao | Auditoria MF2 anterior | 8 | 5 | 2 | 1 |
+| Depois desta correcao | Releitura dos guias MF2 editados | 8 | 8 | 0 | 0 |
 
 ## BKs editados nesta execucao
 
-| BK | Estado anterior | Estado depois | Correcao aplicada |
-| --- | --- | --- | --- |
-| `BK-MF2-02` | `PARCIAL` | `OK` | Normalizados criterios, evidence, handoff, proximo BK e changelog. |
-| `BK-MF2-03` | `PARCIAL` | `OK` | Normalizados criterios, evidence de catalogo/admin, handoff, proximo BK e changelog. |
-| `BK-MF2-04` | `PARCIAL` | `OK` | Normalizados criterios, evidence de detalhe, handoff, proximo BK e changelog. |
-| `BK-MF2-05` | `PARCIAL` | `OK` | Normalizados criterios, evidence de playback/ownership, handoff, proximo BK e changelog. |
-| `BK-MF2-06` | `PARCIAL` | `OK` | Normalizados criterios, evidence de parental/preferencias, handoff, proximo BK e changelog. |
-| `BK-MF2-07` | `PARCIAL` | `OK` | Normalizados criterios, evidence de listas/ownership, handoff, proximo BK e changelog. |
-| `BK-MF2-08` | `PARCIAL` | `OK` | Normalizados criterios/evidence/handoff/changelog e marcada a dependencia Playwright como `DERIVADO`. |
+- `docs/planificacao/guias-bk/MF2/BK-MF2-03-crud-catalogo-taxonomias.md`
+- `docs/planificacao/guias-bk/MF2/BK-MF2-06-legendas-audio-parental-e-qualidade.md`
+- `docs/planificacao/guias-bk/MF2/BK-MF2-08-teste-e2e-fluxo-principal.md`
 
-## Classificacao final por BK
+Nenhum ficheiro de codigo real da app foi editado.
 
-| BK | Estado final | Justificacao |
+## Classificacao por BK
+
+| BK | Estado | Justificacao |
 | --- | --- | --- |
-| `BK-MF2-01` | `OK` | Ja cumpria header, passos, codigo integrado, criterios, validacao, evidence, handoff e changelog. |
-| `BK-MF2-02` | `OK` | Fecho documental completo e roles/perfil mantidos coerentes com `RF03` e `RF04`. |
-| `BK-MF2-03` | `OK` | Fecho documental completo e catalogo/taxonomias mantidos coerentes com `RF06`, `RF07`, `RF09` e `RF10`. |
-| `BK-MF2-04` | `OK` | Fecho documental completo e detalhe preparado para player e E2E. |
-| `BK-MF2-05` | `OK` | Fecho documental completo e progresso por utilizador documentado com ownership. |
-| `BK-MF2-06` | `OK` | Fecho documental completo e regras de parental/preferencias mantidas no backend. |
-| `BK-MF2-07` | `OK` | Fecho documental completo e listas pessoais/historico documentados com ownership. |
-| `BK-MF2-08` | `OK` | Fecho documental completo e E2E documentado com evidence de `RNF07` e `RNF08`. |
+| `BK-MF2-01` | `OK` | Guia completo para registo, login, sessao por cookie HttpOnly, recuperacao de password, frontend e negativos. Mantem decisao `DERIVADO` de token opaco em servidor e nao usa `localStorage`. |
+| `BK-MF2-02` | `OK` | Perfil e roles ficam separados, `requireAuth`/`requireRole` sao claros, rotas admin exigem role e o perfil proprio ignora `role` enviada pelo frontend. |
+| `BK-MF2-03` | `OK` | Passou a validar `taxonomyIds` contra ObjectIds existentes, listar revisoes, reverter snapshots por endpoint protegido e expor essa reversao na pagina admin. |
+| `BK-MF2-04` | `OK` | Detalhe publico por `id` ou `slug`, filtro por `published`, rota frontend e handoff para player estao coerentes. |
+| `BK-MF2-05` | `OK` | Playback, progresso, continuar a ver e ownership por `req.user.id` ficam integrados com endpoints reais e criterios mensuraveis. |
+| `BK-MF2-06` | `OK` | Passou a exigir `src` em audio, resolver fonte por audio/qualidade real, aplicar legendas via `TextTrack.mode` e preservar tempo em trocas de fonte. |
+| `BK-MF2-07` | `OK` | Favoritos, watchlist e historico usam endpoints autenticados, idempotencia e ownership. O historico reutiliza `playback_progress`, alinhado com o BK anterior. |
+| `BK-MF2-08` | `OK` | O seed passou a limpar apenas fixture E2E, os seletores ficaram compativeis com `AuthForms` do `BK-MF2-01`, e `RNF07` passou a ser medido em `/catalogo`. |
 
-## Lacunas corrigidas
+## Achados corrigidos nesta execucao
 
-- `BK-MF2-02..08` passaram de `## Criterios de aceitacao` para `## Criterios de aceite (mensuraveis)`.
-- `BK-MF2-02..08` receberam `## Evidence para PR/defesa`.
-- `BK-MF2-02..08` receberam `## Changelog`.
-- `BK-MF2-02..08` receberam `## Proximo BK recomendado`.
-- `BK-MF2-02..08` passaram a usar o titulo canonico `## Handoff`.
-- `BK-MF2-08` passou a marcar a decisao sobre `@playwright/test` como `DERIVADO`.
+### `BK-MF2-03` - de `PARCIAL` para `OK`
+
+- Ficheiro: `docs/planificacao/guias-bk/MF2/BK-MF2-03-crud-catalogo-taxonomias.md`
+- Problema corrigido: `RF10` estava limitado a guardar revisoes, sem consulta nem reversao demonstravel.
+- Correcoes aplicadas:
+  - `taxonomyIds` passou a validar ObjectIds e existencia em `taxonomies`.
+  - `catalog.service.js` documentado passou a incluir `listContentRevisions` e `revertContentRevision`.
+  - `catalog.controller.js`, `catalog.routes.js` e `catalogApi.js` passaram a documentar endpoints de revisoes.
+  - `AdminCatalogPage` passou a listar revisoes e acionar reversao.
+  - Criterios, validacao, evidence e handoff passaram a exigir taxonomia inexistente `400`, historico e reversao.
+- Resultado: `RF10` fica demonstravel por endpoint e UI admin, sem alterar o scope dos BKs seguintes.
+
+### `BK-MF2-06` - de `PARCIAL` para `OK`
+
+- Ficheiro: `docs/planificacao/guias-bk/MF2/BK-MF2-06-legendas-audio-parental-e-qualidade.md`
+- Problema corrigido: legendas e audio eram guardados como preferencias, mas o player nao aplicava a selecao.
+- Correcoes aplicadas:
+  - `tracks.audio` passou a exigir `src`, tal como legendas.
+  - `resolvePlayableMedia` passou a resolver fonte por audio escolhido, qualidade escolhida e fallback seguro.
+  - `PlaybackPage` passou a aplicar legendas com `TextTrack.mode`.
+  - Trocas de audio e qualidade passaram a preservar tempo com `resumeAtRef`.
+  - Criterios e evidence passaram a cobrir audio inexistente, qualidade inexistente e aplicacao real de legendas.
+- Resultado: `RF13`, `RF14` e `RF15` ficam demonstraveis no player e no backend.
+
+### `BK-MF2-08` - de `CRITICO` para `OK`
+
+- Ficheiro: `docs/planificacao/guias-bk/MF2/BK-MF2-08-teste-e2e-fluxo-principal.md`
+- Problema corrigido: seed destrutivo, seletores incompativeis com `AuthForms` e medicao de `RNF07` no detalhe.
+- Correcoes aplicadas:
+  - Seed passou a limpar apenas o email E2E, o utilizador associado e documentos marcados com `mf2-e2e`.
+  - `AuthForms` passou a mostrar o componente completo do `BK-MF2-01` com `data-testid` adicionados sem mudar o estado `form`.
+  - Teste passou a confirmar login, medir `RNF07 catalogLoadMs` em `/catalogo` e depois seguir para detalhe/player/biblioteca.
+  - Criterios e evidence passaram a exigir prova de seed restrito e log `RNF07 catalogLoadMs`.
+- Resultado: o E2E deixa de ser destrutivo e passa a medir `RNF07` no alvo definido em `docs/RNF.md`.
+
+## Lacunas corrigidas nesta execucao
+
+- `BK-MF2-03`: `RF10` completado com historico, reversao e validacao de taxonomias.
+- `BK-MF2-06`: selecao de legendas/audio completada com comportamento real no player.
+- `BK-MF2-08`: seed, seletores e medicao `RNF07` corrigidos.
 
 ## Decisoes tecnicas confirmadas
 
-- `CANONICO`: a `MF2` cobre `RF01..RF18`, com `BK-MF2-08` a validar `RNF07` e `RNF08`.
-- `CANONICO`: sessoes autenticadas usam cookie `HttpOnly`, alinhado com `RNF15`.
-- `CANONICO`: a base de dados principal do MVP e MongoDB.
-- `DERIVADO`: os BKs usam React/Vite e `fetch` via `apiClient` por coerencia com `MF1`, apesar de `RNF.md` sugerir Next.js/Axios como stack possivel.
-- `DERIVADO`: `@playwright/test` fica como dependencia de desenvolvimento para validar fluxo E2E real no browser.
+- `CANONICO`: `MF2` cobre `RF01..RF18` e fecha o core streaming MVP.
+- `CANONICO`: `BK-MF2-08` e responsavel por `RNF07` e `RNF08`.
+- `CANONICO`: sessoes autenticadas devem usar cookies `HttpOnly`, com flags adequadas (`RNF15`).
+- `CANONICO`: backend modular em Node.js/Express e base principal MongoDB Atlas no MVP.
+- `DERIVADO`: os BKs seguem React + Vite e `fetch` via `apiClient`, por coerencia com `MF1`, embora `RNF.md` sugira Next.js/Axios como stack recomendada de alto nivel.
+- `DERIVADO`: streaming e simplificado com ficheiro local/URL de media, sem CDN, DRM ou URLs temporarios reais.
 - `DERIVADO`: `playback_progress` e a fonte unica para progresso, continuar a ver e historico.
 
 ## Mapa de integracao da MF
 
-| BK | Ficheiros editados nesta execucao | Exports/ficheiros da app documentados no BK | Endpoints/rotas documentados | Dados persistidos | Auth/ownership/roles | Dependentes |
-| --- | --- | --- | --- | --- | --- | --- |
-| `BK-MF2-02` | `BK-MF2-02-edicao-perfil-papeis-base.md` | `requireAuth`, `requireRole`, `userApi`, `AccountPage`, `AdminUsersPage` | `/api/users/me`, `/api/users`, `/api/users/:id/role`, `/conta`, `/admin/utilizadores` | `users.name`, `users.role` | `requireAuth`; `requireRole(["admin"])` | `BK-MF2-03`, `BK-MF5-04` |
-| `BK-MF2-03` | `BK-MF2-03-crud-catalogo-taxonomias.md` | `catalogApi`, `CatalogPage`, `AdminCatalogPage`, catalog/taxonomy services | `/api/catalog`, `/api/catalog/admin`, `/api/catalog/:id/status`, `/api/catalog/taxonomies`, `/catalogo`, `/admin/catalogo` | `contents`, `taxonomies`, `content_revisions` | Escrita por `admin/moderator`; leitura publica so de `published` | `BK-MF2-04`, `BK-MF3-03` |
-| `BK-MF2-04` | `BK-MF2-04-pagina-detalhe-conteudo.md` | `getPublishedContentDetail`, `getCatalogDetail`, `catalogApi.getDetail`, `ContentDetailPage` | `/api/catalog/:idOrSlug`, `/catalogo/:idOrSlug` | Leitura de `contents` publicados | Nao expoe `draft`/`archived` | `BK-MF2-05`, `BK-MF2-07`, `BK-MF3-04` |
-| `BK-MF2-05` | `BK-MF2-05-reproducao-continuar-a-ver.md` | `playbackApi`, `PlaybackPage`, `ContinueWatchingStrip`, playback service/controller/router | `/api/playback/:contentId`, `/api/playback/:contentId/progress`, `/api/playback/me/continue-watching`, `/ver/:contentId` | `playback_progress` | `requireAuth`; progresso por `req.user.id` | `BK-MF2-06`, `BK-MF2-07`, `BK-MF2-08` |
-| `BK-MF2-06` | `BK-MF2-06-legendas-audio-parental-e-qualidade.md` | `assertMediaOptions`, `assertParentalSettings`, `media-preferences.service.js`, player atualizado | `/api/playback/preferences`, `/api/users/me/parental` | `media_preferences`, `users.parentalMaxAgeRating`, `tracks`, `qualityOptions` | `requireAuth`; parental validado no backend | `BK-MF2-07`, `BK-MF2-08`, `BK-MF6-05` |
-| `BK-MF2-07` | `BK-MF2-07-favoritos-watchlist-historico.md` | `libraryApi`, `LibraryActions`, `MyLibraryPage`, library service/controller/router | `/api/me/favorites`, `/api/me/watchlist`, `/api/me/history`, `/biblioteca` | `user_content_lists`; leitura de `playback_progress` | `requireAuth`; listas e historico por `req.user.id` | `BK-MF2-08`, `BK-MF3-01`, `BK-MF3-05` |
-| `BK-MF2-08` | `BK-MF2-08-teste-e2e-fluxo-principal.md` | `playwright.config.js`, `seed-mf2-e2e.js`, `mf2-flow.spec.js` | `npm run e2e:mf2`; `/login`, `/catalogo/piloto-faithflix`, `/ver/:contentId`, `/biblioteca` | Seed temporario em colecoes MF2 | Login real por cookie; fluxo autenticado | `BK-MF3-01`, gate `S4` |
+| BK | Ficheiros criados/editados documentados | Exports/imports principais | Endpoints/rotas | DTOs/validacoes/modelos | Services/componentes/paginas | Dados persistidos | Auth/ownership/roles | Dependentes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `BK-MF2-01` | `backend/package.json`, `.env.example`, `env.js`, `database.js`, `auth/*`, `session.middleware.js`, `app.js`, `authApi.js`, `AuthForms.jsx`, `pages.jsx` | `getDb`, `ensureAuthIndexes`, `hashPassword`, `createSession`, `resolveSession`, `authApi` | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`, `GET /api/session/me`, `POST /api/session/logout` | validacao email/nome/password; tokens opacos | `auth.service`, `auth.controller`, `AuthForms` | `users`, `sessions`, `password_reset_tokens` | cookie HttpOnly; `req.user` derivado da sessao | `BK-MF2-02`, `BK-MF4-01`, `BK-MF5-01`, `BK-MF5-03` |
+| `BK-MF2-02` | `auth.middleware.js`, `users/*`, `app.js`, `promote-admin.js`, `userApi.js`, `AccountPage.jsx`, `AdminUsersPage.jsx` | `requireAuth`, `requireRole`, `userApi` | `GET/PATCH /api/users/me`, `GET /api/users`, `PATCH /api/users/:id/role`, `/conta`, `/admin/utilizadores` | `assertProfileUpdate`, `assertRoleUpdate` | `user.service`, `user.controller`, paginas conta/admin | `users.name`, `users.role` | `requireAuth`; `requireRole(["admin"])` | `BK-MF2-03`, `BK-MF5-04` |
+| `BK-MF2-03` | `catalog.validation.js`, `catalog.service.js`, `taxonomy.service.js`, `catalog.controller.js`, `catalog.routes.js`, `catalogApi.js`, `CatalogPage.jsx`, `AdminCatalogPage.jsx` | `catalogRouter`, `catalogApi`, `ensureCatalogIndexes`, `listContentRevisions`, `revertContentRevision` | `GET /api/catalog`, `GET /api/catalog/admin`, `POST/PATCH /api/catalog`, `PATCH /api/catalog/:id/status`, `GET/POST /api/catalog/taxonomies`, `GET /api/catalog/:id/revisions`, `POST /api/catalog/:id/revisions/:revisionId/revert`, `/catalogo`, `/admin/catalogo` | `assertCatalogPayload`, `assertStatus`, `assertTaxonomyPayload`; `contents`, `taxonomies`, `content_revisions` | catalog/taxonomy services, paginas catalogo/admin com reversao | `contents`, `taxonomies`, `content_revisions` | escrita, revisoes e reversao por `admin/moderator`; leitura publica de `published` | `BK-MF2-04`, `BK-MF3-03` |
+| `BK-MF2-04` | `catalog.service.js`, `catalog.controller.js`, `catalog.routes.js`, `catalogApi.js`, `ContentDetailPage.jsx`, `AppRoutes.jsx` | `getPublishedContentDetail`, `getCatalogDetail`, `catalogApi.getDetail` | `GET /api/catalog/:idOrSlug`, `/catalogo/:idOrSlug` | query por ObjectId ou slug, sempre `status: "published"` | `ContentDetailPage` | leitura de `contents` | nao expoe `draft`/`archived` | `BK-MF2-05`, `BK-MF2-07`, `BK-MF3-04` |
+| `BK-MF2-05` | `playback.validation.js`, `playback.service.js`, `playback.controller.js`, `playback.routes.js`, `playbackApi.js`, `PlaybackPage.jsx`, `ContinueWatchingStrip.jsx` | `playbackRouter`, `playbackApi`, `ensurePlaybackIndexes` | `GET /api/playback/:contentId`, `PUT /api/playback/:contentId/progress`, `GET /api/playback/me/continue-watching`, `/ver/:contentId` | `assertProgressPayload`; `playback_progress` | playback service, player, continuar a ver | `playback_progress` | `requireAuth`; progresso por `req.user.id` | `BK-MF2-06`, `BK-MF2-07`, `BK-MF2-08` |
+| `BK-MF2-06` | `catalog.validation.js`, `users/*`, `media-preferences.service.js`, `playback.service.js`, `playback.controller.js`, `playback.routes.js`, `playbackApi.js`, `PlaybackPage.jsx` | `assertMediaOptions`, `assertParentalSettings`, `getMediaPreferences`, `saveMediaPreferences` | `PATCH /api/users/me/parental`, `GET/PUT /api/playback/preferences` | parental 0..18; `tracks.subtitles`, `tracks.audio.src`, `qualityOptions`, preferencias | media preferences service; player com selects, `TextTrack.mode` e troca de fonte | `users.parentalMaxAgeRating`, `media_preferences`, campos media em `contents` | `requireAuth`; parental validado no backend | `BK-MF2-07`, `BK-MF2-08`, `BK-MF6-05` |
+| `BK-MF2-07` | `library.validation.js`, `library.service.js`, `library.controller.js`, `library.routes.js`, `libraryApi.js`, `LibraryActions.jsx`, `MyLibraryPage.jsx` | `libraryRouter`, `libraryApi`, `ensureLibraryIndexes` | `GET/PUT/DELETE /api/me/favorites`, `GET/PUT/DELETE /api/me/watchlist`, `GET /api/me/history`, `/biblioteca` | `assertListType`, `asObjectId`; `user_content_lists` | library service, acoes no detalhe, biblioteca | `user_content_lists`; leitura de `playback_progress` | `requireAuth`; listas por `req.user.id` | `BK-MF2-08`, `BK-MF3-01`, `BK-MF3-05` |
+| `BK-MF2-08` | `package.json`, `playwright.config.js`, `seed-mf2-e2e.js`, `AuthForms.jsx`, `mf2-flow.spec.js`, `frontend/public/media/piloto.mp4` | `@playwright/test`, seed restrito, seletores estaveis | `npm run e2e:mf2`; `/login`, `/catalogo`, `/catalogo/piloto-faithflix`, `/ver/:contentId`, `/biblioteca` | fixture E2E `mf2-e2e`; medicoes `RNF07 catalogLoadMs`/`RNF08 playStartMs` | Playwright config/test | fixture em `users`, `contents`; limpeza por email/userId/tag | login real por cookie; fluxo autenticado | `BK-MF3-01`, Gate S4 |
 
 ## Confirmacao de integracao
 
-- Nao foram introduzidos endpoints duplicados.
-- Nao foram introduzidos schemas/modelos duplicados.
-- Os nomes de conceitos mantem a sequencia `auth -> users -> catalog -> playback -> library -> E2E`.
-- O frontend continua a chamar endpoints documentados nos BKs.
-- Os BKs seguintes declarados em `CONTRATO-CAMPOS-BK.md` continuam a receber os elementos necessarios.
+- Nao foram encontrados endpoints duplicados para a mesma acao dentro da `MF2`.
+- Nao foram encontrados dois modelos diferentes para a mesma entidade principal.
+- A sequencia `auth -> users -> catalog -> detail -> playback -> library -> E2E` esta documentada.
+- Os riscos de integracao identificados na auditoria anterior foram tratados nos BKs editados.
 
 ## Drift documental encontrado
 
-- O relatorio anterior a esta correcao marcava `1 OK` e `7 PARCIAL`; depois da correcao, a `MF2` fica com `8 OK`.
-- `MATRIZ-RF-RNF-POR-BK.md` existe mas esta marcado como `DEPRECATED`; a fonte canonica pratica e `MATRIZ-CANONICA-BK.md` com `CONTRATO-CAMPOS-BK.md`.
-- BKs posteriores com dependencia direta de `MF2` ainda usam guias genericos com pseudo-checklist. Isso fica fora do escopo desta execucao, que corrigiu apenas `MF2`.
-- O codigo real em `backend/` e `frontend/` ainda representa fundacao parcial, nao a `MF2` implementada. Esta execucao corrige guias, nao codigo da app.
+- A versao anterior deste relatorio reclassificou `MF2` como `5 OK`, `2 PARCIAL` e `1 CRITICO`; esta execucao voltou a fechar `MF2` como `8 OK`.
+- `MATRIZ-RF-RNF-POR-BK.md` existe apenas como alias `DEPRECATED`; a fonte ativa e `MATRIZ-CANONICA-BK.md`.
+- `RNF07` fala em pagina inicial/catalogo principal; `BK-MF2-08` foi alinhado para medir `/catalogo`.
+- O codigo real em `backend/` e `frontend/` continua mais proximo da fundacao `MF1`; nao deve ser tratado como app `MF2` implementada.
+- BKs posteriores diretos de `MF3`, `MF4` e `MF5` ainda sao guias genericos e nao provam, por si, que os contratos de `MF2` estejam suficientes.
+
+## Ordem aplicada de correcao
+
+1. `BK-MF2-03` (`PARCIAL`): completado `RF10` e validacao de taxonomias.
+2. `BK-MF2-06` (`PARCIAL`): completada aplicacao real de legendas/audio.
+3. `BK-MF2-08` (`CRITICO`): corrigidos seed, seletores e medicao de `RNF07`.
 
 ## Validacao executada
 
@@ -122,23 +161,12 @@ git diff --check
 bash scripts/validate-planificacao.sh
 ```
 
-Resultado:
-
-| Comando | Estado | Observacao |
+| Comando | Estado | Resultado |
 | --- | --- | --- |
-| Varredura textual MF2 | `OK` | Sem ocorrencias nos BKs de `MF2/`; `rg` terminou com codigo `1`, que aqui significa ausencia de matches. |
-| `git diff --check` | `OK` | Sem whitespace errors. |
-| `bash scripts/validate-planificacao.sh` | `BLOQUEADO` | O script tenta abrir `../scripts/validate_planificacao_canonica.py`, mas esse ficheiro nao existe no workspace atual. |
+| Varredura textual MF2 | `OK` | Sem ocorrencias nos BKs de `MF2/`; `rg` terminou com codigo `1`, que significa ausencia de matches. |
+| `git diff --check` | `OK` | Sem erros de whitespace. |
+| `bash scripts/validate-planificacao.sh` | `BLOQUEADO` | O script tentou abrir `../scripts/validate_planificacao_canonica.py`, mas esse ficheiro nao existe no workspace atual. Erro: `[Errno 2] No such file or directory`. |
 
-## Estado final esperado
+## Changelog
 
-Com esta correcao documental, a `MF2` fica com oito BKs em estado `OK`, prontos para orientar a implementacao incremental de:
-
-1. autenticacao real;
-2. perfil e roles;
-3. catalogo;
-4. detalhe;
-5. player e progresso;
-6. preferencias media e parental;
-7. biblioteca pessoal;
-8. E2E do fluxo principal.
+- `2026-05-31`: Relatorio atualizado em modo `corrigir_apenas`; editados apenas `BK-MF2-03`, `BK-MF2-06` e `BK-MF2-08`; resultado final `8 OK`, `0 PARCIAL`, `0 CRITICO`.

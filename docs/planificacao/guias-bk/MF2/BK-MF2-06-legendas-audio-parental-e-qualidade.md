@@ -104,7 +104,7 @@ Legendas, audio, qualidade e parental tornam a experiencia mais acessivel e segu
 | Utilizador | `parentalMaxAgeRating` |
 | Preferencias | `GET /api/playback/preferences`, `PUT /api/playback/preferences` |
 | Parental | `GET /api/playback/:contentId` devolve `403` se `ageRating` exceder limite |
-| Player | selects para legenda, audio e qualidade |
+| Player | selects para legenda, audio e qualidade com aplicacao no elemento `<video>` |
 | Risco bloqueado | qualidade inexistente nao cria URL de media |
 
 ### Modelo de media
@@ -116,7 +116,8 @@ Legendas, audio, qualidade e parental tornam a experiencia mais acessivel e segu
       { language: "pt", label: "Portugues", src: "/tracks/piloto-pt.vtt" }
     ],
     audio: [
-      { language: "pt", label: "Portugues" }
+      { language: "pt", label: "Portugues", src: "/media/piloto-pt.mp4" },
+      { language: "en", label: "English", src: "/media/piloto-en.mp4" }
     ]
   },
   qualityOptions: [
@@ -131,7 +132,8 @@ Legendas, audio, qualidade e parental tornam a experiencia mais acessivel e segu
 - `CANONICO`: parental e validado no backend.
 - `CANONICO`: preferencias pertencem ao utilizador autenticado.
 - `DERIVADO`: `qualityOptions` guarda URLs explicitas; o player nunca calcula caminho de media.
-- `DERIVADO`: se a preferencia de qualidade nao existir no conteudo, usa-se `media.playbackUrl`.
+- `DERIVADO`: cada opcao de audio aponta para uma fonte de media completa nessa lingua.
+- `DERIVADO`: se a preferencia de audio ou qualidade nao existir no conteudo, usa-se `media.playbackUrl`.
 
 ### Guia de execucao (passo-a-passo)
 
@@ -152,6 +154,8 @@ Atualiza o ficheiro completo. Esta versao inclui todos os campos anteriores e os
 4. Codigo completo.
 
 ```js
+import { ObjectId } from "mongodb";
+
 export const CONTENT_TYPES = ["movie", "series", "episode", "documentary"];
 export const CONTENT_STATUS = ["draft", "published", "archived"];
 
@@ -196,17 +200,28 @@ function assertAgeRating(value) {
   return number;
 }
 
-function mediaTrack(track, includeSrc) {
-  const item = {
-    language: requiredText(track.language, "language", 2, 12),
-    label: requiredText(track.label, "label", 2, 80),
-  };
-
-  if (includeSrc) {
-    item.src = requiredText(track.src, "src", 1, 500);
+function taxonomyObjectIds(value) {
+  if (!Array.isArray(value)) {
+    return [];
   }
 
-  return item;
+  return value.map((id) => {
+    if (!ObjectId.isValid(id)) {
+      const error = new Error("Taxonomia invalida.");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    return new ObjectId(id);
+  });
+}
+
+function mediaTrack(track) {
+  return {
+    language: requiredText(track.language, "language", 2, 12),
+    label: requiredText(track.label, "label", 2, 80),
+    src: requiredText(track.src, "src", 1, 500),
+  };
 }
 
 function qualityOption(option) {
@@ -230,10 +245,10 @@ export function assertMediaOptions(input) {
   return {
     tracks: {
       subtitles: Array.isArray(input.tracks?.subtitles)
-        ? input.tracks.subtitles.map((track) => mediaTrack(track, true))
+        ? input.tracks.subtitles.map(mediaTrack)
         : [],
       audio: Array.isArray(input.tracks?.audio)
-        ? input.tracks.audio.map((track) => mediaTrack(track, false))
+        ? input.tracks.audio.map(mediaTrack)
         : [],
     },
     qualityOptions: Array.isArray(input.qualityOptions)
@@ -267,7 +282,7 @@ export function assertCatalogPayload(input) {
     type,
     durationSeconds: positiveInteger(input.durationSeconds, "durationSeconds"),
     ageRating: assertAgeRating(input.ageRating ?? 0),
-    taxonomyIds: Array.isArray(input.taxonomyIds) ? input.taxonomyIds : [],
+    taxonomyIds: taxonomyObjectIds(input.taxonomyIds),
     assets: {
       posterUrl: optionalText(input.assets?.posterUrl),
       backdropUrl: optionalText(input.assets?.backdropUrl),
@@ -304,7 +319,7 @@ export function assertTaxonomyPayload(input) {
 
 5. Explicacao do codigo ou da decisao.
 
-A funcao `assertCatalogPayload` fica completa e devolve todos os campos do catalogo numa unica estrutura.
+A funcao `assertCatalogPayload` fica completa, mantem a validacao de taxonomias do BK-MF2-03 e exige `src` tanto em legendas como em audio.
 
 6. Validacao do passo.
 
@@ -515,10 +530,12 @@ Importa `getMediaPreferences`, adiciona as funcoes abaixo e usa-as dentro de `ge
 import { getMediaPreferences } from "./media-preferences.service.js";
 
 function resolvePlayableMedia(content, preferences) {
+  const selectedAudio = content.tracks?.audio?.find((track) => track.language === preferences.audioLanguage);
   const selectedQuality = content.qualityOptions?.find((option) => option.value === preferences.quality);
 
   return {
-    playbackUrl: selectedQuality?.playbackUrl ?? content.media.playbackUrl,
+    playbackUrl: selectedAudio?.src ?? selectedQuality?.playbackUrl ?? content.media.playbackUrl,
+    selectedAudioLanguage: selectedAudio?.language ?? "",
     selectedQuality: selectedQuality?.value ?? "",
   };
 }
@@ -560,7 +577,7 @@ content: {
 
 5. Explicacao do codigo ou da decisao.
 
-`resolvePlayableMedia` procura a qualidade no array do conteudo. Se nao existir, volta a `content.media.playbackUrl`.
+`resolvePlayableMedia` procura primeiro a fonte de audio escolhida e depois a qualidade escolhida. Se nenhuma existir no conteudo, volta a `content.media.playbackUrl`.
 
 6. Validacao do passo.
 
@@ -574,7 +591,7 @@ Resultado esperado: `403`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Uma qualidade inventada como `9999p` nao deve produzir `/media/9999p.mp4`.
+Uma qualidade inventada como `9999p` ou um audio inexistente nao devem produzir uma URL criada a partir do texto da preferencia.
 
 ### Passo 5 - Criar endpoints de preferencias
 
@@ -737,9 +754,32 @@ export function PlaybackPage() {
       .catch((requestError) => setError(requestError.message));
   }, [contentId]);
 
+  function applySubtitlePreference(video, language) {
+    Array.from(video.textTracks).forEach((track) => {
+      track.mode = language && track.language === language ? "showing" : "disabled";
+    });
+  }
+
+  function resolveVideoSource(nextPreferences) {
+    if (!playback) {
+      return videoSrc;
+    }
+
+    const selectedAudio = playback.content.tracks.audio.find(
+      (track) => track.language === nextPreferences.audioLanguage,
+    );
+    const selectedQuality = playback.content.qualityOptions.find(
+      (option) => option.value === nextPreferences.quality,
+    );
+
+    return selectedAudio?.src ?? selectedQuality?.playbackUrl ?? playback.content.media.playbackUrl;
+  }
+
   function handleLoadedMetadata() {
     const video = videoRef.current;
     if (!video) return;
+
+    applySubtitlePreference(video, preferences.subtitleLanguage);
 
     const startAt = resumeAtRef.current || playback?.progress.currentTimeSeconds || 0;
     if (startAt > 0) video.currentTime = startAt;
@@ -768,12 +808,14 @@ export function PlaybackPage() {
     setPreferences(nextPreferences);
     await playbackApi.savePreferences(nextPreferences);
 
-    if (name === "quality" && playback) {
-      const selectedQuality = playback.content.qualityOptions.find((option) => option.value === value);
-      if (!selectedQuality || !videoRef.current) return;
+    if (name === "subtitleLanguage" && videoRef.current) {
+      applySubtitlePreference(videoRef.current, value);
+      return;
+    }
 
+    if ((name === "audioLanguage" || name === "quality") && playback && videoRef.current) {
       resumeAtRef.current = videoRef.current.currentTime;
-      setVideoSrc(selectedQuality.playbackUrl);
+      setVideoSrc(resolveVideoSource(nextPreferences));
     }
   }
 
@@ -837,21 +879,21 @@ export function PlaybackPage() {
 
 5. Explicacao do codigo ou da decisao.
 
-Ao trocar qualidade, o componente guarda o tempo atual em `resumeAtRef` e repoe esse tempo quando a nova fonte carrega.
+Ao trocar audio ou qualidade, o componente guarda o tempo atual em `resumeAtRef` e repoe esse tempo quando a nova fonte carrega. Ao trocar legenda, aplica a preferencia nos `TextTrack` do video sem recarregar a media.
 
 6. Validacao do passo.
 
-Abre `/ver/:contentId`, muda de qualidade aos 20 segundos e confirma que o video continua perto desse tempo.
+Abre `/ver/:contentId`, muda de legenda e confirma que apenas essa faixa fica ativa. Depois muda audio ou qualidade aos 20 segundos e confirma que o video continua perto desse tempo.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Se o player reiniciar sempre em `0`, a troca de qualidade prejudica a experiencia.
+Se o player reiniciar sempre em `0`, a troca de audio ou qualidade prejudica a experiencia. Se nenhuma `TextTrack` mudar para `showing`, a legenda nao foi aplicada.
 
 ### Passo 8 - Validar parental, preferencias e qualidade
 
 1. Objetivo do passo.
 
-Confirmar os tres contratos principais deste BK.
+Confirmar parental, preferencias, qualidade, audio e legendas.
 
 2. Ficheiros envolvidos.
     - EXECUTAR: backend e frontend
@@ -859,7 +901,7 @@ Confirmar os tres contratos principais deste BK.
 
 3. Instrucoes concretas.
 
-Testa limite parental, preferencias e qualidade inexistente.
+Testa limite parental, preferencias, qualidade inexistente e audio inexistente.
 
 4. Codigo completo.
 
@@ -875,7 +917,7 @@ curl -i -b /tmp/faithflix.cookies http://localhost:3000/api/playback/CONTENT_ID
 curl -i -b /tmp/faithflix.cookies \
   -X PUT \
   -H "Content-Type: application/json" \
-  -d '{"subtitleLanguage":"pt","audioLanguage":"pt","quality":"qualidade-inexistente"}' \
+  -d '{"subtitleLanguage":"pt","audioLanguage":"audio-inexistente","quality":"qualidade-inexistente"}' \
   http://localhost:3000/api/playback/preferences
 ```
 
@@ -890,17 +932,19 @@ Resultados esperados:
 - Conteudo acima do limite devolve `403`.
 - Preferencias devolvem `200`.
 - Qualidade inexistente nao altera `media.playbackUrl` para uma URL criada artificialmente.
-- Player mostra selects e continua funcional.
+- Audio inexistente nao altera `media.playbackUrl` para uma URL criada artificialmente.
+- Player mostra selects, ativa legendas por `TextTrack.mode` e continua funcional apos troca de fonte.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Se a resposta devolver uma URL construida a partir da qualidade inexistente, a regra de seguranca deste BK falhou.
+Se a resposta devolver uma URL construida a partir da qualidade ou do audio inexistente, a regra de seguranca deste BK falhou.
 
 ## Snippet tecnico aplicavel
 
 ```js
+const selectedAudio = content.tracks?.audio?.find((track) => track.language === preferences.audioLanguage);
 const selectedQuality = content.qualityOptions?.find((option) => option.value === preferences.quality);
-const playbackUrl = selectedQuality?.playbackUrl ?? content.media.playbackUrl;
+const playbackUrl = selectedAudio?.src ?? selectedQuality?.playbackUrl ?? content.media.playbackUrl;
 ```
 
 ## Criterios de aceite (mensuraveis)
@@ -910,8 +954,11 @@ const playbackUrl = selectedQuality?.playbackUrl ?? content.media.playbackUrl;
 - [ ] `GET /api/playback/:contentId` devolve `403` acima do limite parental.
 - [ ] `GET/PUT /api/playback/preferences` exige login.
 - [ ] Player mostra selects de legenda, audio e qualidade.
+- [ ] Legenda selecionada ativa a `TextTrack` correta e desativa as restantes.
+- [ ] Troca de audio preserva aproximadamente o tempo atual.
 - [ ] Troca de qualidade preserva aproximadamente o tempo atual.
 - [ ] Qualidade inexistente nao gera URL.
+- [ ] Audio inexistente nao gera URL.
 
 ## Validacao final
 
@@ -930,7 +977,8 @@ Regista evidence com resposta `403`, resposta de preferencias e screenshot do pl
 - Resposta `curl` de `GET /api/playback/:contentId` com `403` para conteudo acima do limite.
 - Resposta `curl` de `PUT /api/playback/preferences` com preferencias guardadas.
 - Screenshot do player com controlos de legenda, audio e qualidade.
-- Nota curta a confirmar que qualidade inexistente nao gera URL nova.
+- Nota curta a confirmar que qualidade e audio inexistentes nao geram URL nova.
+- Nota curta a confirmar que `subtitleLanguage` altera `TextTrack.mode`.
 
 ## Handoff
 
@@ -943,3 +991,4 @@ O `BK-MF2-07` pode reutilizar `playback_progress` para historico e manter o play
 ## Changelog
 
 - 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.
+- 2026-05-31: Completada aplicacao real de legendas via `TextTrack.mode` e troca de fonte para audio/qualidade.

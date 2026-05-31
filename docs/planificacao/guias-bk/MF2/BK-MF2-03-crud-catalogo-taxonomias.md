@@ -38,6 +38,8 @@ O catalogo e o contrato central da experiencia de streaming. A pagina de detalhe
 - Listar apenas conteudos publicados no catalogo publico.
 - Permitir criar, editar, publicar e arquivar conteudos a `admin` e `moderator`.
 - Criar taxonomias reutilizaveis.
+- Validar `taxonomyIds` contra taxonomias existentes.
+- Listar historico de revisoes e permitir reverter conteudo a uma revisao anterior.
 - Criar cliente frontend de catalogo e uma pagina admin minima.
 
 ### Scope-out
@@ -64,6 +66,7 @@ O catalogo e o contrato central da experiencia de streaming. A pagina de detalhe
 - Criar ou alterar catalogo e uma acao protegida por role.
 - O `slug` deve ser unico para permitir URLs estaveis.
 - `media.playbackUrl` fica definido aqui para o player do `BK-MF2-05`.
+- `RF10` fica demonstravel quando o admin consegue consultar revisoes e repor um snapshot anterior.
 
 ### Tempo estimado
 
@@ -108,6 +111,7 @@ O catalogo e o contrato central da experiencia de streaming. A pagina de detalhe
 | Catalogo publico | `GET /api/catalog` devolve apenas `published` |
 | Admin catalogo | `POST /api/catalog`, `PATCH /api/catalog/:id`, `PATCH /api/catalog/:id/status` |
 | Taxonomias | `GET /api/catalog/taxonomies`, `POST /api/catalog/taxonomies` |
+| Revisoes | `GET /api/catalog/:id/revisions`, `POST /api/catalog/:id/revisions/:revisionId/revert` |
 | Guards | `admin` e `moderator` gerem catalogo; `user` consulta apenas publicado |
 | Handoff | `BK-MF2-04` recebe `id`, `slug`, `title`, `synopsis`, `assets`, `media`, `taxonomyIds` |
 
@@ -165,6 +169,8 @@ Cria o ficheiro abaixo. Usa `assertCatalogPayload` em criacao e edicao.
 4. Codigo completo.
 
 ```js
+import { ObjectId } from "mongodb";
+
 export const CONTENT_TYPES = ["movie", "series", "episode", "documentary"];
 export const CONTENT_STATUS = ["draft", "published", "archived"];
 
@@ -204,6 +210,22 @@ function ageRating(value) {
   return number;
 }
 
+function taxonomyObjectIds(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((id) => {
+    if (!ObjectId.isValid(id)) {
+      const error = new Error("Taxonomia invalida.");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    return new ObjectId(id);
+  });
+}
+
 export function slugify(value) {
   return String(value ?? "")
     .normalize("NFD")
@@ -238,7 +260,7 @@ export function assertCatalogPayload(input) {
     type,
     durationSeconds: positiveInteger(input.durationSeconds, "durationSeconds"),
     ageRating: ageRating(input.ageRating ?? 0),
-    taxonomyIds: Array.isArray(input.taxonomyIds) ? input.taxonomyIds : [],
+    taxonomyIds: taxonomyObjectIds(input.taxonomyIds),
     assets: {
       posterUrl: String(input.assets?.posterUrl ?? "").trim(),
       backdropUrl: String(input.assets?.backdropUrl ?? "").trim(),
@@ -292,7 +314,7 @@ Sem estados fechados, um conteudo com `status: "publicado"` poderia ficar invisi
 
 1. Objetivo do passo.
 
-Implementar criacao, edicao, publicacao, arquivo e listagem publica com revisoes.
+Implementar criacao, edicao, publicacao, arquivo, listagem publica, historico de revisoes e reversao.
 
 2. Ficheiros envolvidos.
     - CRIAR: `backend/src/modules/catalog/catalog.service.js`
@@ -319,6 +341,16 @@ function asContentObjectId(id) {
   return new ObjectId(id);
 }
 
+function asRevisionObjectId(id) {
+  if (!ObjectId.isValid(id)) {
+    const error = new Error("Revisao invalida.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return new ObjectId(id);
+}
+
 function publicContent(content) {
   return {
     id: String(content._id),
@@ -328,10 +360,24 @@ function publicContent(content) {
     type: content.type,
     durationSeconds: content.durationSeconds,
     ageRating: content.ageRating,
-    taxonomyIds: content.taxonomyIds ?? [],
+    taxonomyIds: (content.taxonomyIds ?? []).map(String),
     assets: content.assets,
     media: content.media,
     publishedAt: content.publishedAt ?? null,
+  };
+}
+
+function publicRevision(revision) {
+  return {
+    id: String(revision._id),
+    contentId: String(revision.contentId),
+    action: revision.action,
+    snapshot: {
+      ...publicContent(revision.snapshot),
+      status: revision.snapshot.status,
+    },
+    changedBy: String(revision.changedBy),
+    createdAt: revision.createdAt,
   };
 }
 
@@ -343,6 +389,23 @@ async function saveRevision(db, content, userId, action) {
     changedBy: new ObjectId(userId),
     createdAt: new Date(),
   });
+}
+
+async function assertExistingTaxonomies(db, taxonomyIds) {
+  if (taxonomyIds.length === 0) {
+    return;
+  }
+
+  const existing = await db
+    .collection("taxonomies")
+    .find({ _id: { $in: taxonomyIds } }, { projection: { _id: 1 } })
+    .toArray();
+
+  if (existing.length !== taxonomyIds.length) {
+    const error = new Error("Uma ou mais taxonomias nao existem.");
+    error.statusCode = 400;
+    throw error;
+  }
 }
 
 export async function ensureCatalogIndexes() {
@@ -373,6 +436,7 @@ export async function createContent(input, userId) {
   const db = await getDb();
   const now = new Date();
   const payload = assertCatalogPayload(input);
+  await assertExistingTaxonomies(db, payload.taxonomyIds);
 
   const document = {
     ...payload,
@@ -399,11 +463,13 @@ export async function updateContent(contentId, input, userId) {
     throw error;
   }
 
+  const payload = assertCatalogPayload(input);
+  await assertExistingTaxonomies(db, payload.taxonomyIds);
   await saveRevision(db, existing, userId, "update");
 
   const updated = await db.collection("contents").findOneAndUpdate(
     { _id },
-    { $set: { ...assertCatalogPayload(input), updatedBy: new ObjectId(userId), updatedAt: new Date() } },
+    { $set: { ...payload, updatedBy: new ObjectId(userId), updatedAt: new Date() } },
     { returnDocument: "after" },
   );
 
@@ -440,23 +506,86 @@ export async function changeContentStatus(contentId, status, userId) {
 
   return { ...publicContent(updated), status: updated.status };
 }
+
+export async function listContentRevisions(contentId) {
+  const db = await getDb();
+  const contentObjectId = asContentObjectId(contentId);
+  const revisions = await db
+    .collection("content_revisions")
+    .find({ contentId: contentObjectId })
+    .sort({ createdAt: -1 })
+    .toArray();
+
+  return revisions.map(publicRevision);
+}
+
+export async function revertContentRevision(contentId, revisionId, userId) {
+  const db = await getDb();
+  const contentObjectId = asContentObjectId(contentId);
+  const revisionObjectId = asRevisionObjectId(revisionId);
+  const existing = await db.collection("contents").findOne({ _id: contentObjectId });
+
+  if (!existing) {
+    const error = new Error("Conteudo nao encontrado.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const revision = await db.collection("content_revisions").findOne({
+    _id: revisionObjectId,
+    contentId: contentObjectId,
+  });
+
+  if (!revision) {
+    const error = new Error("Revisao nao encontrada.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  await saveRevision(db, existing, userId, "revert");
+
+  const snapshot = revision.snapshot;
+  const updated = await db.collection("contents").findOneAndUpdate(
+    { _id: contentObjectId },
+    {
+      $set: {
+        title: snapshot.title,
+        slug: snapshot.slug,
+        synopsis: snapshot.synopsis,
+        type: snapshot.type,
+        durationSeconds: snapshot.durationSeconds,
+        ageRating: snapshot.ageRating,
+        status: snapshot.status,
+        taxonomyIds: snapshot.taxonomyIds ?? [],
+        assets: snapshot.assets,
+        media: snapshot.media,
+        publishedAt: snapshot.publishedAt ?? null,
+        updatedBy: new ObjectId(userId),
+        updatedAt: new Date(),
+      },
+    },
+    { returnDocument: "after" },
+  );
+
+  return { ...publicContent(updated), status: updated.status };
+}
 ```
 
 5. Explicacao do codigo ou da decisao.
 
-O servico publico devolve apenas conteudos publicados. O servico admin devolve tambem `status`, porque essa informacao e necessaria para gestao editorial.
+O servico publico devolve apenas conteudos publicados. O servico admin devolve tambem `status`, porque essa informacao e necessaria para gestao editorial. As revisoes guardam o snapshot anterior e a reversao cria uma nova revisao antes de repor o estado antigo.
 
 6. Validacao do passo.
 
 ```bash
-node -e "import('./src/modules/catalog/catalog.service.js').then((m) => console.log(typeof m.createContent, typeof m.listPublishedCatalog))"
+node -e "import('./src/modules/catalog/catalog.service.js').then((m) => console.log(typeof m.createContent, typeof m.listContentRevisions, typeof m.revertContentRevision))"
 ```
 
-Resultado esperado: `function function`.
+Resultado esperado: `function function function`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Sem indice unico em `slug`, dois conteudos poderiam disputar a mesma URL no detalhe.
+Sem validacao de taxonomias, um conteudo pode guardar IDs inexistentes e quebrar filtros ou recomendacoes futuras.
 
 ### Passo 3 - Criar servico de taxonomias
 
@@ -547,7 +676,9 @@ import {
   changeContentStatus,
   createContent,
   listAdminCatalog,
+  listContentRevisions,
   listPublishedCatalog,
+  revertContentRevision,
   updateContent,
 } from "./catalog.service.js";
 import { createTaxonomy, listTaxonomies } from "./taxonomy.service.js";
@@ -572,6 +703,16 @@ export async function patchContentStatus(req, res) {
   res.status(200).json({ content: await changeContentStatus(req.params.id, req.body.status, req.user.id) });
 }
 
+export async function getContentRevisions(req, res) {
+  res.status(200).json({ items: await listContentRevisions(req.params.id) });
+}
+
+export async function postContentRevisionRevert(req, res) {
+  res.status(200).json({
+    content: await revertContentRevision(req.params.id, req.params.revisionId, req.user.id),
+  });
+}
+
 export async function getTaxonomies(req, res) {
   res.status(200).json({ items: await listTaxonomies() });
 }
@@ -590,9 +731,11 @@ import { asyncHandler } from "../../utils/async-handler.js";
 import {
   getAdminCatalog,
   getCatalog,
+  getContentRevisions,
   getTaxonomies,
   patchContent,
   patchContentStatus,
+  postContentRevisionRevert,
   postContent,
   postTaxonomy,
 } from "./catalog.controller.js";
@@ -606,13 +749,15 @@ catalogRouter.get("/admin", canManageCatalog, asyncHandler(getAdminCatalog));
 catalogRouter.get("/taxonomies", asyncHandler(getTaxonomies));
 catalogRouter.post("/taxonomies", canManageCatalog, asyncHandler(postTaxonomy));
 catalogRouter.post("/", canManageCatalog, asyncHandler(postContent));
+catalogRouter.get("/:id/revisions", canManageCatalog, asyncHandler(getContentRevisions));
+catalogRouter.post("/:id/revisions/:revisionId/revert", canManageCatalog, asyncHandler(postContentRevisionRevert));
 catalogRouter.patch("/:id", canManageCatalog, asyncHandler(patchContent));
 catalogRouter.patch("/:id/status", canManageCatalog, asyncHandler(patchContentStatus));
 ```
 
 5. Explicacao do codigo ou da decisao.
 
-`GET /api/catalog` e publico. Qualquer escrita passa por `canManageCatalog`.
+`GET /api/catalog` e publico. Qualquer escrita e qualquer consulta de revisoes passa por `canManageCatalog`. As rotas de revisoes ficam antes de `/:id` para nao colidirem com a rota dinamica do detalhe no BK seguinte.
 
 6. Validacao do passo.
 
@@ -624,9 +769,17 @@ curl -i -X POST http://localhost:3000/api/catalog
 
 Resultado esperado: `401`.
 
+Com admin:
+
+```bash
+curl -i -b /tmp/faithflix.cookies http://localhost:3000/api/catalog/CONTENT_ID/revisions
+```
+
+Resultado esperado: `200`.
+
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Se `POST /api/catalog` ficar publico, qualquer visitante pode criar conteudo.
+Se `POST /api/catalog` ou as rotas de revisao ficarem publicas, qualquer visitante pode criar conteudo ou ler historico editorial.
 
 ### Passo 5 - Montar catalogo na app
 
@@ -718,6 +871,14 @@ export const catalogApi = {
   },
   updateStatus(contentId, status) {
     return apiClient.patch(`/api/catalog/${encodeURIComponent(contentId)}/status`, { status });
+  },
+  listRevisions(contentId) {
+    return apiClient.get(`/api/catalog/${encodeURIComponent(contentId)}/revisions`);
+  },
+  revertRevision(contentId, revisionId) {
+    return apiClient.post(
+      `/api/catalog/${encodeURIComponent(contentId)}/revisions/${encodeURIComponent(revisionId)}/revert`,
+    );
   },
   listTaxonomies() {
     return apiClient.get("/api/catalog/taxonomies");
@@ -818,6 +979,7 @@ const EMPTY_FORM = {
 export function AdminCatalogPage() {
   const [items, setItems] = useState([]);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [revisionsByContent, setRevisionsByContent] = useState({});
   const [error, setError] = useState("");
 
   async function loadItems() {
@@ -853,6 +1015,29 @@ export function AdminCatalogPage() {
     }
   }
 
+  async function loadRevisions(contentId) {
+    setError("");
+
+    try {
+      const response = await catalogApi.listRevisions(contentId);
+      setRevisionsByContent((current) => ({ ...current, [contentId]: response.items }));
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  }
+
+  async function revertRevision(contentId, revisionId) {
+    setError("");
+
+    try {
+      await catalogApi.revertRevision(contentId, revisionId);
+      await loadItems();
+      await loadRevisions(contentId);
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  }
+
   return (
     <main className="page-shell">
       <h1>Gestao de catalogo</h1>
@@ -869,6 +1054,15 @@ export function AdminCatalogPage() {
             <p>{content.status}</p>
             <button type="button" onClick={() => changeStatus(content.id, "published")}>Publicar</button>
             <button type="button" onClick={() => changeStatus(content.id, "archived")}>Arquivar</button>
+            <button type="button" onClick={() => loadRevisions(content.id)}>Ver revisoes</button>
+            <ul>
+              {(revisionsByContent[content.id] ?? []).map((revision) => (
+                <li key={revision.id}>
+                  <span>{revision.action} - {new Date(revision.createdAt).toLocaleString("pt-PT")}</span>
+                  <button type="button" onClick={() => revertRevision(content.id, revision.id)}>Reverter</button>
+                </li>
+              ))}
+            </ul>
           </article>
         ))}
       </section>
@@ -887,15 +1081,15 @@ import { AdminCatalogPage } from "../pages/AdminCatalogPage.jsx";
 
 5. Explicacao do codigo ou da decisao.
 
-A UI e minima, mas usa os endpoints reais. A permissao continua a ser validada no backend.
+A UI e minima, mas usa os endpoints reais para criar, publicar, arquivar, listar revisoes e reverter. A permissao continua a ser validada no backend.
 
 6. Validacao do passo.
 
-Com utilizador `admin` ou `moderator`, cria conteudo, publica e confirma que aparece em `/catalogo`.
+Com utilizador `admin` ou `moderator`, cria conteudo, edita-o para gerar revisao, abre `Ver revisoes`, reverte uma revisao e confirma que o conteudo voltou ao estado anterior.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Se o admin criar conteudo com `media.playbackUrl` vazio, o player do BK seguinte nao tem fonte de video.
+Se a UI apenas mostrar revisoes sem botao de reversao, `RF10` continua sem demonstracao funcional.
 
 ### Passo 8 - Validar endpoints principais
 
@@ -922,6 +1116,12 @@ curl -i -b /tmp/faithflix.cookies \
   http://localhost:3000/api/catalog
 
 curl -i -b /tmp/faithflix.cookies http://localhost:3000/api/catalog/admin
+
+curl -i -b /tmp/faithflix.cookies http://localhost:3000/api/catalog/CONTENT_ID/revisions
+
+curl -i -b /tmp/faithflix.cookies \
+  -X POST \
+  http://localhost:3000/api/catalog/CONTENT_ID/revisions/REVISION_ID/revert
 ```
 
 5. Explicacao do codigo ou da decisao.
@@ -936,6 +1136,8 @@ Resultados esperados:
 - `POST /api/catalog` sem cookie devolve `401`.
 - `POST /api/catalog` com admin devolve `201`.
 - Conteudo `draft` nao aparece em `/api/catalog` antes de publicar.
+- Taxonomia inexistente em `taxonomyIds` devolve `400`.
+- Reversao de revisao com admin devolve `200` e repoe o snapshot escolhido.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
@@ -954,9 +1156,12 @@ catalogRouter.post("/", requireRole(["admin", "moderator"]), asyncHandler(postCo
 - [ ] `POST /api/catalog` exige `admin` ou `moderator`.
 - [ ] `PATCH /api/catalog/:id/status` aceita apenas `draft`, `published` e `archived`.
 - [ ] `slug` e unico.
+- [ ] `taxonomyIds` aceita apenas ObjectIds existentes em `taxonomies`.
 - [ ] Alteracoes relevantes geram documento em `content_revisions`.
+- [ ] `GET /api/catalog/:id/revisions` lista historico apenas para `admin` ou `moderator`.
+- [ ] `POST /api/catalog/:id/revisions/:revisionId/revert` reverte para o snapshot escolhido.
 - [ ] `/catalogo` mostra conteudos publicados.
-- [ ] `/admin/catalogo` permite gestao minima a roles autorizadas.
+- [ ] `/admin/catalogo` permite gestao minima e reversao a roles autorizadas.
 
 ## Validacao final
 
@@ -965,7 +1170,7 @@ npm --prefix backend test
 npm --prefix frontend run build
 ```
 
-Regista evidence com respostas de `curl`, screenshot de `/catalogo` e screenshot de `/admin/catalogo`.
+Regista evidence com respostas de `curl`, screenshot de `/catalogo`, screenshot de `/admin/catalogo` e prova de reversao.
 
 ## Evidence para PR/defesa
 
@@ -974,12 +1179,15 @@ Regista evidence com respostas de `curl`, screenshot de `/catalogo` e screenshot
 - Resposta `curl` de `GET /api/catalog` com apenas conteudos `published`.
 - Resposta `curl` de `POST /api/catalog` sem cookie a devolver `401`.
 - Resposta `curl` de `POST /api/catalog` com admin a devolver `201`.
+- Resposta `curl` de taxonomia inexistente a devolver `400`.
+- Resposta `curl` de `GET /api/catalog/:id/revisions` com lista de revisoes.
+- Resposta `curl` de reversao a devolver `200` e conteudo reposto.
 - Screenshot de `/catalogo` com conteudos publicados.
-- Screenshot de `/admin/catalogo` com gestao minima para roles autorizadas.
+- Screenshot de `/admin/catalogo` com gestao e reversao para roles autorizadas.
 
 ## Handoff
 
-O `BK-MF2-04` deve usar `GET /api/catalog/:idOrSlug` sobre a colecao `contents`, devolvendo apenas conteudos `published` com os campos definidos neste BK.
+O `BK-MF2-04` deve usar `GET /api/catalog/:idOrSlug` sobre a colecao `contents`, devolvendo apenas conteudos `published` com os campos definidos neste BK. Ao montar a rota de detalhe, mantem `/taxonomies`, `/admin` e `/:id/revisions` antes de `/:idOrSlug`.
 
 ## Proximo BK recomendado
 
@@ -988,3 +1196,4 @@ O `BK-MF2-04` deve usar `GET /api/catalog/:idOrSlug` sobre a colecao `contents`,
 ## Changelog
 
 - 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.
+- 2026-05-31: Completado `RF10` com validacao de taxonomias, listagem de revisoes e reversao por roles autorizadas.

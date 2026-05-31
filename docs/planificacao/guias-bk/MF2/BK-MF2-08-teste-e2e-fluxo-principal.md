@@ -37,7 +37,7 @@ Depois dos BKs 01 a 07, a MF2 ja tem varias pecas ligadas. Este teste confirma q
 - Criar seed de dados para utilizador e conteudo publicado.
 - Garantir seletores estaveis nos componentes principais.
 - Testar login, detalhe, favoritos, watchlist, player, progresso e biblioteca.
-- Medir `RNF07` no detalhe e `RNF08` no arranque do video.
+- Medir `RNF07` no catalogo principal e `RNF08` no arranque do video.
 
 ### Scope-out
 
@@ -59,6 +59,7 @@ Depois dos BKs 01 a 07, a MF2 ja tem varias pecas ligadas. Este teste confirma q
 
 - O teste deve usar rotas reais: `/login`, `/catalogo/:idOrSlug`, `/ver/:contentId` e `/biblioteca`.
 - Dados de teste devem ser criados por script e nao manualmente.
+- O seed deve limpar apenas a fixture E2E, nunca colecoes inteiras.
 - `data-testid` evita testes frageis baseados em layout.
 - O teste deve falhar se o video nao existir ou nao conseguir tocar.
 - O E2E complementa testes unitarios e manuais; nao os substitui.
@@ -76,6 +77,7 @@ Depois dos BKs 01 a 07, a MF2 ja tem varias pecas ligadas. Este teste confirma q
 - Testar apenas endpoints e chamar isso de E2E.
 - Depender de dados criados manualmente.
 - Medir performance sem guardar o valor observado.
+- Apagar colecoes completas num seed local.
 - Usar rota `/library` quando a app usa `/biblioteca`.
 - Ignorar o ficheiro de video necessario para `RNF08`.
 
@@ -95,7 +97,7 @@ Depois dos BKs 01 a 07, a MF2 ja tem varias pecas ligadas. Este teste confirma q
 - MongoDB acessivel.
 - Existe `frontend/public/media/piloto.mp4`, com video curto e leve para teste.
 - Existe rota `/login`.
-- Existem seletores `auth-form`, `content-detail`, `faithflix-player` e `my-library`.
+- Existem seletores `auth-form`, `email-input`, `password-input`, `login-submit`, `content-detail`, `faithflix-player` e `my-library`.
 
 ### Contrato tecnico deste BK
 
@@ -105,7 +107,7 @@ Depois dos BKs 01 a 07, a MF2 ja tem varias pecas ligadas. Este teste confirma q
 | Browser | Chromium |
 | Seed | `backend/scripts/seed-mf2-e2e.js` |
 | Teste | `tests/e2e/mf2-flow.spec.js` |
-| RNF07 | detalhe carrega em menos de 3000 ms no ambiente local |
+| RNF07 | catalogo principal carrega em menos de 3000 ms no ambiente local |
 | RNF08 | video dispara evento `playing` ate 3000 ms depois de `play()` |
 | Evidence | relatorio Playwright e logs de medicoes |
 
@@ -275,13 +277,24 @@ const now = new Date();
 const userId = new ObjectId();
 const contentId = new ObjectId();
 const email = "e2e@faithflix.test";
+const E2E_TAG = "mf2-e2e";
 
-await db.collection("sessions").deleteMany({});
-await db.collection("users").deleteMany({ email });
-await db.collection("contents").deleteMany({ slug: "piloto-faithflix" });
-await db.collection("playback_progress").deleteMany({});
-await db.collection("user_content_lists").deleteMany({});
-await db.collection("media_preferences").deleteMany({});
+const existingUser = await db.collection("users").findOne({ email });
+
+if (existingUser) {
+  await db.collection("sessions").deleteMany({ userId: existingUser._id });
+  await db.collection("playback_progress").deleteMany({ userId: existingUser._id });
+  await db.collection("user_content_lists").deleteMany({ userId: existingUser._id });
+  await db.collection("media_preferences").deleteMany({ userId: existingUser._id });
+  await db.collection("users").deleteOne({ _id: existingUser._id });
+}
+
+await db.collection("contents").deleteMany({
+  $or: [{ slug: "piloto-faithflix" }, { e2eFixture: E2E_TAG }],
+});
+await db.collection("playback_progress").deleteMany({ e2eFixture: E2E_TAG });
+await db.collection("user_content_lists").deleteMany({ e2eFixture: E2E_TAG });
+await db.collection("media_preferences").deleteMany({ e2eFixture: E2E_TAG });
 
 await db.collection("users").insertOne({
   _id: userId,
@@ -290,6 +303,7 @@ await db.collection("users").insertOne({
   passwordHash: await hashPassword("password-segura-123"),
   role: "user",
   parentalMaxAgeRating: 18,
+  e2eFixture: E2E_TAG,
   createdAt: now,
   updatedAt: now,
 });
@@ -313,13 +327,14 @@ await db.collection("contents").insertOne({
   },
   tracks: {
     subtitles: [],
-    audio: [{ language: "pt", label: "Portugues" }],
+    audio: [{ language: "pt", label: "Portugues", src: "/media/piloto.mp4" }],
   },
   qualityOptions: [
     { label: "720p", value: "720p", playbackUrl: "/media/piloto.mp4" },
   ],
   createdBy: userId,
   updatedBy: userId,
+  e2eFixture: E2E_TAG,
   publishedAt: now,
   createdAt: now,
   updatedAt: now,
@@ -331,7 +346,7 @@ process.exit(0);
 
 5. Explicacao do codigo ou da decisao.
 
-O seed limpa apenas dados usados pelo E2E e cria um conteudo publicado com slug conhecido.
+O seed limpa apenas dados associados ao email e a marca `mf2-e2e`, preservando outros dados locais. Depois cria um conteudo publicado com slug conhecido.
 
 6. Validacao do passo.
 
@@ -343,7 +358,7 @@ Resultado esperado: mensagem `Seed MF2 E2E concluida`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Sem seed, o teste pode passar numa maquina e falhar noutra por falta de dados.
+Sem filtros de limpeza restritos, o seed pode apagar dados locais que nao pertencem ao teste.
 
 ### Passo 4 - Confirmar media de teste
 
@@ -405,14 +420,107 @@ Adiciona os atributos abaixo. Os BKs 04, 05 e 07 ja indicaram os restantes selet
 
 4. Codigo completo.
 
-Em `AuthForms.jsx`:
+Em `AuthForms.jsx`, mantem o estado `form` criado no `BK-MF2-01` e acrescenta apenas `data-testid`:
 
 ```jsx
-<form data-testid="auth-form" onSubmit={handleSubmit}>
-  <input data-testid="email-input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
-  <input data-testid="password-input" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
-  <button data-testid="login-submit" type="submit">Entrar</button>
-</form>
+import { useState } from "react";
+import { authApi } from "../../services/api/authApi.js";
+
+const INITIAL_FORM = { name: "", email: "", password: "", token: "" };
+
+export function AuthForms() {
+  const [mode, setMode] = useState("login");
+  const [form, setForm] = useState(INITIAL_FORM);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
+
+  function updateField(event) {
+    setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  }
+
+  async function submit(event) {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+    setStatus("");
+
+    try {
+      if (mode === "register") {
+        await authApi.register({ name: form.name, email: form.email, password: form.password });
+        setStatus("Conta criada e sessao iniciada.");
+      }
+
+      if (mode === "login") {
+        await authApi.login({ email: form.email, password: form.password });
+        setStatus("Sessao iniciada.");
+      }
+
+      if (mode === "forgot") {
+        const response = await authApi.forgotPassword({ email: form.email });
+        setStatus(response.resetToken ? `Token de recuperacao: ${response.resetToken}` : response.message);
+      }
+
+      if (mode === "reset") {
+        await authApi.resetPassword({ token: form.token, password: form.password });
+        setStatus("Password atualizada. Ja podes iniciar sessao.");
+      }
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section className="auth-panel" data-testid="auth-form">
+      <div className="auth-tabs" aria-label="Autenticacao">
+        {["login", "register", "forgot", "reset"].map((item) => (
+          <button key={item} type="button" className={mode === item ? "active" : ""} onClick={() => setMode(item)}>
+            {item}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={submit} className="auth-form">
+        {mode === "register" ? (
+          <label>
+            Nome
+            <input data-testid="name-input" name="name" value={form.name} onChange={updateField} autoComplete="name" />
+          </label>
+        ) : null}
+
+        {mode !== "reset" ? (
+          <label>
+            Email
+            <input data-testid="email-input" name="email" type="email" value={form.email} onChange={updateField} autoComplete="email" />
+          </label>
+        ) : null}
+
+        {mode === "reset" ? (
+          <label>
+            Token
+            <input data-testid="token-input" name="token" value={form.token} onChange={updateField} />
+          </label>
+        ) : null}
+
+        {mode !== "forgot" ? (
+          <label>
+            Password
+            <input data-testid="password-input" name="password" type="password" value={form.password} onChange={updateField} autoComplete="current-password" />
+          </label>
+        ) : null}
+
+        <button data-testid={mode === "login" ? "login-submit" : `${mode}-submit`} type="submit" disabled={loading}>
+          {loading ? "A validar..." : "Confirmar"}
+        </button>
+      </form>
+
+      {status ? <p className="form-status">{status}</p> : null}
+      {error ? <p className="form-error">{error}</p> : null}
+    </section>
+  );
+}
 ```
 
 Confirmar que existem:
@@ -425,15 +533,15 @@ Confirmar que existem:
 
 5. Explicacao do codigo ou da decisao.
 
-`data-testid` reduz fragilidade quando o texto ou layout mudam.
+`data-testid` reduz fragilidade quando o texto ou layout mudam. O exemplo usa o mesmo estado `form`, `updateField` e `submit` do BK-MF2-01.
 
 6. Validacao do passo.
 
-Abre `/login` e verifica no DevTools que o formulario tem `data-testid="auth-form"`.
+Abre `/login` e verifica no DevTools que existem `auth-form`, `email-input`, `password-input` e `login-submit`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Sem seletores estaveis, o teste pode falhar por mudancas visuais sem regressao funcional.
+Se abandonares o estado `form`, partes o componente definido no BK-MF2-01.
 
 ### Passo 6 - Criar teste E2E
 
@@ -460,13 +568,18 @@ test("MF2 fluxo principal: login, detalhe, listas, player e biblioteca", async (
   await page.getByTestId("email-input").fill("e2e@faithflix.test");
   await page.getByTestId("password-input").fill("password-segura-123");
   await page.getByTestId("login-submit").click();
+  await expect(page.getByText("Sessao iniciada.")).toBeVisible();
 
-  const detailStart = performance.now();
+  const catalogStart = performance.now();
+  await page.goto("/catalogo");
+  await expect(page.getByRole("heading", { name: /catalogo/i })).toBeVisible();
+  await expect(page.getByText("Piloto FaithFlix")).toBeVisible();
+  const catalogLoadMs = performance.now() - catalogStart;
+  console.log(`RNF07 catalogLoadMs=${Math.round(catalogLoadMs)}`);
+  expect(catalogLoadMs).toBeLessThan(3000);
+
   await page.goto("/catalogo/piloto-faithflix");
   await expect(page.getByTestId("content-detail")).toBeVisible();
-  const detailLoadMs = performance.now() - detailStart;
-  console.log(`RNF07 detailLoadMs=${Math.round(detailLoadMs)}`);
-  expect(detailLoadMs).toBeLessThan(3000);
 
   await page.getByRole("button", { name: /adicionar aos favoritos/i }).click();
   await page.getByRole("button", { name: /adicionar a watchlist/i }).click();
@@ -510,7 +623,7 @@ test("MF2 fluxo principal: login, detalhe, listas, player e biblioteca", async (
 
 5. Explicacao do codigo ou da decisao.
 
-O teste mede detalhe e arranque do video com `performance.now()`, guarda logs e valida que a biblioteca mostra o conteudo depois das acoes.
+O teste mede catalogo principal e arranque do video com `performance.now()`, guarda logs e valida que a biblioteca mostra o conteudo depois das acoes.
 
 6. Validacao do passo.
 
@@ -518,7 +631,7 @@ O teste mede detalhe e arranque do video com `performance.now()`, guarda logs e 
 npm run e2e:mf2
 ```
 
-Resultado esperado: teste passa e imprime `RNF07 detailLoadMs` e `RNF08 playStartMs`.
+Resultado esperado: teste passa e imprime `RNF07 catalogLoadMs` e `RNF08 playStartMs`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
@@ -555,7 +668,7 @@ O relatorio HTML permite rever screenshots, traces e videos retidos em falha.
 Evidence minima:
 
 - estado final do teste;
-- valor observado de `RNF07 detailLoadMs`;
+- valor observado de `RNF07 catalogLoadMs`;
 - valor observado de `RNF08 playStartMs`;
 - screenshot ou trace se falhar.
 
@@ -566,6 +679,8 @@ Sem evidence, uma falha de performance fica dificil de distinguir de falha de se
 ## Snippet tecnico aplicavel
 
 ```js
+await page.goto("/catalogo");
+await expect(page.getByText("Piloto FaithFlix")).toBeVisible();
 await page.goto("/catalogo/piloto-faithflix");
 await expect(page.getByTestId("content-detail")).toBeVisible();
 await page.getByRole("link", { name: /reproduzir/i }).click();
@@ -574,7 +689,9 @@ await page.getByRole("link", { name: /reproduzir/i }).click();
 ## Criterios de aceite (mensuraveis)
 
 - [ ] `npm run e2e:mf2` executa seed antes do teste.
+- [ ] O seed limpa apenas dados associados a `mf2-e2e` ou ao email E2E.
 - [ ] O teste faz login por `/login`.
+- [ ] O teste mede `RNF07` em `/catalogo`.
 - [ ] O teste valida `/catalogo/piloto-faithflix`.
 - [ ] O teste usa `/ver/:contentId` atraves do link de reproducao.
 - [ ] O teste valida favoritos e watchlist.
@@ -593,11 +710,12 @@ Regista no PR/defesa os valores de `RNF07` e `RNF08`, juntamente com o estado do
 ## Evidence para PR/defesa
 
 - Output de `npm run e2e:mf2`.
-- Linha de log `RNF07 detailLoadMs=...` com valor inferior a `3000`.
+- Linha de log `RNF07 catalogLoadMs=...` com valor inferior a `3000`.
 - Linha de log `RNF08 playStartMs=...` com valor inferior a `3000`.
 - Relatorio Playwright em `test-results/mf2-html-report`.
 - Screenshot, trace ou video quando existir falha.
 - Nota curta a indicar que o fluxo passou por `/login`, `/catalogo/piloto-faithflix`, `/ver/:contentId` e `/biblioteca`.
+- Nota curta a indicar que o seed nao apaga colecoes inteiras.
 
 ## Handoff
 
@@ -610,3 +728,4 @@ A `MF3` pode assumir que existe um fluxo principal autenticado e validado: login
 ## Changelog
 
 - 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.
+- 2026-05-31: Corrigidos seed E2E, seletores de login e medicao de `RNF07` no catalogo principal.
