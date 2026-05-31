@@ -903,7 +903,7 @@ const selectedQuality = content.qualityOptions?.find((option) => option.value ==
 const playbackUrl = selectedQuality?.playbackUrl ?? content.media.playbackUrl;
 ```
 
-## Criterios de aceitacao
+## Criterios de aceite (mensuraveis)
 
 - [ ] Catalogo aceita `tracks.subtitles`, `tracks.audio` e `qualityOptions`.
 - [ ] `PATCH /api/users/me/parental` valida limite entre `0` e `18`.
@@ -922,6 +922,24 @@ npm --prefix frontend run build
 
 Regista evidence com resposta `403`, resposta de preferencias e screenshot do player com controlos.
 
-## Handoff para o proximo BK
+## Evidence para PR/defesa
+
+- Output de `npm --prefix backend test`.
+- Output de `npm --prefix frontend run build`.
+- Resposta `curl` de `PATCH /api/users/me/parental` com limite valido.
+- Resposta `curl` de `GET /api/playback/:contentId` com `403` para conteudo acima do limite.
+- Resposta `curl` de `PUT /api/playback/preferences` com preferencias guardadas.
+- Screenshot do player com controlos de legenda, audio e qualidade.
+- Nota curta a confirmar que qualidade inexistente nao gera URL nova.
+
+## Handoff
 
 O `BK-MF2-07` pode reutilizar `playback_progress` para historico e manter o player como origem dos eventos de visualizacao.
+
+## Proximo BK recomendado
+
+`BK-MF2-07` - Favoritos/watchlist/historico.
+
+## Changelog
+
+- 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.

@@ -762,7 +762,7 @@ userRouter.get("/me", requireAuth, asyncHandler(getMe));
 userRouter.get("/", requireRole(["admin"]), asyncHandler(getUsers));
 ```
 
-## Criterios de aceitacao
+## Criterios de aceite (mensuraveis)
 
 - [ ] `GET /api/users/me` exige login.
 - [ ] `PATCH /api/users/me` altera apenas `name`.
@@ -780,6 +780,23 @@ npm --prefix frontend run build
 
 Se o projeto ainda nao tiver testes automaticos para este modulo, regista evidence manual com os comandos `curl`, screenshots de `/conta` e `/admin/utilizadores`, e resultados esperados.
 
-## Handoff para o proximo BK
+## Evidence para PR/defesa
+
+- Output de `npm --prefix backend test`.
+- Output de `npm --prefix frontend run build`.
+- Respostas `curl` de `GET /api/users/me`, `GET /api/users` e `PATCH /api/users/:id/role`.
+- Screenshot de `/conta` com o nome atualizado.
+- Screenshot de `/admin/utilizadores` visivel apenas para admin.
+- Nota curta a confirmar que nenhuma resposta expoe `passwordHash`.
+
+## Handoff
 
 O `BK-MF2-03` pode usar `requireRole(["admin", "moderator"])` para proteger criacao, edicao, publicacao e arquivo de conteudos. Utilizadores com role `user` ficam apenas com leitura publica do catalogo publicado.
+
+## Proximo BK recomendado
+
+`BK-MF2-03` - CRUD de catalogo e taxonomias.
+
+## Changelog
+
+- 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.

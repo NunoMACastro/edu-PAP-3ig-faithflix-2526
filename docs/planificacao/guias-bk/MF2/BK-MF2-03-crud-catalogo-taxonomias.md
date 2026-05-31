@@ -948,7 +948,7 @@ catalogRouter.get("/", asyncHandler(getCatalog));
 catalogRouter.post("/", requireRole(["admin", "moderator"]), asyncHandler(postContent));
 ```
 
-## Criterios de aceitacao
+## Criterios de aceite (mensuraveis)
 
 - [ ] `GET /api/catalog` devolve apenas conteudos `published`.
 - [ ] `POST /api/catalog` exige `admin` ou `moderator`.
@@ -967,6 +967,24 @@ npm --prefix frontend run build
 
 Regista evidence com respostas de `curl`, screenshot de `/catalogo` e screenshot de `/admin/catalogo`.
 
-## Handoff para o proximo BK
+## Evidence para PR/defesa
+
+- Output de `npm --prefix backend test`.
+- Output de `npm --prefix frontend run build`.
+- Resposta `curl` de `GET /api/catalog` com apenas conteudos `published`.
+- Resposta `curl` de `POST /api/catalog` sem cookie a devolver `401`.
+- Resposta `curl` de `POST /api/catalog` com admin a devolver `201`.
+- Screenshot de `/catalogo` com conteudos publicados.
+- Screenshot de `/admin/catalogo` com gestao minima para roles autorizadas.
+
+## Handoff
 
 O `BK-MF2-04` deve usar `GET /api/catalog/:idOrSlug` sobre a colecao `contents`, devolvendo apenas conteudos `published` com os campos definidos neste BK.
+
+## Proximo BK recomendado
+
+`BK-MF2-04` - Pagina de detalhe de conteudo.
+
+## Changelog
+
+- 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.

@@ -488,7 +488,7 @@ Se o draft devolver `200`, ha exposicao indevida de conteudo nao publicado.
 catalogRouter.get("/:idOrSlug", asyncHandler(getCatalogDetail));
 ```
 
-## Criterios de aceitacao
+## Criterios de aceite (mensuraveis)
 
 - [ ] `GET /api/catalog/:idOrSlug` aceita ObjectId ou slug.
 - [ ] Conteudo `draft` e `archived` devolve `404`.
@@ -506,6 +506,24 @@ npm --prefix frontend run build
 
 Regista evidence com respostas `curl` e screenshot de `/catalogo/piloto-faithflix`.
 
-## Handoff para o proximo BK
+## Evidence para PR/defesa
+
+- Output de `npm --prefix backend test`.
+- Output de `npm --prefix frontend run build`.
+- Resposta `curl` de `GET /api/catalog/piloto-faithflix` com `200`.
+- Resposta `curl` de slug inexistente com `404`.
+- Resposta `curl` de conteudo `draft` com `404`.
+- Screenshot de `/catalogo/piloto-faithflix` com `data-testid="content-detail"`.
+- Confirmacao visual de que o link de reproducao aponta para `/ver/:contentId`.
+
+## Handoff
 
 O `BK-MF2-05` recebe `content.id`, `durationSeconds` e `media.playbackUrl` para criar o player, guardar progresso por utilizador e apresentar "continuar a ver".
+
+## Proximo BK recomendado
+
+`BK-MF2-05` - Reproducao e continuar a ver.
+
+## Changelog
+
+- 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.

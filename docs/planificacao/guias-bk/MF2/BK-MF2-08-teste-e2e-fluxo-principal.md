@@ -111,7 +111,7 @@ Depois dos BKs 01 a 07, a MF2 ja tem varias pecas ligadas. Este teste confirma q
 
 ### Decisao sobre dependencia
 
-`@playwright/test` e uma `devDependency` justificada neste BK porque:
+`DERIVADO`: `@playwright/test` e uma `devDependency` justificada neste BK porque:
 
 - `node:test` nao controla browser real;
 - `RNF07` e `RNF08` precisam de medir interface e video;
@@ -571,7 +571,7 @@ await expect(page.getByTestId("content-detail")).toBeVisible();
 await page.getByRole("link", { name: /reproduzir/i }).click();
 ```
 
-## Criterios de aceitacao
+## Criterios de aceite (mensuraveis)
 
 - [ ] `npm run e2e:mf2` executa seed antes do teste.
 - [ ] O teste faz login por `/login`.
@@ -590,6 +590,23 @@ npm run e2e:mf2
 
 Regista no PR/defesa os valores de `RNF07` e `RNF08`, juntamente com o estado do relatorio Playwright.
 
-## Handoff para a proxima macrofase
+## Evidence para PR/defesa
+
+- Output de `npm run e2e:mf2`.
+- Linha de log `RNF07 detailLoadMs=...` com valor inferior a `3000`.
+- Linha de log `RNF08 playStartMs=...` com valor inferior a `3000`.
+- Relatorio Playwright em `test-results/mf2-html-report`.
+- Screenshot, trace ou video quando existir falha.
+- Nota curta a indicar que o fluxo passou por `/login`, `/catalogo/piloto-faithflix`, `/ver/:contentId` e `/biblioteca`.
+
+## Handoff
 
 A `MF3` pode assumir que existe um fluxo principal autenticado e validado: login, catalogo, detalhe, reproducao, progresso, listas pessoais e biblioteca.
+
+## Proximo BK recomendado
+
+`BK-MF3-01` - Ratings e agregacao.
+
+## Changelog
+
+- 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.

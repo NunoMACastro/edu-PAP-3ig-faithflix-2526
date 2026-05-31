@@ -786,7 +786,7 @@ removeFavorite(contentId) {
 }
 ```
 
-## Criterios de aceitacao
+## Criterios de aceite (mensuraveis)
 
 - [ ] `GET /api/me/favorites` exige login.
 - [ ] `PUT/DELETE /api/me/favorites/:contentId` sao idempotentes.
@@ -806,6 +806,24 @@ npm --prefix frontend run build
 
 Regista evidence com respostas `curl`, screenshot do detalhe com acoes e screenshot de `/biblioteca`.
 
-## Handoff para o proximo BK
+## Evidence para PR/defesa
+
+- Output de `npm --prefix backend test`.
+- Output de `npm --prefix frontend run build`.
+- Respostas `curl` de `PUT` repetido em favoritos a provar idempotencia.
+- Resposta `curl` de User A e User B a provar ownership.
+- Resposta `curl` de `GET /api/me/history` baseada em `playback_progress`.
+- Screenshot do detalhe com acoes de favoritos e watchlist.
+- Screenshot de `/biblioteca` com `data-testid="my-library"`.
+
+## Handoff
 
 O `BK-MF2-08` pode validar login, detalhe, favoritos, watchlist, player, progresso e biblioteca usando as rotas `/login`, `/catalogo/:idOrSlug`, `/ver/:contentId` e `/biblioteca`.
+
+## Proximo BK recomendado
+
+`BK-MF2-08` - Teste E2E do fluxo principal.
+
+## Changelog
+
+- 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.

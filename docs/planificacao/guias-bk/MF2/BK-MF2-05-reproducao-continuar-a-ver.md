@@ -759,7 +759,7 @@ playbackRouter.get("/me/continue-watching", asyncHandler(getContinueWatching));
 playbackRouter.get("/:contentId", asyncHandler(getPlaybackByContent));
 ```
 
-## Criterios de aceitacao
+## Criterios de aceite (mensuraveis)
 
 - [ ] `GET /api/playback/:contentId` exige login.
 - [ ] Conteudo nao publicado nao reproduz.
@@ -777,6 +777,24 @@ npm --prefix frontend run build
 
 Regista evidence com respostas `curl`, screenshot do player e screenshot da lista "Continuar a ver".
 
-## Handoff para o proximo BK
+## Evidence para PR/defesa
+
+- Output de `npm --prefix backend test`.
+- Output de `npm --prefix frontend run build`.
+- Resposta `curl` de `GET /api/playback/:contentId` com utilizador autenticado.
+- Resposta `curl` de `PUT /api/playback/:contentId/progress` com `200`.
+- Resposta `curl` a provar que User B nao ve progresso de User A.
+- Screenshot de `/ver/:contentId` com `data-testid="faithflix-player"`.
+- Screenshot da zona "Continuar a ver" apos guardar progresso.
+
+## Handoff
 
 O `BK-MF2-06` vai acrescentar legendas, audio, qualidade e parental sobre o mesmo endpoint `GET /api/playback/:contentId`, sem mudar a rota do player.
+
+## Proximo BK recomendado
+
+`BK-MF2-06` - Legendas/audio, parental e qualidade.
+
+## Changelog
+
+- 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.
