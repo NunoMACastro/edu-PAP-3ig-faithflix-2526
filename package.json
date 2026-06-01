@@ -1,0 +1,9 @@
+{
+    "name": "faithflix",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "smoke": "npm --prefix backend run smoke && npm --prefix frontend run smoke"
+    }
+}

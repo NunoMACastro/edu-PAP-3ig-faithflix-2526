@@ -74,7 +74,7 @@ Regras obrigatorias:
 | Macro | Estado | Progresso |
 | ----- | ------ | --------- |
 | `MF0` | `TODO` | `0/6`     |
-| `MF1` | `TODO` | `0/6`     |
+| `MF1` | `DONE` | `6/6`     |
 | `MF2` | `TODO` | `0/8`     |
 | `MF3` | `TODO` | `0/6`     |
 | `MF4` | `TODO` | `0/7`     |
@@ -169,12 +169,12 @@ Estado do guia indica a fase de criacao documental.
 
 | BK          | Titulo                                      | Owner   | Apoio   | Pri | Estado | Esforco | Dependencias            | RF/RNF       |
 | ----------- | ------------------------------------------- | ------- | ------- | --- | ------ | ------- | ----------------------- | ------------ |
-| `BK-MF1-01` | Estrutura base backend por modulos          | Matheus | Davi    | P0  | TODO   | M       | `BK-MF0-06`             | RNF27        |
-| `BK-MF1-02` | Estrutura base frontend por componentes     | Mateus  | Kaue    | P0  | TODO   | M       | `BK-MF0-06`             | RNF28        |
-| `BK-MF1-03` | Cliente API frontend com tratamento de erro | Mateus  | Matheus | P0  | TODO   | M       | `BK-MF1-02`             | RNF05, RNF30 |
-| `BK-MF1-04` | Sessao segura backend (cookies e auth base) | Matheus | Kaue    | P0  | TODO   | M       | `BK-MF1-01`             | RNF13, RNF15 |
-| `BK-MF1-05` | Health-check e logging estruturado          | Kaue    | Davi    | P1  | TODO   | S       | `BK-MF1-01`,`BK-MF1-04` | RNF31 |
-| `BK-MF1-06` | Smoke tests FE/BE                           | Kaue    | Mateus  | P1  | TODO   | M       | `BK-MF1-03`,`BK-MF1-04`,`BK-MF1-05` | RNF29        |
+| `BK-MF1-01` | Estrutura base backend por modulos          | Matheus | Davi    | P0  | DONE   | M       | `BK-MF0-06`             | RNF27        |
+| `BK-MF1-02` | Estrutura base frontend por componentes     | Mateus  | Kaue    | P0  | DONE   | M       | `BK-MF0-06`             | RNF28        |
+| `BK-MF1-03` | Cliente API frontend com tratamento de erro | Mateus  | Matheus | P0  | DONE   | M       | `BK-MF1-02`             | RNF05, RNF30 |
+| `BK-MF1-04` | Sessao segura backend (cookies e auth base) | Matheus | Kaue    | P0  | DONE   | M       | `BK-MF1-01`             | RNF13, RNF15 |
+| `BK-MF1-05` | Health-check e logging estruturado          | Kaue    | Davi    | P1  | DONE   | S       | `BK-MF1-01`,`BK-MF1-04` | RNF31 |
+| `BK-MF1-06` | Smoke tests FE/BE                           | Kaue    | Mateus  | P1  | DONE   | M       | `BK-MF1-03`,`BK-MF1-04`,`BK-MF1-05` | RNF29        |
 
 ---
 

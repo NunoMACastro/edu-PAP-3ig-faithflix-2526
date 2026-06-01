@@ -1,0 +1,29 @@
+import { sessionConfig } from "../config/session.js";
+import { resolveSession } from "../modules/auth/session.service.js";
+import { readCookie } from "../utils/cookies.js";
+
+/**
+ * Attaches the current session state to the Express request.
+ *
+ * @param {import("express").Request & { session?: { token?: string, user: unknown, isAuthenticated: boolean } }} req - Current HTTP request.
+ * @param {import("express").Response} _res - Unused response object.
+ * @param {import("express").NextFunction} next - Express callback used to continue or forward errors.
+ * @returns {Promise<void>} Resolves after the session state is attached.
+ */
+export async function attachSession(req, _res, next) {
+    try {
+        const token = readCookie(req, sessionConfig.cookieName);
+        const user = await resolveSession(token);
+
+        // The shape is stable even when there is no authenticated user.
+        req.session = {
+            token,
+            user,
+            isAuthenticated: Boolean(user),
+        };
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+}
