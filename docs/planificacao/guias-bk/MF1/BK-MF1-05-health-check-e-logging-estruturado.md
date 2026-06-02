@@ -1,4 +1,4 @@
-# BK-MF1-05 - Health-check e logging estruturado
+# BK-MF1-05 - Health-check, CORS e logging estruturado
 
 ## Header
 
@@ -21,28 +21,33 @@
 
 ## Bloco pedagogico (obrigatorio)
 
-Este BK acrescenta capacidade operacional ao backend: um endpoint `/health` para saber se a API esta viva e logs estruturados para diagnosticar pedidos e erros. Isto nao cria funcionalidades de produto, mas e essencial para operar uma app real.
+Este BK acrescenta capacidade operacional ao backend: um endpoint `/health` para saber se a API esta viva, CORS local controlado para o frontend e logs estruturados para diagnosticar pedidos e erros. Isto nao cria funcionalidades de produto, mas e essencial para operar uma app real.
 
-Para alunos do 12.º ano, a ideia principal e: uma aplicacao nao basta "funcionar no meu computador". Precisamos de sinais simples para saber se esta online, que pedidos recebeu e que erros aconteceram, sem expor dados sensiveis.
+Para alunos do 12.º ano, a ideia principal e: uma aplicacao nao basta "funcionar no meu computador". Precisamos de sinais simples para saber se esta online, que frontend pode falar com ela, que pedidos recebeu e que erros aconteceram, sem expor dados sensiveis.
 
 ### O que entra
 
 - Criar `GET /health`.
+- Criar configuracao CORS com `FRONTEND_ORIGIN`.
+- Criar middleware CORS para origens frontend locais autorizadas.
 - Criar logger em JSON.
 - Criar middleware de request logging com `x-request-id`.
 - Integrar logs no error handler.
-- Atualizar `app.js` sem remover `/api` nem `/api/session`.
+- Atualizar `app.js` sem remover `/api`, `/api/session` nem `/health`.
 
 ### O que nao entra
 
 - Monitorizacao externa paga.
 - Checks de MongoDB, pagamentos, streaming, CDN ou DRM.
+- CORS aberto com wildcard `*` quando pedidos usam credenciais.
+- Aceitar origens nao configuradas.
 - Logs com cookies, tokens, passwords ou dados pessoais.
 - Auditoria administrativa completa, que entra em hardening/operacao posterior.
 
 ### Check de compreensao
 
 - [ ] Sei explicar para que serve `/health`.
+- [ ] Sei explicar porque CORS com credenciais precisa de origem explicita.
 - [ ] Sei explicar porque logs devem ser JSON.
 - [ ] Sei provar que cookies nao aparecem nos logs.
 
@@ -52,7 +57,7 @@ Para alunos do 12.º ano, a ideia principal e: uma aplicacao nao basta "funciona
 
 - `BK-MF1-01` executado.
 - `BK-MF1-04` executado, com sessao base em `/api/session`.
-- Preservar `/api/session` ao acrescentar `/health` e logging.
+- Preservar `/api/session` ao acrescentar `/health`, CORS e logging.
 - Confirmar em `RNF.md` que `RNF31` pede endpoint de health-check e `RNF30` pede logs estruturados.
 - Confirmar que ainda nao existem MongoDB, pagamentos ou streaming real; por isso, `/health` nao deve fingir checks desses servicos.
 
@@ -137,7 +142,93 @@ A rota ainda precisa de ser montada em `app.js`. Depois do Passo 4, `curl -i htt
 
 Erro comum: devolver `database: ok` antes de existir base de dados. Isso seria um health-check enganador.
 
-### Passo 2 - Criar logger estruturado com redacao de dados sensiveis
+### Passo 2 - Criar configuracao e middleware CORS local
+
+1. Objetivo do passo.
+
+Permitir que o frontend local chame a API com cookies, mas apenas a partir de origens explicitamente configuradas.
+
+2. Ficheiros envolvidos:
+    - EDITAR: `backend/.env.example`
+    - CRIAR: `backend/src/config/cors.js`
+    - CRIAR: `backend/src/middlewares/cors.middleware.js`
+    - LOCALIZACAO: `backend/`, `backend/src/config/` e `backend/src/middlewares/`
+    - REVER: `BK-MF1-03`, porque o cliente API usa `credentials: "include"`
+
+3. Instrucoes concretas.
+
+Acrescenta `FRONTEND_ORIGIN` ao `.env.example`. Depois cria a configuracao e o middleware CORS. A regra principal e nao usar `*` com credenciais: quando cookies podem ser enviados, a origem permitida tem de ser explicita.
+
+4. Linha a acrescentar em `backend/.env.example`.
+
+```env
+FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
+```
+
+5. Codigo do ficheiro `backend/src/config/cors.js`.
+
+```js
+const DEFAULT_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+];
+
+function parseAllowedOrigins(value) {
+    if (!value) {
+        return DEFAULT_ALLOWED_ORIGINS;
+    }
+
+    return value
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean);
+}
+
+export const corsConfig = {
+    allowedOrigins: parseAllowedOrigins(process.env.FRONTEND_ORIGIN),
+};
+```
+
+6. Codigo do ficheiro `backend/src/middlewares/cors.middleware.js`.
+
+```js
+import { corsConfig } from "../config/cors.js";
+
+const ALLOWED_METHODS = "GET,POST,PUT,PATCH,DELETE,OPTIONS";
+const ALLOWED_HEADERS = "Content-Type,X-Request-Id";
+
+export function corsMiddleware(req, res, next) {
+    const origin = req.headers.origin;
+
+    if (typeof origin === "string" && corsConfig.allowedOrigins.includes(origin)) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+        res.setHeader("Access-Control-Allow-Credentials", "true");
+        res.setHeader("Access-Control-Allow-Methods", ALLOWED_METHODS);
+        res.setHeader("Access-Control-Allow-Headers", ALLOWED_HEADERS);
+        res.setHeader("Vary", "Origin");
+    }
+
+    if (req.method === "OPTIONS") {
+        return res.status(204).send();
+    }
+
+    next();
+}
+```
+
+7. Explicacao do codigo.
+
+`FRONTEND_ORIGIN` permite configurar que origens frontend podem chamar a API. O middleware so devolve `Access-Control-Allow-Origin` quando a origem esta autorizada. `Access-Control-Allow-Credentials: true` permite cookies HttpOnly nos pedidos do frontend, mas sem abrir a API a qualquer origem.
+
+8. Validacao do passo.
+
+Depois de montar o middleware em `app.js`, uma chamada com origem `http://127.0.0.1:5173` deve devolver `Access-Control-Allow-Origin: http://127.0.0.1:5173` e `Access-Control-Allow-Credentials: true`. Uma origem nao configurada nao deve receber `Access-Control-Allow-Origin`.
+
+9. Caso negativo ou erro comum.
+
+Erro comum: devolver `Access-Control-Allow-Origin: *` juntamente com credenciais. Isso quebra o modelo de seguranca esperado para cookies e deve reprovar o BK.
+
+### Passo 3 - Criar logger estruturado com redacao de dados sensiveis
 
 1. Objetivo do passo.
 
@@ -238,7 +329,7 @@ Resultado esperado: log JSON com `"cookie":"[REDACTED]"`.
 
 Erro comum: fazer `console.log(req.headers)`. Isso pode gravar cookies e tokens nos logs.
 
-### Passo 3 - Criar request logger com request id
+### Passo 4 - Criar request logger com request id
 
 1. Objetivo do passo.
 
@@ -296,11 +387,11 @@ Depois de montar em `app.js`, qualquer resposta deve incluir header `x-request-i
 
 Erro comum: usar o mesmo request id para todos os pedidos. Cada pedido precisa de um identificador diferente, salvo quando o cliente ja envia um.
 
-### Passo 4 - Integrar logging no error handler e montar `/health`
+### Passo 5 - Integrar CORS, logging no error handler e montar `/health`
 
 1. Objetivo do passo.
 
-Ligar `/health`, request logging e logs de erro na app Express.
+Ligar CORS, `/health`, request logging e logs de erro na app Express.
 
 2. Ficheiros envolvidos:
     - EDITAR: `backend/src/middlewares/error.middleware.js`
@@ -311,7 +402,7 @@ Ligar `/health`, request logging e logs de erro na app Express.
 
 3. Instrucoes concretas.
 
-Substitui `error.middleware.js` e `app.js`. O `app.js` abaixo assume que `BK-MF1-04` ja criou `attachSession` e `authRouter`. Se `BK-MF1-04` ainda nao tiver sido executado, executa-o antes deste passo para evitar imports partidos.
+Substitui `error.middleware.js` e `app.js`. O `app.js` abaixo assume que `BK-MF1-04` ja criou `attachSession` e `authRouter`, e que o Passo 2 ja criou `corsMiddleware`. Se `BK-MF1-04` ainda nao tiver sido executado, executa-o antes deste passo para evitar imports partidos.
 
 4. Codigo do ficheiro `backend/src/middlewares/error.middleware.js`.
 
@@ -366,6 +457,7 @@ O error handler continua a devolver JSON, mas agora tambem escreve logs. Erros 4
 
 ```js
 import express from "express";
+import { corsMiddleware } from "./middlewares/cors.middleware.js";
 import {
     errorHandler,
     notFoundHandler,
@@ -380,6 +472,7 @@ export function createApp() {
     const app = express();
 
     app.use(requestLogger);
+    app.use(corsMiddleware);
     app.use(express.json({ limit: "1mb" }));
     app.use(attachSession);
 
@@ -396,7 +489,7 @@ export function createApp() {
 
 7. Explicacao do codigo.
 
-`requestLogger` fica antes de tudo para medir todos os pedidos. `/health` fica ao lado de `/api`, porque e uma rota operacional. `/api/session` continua preservado para a base de sessao. Os handlers de erro continuam no fim.
+`requestLogger` fica antes de tudo para medir todos os pedidos. `corsMiddleware` fica antes de JSON e das rotas para responder tambem a preflight `OPTIONS`. `/health` fica ao lado de `/api`, porque e uma rota operacional. `/api/session` continua preservado para a base de sessao. Os handlers de erro continuam no fim.
 
 8. Codigo a acrescentar ao fim de `backend/README.md`.
 
@@ -407,6 +500,11 @@ export function createApp() {
 - Todas as respostas incluem `x-request-id`.
 - Logs sao JSON por linha.
 - Cookies, tokens e passwords nao devem aparecer nos logs.
+
+## CORS local
+
+- `FRONTEND_ORIGIN` define as origens frontend autorizadas.
+- Em desenvolvimento, `http://localhost:5173` e `http://127.0.0.1:5173` estao autorizadas para permitir cookies com `credentials: include`.
 ```
 
 9. Explicacao do codigo.
@@ -419,23 +517,25 @@ Executar:
 
 ```bash
 curl -i http://localhost:3000/health
+curl -i -H "Origin: http://127.0.0.1:5173" http://localhost:3000/api
+curl -i -X OPTIONS -H "Origin: http://127.0.0.1:5173" http://localhost:3000/api
 curl -i http://localhost:3000/api/nao-existe -H "Cookie: faithflix_session=falso"
 ```
 
 11. Caso negativo ou erro comum.
 
-Erro comum: montar `/health` dentro de `/api/session` ou exigir login para health-check. Health-check deve poder validar a app sem sessao.
+Erro comum: montar `/health` dentro de `/api/session`, exigir login para health-check ou colocar CORS depois das rotas. Health-check deve poder validar a app sem sessao e CORS deve responder antes da logica funcional.
 
-### Passo 5 - Validar payloads, logs e negativos
+### Passo 6 - Validar payloads, CORS, logs e negativos
 
 1. Objetivo do passo.
 
-Provar que `/health` responde, logs existem e dados sensiveis nao aparecem.
+Provar que `/health` responde, CORS esta limitado a origens configuradas, logs existem e dados sensiveis nao aparecem.
 
 2. Ficheiros envolvidos:
     - EDITAR: nenhum, se os passos anteriores estiverem corretos
     - LOCALIZACAO: executar comandos em `backend/`
-    - REVER: `logger.js`, `request-logger.middleware.js`, `error.middleware.js`
+    - REVER: `cors.js`, `cors.middleware.js`, `logger.js`, `request-logger.middleware.js`, `error.middleware.js`
 
 3. Instrucoes concretas.
 
@@ -486,6 +586,10 @@ O log tem campos previsiveis. Isto permite filtrar por `requestId`, `statusCode`
 
 - `GET /health` devolve 200.
 - Resposta inclui `x-request-id`.
+- Pedido com `Origin: http://127.0.0.1:5173` devolve `Access-Control-Allow-Origin` com essa origem.
+- Pedido com origem permitida devolve `Access-Control-Allow-Credentials: true`.
+- Preflight `OPTIONS` com origem permitida devolve HTTP 204.
+- Pedido com origem nao configurada nao devolve `Access-Control-Allow-Origin`.
 - Pedido 404 gera log `warn`.
 - Erro 500, quando simulado futuramente, deve gerar log `error`.
 - Cookie falso nao aparece nos logs.
@@ -496,8 +600,12 @@ Erro comum: fazer health-check depender de MongoDB antes de MongoDB existir. Iss
 
 ## Criterios de aceite (mensuraveis)
 
-- `backend/src/modules/system/health.*`, `backend/src/utils/logger.js` e `backend/src/middlewares/request-logger.middleware.js` existem.
+- `backend/src/modules/system/health.*`, `backend/src/config/cors.js`, `backend/src/middlewares/cors.middleware.js`, `backend/src/utils/logger.js` e `backend/src/middlewares/request-logger.middleware.js` existem.
+- `backend/.env.example` inclui `FRONTEND_ORIGIN`.
 - `GET /health` devolve HTTP 200 e JSON com `status`, `service`, `timestamp`, `uptimeSeconds` e `dependencies`.
+- Origem local permitida devolve `Access-Control-Allow-Origin` igual a origem recebida e `Access-Control-Allow-Credentials: true`.
+- Preflight `OPTIONS` com origem permitida devolve HTTP 204.
+- Origem nao configurada nao recebe `Access-Control-Allow-Origin`.
 - Todas as respostas incluem `x-request-id`.
 - Pedidos geram logs JSON com `level`, `message`, `requestId`, `method`, `path`, `statusCode` e `durationMs`.
 - Cookies, tokens, passwords e segredos nao aparecem nos logs.
@@ -509,18 +617,21 @@ Executar dentro de `backend/`:
 ```bash
 npm run dev
 curl -i http://localhost:3000/health
+curl -i -H "Origin: http://127.0.0.1:5173" http://localhost:3000/api
+curl -i -X OPTIONS -H "Origin: http://127.0.0.1:5173" http://localhost:3000/api
+curl -i -H "Origin: http://malicioso.test" http://localhost:3000/api
 curl -i http://localhost:3000/api/nao-existe -H "Cookie: faithflix_session=falso"
 ```
 
 ## Evidence para PR/defesa
 
-- `pr`: referencia do PR/commit com health/logging.
-- `proof`: output de `/health`, header `x-request-id` e exemplo de log `info`.
-- `neg`: 404 logado, cookie ausente/redigido em logs e health sem checks inventados.
+- `pr`: referencia do PR/commit com health/CORS/logging.
+- `proof`: output de `/health`, header `x-request-id`, CORS com origem local permitida e exemplo de log `info`.
+- `neg`: 404 logado, cookie ausente/redigido em logs, origem nao configurada sem `Access-Control-Allow-Origin` e health sem checks inventados.
 
 ## Handoff
 
-- `BK-MF1-06` deve automatizar `/health`, `x-request-id`, 404 e 401.
+- `BK-MF1-06` deve automatizar `/health`, CORS local, `x-request-id`, 404 e 401.
 - `BK-MF2-01` deve manter cookies fora dos logs quando criar login real.
 - Fases futuras podem acrescentar checks de MongoDB, streaming ou pagamentos apenas quando essas dependencias existirem.
 
