@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { getCurrentSession, logout } from "./session.controller.js";
+import { asyncHandler } from "../../utils/async-handler.js";
+import { forgotPassword, login, register, resetPasswordController } from "./auth.controller.js";
 
 export const authRouter = Router();
 
-// Session routes stay intentionally small in MF1: no login, no register, no users.
-authRouter.get("/me", getCurrentSession);
-authRouter.post("/logout", logout);
+authRouter.post("/register", asyncHandler(register));
+authRouter.post("/login", asyncHandler(login));
+authRouter.post("/forgot-password", asyncHandler(forgotPassword));
+authRouter.post("/reset-password", asyncHandler(resetPasswordController));
