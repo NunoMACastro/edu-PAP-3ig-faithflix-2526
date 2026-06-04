@@ -7,12 +7,15 @@ import { sessionRouter } from "./modules/auth/session.routes.js";
 import { healthRouter } from "./modules/system/health.routes.js";
 import { systemRouter } from "./modules/system/system.routes.js";
 import { userRouter } from "./modules/users/user.routes.js";
+import { catalogRouter } from "./modules/catalog/catalog.routes.js";
+
 
 export function createApp() {
   const app = express();
 
   app.use(attachSession);
   app.use("/api/users", userRouter);
+  app.use("/api/catalog", catalogRouter);
 
   app.use(requestLogger);
   app.use(express.json({ limit: "1mb" }));

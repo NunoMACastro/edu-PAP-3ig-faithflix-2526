@@ -13,6 +13,8 @@ import {
 } from "../pages/pages.jsx";
 import { AccountPage } from "../pages/AccountPage.jsx";
 import { AdminUsersPage } from "../pages/AdminUsersPage.jsx";
+import { CatalogPage } from "../pages/CatalogPage.jsx";
+import { AdminCatalogPage } from "../pages/AdminCatalogPage.jsx";
 
 
 
@@ -36,6 +38,8 @@ export function AppRoutes() {
                 <Route path="*" element={<NotFoundPage />} />
                 <Route path="/conta" element={<AccountPage />} />
                 <Route path="/admin/utilizadores" element={<AdminUsersPage />} />
+                <Route path="/catalogo" element={<CatalogPage />} />
+                <Route path="/admin/catalogo" element={<AdminCatalogPage />} />
             </Routes>
         </AppLayout>
     );
