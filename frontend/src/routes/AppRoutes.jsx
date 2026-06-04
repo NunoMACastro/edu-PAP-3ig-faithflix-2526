@@ -11,6 +11,10 @@ import {
     PlansPage,
     SearchPage,
 } from "../pages/pages.jsx";
+import { AccountPage } from "../pages/AccountPage.jsx";
+import { AdminUsersPage } from "../pages/AdminUsersPage.jsx";
+
+
 
 /**
  * Declares the route table for the MF1 frontend foundation.
@@ -30,6 +34,8 @@ export function AppRoutes() {
                 <Route path="/notificacoes" element={<NotificationsPage />} />
                 <Route path="/pesquisa" element={<SearchPage />} />
                 <Route path="*" element={<NotFoundPage />} />
+                <Route path="/conta" element={<AccountPage />} />
+                <Route path="/admin/utilizadores" element={<AdminUsersPage />} />
             </Routes>
         </AppLayout>
     );
