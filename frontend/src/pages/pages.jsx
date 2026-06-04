@@ -4,6 +4,19 @@ import { BaseButton } from "../components/ui/BaseButton.jsx";
 import { ContentCard } from "../components/ui/ContentCard.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { TextField } from "../components/ui/TextField.jsx";
+import { AuthForms } from "../components/auth/AuthForms.jsx";
+
+
+
+export function LoginPage() {
+  return (
+    <main className="page-shell">
+      <h1>Entrar no FaithFlix</h1>
+      <p>Cria conta, inicia sessao ou recupera o acesso com seguranca.</p>
+      <AuthForms />
+    </main>
+  );
+}
 
 /**
  * Home page for the MF1 frontend foundation.
