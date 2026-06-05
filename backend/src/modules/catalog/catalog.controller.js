@@ -8,6 +8,11 @@ import {
   updateContent,
 } from "./catalog.service.js";
 import { createTaxonomy, listTaxonomies } from "./taxonomy.service.js";
+import { getPublishedContentDetail } from "./catalog.service.js";
+
+export async function getCatalogDetail(req, res) {
+  res.status(200).json({ content: await getPublishedContentDetail(req.params.idOrSlug) });
+}
 
 export async function getCatalog(req, res) {
   res.status(200).json({ items: await listPublishedCatalog() });

@@ -4,6 +4,9 @@ export const catalogApi = {
   listPublished() {
     return apiClient.get("/api/catalog");
   },
+  getDetail(idOrSlug) {
+    return apiClient.get(`/api/catalog/${encodeURIComponent(idOrSlug)}`);
+  },
   listAdmin() {
     return apiClient.get("/api/catalog/admin");
   },
