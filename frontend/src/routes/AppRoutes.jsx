@@ -17,6 +17,8 @@ import { AdminUsersPage } from "../pages/AdminUsersPage.jsx";
 import { CatalogPage } from "../pages/CatalogPage.jsx";
 import { AdminCatalogPage } from "../pages/AdminCatalogPage.jsx";
 import { PlaybackPage } from "../pages/PlaybackPage.jsx";
+import { MyLibraryPage } from "../pages/MyLibraryPage.jsx";
+
 
 
 
@@ -45,6 +47,7 @@ export function AppRoutes() {
                 <Route path="/catalogo" element={<CatalogPage />} />
                 <Route path="/catalogo/:idOrSlug" element={<ContentDetailPage />} />
                 <Route path="/ver/:contentId" element={<PlaybackPage />} />
+                <Route path="/biblioteca" element={<MyLibraryPage />} />
             </Routes>
         </AppLayout>
     );

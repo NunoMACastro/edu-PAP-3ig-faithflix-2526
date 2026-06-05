@@ -9,6 +9,8 @@ import { systemRouter } from "./modules/system/system.routes.js";
 import { userRouter } from "./modules/users/user.routes.js";
 import { catalogRouter } from "./modules/catalog/catalog.routes.js";
 import { playbackRouter } from "./modules/playback/playback.routes.js";
+import { libraryRouter } from "./modules/library/library.routes.js";
+
 
 
 export function createApp() {
@@ -30,6 +32,9 @@ export function createApp() {
   app.use(notFoundHandler);
   app.use(errorHandler);
   app.use("/api/playback", playbackRouter);
+
+  app.use(attachSession);
+  app.use("/api/me", libraryRouter);
 
 
   return app;
