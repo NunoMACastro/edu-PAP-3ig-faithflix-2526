@@ -16,6 +16,7 @@ import { AccountPage } from "../pages/AccountPage.jsx";
 import { AdminUsersPage } from "../pages/AdminUsersPage.jsx";
 import { CatalogPage } from "../pages/CatalogPage.jsx";
 import { AdminCatalogPage } from "../pages/AdminCatalogPage.jsx";
+import { PlaybackPage } from "../pages/PlaybackPage.jsx";
 
 
 
@@ -43,6 +44,7 @@ export function AppRoutes() {
                 <Route path="/admin/catalogo" element={<AdminCatalogPage />} />
                 <Route path="/catalogo" element={<CatalogPage />} />
                 <Route path="/catalogo/:idOrSlug" element={<ContentDetailPage />} />
+                <Route path="/ver/:contentId" element={<PlaybackPage />} />
             </Routes>
         </AppLayout>
     );

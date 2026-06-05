@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { catalogApi } from "../services/api/catalogApi.js";
+import { ContinueWatchingStrip } from "../components/playback/ContinueWatchingStrip.jsx";
 
 export function CatalogPage() {
   const [items, setItems] = useState([]);
@@ -13,9 +14,9 @@ export function CatalogPage() {
   }, []);
 
   return (
-    <main className="page-shell">
+   <main className="page-shell">
       <h1>Catalogo</h1>
-      {error && <p role="alert">{error}</p>}
+      <ContinueWatchingStrip />
       <section className="content-grid" aria-label="Conteudos publicados">
         {items.map((content) => (
           <article key={content.id}>
