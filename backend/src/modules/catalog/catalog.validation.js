@@ -1,242 +1,161 @@
 import { ObjectId } from "mongodb";
-import { getDb } from "../../config/database.js";
-import { assertCatalogPayload, assertStatus } from "./catalog.validation.js";
 
-function asContentObjectId(id) {
-  if (!ObjectId.isValid(id)) {
-    const error = new Error("Conteudo invalido.");
+export const CONTENT_TYPES = ["movie", "series", "episode", "documentary"];
+export const CONTENT_STATUS = ["draft", "published", "archived"];
+
+function requiredText(value, field, min = 2, max = 160) {
+  const text = String(value ?? "").trim();
+
+  if (text.length < min || text.length > max) {
+    const error = new Error(`${field} invalido.`);
     error.statusCode = 400;
     throw error;
   }
 
-  return new ObjectId(id);
+  return text;
 }
 
-function asRevisionObjectId(id) {
-  if (!ObjectId.isValid(id)) {
-    const error = new Error("Revisao invalida.");
+function optionalText(value, max = 500) {
+  const text = String(value ?? "").trim();
+  return text.length > max ? text.slice(0, max) : text;
+}
+
+function positiveInteger(value, field) {
+  const number = Number(value);
+
+  if (!Number.isInteger(number) || number <= 0) {
+    const error = new Error(`${field} deve ser um inteiro positivo.`);
     error.statusCode = 400;
     throw error;
   }
 
-  return new ObjectId(id);
+  return number;
 }
 
-function publicContent(content) {
-  return {
-    id: String(content._id),
-    title: content.title,
-    slug: content.slug,
-    synopsis: content.synopsis,
-    type: content.type,
-    durationSeconds: content.durationSeconds,
-    ageRating: content.ageRating,
-    taxonomyIds: (content.taxonomyIds ?? []).map(String),
-    assets: content.assets,
-    media: content.media,
-    publishedAt: content.publishedAt ?? null,
-  };
+function assertAgeRating(value) {
+  const number = Number(value);
+
+  if (!Number.isInteger(number) || number < 0 || number > 18) {
+    const error = new Error("Classificacao etaria invalida.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return number;
 }
 
-function publicRevision(revision) {
-  return {
-    id: String(revision._id),
-    contentId: String(revision.contentId),
-    action: revision.action,
-    snapshot: {
-      ...publicContent(revision.snapshot),
-      status: revision.snapshot.status,
-    },
-    changedBy: String(revision.changedBy),
-    createdAt: revision.createdAt,
-  };
-}
+function taxonomyObjectIds(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
 
-async function saveRevision(db, content, userId, action) {
-  await db.collection("content_revisions").insertOne({
-    contentId: content._id,
-    action,
-    snapshot: content,
-    changedBy: new ObjectId(userId),
-    createdAt: new Date(),
+  return value.map((id) => {
+    if (!ObjectId.isValid(id)) {
+      const error = new Error("Taxonomia invalida.");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    return new ObjectId(id);
   });
 }
 
-async function assertExistingTaxonomies(db, taxonomyIds) {
-  if (taxonomyIds.length === 0) {
-    return;
-  }
+function mediaTrack(track) {
+  return {
+    language: requiredText(track.language, "language", 2, 12),
+    label: requiredText(track.label, "label", 2, 80),
+    src: requiredText(track.src, "src", 1, 500),
+  };
+}
 
-  const existing = await db
-    .collection("taxonomies")
-    .find({ _id: { $in: taxonomyIds } }, { projection: { _id: 1 } })
-    .toArray();
+function qualityOption(option) {
+  return {
+    label: requiredText(option.label, "label", 2, 40),
+    value: requiredText(option.value, "value", 2, 40),
+    playbackUrl: requiredText(option.playbackUrl, "playbackUrl", 1, 500),
+  };
+}
 
-  if (existing.length !== taxonomyIds.length) {
-    const error = new Error("Uma ou mais taxonomias nao existem.");
+export function slugify(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+export function assertMediaOptions(input) {
+  return {
+    tracks: {
+      subtitles: Array.isArray(input.tracks?.subtitles)
+        ? input.tracks.subtitles.map(mediaTrack)
+        : [],
+      audio: Array.isArray(input.tracks?.audio)
+        ? input.tracks.audio.map(mediaTrack)
+        : [],
+    },
+    qualityOptions: Array.isArray(input.qualityOptions)
+      ? input.qualityOptions.map(qualityOption)
+      : [],
+  };
+}
+
+export function assertCatalogPayload(input) {
+  const title = requiredText(input.title, "title");
+  const type = String(input.type ?? "").trim();
+
+  if (!CONTENT_TYPES.includes(type)) {
+    const error = new Error("Tipo de conteudo invalido.");
     error.statusCode = 400;
     throw error;
   }
-}
 
-export async function ensureCatalogIndexes() {
-  const db = await getDb();
-  await db.collection("contents").createIndex({ slug: 1 }, { unique: true });
-  await db.collection("contents").createIndex({ status: 1, publishedAt: -1 });
-  await db.collection("taxonomies").createIndex({ slug: 1 }, { unique: true });
-}
+  const slug = input.slug ? slugify(input.slug) : slugify(title);
 
-export async function listPublishedCatalog() {
-  const db = await getDb();
-  const contents = await db
-    .collection("contents")
-    .find({ status: "published" })
-    .sort({ publishedAt: -1, title: 1 })
-    .toArray();
+  if (!slug) {
+    const error = new Error("Slug invalido.");
+    error.statusCode = 400;
+    throw error;
+  }
 
-  return contents.map(publicContent);
-}
-
-export async function listAdminCatalog() {
-  const db = await getDb();
-  const contents = await db.collection("contents").find({}).sort({ updatedAt: -1 }).toArray();
-  return contents.map((content) => ({ ...publicContent(content), status: content.status }));
-}
-
-export async function createContent(input, userId) {
-  const db = await getDb();
-  const now = new Date();
-  const payload = assertCatalogPayload(input);
-  await assertExistingTaxonomies(db, payload.taxonomyIds);
-
-  const document = {
-    ...payload,
-    status: "draft",
-    createdBy: new ObjectId(userId),
-    updatedBy: new ObjectId(userId),
-    publishedAt: null,
-    createdAt: now,
-    updatedAt: now,
+  return {
+    title,
+    slug,
+    synopsis: requiredText(input.synopsis, "synopsis", 20, 1000),
+    type,
+    durationSeconds: positiveInteger(input.durationSeconds, "durationSeconds"),
+    ageRating: assertAgeRating(input.ageRating ?? 0),
+    taxonomyIds: taxonomyObjectIds(input.taxonomyIds),
+    assets: {
+      posterUrl: optionalText(input.assets?.posterUrl),
+      backdropUrl: optionalText(input.assets?.backdropUrl),
+    },
+    media: {
+      playbackUrl: requiredText(input.media?.playbackUrl, "media.playbackUrl", 1, 500),
+    },
+    ...assertMediaOptions(input),
   };
-
-  const result = await db.collection("contents").insertOne(document);
-  return { ...publicContent({ ...document, _id: result.insertedId }), status: document.status };
 }
 
-export async function updateContent(contentId, input, userId) {
-  const db = await getDb();
-  const _id = asContentObjectId(contentId);
-  const existing = await db.collection("contents").findOne({ _id });
+export function assertStatus(status) {
+  const normalized = String(status ?? "").trim();
 
-  if (!existing) {
-    const error = new Error("Conteudo nao encontrado.");
-    error.statusCode = 404;
+  if (!CONTENT_STATUS.includes(normalized)) {
+    const error = new Error("Estado de conteudo invalido.");
+    error.statusCode = 400;
     throw error;
   }
 
-  const payload = assertCatalogPayload(input);
-  await assertExistingTaxonomies(db, payload.taxonomyIds);
-  await saveRevision(db, existing, userId, "update");
-
-  const updated = await db.collection("contents").findOneAndUpdate(
-    { _id },
-    { $set: { ...payload, updatedBy: new ObjectId(userId), updatedAt: new Date() } },
-    { returnDocument: "after" },
-  );
-
-  return { ...publicContent(updated), status: updated.status };
+  return normalized;
 }
 
-export async function changeContentStatus(contentId, status, userId) {
-  const db = await getDb();
-  const _id = asContentObjectId(contentId);
-  const existing = await db.collection("contents").findOne({ _id });
+export function assertTaxonomyPayload(input) {
+  const name = requiredText(input.name, "name", 2, 80);
 
-  if (!existing) {
-    const error = new Error("Conteudo nao encontrado.");
-    error.statusCode = 404;
-    throw error;
-  }
-
-  const nextStatus = assertStatus(status);
-  const now = new Date();
-  await saveRevision(db, existing, userId, nextStatus);
-
-  const updated = await db.collection("contents").findOneAndUpdate(
-    { _id },
-    {
-      $set: {
-        status: nextStatus,
-        updatedBy: new ObjectId(userId),
-        updatedAt: now,
-        publishedAt: nextStatus === "published" ? now : existing.publishedAt ?? null,
-      },
-    },
-    { returnDocument: "after" },
-  );
-
-  return { ...publicContent(updated), status: updated.status };
-}
-
-export async function listContentRevisions(contentId) {
-  const db = await getDb();
-  const contentObjectId = asContentObjectId(contentId);
-  const revisions = await db
-    .collection("content_revisions")
-    .find({ contentId: contentObjectId })
-    .sort({ createdAt: -1 })
-    .toArray();
-
-  return revisions.map(publicRevision);
-}
-
-export async function revertContentRevision(contentId, revisionId, userId) {
-  const db = await getDb();
-  const contentObjectId = asContentObjectId(contentId);
-  const revisionObjectId = asRevisionObjectId(revisionId);
-  const existing = await db.collection("contents").findOne({ _id: contentObjectId });
-
-  if (!existing) {
-    const error = new Error("Conteudo nao encontrado.");
-    error.statusCode = 404;
-    throw error;
-  }
-
-  const revision = await db.collection("content_revisions").findOne({
-    _id: revisionObjectId,
-    contentId: contentObjectId,
-  });
-
-  if (!revision) {
-    const error = new Error("Revisao nao encontrada.");
-    error.statusCode = 404;
-    throw error;
-  }
-
-  await saveRevision(db, existing, userId, "revert");
-
-  const snapshot = revision.snapshot;
-  const updated = await db.collection("contents").findOneAndUpdate(
-    { _id: contentObjectId },
-    {
-      $set: {
-        title: snapshot.title,
-        slug: snapshot.slug,
-        synopsis: snapshot.synopsis,
-        type: snapshot.type,
-        durationSeconds: snapshot.durationSeconds,
-        ageRating: snapshot.ageRating,
-        status: snapshot.status,
-        taxonomyIds: snapshot.taxonomyIds ?? [],
-        assets: snapshot.assets,
-        media: snapshot.media,
-        publishedAt: snapshot.publishedAt ?? null,
-        updatedBy: new ObjectId(userId),
-        updatedAt: new Date(),
-      },
-    },
-    { returnDocument: "after" },
-  );
-
-  return { ...publicContent(updated), status: updated.status };
+  return {
+    name,
+    slug: input.slug ? slugify(input.slug) : slugify(name),
+    description: optionalText(input.description),
+  };
 }

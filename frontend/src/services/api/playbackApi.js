@@ -10,4 +10,10 @@ export const playbackApi = {
   listContinueWatching() {
     return apiClient.get("/api/playback/me/continue-watching");
   },
+  getPreferences() {
+    return apiClient.get("/api/playback/preferences");
+  },
+  savePreferences(input) {
+    return apiClient.put("/api/playback/preferences", input);
+  },
 };

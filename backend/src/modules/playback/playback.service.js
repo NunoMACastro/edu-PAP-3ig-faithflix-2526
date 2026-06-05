@@ -1,6 +1,28 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { assertProgressPayload } from "./playback.validation.js";
+import { getMediaPreferences } from "./media-preferences.service.js";
+
+function resolvePlayableMedia(content, preferences) {
+  const selectedAudio = content.tracks?.audio?.find((track) => track.language === preferences.audioLanguage);
+  const selectedQuality = content.qualityOptions?.find((option) => option.value === preferences.quality);
+
+  return {
+    playbackUrl: selectedAudio?.src ?? selectedQuality?.playbackUrl ?? content.media.playbackUrl,
+    selectedAudioLanguage: selectedAudio?.language ?? "",
+    selectedQuality: selectedQuality?.value ?? "",
+  };
+}
+
+function assertParentalAccess(user, content) {
+  const maxAge = Number.isInteger(user?.parentalMaxAgeRating) ? user.parentalMaxAgeRating : 18;
+
+  if (Number(content.ageRating) > maxAge) {
+    const error = new Error("Conteudo bloqueado pelo controlo parental.");
+    error.statusCode = 403;
+    throw error;
+  }
+}
 
 function asObjectId(id, label) {
   if (!ObjectId.isValid(id)) {
@@ -56,6 +78,12 @@ export async function getPlayback(contentId, userId) {
     _id: contentObjectId,
     status: "published",
   });
+
+  const user = await db.collection("users").findOne({ _id: userObjectId });
+  assertParentalAccess(user, content);
+
+  const preferences = await getMediaPreferences(userId);
+  const media = resolvePlayableMedia(content, preferences);
 
   if (!content) {
     const error = new Error("Conteudo nao encontrado.");
