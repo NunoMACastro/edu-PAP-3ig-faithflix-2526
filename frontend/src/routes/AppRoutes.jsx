@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { AppLayout } from "../layouts/AppLayout.jsx";
+import { ContentDetailPage } from "../pages/ContentDetailPage.jsx";
 import {
     AccountPage,
     AssociationsPage,
@@ -40,6 +41,8 @@ export function AppRoutes() {
                 <Route path="/admin/utilizadores" element={<AdminUsersPage />} />
                 <Route path="/catalogo" element={<CatalogPage />} />
                 <Route path="/admin/catalogo" element={<AdminCatalogPage />} />
+                <Route path="/catalogo" element={<CatalogPage />} />
+                <Route path="/catalogo/:idOrSlug" element={<ContentDetailPage />} />
             </Routes>
         </AppLayout>
     );

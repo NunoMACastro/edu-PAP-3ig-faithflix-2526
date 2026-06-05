@@ -4,6 +4,7 @@ import { asyncHandler } from "../../utils/async-handler.js";
 import {
   getAdminCatalog,
   getCatalog,
+  getCatalogDetail,
   getContentRevisions,
   getTaxonomies,
   patchContent,
@@ -26,3 +27,4 @@ catalogRouter.get("/:id/revisions", canManageCatalog, asyncHandler(getContentRev
 catalogRouter.post("/:id/revisions/:revisionId/revert", canManageCatalog, asyncHandler(postContentRevisionRevert));
 catalogRouter.patch("/:id", canManageCatalog, asyncHandler(patchContent));
 catalogRouter.patch("/:id/status", canManageCatalog, asyncHandler(patchContentStatus));
+catalogRouter.get("/:idOrSlug", asyncHandler(getCatalogDetail));
