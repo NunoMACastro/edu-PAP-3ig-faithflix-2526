@@ -8,6 +8,7 @@ import { healthRouter } from "./modules/system/health.routes.js";
 import { systemRouter } from "./modules/system/system.routes.js";
 import { userRouter } from "./modules/users/user.routes.js";
 import { catalogRouter } from "./modules/catalog/catalog.routes.js";
+import { playbackRouter } from "./modules/playback/playback.routes.js";
 
 
 export function createApp() {
@@ -28,6 +29,8 @@ export function createApp() {
 
   app.use(notFoundHandler);
   app.use(errorHandler);
+  app.use("/api/playback", playbackRouter);
+
 
   return app;
 }
