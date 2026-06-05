@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { catalogApi } from "../services/api/catalogApi.js";
+import { LibraryActions } from "../components/library/LibraryActions.jsx";
 
 function formatDuration(seconds) {
   const minutes = Math.round(Number(seconds) / 60);
@@ -61,6 +62,8 @@ export function ContentDetailPage() {
         <dd>{content.ageRating}+</dd>
       </dl>
       <Link to={`/ver/${content.id}`}>Reproduzir</Link>
+      <Link to={`/ver/${content.id}`}>Reproduzir</Link>
+      <LibraryActions contentId={content.id} />
     </main>
   );
 }
