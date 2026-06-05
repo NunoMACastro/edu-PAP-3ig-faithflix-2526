@@ -23,3 +23,15 @@ export function assertRoleUpdate(input) {
 
   return { role };
 }
+
+export function assertParentalSettings(input) {
+  const parentalMaxAgeRating = Number(input.parentalMaxAgeRating);
+
+  if (!Number.isInteger(parentalMaxAgeRating) || parentalMaxAgeRating < 0 || parentalMaxAgeRating > 18) {
+    const error = new Error("Limite parental invalido.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return { parentalMaxAgeRating };
+}

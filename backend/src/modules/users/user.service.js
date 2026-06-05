@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { assertProfileUpdate, assertRoleUpdate } from "./user.validation.js";
+import { assertParentalSettings } from "./user.validation.js";
 
 function toPublicUser(user) {
   return {
@@ -75,6 +76,23 @@ export async function updateUserRole(targetUserId, input) {
   const user = await db.collection("users").findOneAndUpdate(
     { _id: asUserObjectId(targetUserId) },
     { $set: { ...update, updatedAt: now } },
+    { returnDocument: "after" },
+  );
+
+  if (!user) {
+    const error = new Error("Utilizador nao encontrado.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return toPublicUser(user);
+}
+
+export async function updateParentalSettings(userId, input) {
+  const db = await getDb();
+  const user = await db.collection("users").findOneAndUpdate(
+    { _id: asUserObjectId(userId) },
+    { $set: { ...assertParentalSettings(input), updatedAt: new Date() } },
     { returnDocument: "after" },
   );
 
