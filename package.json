@@ -1,9 +1,11 @@
 {
-    "name": "faithflix",
-    "version": "0.1.0",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "smoke": "npm --prefix backend run smoke && npm --prefix frontend run smoke"
-    }
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e:install": "playwright install chromium",
+    "e2e:mf2": "npm --prefix backend run seed:e2e && playwright test tests/e2e/mf2-flow.spec.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.0"
+  }
 }

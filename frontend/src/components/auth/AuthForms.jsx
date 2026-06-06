@@ -61,32 +61,34 @@ export function AuthForms() {
         {mode === "register" ? (
           <label>
             Nome
-            <input name="name" value={form.name} onChange={updateField} autoComplete="name" />
+            <input data-testid="name-input" name="name" value={form.name} onChange={updateField} autoComplete="name" />
           </label>
         ) : null}
 
         {mode !== "reset" ? (
           <label>
             Email
-            <input name="email" type="email" value={form.email} onChange={updateField} autoComplete="email" />
+            <input data-testid="email-input" name="email" type="email" value={form.email} onChange={updateField} autoComplete="email" />
           </label>
         ) : null}
 
         {mode === "reset" ? (
           <label>
             Token
-            <input name="token" value={form.token} onChange={updateField} />
+            <input data-testid="token-input" name="token" value={form.token} onChange={updateField} />
           </label>
         ) : null}
 
         {mode !== "forgot" ? (
           <label>
             Password
-            <input name="password" type="password" value={form.password} onChange={updateField} autoComplete="current-password" />
+            <input data-testid="password-input" name="password" type="password" value={form.password} onChange={updateField} autoComplete="current-password" />
           </label>
         ) : null}
 
-        <button type="submit" disabled={loading}>{loading ? "A validar..." : "Confirmar"}</button>
+        <button data-testid={mode === "login" ? "login-submit" : `${mode}-submit`} type="submit" disabled={loading}>
+          {loading ? "A validar..." : "Confirmar"}
+        </button>
       </form>
 
       {status ? <p className="form-status">{status}</p> : null}
