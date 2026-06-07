@@ -289,9 +289,18 @@ if (existingUser) {
   await db.collection("users").deleteOne({ _id: existingUser._id });
 }
 
-await db.collection("contents").deleteMany({
-  $or: [{ slug: "piloto-faithflix" }, { e2eFixture: E2E_TAG }],
+const conflictingContent = await db.collection("contents").findOne({
+  slug: "piloto-faithflix",
+  e2eFixture: { $ne: E2E_TAG },
 });
+
+if (conflictingContent) {
+  throw new Error(
+    'Conteudo com slug "piloto-faithflix" ja existe sem fixture E2E. Seed abortada para preservar dados locais.',
+  );
+}
+
+await db.collection("contents").deleteMany({ e2eFixture: E2E_TAG });
 await db.collection("playback_progress").deleteMany({ e2eFixture: E2E_TAG });
 await db.collection("user_content_lists").deleteMany({ e2eFixture: E2E_TAG });
 await db.collection("media_preferences").deleteMany({ e2eFixture: E2E_TAG });
@@ -346,7 +355,7 @@ process.exit(0);
 
 5. Explicacao do codigo ou da decisao.
 
-O seed limpa apenas dados associados ao email e a marca `mf2-e2e`, preservando outros dados locais. Depois cria um conteudo publicado com slug conhecido.
+O seed limpa apenas dados marcados com `e2eFixture: "mf2-e2e"` e dados do utilizador E2E controlado. Se encontrar o slug reservado sem tag de fixture, aborta com erro claro em vez de apagar conteudo local legitimo. Depois cria um conteudo publicado com slug conhecido.
 
 6. Validacao do passo.
 
@@ -458,7 +467,7 @@ export function AuthForms() {
 
       if (mode === "forgot") {
         const response = await authApi.forgotPassword({ email: form.email });
-        setStatus(response.resetToken ? `Token de recuperacao: ${response.resetToken}` : response.message);
+        setStatus(response.message);
       }
 
       if (mode === "reset") {
@@ -689,7 +698,7 @@ await page.getByRole("link", { name: /reproduzir/i }).click();
 ## Criterios de aceite (mensuraveis)
 
 - [ ] `npm run e2e:mf2` executa seed antes do teste.
-- [ ] O seed limpa apenas dados associados a `mf2-e2e` ou ao email E2E.
+- [ ] O seed limpa apenas dados associados a `mf2-e2e` e ao email E2E controlado, nunca conteudo por slug solto.
 - [ ] O teste faz login por `/login`.
 - [ ] O teste mede `RNF07` em `/catalogo`.
 - [ ] O teste valida `/catalogo/piloto-faithflix`.

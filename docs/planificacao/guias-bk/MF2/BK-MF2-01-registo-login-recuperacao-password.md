@@ -121,7 +121,7 @@ Identidade e a porta de entrada da aplicacao. Sem esta entrega, os BKs de perfil
 - `CANONICO`: a sessao autenticada usa cookie `HttpOnly`, alinhado com `RNF15`.
 - `CANONICO`: a base de dados principal do MVP e MongoDB.
 - `DERIVADO`: usa-se token opaco em vez de JWT para manter dados de sessao no servidor e reduzir exposicao no browser.
-- `DERIVADO`: em ambiente PAP, o endpoint de recuperacao devolve o token na resposta para demonstracao controlada; em producao seria enviado por email.
+- `DERIVADO`: o endpoint publico de recuperacao devolve sempre uma mensagem generica. O token bruto de reset nunca deve ser exposto na resposta publica nem apresentado pelo frontend; se for preciso demonstra-lo em contexto PAP, usa um canal dev-only separado e controlado.
 
 ### Guia de execucao (passo-a-passo)
 
@@ -620,7 +620,7 @@ export async function requestPasswordReset(input) {
     expiresAt: new Date(Date.now() + RESET_TTL_MS),
   });
 
-  return { ...response, resetToken };
+  return response;
 }
 
 export async function resetPassword(input) {
@@ -901,7 +901,7 @@ export function AuthForms() {
 
       if (mode === "forgot") {
         const response = await authApi.forgotPassword({ email: form.email });
-        setStatus(response.resetToken ? `Token de recuperacao: ${response.resetToken}` : response.message);
+        setStatus(response.message);
       }
 
       if (mode === "reset") {
