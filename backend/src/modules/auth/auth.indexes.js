@@ -21,4 +21,10 @@ export async function ensureAuthIndexes() {
     await db
         .collection("password_reset_tokens")
         .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    await db
+        .collection("password_reset_dev_outbox")
+        .createIndex({ email: 1, createdAt: -1 });
+    await db
+        .collection("password_reset_dev_outbox")
+        .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 }

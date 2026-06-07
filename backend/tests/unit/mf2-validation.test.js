@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
-import { requestPasswordReset } from "../../src/modules/auth/auth.service.js";
+import {
+    getLatestDevPasswordResetToken,
+    requestPasswordReset,
+} from "../../src/modules/auth/auth.service.js";
 import {
     assertValidEmail,
     assertValidName,
@@ -69,6 +72,76 @@ test("password reset nao revela se o email existe", async () => {
     assert.deepEqual(Object.keys(existingResponse), ["message"]);
     assert.equal(existingDb.insertedTokens.length, 1);
     assert.equal(missingDb.insertedTokens.length, 0);
+});
+
+test("password reset expoe token apenas no canal dev-only separado", async () => {
+    const previousFlag = process.env.ENABLE_DEV_RESET_TOKEN_OUTBOX;
+    const previousNodeEnv = process.env.NODE_ENV;
+    const insertedTokens = [];
+    const devOutbox = [];
+
+    process.env.ENABLE_DEV_RESET_TOKEN_OUTBOX = "true";
+    process.env.NODE_ENV = "development";
+
+    const db = {
+        collection(name) {
+            if (name === "users") {
+                return {
+                    findOne: async () => ({ _id: "user-id" }),
+                };
+            }
+
+            if (name === "password_reset_tokens") {
+                return {
+                    insertOne: async (document) => {
+                        insertedTokens.push(document);
+                        return { insertedId: "reset-token-id" };
+                    },
+                };
+            }
+
+            if (name === "password_reset_dev_outbox") {
+                return {
+                    insertOne: async (document) => {
+                        devOutbox.push(document);
+                        return { insertedId: "dev-reset-token-id" };
+                    },
+                    findOne: async () => devOutbox.at(-1),
+                };
+            }
+
+            throw new Error(`Colecao inesperada em teste: ${name}`);
+        },
+    };
+
+    try {
+        const publicResponse = await requestPasswordReset(
+            { email: "aluno@example.com" },
+            { db },
+        );
+        const devResponse = await getLatestDevPasswordResetToken(
+            "aluno@example.com",
+            { db },
+        );
+
+        assert.deepEqual(Object.keys(publicResponse), ["message"]);
+        assert.equal(insertedTokens.length, 1);
+        assert.equal(devOutbox.length, 1);
+        assert.equal(typeof devOutbox[0].resetToken, "string");
+        assert.equal(devResponse.resetToken, devOutbox[0].resetToken);
+    } finally {
+        if (previousFlag === undefined) {
+            delete process.env.ENABLE_DEV_RESET_TOKEN_OUTBOX;
+        } else {
+            process.env.ENABLE_DEV_RESET_TOKEN_OUTBOX = previousFlag;
+        }
+
+        if (previousNodeEnv === undefined) {
+            delete process.env.NODE_ENV;
+        } else {
+            process.env.NODE_ENV = previousNodeEnv;
+        }
+    }
 });
 
 test("catalog validation fecha tipos, estados e media", () => {

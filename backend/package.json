@@ -9,7 +9,8 @@
         "test": "node --test",
         "smoke": "node --test tests/smoke/*.test.js",
         "promote:admin": "node scripts/promote-admin.js",
-        "seed:e2e": "node scripts/seed-mf2-e2e.js"
+        "seed:e2e": "node scripts/seed-mf2-e2e.js",
+        "dev:reset-token": "node scripts/show-dev-reset-token.js"
     },
     "dependencies": {
         "express": "^4.19.2",

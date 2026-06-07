@@ -183,15 +183,15 @@ test("rota inexistente devolve 404 em JSON", async () => {
     assert.equal(body.details.path, "/api/nao-existe");
 });
 
-test("sessao sem cookie devolve 401", async () => {
+test("sessao sem cookie devolve utilizador nulo", async () => {
     const response = await fetch(`${testServer.baseUrl}/api/session/me`);
     const body = await response.json();
 
-    assert.equal(response.status, 401);
-    assert.equal(body.message, "Sessao nao autenticada.");
+    assert.equal(response.status, 200);
+    assert.equal(body.user, null);
 });
 
-test("sessao com cookie falso continua a devolver 401", async () => {
+test("sessao com cookie falso continua a devolver utilizador nulo", async () => {
     const response = await fetch(`${testServer.baseUrl}/api/session/me`, {
         headers: {
             Cookie: "faithflix_session=falso",
@@ -199,8 +199,8 @@ test("sessao com cookie falso continua a devolver 401", async () => {
     });
     const body = await response.json();
 
-    assert.equal(response.status, 401);
-    assert.equal(body.message, "Sessao nao autenticada.");
+    assert.equal(response.status, 200);
+    assert.equal(body.user, null);
 });
 ```
 
@@ -361,8 +361,8 @@ O comando da raiz nao substitui os comandos de cada app. Ele apenas agrega backe
 ## Negativos
 
 - Rota inexistente devolve 404 JSON.
-- Sessao sem cookie devolve 401.
-- Cookie falso devolve 401.
+- Sessao sem cookie devolve `200` com `user: null`.
+- Cookie falso devolve `200` com `user: null`.
 
 ## Handoff para MF2
 
@@ -449,7 +449,7 @@ npm run smoke
 
 - `pr`: referencia do PR/commit com testes smoke e scripts.
 - `proof`: output de `npm --prefix backend run smoke`, `npm --prefix frontend run smoke` e `npm run smoke`.
-- `neg`: resumo dos testes 404/401 e confirmacao de que servidor de teste fecha no fim.
+- `neg`: resumo dos testes 404 e sessao anonima com `user: null`, com confirmacao de que servidor de teste fecha no fim.
 
 ## Handoff
 

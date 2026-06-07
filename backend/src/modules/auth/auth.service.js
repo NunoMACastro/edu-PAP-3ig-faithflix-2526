@@ -11,9 +11,46 @@ import { createSession, toPublicUser } from "./session.service.js";
 import { createOpaqueToken, hashToken, isOpaqueToken } from "./token.js";
 
 const RESET_TTL_MS = 1000 * 60 * 30;
+const DEV_RESET_OUTBOX_FLAG = "ENABLE_DEV_RESET_TOKEN_OUTBOX";
 const PASSWORD_RESET_RESPONSE = {
     message: "Se o email existir, foi criado um pedido de recuperacao.",
 };
+
+/**
+ * Checks whether the separated dev-only reset token outbox is enabled.
+ *
+ * @returns {boolean} True only in non-production environments with the explicit flag enabled.
+ */
+function isDevResetOutboxEnabled() {
+    return (
+        process.env[DEV_RESET_OUTBOX_FLAG] === "true" &&
+        process.env.NODE_ENV !== "production"
+    );
+}
+
+/**
+ * Stores the raw reset token in a separated dev-only outbox for PAP evidence.
+ *
+ * @param {import("mongodb").Db} db - MongoDB database.
+ * @param {{ email: string, userId: unknown, resetToken: string, expiresAt: Date, now: Date }} tokenData - Reset token evidence data.
+ * @returns {Promise<void>} Resolves after optionally writing the outbox entry.
+ */
+async function writeDevResetOutbox(
+    db,
+    { email, userId, resetToken, expiresAt, now },
+) {
+    if (!isDevResetOutboxEnabled()) {
+        return;
+    }
+
+    await db.collection("password_reset_dev_outbox").insertOne({
+        email,
+        userId,
+        resetToken,
+        createdAt: now,
+        expiresAt,
+    });
+}
 
 /**
  * Registers a user and creates the initial authenticated session.
@@ -95,16 +132,62 @@ export async function requestPasswordReset(input, options = {}) {
     }
 
     const resetToken = createOpaqueToken();
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + RESET_TTL_MS);
 
     await db.collection("password_reset_tokens").insertOne({
         userId: user._id,
         tokenHash: hashToken(resetToken),
         usedAt: null,
-        createdAt: new Date(),
-        expiresAt: new Date(Date.now() + RESET_TTL_MS),
+        createdAt: now,
+        expiresAt,
+    });
+
+    await writeDevResetOutbox(db, {
+        email,
+        userId: user._id,
+        resetToken,
+        expiresAt,
+        now,
     });
 
     return { ...PASSWORD_RESET_RESPONSE };
+}
+
+/**
+ * Reads the latest reset token from the separated dev-only evidence outbox.
+ *
+ * @param {unknown} emailInput - Email whose latest dev reset token should be read.
+ * @param {{ db?: import("mongodb").Db }} [options] - Optional dependencies for tests.
+ * @returns {Promise<{ email: string, resetToken: string, expiresAt: Date }>} Latest dev-only token record.
+ */
+export async function getLatestDevPasswordResetToken(emailInput, options = {}) {
+    if (!isDevResetOutboxEnabled()) {
+        throw new HttpError(404, "Canal dev-only de reset desativado.");
+    }
+
+    const email = assertValidEmail(emailInput);
+    const db = options.db ?? (await getDb());
+    const entry = await db.collection("password_reset_dev_outbox").findOne(
+        {
+            email,
+            expiresAt: { $gt: new Date() },
+        },
+        {
+            sort: { createdAt: -1 },
+            projection: { _id: 0, email: 1, resetToken: 1, expiresAt: 1 },
+        },
+    );
+
+    if (!entry) {
+        throw new HttpError(404, "Token dev-only nao encontrado.");
+    }
+
+    return {
+        email: entry.email,
+        resetToken: entry.resetToken,
+        expiresAt: entry.expiresAt,
+    };
 }
 
 /**
