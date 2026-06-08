@@ -17,167 +17,387 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF4-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-06-07`
 
 ## Bloco pedagogico (obrigatorio)
 
 ### Objetivo pedagogico
 
-- Consolidar a entrega de `Explicabilidade de recomendacao` com rastreabilidade explicita para `RF28, RNF34`.
-- Executar o BK `BK-MF3-06` no contexto da macro `MF3` e da sprint `S06`.
+Neste BK vais acrescentar explicabilidade a recomendacao baseline (`RF28`, `RNF34`).
+
+No fim, deves conseguir explicar ao utilizador porque um grupo foi sugerido, sem revelar dados pessoais detalhados, sem prometer inteligencia avancada e sem esconder que a recomendacao e feita por regras simples.
+
+### Importancia funcional
+
+Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumenta confianca, ajuda o aluno a defender a solucao e cumpre o contrato de recomendacao etica do MVP.
+
+### Scope-in
+
+- Criar mapa de explicacoes para `reasonCode`.
+- Acrescentar `explanation` aos grupos de `GET /api/recommendations/me`.
+- Mostrar "Porque recomendamos" na pagina `/para-si`.
+- Explicar cold start de forma honesta.
+- Garantir que a explicacao nao revela IDs internos nem historico detalhado.
+
+### Scope-out
+
+- Novo algoritmo de recomendacao.
+- Dashboard admin de ajustes.
+- Explicacoes por modelo generativo.
+- Exportacao de dados pessoais.
+- Alteracao dos sinais permitidos.
+
+### Glossario rapido
+
+- `Explicabilidade`: capacidade de explicar uma sugestao de forma simples.
+- `reasonCode`: codigo interno usado para escolher a mensagem.
+- `Sinal agregado`: indicacao geral, como "temas vistos", sem listar todo o historico.
+- `Privacidade`: proteger detalhes pessoais que nao precisam de aparecer na UI.
+
+### Conceitos essenciais
+
+- `CANONICO`: `RF28` pede explicabilidade.
+- `CANONICO`: `RNF34` pede explicacao simples para grupos sugeridos.
+- `CANONICO`: `RNF37` impede usar dados de recomendacao para outro fim.
+- `DERIVADO`: a explicacao fica ao nivel do grupo, porque o BK anterior devolve grupos.
+- `DERIVADO`: `reasonCode` desconhecido recebe uma mensagem neutra, para evitar quebrar a UI.
 
 ### Tempo estimado
 
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
+- Rever `BK-MF3-05`: 15 min.
+- Backend de explicacoes: 35 min.
+- Frontend de explicacoes: 35 min.
+- Validacao e evidence: 25 min.
 
 ### Erros comuns
 
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
+- Mostrar IDs internos do historico.
+- Dizer que a sugestao foi feita por um modelo avancado.
+- Criar outro endpoint de recomendacao.
+- Repetir explicacoes vazias ou tecnicas demais.
 
 ### Check de compreensao
 
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
-
-
-## O que vamos fazer neste BK
-
-Entregar `Explicabilidade de recomendacao` cobrindo `RF28, RNF34` na `MF3`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
-
-## Porque isto e importante
-
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF4-01`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+- [ ] Sei explicar a diferenca entre recomendacao e explicabilidade.
+- [ ] Sei porque a explicacao nao deve revelar historico detalhado.
+- [ ] Sei testar cold start e `reasonCode` desconhecido.
 
 ## Bloco operacional (obrigatorio)
 
 ### Pre-condicoes
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+- `BK-MF3-05` concluido.
+- `GET /api/recommendations/me` devolve `groups` com `reasonCode`.
+- Frontend `/para-si` apresenta grupos.
+- A equipa confirma que recomendacao continua baseline.
 
-### Execucao
+### Contrato tecnico deste BK
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+| Area | Contrato |
+| --- | --- |
+| Endpoint mantido | `GET /api/recommendations/me` |
+| Novo campo por grupo | `explanation` |
+| Explicacao | mensagem simples em portugues de Portugal |
+| Privacidade | sem IDs internos, sem lista detalhada de historico |
+| Frontend | `RecommendationExplanation`, `ForYouPage` atualizado |
+| Handoff | `BK-MF4-01` pode iniciar monetizacao sem alterar descoberta |
 
-### Outputs
+### Formato final do grupo
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
-
-### Validacao
-
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
-
-### Handoff
-
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
-
-
-## Pre-condicoes de entrada
-
-- Dependencias declaradas: `BK-MF3-05`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
-
-## O que entra (scope)
-
-- Entrega funcional de `Explicabilidade de recomendacao` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
-
-## O que nao entra (scope-out)
-
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
-
-## Como saber que isto ficou bem
-
-- Fluxo principal de `BK-MF3-06` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P2`.
-- Evidence documentada e pronta para auditoria de gate.
-
-## Pre-leitura minima (10-15 min)
-
-- `docs/RF.md` e `docs/RNF.md` (itens de `RF28, RNF34`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF3-06`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
-
-## Guia de execucao (passo-a-passo)
-
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Explicabilidade de recomendacao`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P2`.
-6. Atualizar evidence e preparar handoff para `BK-MF4-01`.
-
-## Outputs esperados
-
-- Output funcional de `BK-MF3-06` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
-
-## Snippet tecnico aplicavel
-
-```text
-# pseudo-checklist BK-MF3-06
-precondicoes_ok = validar_dependencias(["BK-MF3-05"])
-assert precondicoes_ok == true
-
-resultado = executar_fluxo_principal("Explicabilidade de recomendacao")
-assert resultado.status == "OK"
-
-negativos = executar_negativos(prioridade="P2", minimo=1)
-assert negativos.passados >= 1
-
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
+```js
+{
+  id,
+  title,
+  reasonCode,
+  explanation: {
+    title,
+    message,
+    signals,
+    confidence
+  },
+  items
+}
 ```
 
-## Checklist de validacao
+### Guia de execucao (passo-a-passo)
 
-### Smoke
+### Passo 1 - Criar mapa de explicacoes
 
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
+1. Objetivo do passo.
 
-### Negativos
+Traduzir `reasonCode` tecnico para uma explicacao clara.
 
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-### Tecnico
+2. Ficheiros envolvidos.
+    - CRIAR: `backend/src/modules/recommendations/recommendation-explanations.js`
+    - LOCALIZACAO: ficheiro completo
 
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
+3. Instrucoes concretas.
+
+Cria o ficheiro abaixo no modulo `recommendations`.
+
+4. Codigo completo.
+
+```js
+const EXPLANATIONS = {
+  "themes-from-user-signals": {
+    title: "Porque recomendamos",
+    message: "Este grupo usa temas associados aos teus favoritos, historico, watchlist ou ratings positivos.",
+    signals: ["temas", "atividade"],
+    confidence: "baseline",
+  },
+  "activity-types": {
+    title: "Porque recomendamos",
+    message: "Este grupo usa tipos de conteudo que aparecem na tua atividade recente.",
+    signals: ["tipo de conteudo", "atividade"],
+    confidence: "baseline",
+  },
+  "popular-fallback": {
+    title: "Porque recomendamos",
+    message: "Este grupo completa as sugestoes com conteudos publicados bem avaliados.",
+    signals: ["ratings agregados", "catalogo publicado"],
+    confidence: "baseline",
+  },
+  "cold-start-popular": {
+    title: "Porque recomendamos",
+    message: "Como ainda ha poucos sinais teus, este grupo mostra conteudos populares do catalogo.",
+    signals: ["ratings agregados", "catalogo publicado"],
+    confidence: "cold-start",
+  },
+  "cold-start-recent": {
+    title: "Porque recomendamos",
+    message: "Como ainda ha poucos sinais teus, este grupo mostra conteudos adicionados recentemente.",
+    signals: ["catalogo publicado"],
+    confidence: "cold-start",
+  },
+  "cold-start-catalog": {
+    title: "Porque recomendamos",
+    message: "Como ainda ha poucos sinais teus, este grupo mostra uma selecao geral do catalogo.",
+    signals: ["catalogo publicado"],
+    confidence: "cold-start",
+  },
+};
+
+export function buildRecommendationExplanation(reasonCode) {
+  return EXPLANATIONS[reasonCode] ?? {
+    title: "Porque recomendamos",
+    message: "Este grupo foi gerado por regras simples da recomendacao baseline.",
+    signals: ["catalogo publicado"],
+    confidence: "baseline",
+  };
+}
+```
+
+5. Explicacao do codigo ou da decisao.
+
+O mapa usa mensagens fechadas e auditaveis. A app nao inventa uma explicacao nova em runtime; escolhe uma explicacao aprovada para cada regra.
+
+6. Validacao do passo.
+
+```bash
+node -e "import('./src/modules/recommendations/recommendation-explanations.js').then(({ buildRecommendationExplanation }) => console.log(buildRecommendationExplanation('cold-start-popular').confidence))"
+```
+
+Resultado esperado: `cold-start`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Sem fallback para `reasonCode` desconhecido, uma alteracao futura pode deixar a UI sem explicacao.
+
+### Passo 2 - Acrescentar explicacao ao service
+
+1. Objetivo do passo.
+
+Atualizar o service do `BK-MF3-05` para devolver `explanation` em cada grupo.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `backend/src/modules/recommendations/recommendations.service.js`
+    - LOCALIZACAO: import e funcao `group`
+
+3. Instrucoes concretas.
+
+Adiciona o import e substitui a funcao `group` pela versao abaixo.
+
+4. Codigo completo.
+
+```js
+import { buildRecommendationExplanation } from "./recommendation-explanations.js";
+
+function group(id, title, reasonCode, items) {
+  return {
+    id,
+    title,
+    reasonCode,
+    explanation: buildRecommendationExplanation(reasonCode),
+    items: items.map(publicCard),
+  };
+}
+```
+
+5. Explicacao do codigo ou da decisao.
+
+O algoritmo nao muda. Apenas acrescentamos uma explicacao ao contrato de resposta. Isto evita reescrever recomendacao no BK errado.
+
+6. Validacao do passo.
+
+```bash
+curl -i http://localhost:3000/api/recommendations/me
+```
+
+Resultado esperado com sessao: cada grupo contem `explanation.title`, `explanation.message`, `signals` e `confidence`.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Criar outro endpoint, como `/api/recommendations/explain`, dividiria a fonte de verdade e podia deixar recomendacoes e explicacoes desalinhadas.
+
+### Passo 3 - Criar componente de explicacao
+
+1. Objetivo do passo.
+
+Mostrar a explicacao ao utilizador de forma curta e clara.
+
+2. Ficheiros envolvidos.
+    - CRIAR: `frontend/src/components/recommendations/RecommendationExplanation.jsx`
+    - LOCALIZACAO: ficheiro completo
+
+3. Instrucoes concretas.
+
+Cria o componente abaixo.
+
+4. Codigo completo.
+
+```jsx
+export function RecommendationExplanation({ explanation }) {
+  if (!explanation) return null;
+
+  return (
+    <aside className="recommendation-explanation">
+      <h3>{explanation.title}</h3>
+      <p>{explanation.message}</p>
+      <ul aria-label="Sinais usados">
+        {explanation.signals.map((signal) => (
+          <li key={signal}>{signal}</li>
+        ))}
+      </ul>
+    </aside>
+  );
+}
+```
+
+5. Explicacao do codigo ou da decisao.
+
+O componente mostra sinais agregados, como "catalogo publicado", mas nao mostra IDs, listas completas ou historico detalhado.
+
+6. Validacao do passo.
+
+```bash
+npm --prefix frontend run build
+```
+
+Resultado esperado: build sem erros.
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Mostrar dados detalhados do historico dentro da explicacao seria excesso de exposicao de dados pessoais.
+
+### Passo 4 - Atualizar pagina `/para-si`
+
+1. Objetivo do passo.
+
+Integrar explicabilidade nos grupos existentes.
+
+2. Ficheiros envolvidos.
+    - EDITAR: `frontend/src/pages/ForYouPage.jsx`
+    - LOCALIZACAO: imports e componente `RecommendationGroup`
+
+3. Instrucoes concretas.
+
+Importa `RecommendationExplanation` e coloca-o dentro de cada grupo, antes da lista de cards.
+
+4. Codigo completo.
+
+Trecho final esperado:
+
+```jsx
+import { Link } from "react-router-dom";
+import { RecommendationExplanation } from "../components/recommendations/RecommendationExplanation.jsx";
+
+function RecommendationGroup({ group }) {
+  if (group.items.length === 0) return null;
+
+  return (
+    <section className="recommendation-group" aria-label={group.title}>
+      <h2>{group.title}</h2>
+      <RecommendationExplanation explanation={group.explanation} />
+      <ul className="content-grid">
+        {group.items.map((item) => (
+          <li key={item.id}>
+            <article className="content-card">
+              {item.posterUrl && <img src={item.posterUrl} alt="" />}
+              <h3>{item.title}</h3>
+              <p>{item.type}</p>
+              <Link to={`/catalogo/${item.slug}`}>Ver detalhe</Link>
+            </article>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+```
+
+5. Explicacao do codigo ou da decisao.
+
+A explicacao fica junto do grupo que explica. O utilizador nao precisa procurar uma pagina separada para perceber a sugestao.
+
+6. Validacao do passo.
+
+Abre `/para-si` com sessao iniciada e confirma que cada grupo visivel mostra "Porque recomendamos".
+
+7. Caso negativo, erro comum ou risco que este passo evita.
+
+Se a explicacao ficar fora do grupo, o utilizador pode nao perceber a que sugestao ela pertence.
 
 ## Criterios de aceite (mensuraveis)
 
-- Condicao: fluxo principal de `BK-MF3-06` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P2`.
-- Metrica/Limiar: minimo de 1 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+- `GET /api/recommendations/me` devolve `explanation` em todos os grupos.
+- Cada `explanation` contem `title`, `message`, `signals` e `confidence`.
+- Cold start mostra mensagem clara de poucos sinais.
+- A UI `/para-si` mostra "Porque recomendamos" por grupo visivel.
+- A explicacao nao contem `userId`, `contentId` de historico, emails ou tokens.
+- `reasonCode` desconhecido recebe mensagem fallback.
+
+## Validacao final
+
+```bash
+npm --prefix backend test
+npm --prefix frontend run build
+curl -i http://localhost:3000/api/recommendations/me
+```
+
+Resultado esperado: build e testes passam; resposta autenticada inclui `explanation`.
 
 ## Evidence para PR/defesa
 
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
+- `pr`: referencia do PR/commit com explicabilidade.
+- `proof`: resposta JSON com `explanation`.
+- `proof`: captura de `/para-si` com "Porque recomendamos".
+- `neg`: `reasonCode` desconhecido tem fallback, sem dados pessoais expostos.
 
-## Proximo BK recomendado
+## Handoff
 
-`BK-MF4-01`
+A `MF3` fica fechada com ratings, comentarios, pesquisa, filtros, discovery, recomendacao baseline e explicabilidade. O `BK-MF4-01` pode iniciar monetizacao solidaria sem alterar os contratos de descoberta.
+
+## Snippet tecnico aplicavel
+
+O codigo aplicavel esta nos passos 1 a 4. O ponto central deste BK e:
+
+```js
+explanation: buildRecommendationExplanation(reasonCode),
+```
+
+Este trecho liga cada regra baseline a uma mensagem compreensivel.
 
 ## Changelog
 
-- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+- `2026-04-13`: retrofit para contrato pedagogico v3.
+- `2026-06-07`: guia reescrito com explicabilidade, privacidade, frontend e validacao mensuravel.
