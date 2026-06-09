@@ -14,6 +14,7 @@ import { systemRouter } from "./modules/system/system.routes.js";
 import { libraryRouter } from "./modules/library/library.routes.js";
 import { playbackRouter } from "./modules/playback/playback.routes.js";
 import { userRouter } from "./modules/users/user.routes.js";
+import { ratingsRouter } from "./modules/ratings/ratings.routes.js";
 
 /**
  * Creates the Express application without opening a network port.
@@ -44,6 +45,8 @@ export function createApp() {
     // Error middlewares remain last so they see all unmatched routes and failures.
     app.use(notFoundHandler);
     app.use(errorHandler);
+
+    app.use("/api/ratings", ratingsRouter);
 
     return app;
 }
