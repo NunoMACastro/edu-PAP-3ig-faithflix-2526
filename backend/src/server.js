@@ -7,6 +7,7 @@ import { ensureLibraryIndexes } from "./modules/library/library.service.js";
 import { ensurePlaybackIndexes } from "./modules/playback/playback.service.js";
 import { logger } from "./utils/logger.js";
 import { ensureRatingIndexes } from "./modules/ratings/ratings.service.js";
+import { ensureCommentIndexes } from "./modules/comments/comments.service.js";
 
 
 await ensureAuthIndexes();
@@ -15,6 +16,7 @@ await ensureTaxonomyIndexes();
 await ensurePlaybackIndexes();
 await ensureLibraryIndexes();
 await ensureRatingIndexes();
+await ensureCommentIndexes();
 
 const app = createApp();
 

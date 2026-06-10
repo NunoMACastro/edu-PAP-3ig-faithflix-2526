@@ -15,6 +15,8 @@ import { libraryRouter } from "./modules/library/library.routes.js";
 import { playbackRouter } from "./modules/playback/playback.routes.js";
 import { userRouter } from "./modules/users/user.routes.js";
 import { ratingsRouter } from "./modules/ratings/ratings.routes.js";
+import { commentsRouter } from "./modules/comments/comments.routes.js";
+
 
 /**
  * Creates the Express application without opening a network port.
@@ -47,6 +49,8 @@ export function createApp() {
     app.use(errorHandler);
 
     app.use("/api/ratings", ratingsRouter);
+
+    app.use("/api/comments", commentsRouter);
 
     return app;
 }

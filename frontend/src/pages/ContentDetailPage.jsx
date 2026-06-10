@@ -35,7 +35,7 @@ export function ContentDetailPage() {
             .catch((requestError) => {
                 if (active) {
                     setError(requestError.message);
-                }
+                }0
             })
             .finally(() => {
                 if (active) {
@@ -89,6 +89,9 @@ export function ContentDetailPage() {
                 </Link>
             </div>
             <LibraryActions contentId={content.id} />
+            <CommentsPanel contentId={content.id} />
         </section>
     );
+
+    
 }
