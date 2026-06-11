@@ -21,7 +21,7 @@ export function ContentDetailPage() {
 
     useEffect(() => {
         let active = true;
-
+        <RelatedContent contentId={content.id} />
         setLoading(true);
         setError("");
 
