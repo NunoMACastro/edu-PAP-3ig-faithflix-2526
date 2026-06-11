@@ -8,6 +8,7 @@ import { ensurePlaybackIndexes } from "./modules/playback/playback.service.js";
 import { logger } from "./utils/logger.js";
 import { ensureRatingIndexes } from "./modules/ratings/ratings.service.js";
 import { ensureCommentIndexes } from "./modules/comments/comments.service.js";
+import { ensureSearchIndexes } from "./modules/search/search.service.js";
 
 
 await ensureAuthIndexes();
@@ -17,6 +18,7 @@ await ensurePlaybackIndexes();
 await ensureLibraryIndexes();
 await ensureRatingIndexes();
 await ensureCommentIndexes();
+await ensureSearchIndexes();
 
 const app = createApp();
 
