@@ -9,6 +9,7 @@ import { LoginPage } from "../pages/LoginPage.jsx";
 import { MyLibraryPage } from "../pages/MyLibraryPage.jsx";
 import { PlaybackPage } from "../pages/PlaybackPage.jsx";
 import { SearchPage } from "../pages/SearchPage.jsx";
+import { DiscoveryHomePage } from "../pages/DiscoveryHomePage.jsx";
 import {
     AssociationsPage,
     HomePage,
@@ -40,6 +41,7 @@ export function AppRoutes() {
                 <Route path="/admin/utilizadores" element={<AdminUsersPage />} />
                 <Route path="/notificacoes" element={<NotificationsPage />} />
                 <Route path="/pesquisa" element={<SearchPage />} />
+                <Route path="/descobrir" element={<DiscoveryHomePage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </AppLayout>

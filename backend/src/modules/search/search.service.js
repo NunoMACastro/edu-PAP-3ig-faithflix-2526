@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
-import { assertSearchQuery, escapeRegExp, parsePagination } from "./search.validation.js";
+import { assertSearchQuery, escapeRegExp, parsePagination, parseSearchFilters } from "./search.validation.js";
 
 function publicSearchItem(content, taxonomyNamesById) {
   const taxonomyNames = (content.taxonomyIds ?? [])
@@ -29,6 +29,7 @@ export async function searchContents(params) {
   const db = await getDb();
   const query = assertSearchQuery(params.q);
   const { page, limit } = parsePagination(params);
+  const filters = parseSearchFilters(params);
   const expression = new RegExp(escapeRegExp(query), "i");
 
   const matchingTaxonomies = await db.collection("taxonomies")
@@ -36,7 +37,7 @@ export async function searchContents(params) {
     .project({ _id: 1, name: 1 })
     .toArray();
 
-  const taxonomyIds = matchingTaxonomies.map((taxonomy) => taxonomy._id);
+  const taxonomyIdsFromQuery = matchingTaxonomies.map((taxonomy) => taxonomy._id);
   const taxonomyNamesById = new Map(
     matchingTaxonomies.map((taxonomy) => [String(taxonomy._id), taxonomy.name]),
   );
@@ -47,18 +48,43 @@ export async function searchContents(params) {
       { title: expression },
       { synopsis: expression },
       { slug: expression },
-      ...(taxonomyIds.length > 0 ? [{ taxonomyIds: { $in: taxonomyIds } }] : []),
+      ...(taxonomyIdsFromQuery.length > 0 ? [{ taxonomyIds: { $in: taxonomyIdsFromQuery } }] : []),
     ],
   };
 
-  const [total, contents] = await Promise.all([
-    db.collection("contents").countDocuments(match),
-    db.collection("contents")
-      .find(match)
-      .sort({ title: 1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .toArray(),
+  if (filters.type) match.type = filters.type;
+  if (filters.taxonomyId) match.taxonomyIds = new ObjectId(filters.taxonomyId);
+
+  const sort =
+    filters.sort === "recent"
+      ? { publishedAt: -1, title: 1 }
+      : { title: 1 };
+
+  const basePipeline = [
+    { $match: match },
+    {
+      $lookup: {
+        from: "content_ratings",
+        localField: "_id",
+        foreignField: "contentId",
+        as: "ratings",
+      },
+    },
+    {
+      $addFields: {
+        ratingAverage: { $ifNull: [{ $avg: "$ratings.value" }, 0] },
+      },
+    },
+    { $sort: filters.sort === "rating" ? { ratingAverage: -1, title: 1 } : sort },
+  ];
+
+  const [totalRows, contents] = await Promise.all([
+    db.collection("contents").aggregate([...basePipeline, { $count: "total" }]).toArray(),
+    db.collection("contents").aggregate([
+      ...basePipeline,
+      { $skip: (page - 1) * limit },
+      { $limit: limit },
+    ]).toArray(),
   ]);
 
   const missingTaxonomyIds = [
@@ -85,7 +111,8 @@ export async function searchContents(params) {
     query,
     page,
     limit,
-    total,
+    total: totalRows[0]?.total ?? 0,
+    filters,
     items: contents.map((content) => publicSearchItem(content, taxonomyNamesById)),
   };
 }

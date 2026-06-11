@@ -1,3 +1,8 @@
+import { ObjectId } from "mongodb";
+
+export const SEARCH_SORTS = ["title", "recent", "rating"];
+export const SEARCH_TYPES = ["movie", "series", "episode", "documentary"];
+
 export function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -31,4 +36,30 @@ export function parsePagination(input) {
   }
 
   return { page, limit };
+}
+
+export function parseSearchFilters(input) {
+  const type = String(input.type ?? "").trim();
+  const sort = String(input.sort ?? "title").trim();
+  const taxonomyId = String(input.taxonomyId ?? "").trim();
+
+  if (type && !SEARCH_TYPES.includes(type)) {
+    const error = new Error("Tipo de conteudo invalido.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (!SEARCH_SORTS.includes(sort)) {
+    const error = new Error("Ordenacao invalida.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (taxonomyId && !ObjectId.isValid(taxonomyId)) {
+    const error = new Error("Taxonomia invalida.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return { type: type || null, sort, taxonomyId: taxonomyId || null };
 }

@@ -17,6 +17,8 @@ import { userRouter } from "./modules/users/user.routes.js";
 import { ratingsRouter } from "./modules/ratings/ratings.routes.js";
 import { commentsRouter } from "./modules/comments/comments.routes.js";
 import { searchRouter } from "./modules/search/search.routes.js";
+import { discoveryRouter } from "./modules/discovery/discovery.routes.js";
+
 
 
 /**
@@ -57,6 +59,10 @@ export function createApp() {
 
     //API de busca
     app.use("/api/search", searchRouter);
+
+    //API de descoberta
+    app.use("/api/discovery", discoveryRouter);
+
 
     return app;
 }
