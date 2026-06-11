@@ -16,6 +16,7 @@ import { playbackRouter } from "./modules/playback/playback.routes.js";
 import { userRouter } from "./modules/users/user.routes.js";
 import { ratingsRouter } from "./modules/ratings/ratings.routes.js";
 import { commentsRouter } from "./modules/comments/comments.routes.js";
+import { searchRouter } from "./modules/search/search.routes.js";
 
 
 /**
@@ -48,9 +49,14 @@ export function createApp() {
     app.use(notFoundHandler);
     app.use(errorHandler);
 
+    //API de avaliações
     app.use("/api/ratings", ratingsRouter);
 
+    //API de comentários
     app.use("/api/comments", commentsRouter);
+
+    //API de busca
+    app.use("/api/search", searchRouter);
 
     return app;
 }

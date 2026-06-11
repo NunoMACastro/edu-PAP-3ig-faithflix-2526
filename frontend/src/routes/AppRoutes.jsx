@@ -8,6 +8,7 @@ import { ContentDetailPage } from "../pages/ContentDetailPage.jsx";
 import { LoginPage } from "../pages/LoginPage.jsx";
 import { MyLibraryPage } from "../pages/MyLibraryPage.jsx";
 import { PlaybackPage } from "../pages/PlaybackPage.jsx";
+import { SearchPage } from "../pages/SearchPage.jsx";
 import {
     AssociationsPage,
     HomePage,
