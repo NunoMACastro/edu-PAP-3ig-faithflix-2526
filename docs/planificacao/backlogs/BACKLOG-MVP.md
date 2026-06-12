@@ -76,7 +76,7 @@ Regras obrigatorias:
 | `MF0` | `TODO` | `0/6`     |
 | `MF1` | `DONE` | `6/6`     |
 | `MF2` | `TODO` | `0/8`     |
-| `MF3` | `TODO` | `0/6`     |
+| `MF3` | `DONE` | `6/6`     |
 | `MF4` | `TODO` | `0/7`     |
 | `MF5` | `TODO` | `0/6`     |
 | `MF6` | `TODO` | `0/6`     |
@@ -197,12 +197,12 @@ Estado do guia indica a fase de criacao documental.
 
 | BK          | Titulo                             | Owner   | Apoio   | Pri | Estado | Esforco | Dependencias            | RF/RNF           |
 | ----------- | ---------------------------------- | ------- | ------- | --- | ------ | ------- | ----------------------- | ---------------- |
-| `BK-MF3-01` | Ratings e agregacao                | Davi    | Matheus | P1  | TODO   | M       | `BK-MF2-07`             | RF19, RF21       |
-| `BK-MF3-02` | Comentarios curtos moderados       | Matheus | Kaue    | P2  | TODO   | M       | `BK-MF3-01`             | RF20             |
-| `BK-MF3-03` | Pesquisa unificada                 | Davi    | Mateus  | P0  | TODO   | M       | `BK-MF2-03`             | RF22             |
-| `BK-MF3-04` | Filtros, carrosseis e relacionados | Mateus  | Davi    | P1  | TODO   | M       | `BK-MF3-03`             | RF23, RF24, RF25 |
-| `BK-MF3-05` | Recomendacao baseline + cold start | Davi    | Matheus | P1  | TODO   | L       | `BK-MF3-01`,`BK-MF2-07` | RF26, RF27       |
-| `BK-MF3-06` | Explicabilidade de recomendacao    | Mateus  | Davi    | P2  | TODO   | S       | `BK-MF3-05`             | RF28, RNF34      |
+| `BK-MF3-01` | Ratings e agregacao                | Davi    | Matheus | P1  | DONE   | M       | `BK-MF2-07`             | RF19, RF21       |
+| `BK-MF3-02` | Comentarios curtos moderados       | Matheus | Kaue    | P2  | DONE   | M       | `BK-MF3-01`             | RF20             |
+| `BK-MF3-03` | Pesquisa unificada                 | Davi    | Mateus  | P0  | DONE   | M       | `BK-MF2-03`             | RF22             |
+| `BK-MF3-04` | Filtros, carrosseis e relacionados | Mateus  | Davi    | P1  | DONE   | M       | `BK-MF3-03`             | RF23, RF24, RF25 |
+| `BK-MF3-05` | Recomendacao baseline + cold start | Davi    | Matheus | P1  | DONE   | L       | `BK-MF3-01`,`BK-MF2-07` | RF26, RF27       |
+| `BK-MF3-06` | Explicabilidade de recomendacao    | Mateus  | Davi    | P2  | DONE   | S       | `BK-MF3-05`             | RF28, RNF34      |
 
 ---
 

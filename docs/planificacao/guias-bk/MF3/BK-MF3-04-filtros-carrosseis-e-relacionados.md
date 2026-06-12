@@ -8,7 +8,7 @@
 - `owner`: `Mateus`
 - `apoio`: `Davi`
 - `prioridade`: `P1`
-- `estado`: `TODO`
+- `estado`: `DONE`
 - `esforco`: `M`
 - `dependencias`: `BK-MF3-03`
 - `rf_rnf`: `RF23, RF24, RF25`
@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF3-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-04-filtros-carrosseis-e-relacionados.md`
-- `last_updated`: `2026-06-07`
+- `last_updated`: `2026-06-12`
 
 ## Bloco pedagogico (obrigatorio)
 

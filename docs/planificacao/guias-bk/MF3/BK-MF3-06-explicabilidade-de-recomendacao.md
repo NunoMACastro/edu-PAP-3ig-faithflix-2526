@@ -8,7 +8,7 @@
 - `owner`: `Mateus`
 - `apoio`: `Davi`
 - `prioridade`: `P2`
-- `estado`: `TODO`
+- `estado`: `DONE`
 - `esforco`: `S`
 - `dependencias`: `BK-MF3-05`
 - `rf_rnf`: `RF28, RNF34`
@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF4-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md`
-- `last_updated`: `2026-06-07`
+- `last_updated`: `2026-06-12`
 
 ## Bloco pedagogico (obrigatorio)
 

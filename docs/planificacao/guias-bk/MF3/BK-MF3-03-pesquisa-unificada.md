@@ -8,7 +8,7 @@
 - `owner`: `Davi`
 - `apoio`: `Mateus`
 - `prioridade`: `P0`
-- `estado`: `TODO`
+- `estado`: `DONE`
 - `esforco`: `M`
 - `dependencias`: `BK-MF2-03`
 - `rf_rnf`: `RF22`
@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF3-04`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-03-pesquisa-unificada.md`
-- `last_updated`: `2026-06-07`
+- `last_updated`: `2026-06-12`
 
 ## Bloco pedagogico (obrigatorio)
 

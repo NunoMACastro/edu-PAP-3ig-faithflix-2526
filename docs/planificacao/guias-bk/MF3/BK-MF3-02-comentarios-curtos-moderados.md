@@ -8,7 +8,7 @@
 - `owner`: `Matheus`
 - `apoio`: `Kaue`
 - `prioridade`: `P2`
-- `estado`: `TODO`
+- `estado`: `DONE`
 - `esforco`: `M`
 - `dependencias`: `BK-MF3-01`
 - `rf_rnf`: `RF20`
@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF3-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-02-comentarios-curtos-moderados.md`
-- `last_updated`: `2026-06-07`
+- `last_updated`: `2026-06-12`
 
 ## Bloco pedagogico (obrigatorio)
 

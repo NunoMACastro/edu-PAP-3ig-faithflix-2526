@@ -8,7 +8,7 @@
 - `owner`: `Davi`
 - `apoio`: `Matheus`
 - `prioridade`: `P1`
-- `estado`: `TODO`
+- `estado`: `DONE`
 - `esforco`: `L`
 - `dependencias`: `BK-MF3-01,BK-MF2-07`
 - `rf_rnf`: `RF26, RF27`
@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF3-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-05-recomendacao-baseline-cold-start.md`
-- `last_updated`: `2026-06-07`
+- `last_updated`: `2026-06-12`
 
 ## Bloco pedagogico (obrigatorio)
 
