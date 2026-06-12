@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { recommendationsApi } from "../services/api/recommendationsApi.js";
+import { RecommendationExplanation } from "../components/recommendations/RecommendationExplanation.jsx";
 
 function RecommendationGroup({ group }) {
   if (group.items.length === 0) return null;
@@ -8,6 +9,29 @@ function RecommendationGroup({ group }) {
   return (
     <section className="recommendation-group" aria-label={group.title}>
       <h2>{group.title}</h2>
+      <ul className="content-grid">
+        {group.items.map((item) => (
+          <li key={item.id}>
+            <article className="content-card">
+              {item.posterUrl && <img src={item.posterUrl} alt="" />}
+              <h3>{item.title}</h3>
+              <p>{item.type}</p>
+              <Link to={`/catalogo/${item.slug}`}>Ver detalhe</Link>
+            </article>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function RecommendationGroup({ group }) {
+  if (group.items.length === 0) return null;
+
+  return (
+    <section className="recommendation-group" aria-label={group.title}>
+      <h2>{group.title}</h2>
+      <RecommendationExplanation explanation={group.explanation} />
       <ul className="content-grid">
         {group.items.map((item) => (
           <li key={item.id}>
