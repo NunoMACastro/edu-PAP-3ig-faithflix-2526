@@ -10,6 +10,7 @@ import { MyLibraryPage } from "../pages/MyLibraryPage.jsx";
 import { PlaybackPage } from "../pages/PlaybackPage.jsx";
 import { SearchPage } from "../pages/SearchPage.jsx";
 import { DiscoveryHomePage } from "../pages/DiscoveryHomePage.jsx";
+import { ForYouPage } from "../pages/ForYouPage.jsx";
 import {
     AssociationsPage,
     HomePage,
@@ -43,6 +44,7 @@ export function AppRoutes() {
                 <Route path="/pesquisa" element={<SearchPage />} />
                 <Route path="/descobrir" element={<DiscoveryHomePage />} />
                 <Route path="*" element={<NotFoundPage />} />
+                <Route path="/para-si" element={<ForYouPage />} />
             </Routes>
         </AppLayout>
     );
