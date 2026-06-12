@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
+import { buildRecommendationExplanation } from "./recommendation-explanations.js";
 
 function asObjectId(id, label) {
   if (!ObjectId.isValid(id)) {
@@ -148,6 +149,7 @@ function group(id, title, reasonCode, items) {
     id,
     title,
     reasonCode,
+    explanation: buildRecommendationExplanation(reasonCode),
     items: items.map(publicCard),
   };
 }
