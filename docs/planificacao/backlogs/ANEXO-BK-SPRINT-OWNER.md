@@ -40,13 +40,13 @@ Consolidar BK, sprint e ownership para validação cruzada rápida.
 | BK-MF3-04 | MF3 | S05 | Mateus | Davi | P1 | Core | RF23, RF24, RF25 | BK-MF3-03 | docs/planificacao/guias-bk/MF3/BK-MF3-04-filtros-carrosseis-e-relacionados.md |
 | BK-MF3-05 | MF3 | S06 | Davi | Matheus | P1 | Core | RF26, RF27 | BK-MF3-01,BK-MF2-07 | docs/planificacao/guias-bk/MF3/BK-MF3-05-recomendacao-baseline-cold-start.md |
 | BK-MF3-06 | MF3 | S06 | Mateus | Davi | P2 | Core | RF28, RNF34 | BK-MF3-05 | docs/planificacao/guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md |
-| BK-MF4-01 | MF4 | S07 | Matheus | Davi | P0 | Reforco | RF35, RF36, RF38, RF39 | BK-MF2-01 | docs/planificacao/guias-bk/MF4/BK-MF4-01-planos-ciclo-subscricao.md |
+| BK-MF4-01 | MF4 | S07 | Matheus | Davi | P0 | Reforco | RF35, RF36, RF38, RF39 | BK-MF2-01,BK-MF2-05 | docs/planificacao/guias-bk/MF4/BK-MF4-01-planos-ciclo-subscricao.md |
 | BK-MF4-02 | MF4 | S07 | Davi | Matheus | P0 | Reforco | RF37, RF40 | BK-MF4-01 | docs/planificacao/guias-bk/MF4/BK-MF4-02-metodos-pagamento-simulados-trial.md |
-| BK-MF4-03 | MF4 | S08 | Kaue | Davi | P0 | Reforco | RF41 | BK-MF1-04 | docs/planificacao/guias-bk/MF4/BK-MF4-03-candidaturas-associacoes.md |
+| BK-MF4-03 | MF4 | S08 | Kaue | Davi | P0 | Reforco | RF41 | BK-MF2-02 | docs/planificacao/guias-bk/MF4/BK-MF4-03-candidaturas-associacoes.md |
 | BK-MF4-04 | MF4 | S08 | Matheus | Kaue | P0 | Reforco | RF42, RF43 | BK-MF4-03 | docs/planificacao/guias-bk/MF4/BK-MF4-04-aprovacao-entrada-pool.md |
-| BK-MF4-05 | MF4 | S08 | Davi | Matheus | P0 | Reforco | RF44, RF45 | BK-MF4-04 | docs/planificacao/guias-bk/MF4/BK-MF4-05-distribuicao-mensal-rotacao.md |
+| BK-MF4-05 | MF4 | S08 | Davi | Matheus | P0 | Reforco | RF44, RF45 | BK-MF4-04,BK-MF4-02 | docs/planificacao/guias-bk/MF4/BK-MF4-05-distribuicao-mensal-rotacao.md |
 | BK-MF4-06 | MF4 | S08 | Kaue | Mateus | P1 | Core | RF46, RF47, RF48 | BK-MF4-05 | docs/planificacao/guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md |
-| BK-MF4-08 | MF4 | S07 | Mateus | Davi | P1 | Core | RF52, RF53, RF54 | BK-MF4-01 | docs/planificacao/guias-bk/MF4/BK-MF4-08-notificacoes-transacionais-e-preferencias.md |
+| BK-MF4-08 | MF4 | S07 | Mateus | Davi | P1 | Core | RF52, RF53, RF54 | BK-MF4-02,BK-MF2-05 | docs/planificacao/guias-bk/MF4/BK-MF4-08-notificacoes-transacionais-e-preferencias.md |
 | BK-MF5-01 | MF5 | S09 | Matheus | Kaue | P0 | Reforco | RF55 | BK-MF2-01 | docs/planificacao/guias-bk/MF5/BK-MF5-01-exportacao-dados-utilizador.md |
 | BK-MF5-02 | MF5 | S09 | Matheus | Kaue | P0 | Reforco | RF56 | BK-MF5-01 | docs/planificacao/guias-bk/MF5/BK-MF5-02-eliminacao-conta-dados.md |
 | BK-MF5-03 | MF5 | S09 | Mateus | Matheus | P0 | Reforco | RF57 | BK-MF2-01 | docs/planificacao/guias-bk/MF5/BK-MF5-03-gestao-consentimentos.md |

@@ -65,6 +65,8 @@ Mesmo quando varios BK aparecem na mesma sprint, a ordem abaixo deve ser respeit
 | `Sprint 2` | `BK-MF1-03` e `BK-MF1-04` -> `BK-MF1-05` -> `BK-MF1-06` -> `BK-MF2-01` | `BK-MF2-01` deve partir de fundacao completa, health/logging e smoke verde. |
 | `Sprint 3` | `BK-MF2-02` -> `BK-MF2-03` -> `BK-MF2-04` | Catalogo usa roles de `BK-MF2-02`; detalhe usa contrato de catalogo. |
 | `Sprint 4` | `BK-MF2-05` -> `BK-MF2-06` e `BK-MF2-07` -> `BK-MF2-08` | E2E fecha apenas depois de player, media controls, favoritos, watchlist e historico. |
+| `Sprint 7` | `BK-MF4-01` -> `BK-MF4-02` -> `BK-MF4-08` | Notificacoes transacionais dependem de subscricoes, checkout/trial e progresso de playback ja existentes. |
+| `Sprint 8` | `BK-MF4-03` -> `BK-MF4-04` -> `BK-MF4-05` -> `BK-MF4-06` | Distribuicao mensal exige associacoes aprovadas e contratos de subscricao/pagamento da Sprint 7. |
 
 PRs de BK dependentes so devem ser integrados depois do PR da dependencia estar merged ou, em alternativa, depois de existir branch de integracao validada pelo owner tecnico.
 

@@ -1,4 +1,4 @@
-# BK-MF4-05 - Distribuicao mensal e rotacao
+# BK-MF4-05 - Distribuição mensal e rotação
 
 ## Header
 
@@ -10,7 +10,7 @@
 - `prioridade`: `P0`
 - `estado`: `TODO`
 - `esforco`: `L`
-- `dependencias`: `BK-MF4-04`
+- `dependencias`: `BK-MF4-04,BK-MF4-02`
 - `rf_rnf`: `RF44, RF45`
 - `fase_documental`: `Fase 1`
 - `sprint`: `S08`
@@ -19,58 +19,108 @@
 - `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-05-distribuicao-mensal-rotacao.md`
 - `last_updated`: `2026-06-13`
 
-## Bloco pedagogico (obrigatorio)
+## Bloco pedagógico (obrigatório)
 
-Neste BK vais criar a distribuicao mensal da pool solidaria. O sistema calcula quanto entra na pool a partir de subscricoes ativas, escolhe associacoes elegiveis por rotacao deterministica e guarda um registo auditavel por mes.
+Neste BK vais criar a distribuição mensal da pool solidária. O sistema calcula quanto entra na pool a partir de subscrições ativas, escolhe associações elegíveis por rotação determinística e guarda um registo auditável por mês.
 
-### Objetivo pedagogico
+### Objetivo pedagógico
 
-- Implementar um processamento idempotente: o mesmo mes nao pode ser distribuido duas vezes.
-- Aplicar rotacao justa entre associacoes elegiveis.
-- Reconciliar valores para que a soma distribuida bata certo com o total da pool.
-- Preparar relatorios do `BK-MF4-06`.
+- Implementar um processamento idempotente: o mesmo mês não pode ser distribuído duas vezes.
+- Aplicar rotação justa entre associações elegíveis.
+- Reconciliar valores para que a soma distribuída bata certo com o total da pool.
+- Preparar relatórios do `BK-MF4-06`.
+
+### Importância funcional
+
+- Este BK implementa o núcleo diferencial do FaithFlix: transformar subscrições em impacto social mensurável.
+- A distribuição mensal precisa de ser auditável, repetível e justa para que a defesa PAP seja credível.
+- O histórico produzido aqui será lido pelos relatórios e pela página pública no `BK-MF4-06`.
+
+### Scope-in
+
+- Validar mês no formato `YYYY-MM`.
+- Calcular a pool a partir de subscrições pagas ativas.
+- Distribuir em cêntimos para evitar erros de números decimais.
+- Aplicar rotação determinística entre associações elegíveis.
+- Garantir idempotência mensal e endpoint admin de execução/consulta.
+
+### Scope-out
+
+- Não fazer transferência bancária real.
+- Não incluir trial como receita paga da pool.
+- Não criar relatórios públicos ou CSV; isso entra no `BK-MF4-06`.
+- Não usar sorteio invisível nem decisão manual sem registo.
 
 ### Tempo estimado
 
 - 3 blocos de 90 minutos.
-- Se a reconciliacao de centimos falhar, corrigir antes de criar frontend.
+- Se a reconciliação de cêntimos falhar, corrigir antes de criar frontend.
 
-### Conceitos essenciais
+### Glossário rápido
 
-- Pool mensal e o total solidario calculado a partir de subscricoes ativas.
-- Rotacao deterministica usa dados persistidos, nao sorteio invisivel.
-- Idempotencia significa que repetir o comando do mesmo mes nao cria duplicados.
-- `CANONICO`: RF44 exige distribuicao mensal de percentagem; RF45 exige rotacao automatica.
-- `DERIVADO`: o MVP distribui por centimos inteiros para evitar erros de ponto flutuante.
+- Pool mensal: valor solidário disponível para distribuir num mês.
+- Cêntimos: unidade inteira usada para representar dinheiro sem erros de vírgula flutuante.
+- Idempotência: repetir o pedido do mesmo mês não cria uma segunda distribuição.
+- Rotação determinística: ordem previsível calculada a partir do histórico guardado.
+
+### Conceitos teóricos essenciais
+
+- Domínio FaithFlix: parte da receita das subscrições pagas é distribuída por associações elegíveis.
+- Backend: o service calcula, divide, reconcilia e grava a distribuição numa única operação lógica.
+- Frontend: o painel admin envia o mês e mostra a distribuição persistida.
+- Segurança: apenas admin executa a distribuição, porque o registo tem impacto financeiro e documental.
+- Dados: `pool_distributions` guarda total, linhas por associação, mês e admin que executou.
+- `CANONICO`: RF44 exige distribuição mensal de percentagem; RF45 exige rotação automática.
+- `DERIVADO`: o MVP distribui por cêntimos inteiros para evitar erros de ponto flutuante.
 
 ### Erros comuns
 
 - Usar numeros decimais para dinheiro.
-- Executar o mesmo mes duas vezes.
-- Incluir associacoes inativas ou pausadas.
-- Nao guardar detalhe por associacao.
+- Executar o mesmo mês duas vezes.
+- Incluir associações inativas ou pausadas.
+- Não guardar detalhe por associação.
 
-### Check de compreensao
+### Check de compreensão
 
 - [ ] Sei explicar como a pool mensal e calculada.
-- [ ] Sei provar que uma associacao inelegivel nao recebe valor.
+- [ ] Sei provar que uma associação inelegivel não recebe valor.
 - [ ] Sei demonstrar que a soma final e igual ao total distribuido.
 
-## Bloco operacional (obrigatorio)
+## Bloco operacional (obrigatório)
 
-### Pre-condicoes
+### Pré-condições
 
 - `BK-MF4-04` executado com `charities.status` e `charities.poolStatus`.
-- `BK-MF4-01` executado com `subscriptions` e `subscription_plans`.
+- `BK-MF4-02` executado com subscrições pagas, trial e dados de pagamento simulado.
 - MongoDB ativo.
 
-### Guia de execucao (passo-a-passo)
+### Arquitetura do BK
 
-### Passo 1 - Criar validacao de mes de distribuicao
+- Backend: validação de mês, service de distribuição, controller e rotas admin.
+- Persistência: `pool_distributions` guarda uma execução por mês.
+- Frontend: `AdminPoolDistributionPage` permite executar e consultar o mês.
+- Segurança: endpoints de distribuição exigem `requireRole(["admin"])`.
+- Integração: `BK-MF4-06` lê `pool_distributions` sem recalcular valores.
+
+### Ficheiros a criar, editar e rever
+
+- CRIAR: `backend/src/modules/charities/pool-distribution.validation.js`
+- CRIAR: `backend/src/modules/charities/pool-distribution.service.js`
+- CRIAR: `backend/src/modules/charities/pool-distribution.controller.js`
+- CRIAR: `frontend/src/pages/AdminPoolDistributionPage.jsx`
+- EDITAR: `backend/src/modules/charities/charities.routes.js`
+- EDITAR: `backend/src/server.js`
+- EDITAR: `frontend/src/services/api/charitiesApi.js`
+- EDITAR: `frontend/src/routes/AppRoutes.jsx`
+- REVER: `BK-MF4-04`, `BK-MF4-01`, `RF44`, `RF45`, `RNF19`, `RNF29`
+
+### Guia de execução (passo-a-passo)
+
+### Passo 1 - Criar validação de mês de distribuição
 
 1. Objetivo do passo.
 
-Normalizar o mes no formato `YYYY-MM`.
+Normalizar o mês no formato `YYYY-MM`.
 
 2. Ficheiros envolvidos.
     - CRIAR: `backend/src/modules/charities/pool-distribution.validation.js`
@@ -78,16 +128,16 @@ Normalizar o mes no formato `YYYY-MM`.
 
 3. Instrucoes concretas.
 
-Cria o ficheiro no modulo `charities`.
+Cria o ficheiro no módulo `charities`.
 
-4. Codigo completo.
+4. Código completo.
 
 ```js
 /**
- * Cria um erro HTTP previsivel para validacao do mes de distribuicao.
+ * Cria um erro HTTP previsivel para validação do mês de distribuição.
  *
  * @param {string} message Mensagem segura para devolver ao cliente.
- * @param {number} [statusCode=400] Codigo HTTP associado.
+ * @param {number} [statusCode=400] Código HTTP associado.
  * @returns {Error} Erro com `statusCode`.
  */
 function httpError(message, statusCode = 400) {
@@ -97,32 +147,32 @@ function httpError(message, statusCode = 400) {
 }
 
 /**
- * Valida o mes operacional da distribuicao no formato `YYYY-MM`.
+ * Valida o mês operacional da distribuição no formato `YYYY-MM`.
  *
  * @param {string} month Valor recebido da API ou da UI.
- * @returns {string} Mes normalizado.
- * @throws {Error} Quando o formato ou o numero do mes e invalido.
+ * @returns {string} Mês normalizado.
+ * @throws {Error} Quando o formato ou o número do mês e inválido.
  */
 export function assertDistributionMonth(month) {
   const value = String(month ?? "").trim();
   if (!/^\d{4}-\d{2}$/.test(value)) {
-    throw httpError("Mes de distribuicao invalido. Usa YYYY-MM.");
+    throw httpError("Mês de distribuição inválido. Usa YYYY-MM.");
   }
 
   const monthNumber = Number(value.slice(5, 7));
   if (monthNumber < 1 || monthNumber > 12) {
-    throw httpError("Mes de distribuicao invalido.");
+    throw httpError("Mês de distribuição inválido.");
   }
 
   return value;
 }
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicação do código ou da decisão.
 
-Um formato unico permite criar indice unico por mes e evita ambiguidades como `06/2026`.
+Um formato único permite criar indice único por mês e evita ambiguidades como `06/2026`.
 
-6. Validacao do passo.
+6. Validação do passo.
 
 ```bash
 node -e "import('./src/modules/charities/pool-distribution.validation.js').then(({ assertDistributionMonth }) => console.log(assertDistributionMonth('2026-06')))"
@@ -130,13 +180,13 @@ node -e "import('./src/modules/charities/pool-distribution.validation.js').then(
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Sem normalizacao, o mesmo mes podia aparecer como `2026-06` e `06/2026`.
+Sem normalizacao, o mesmo mês podia aparecer como `2026-06` e `06/2026`.
 
-### Passo 2 - Criar service de distribuicao
+### Passo 2 - Criar service de distribuição
 
 1. Objetivo do passo.
 
-Calcular pool, selecionar associacoes por rotacao e persistir run mensal.
+Calcular pool, selecionar associações por rotação e persistir run mensal.
 
 2. Ficheiros envolvidos.
     - CRIAR: `backend/src/modules/charities/pool-distribution.service.js`
@@ -146,18 +196,24 @@ Calcular pool, selecionar associacoes por rotacao e persistir run mensal.
 
 Cria o service abaixo.
 
-4. Codigo completo.
+4. Código completo.
 
 ```js
+/**
+ * Módulo de serviço para distribuição mensal da pool solidária.
+ *
+ * Calcula valores em cêntimos, aplica rotação entre associações elegíveis e
+ * grava execuções idempotentes para evitar duplicar distribuições do mesmo mês.
+ */
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { assertDistributionMonth } from "./pool-distribution.validation.js";
 
 /**
- * Converte uma distribuicao mensal para o formato publico da API.
+ * Converte uma distribuição mensal para o formato público da API.
  *
  * @param {object} run Documento da colecao `pool_distributions`.
- * @returns {object} Distribuicao sem campos internos.
+ * @returns {object} Distribuição sem campos internos.
  */
 function toPublicRun(run) {
   return {
@@ -176,18 +232,18 @@ function toPublicRun(run) {
 }
 
 /**
- * Divide um total em centimos por associacoes, preservando a soma exata.
+ * Divide um total em cêntimos por associações, preservando a soma exata.
  *
- * @param {number} totalCents Valor total da pool em centimos.
- * @param {object[]} charities Associacoes ja ordenadas pela rotacao deste mes.
- * @returns {object[]} Itens de distribuicao.
+ * @param {number} totalCents Valor total da pool em cêntimos.
+ * @param {object[]} charities Associações já ordenadas pela rotação deste mês.
+ * @returns {object[]} Itens de distribuição.
  */
 function splitCents(totalCents, charities) {
   const base = Math.floor(totalCents / charities.length);
   let remainder = totalCents - base * charities.length;
 
   return charities.map((charity, index) => {
-    // Os centimos sobrantes sao atribuidos aos primeiros itens da rotacao atual.
+    // Os cêntimos sobrantes sao atribuidos aos primeiros itens da rotação atual.
     const extra = remainder > 0 ? 1 : 0;
     remainder -= extra;
     return {
@@ -200,10 +256,10 @@ function splitCents(totalCents, charities) {
 }
 
 /**
- * Calcula o ponto de arranque da proxima rotacao.
+ * Calcula o ponto de arranque da proxima rotação.
  *
- * @param {object[]} charities Associacoes elegiveis ordenadas por aprovacao.
- * @param {object | null} lastRun Ultima distribuicao gravada.
+ * @param {object[]} charities Associações elegíveis ordenadas por aprovação.
+ * @param {object | null} lastRun Ultima distribuição gravada.
  * @returns {number} Offset usado para rodar a lista.
  */
 function nextRotationOffset(charities, lastRun) {
@@ -222,7 +278,7 @@ function nextRotationOffset(charities, lastRun) {
 }
 
 /**
- * Cria indices para idempotencia mensal e consultas por associacao.
+ * Cria indices para idempotência mensal e consultas por associação.
  *
  * @returns {Promise<void>}
  */
@@ -233,12 +289,12 @@ export async function ensurePoolDistributionIndexes() {
 }
 
 /**
- * Executa a distribuicao mensal da pool solidaria.
+ * Executa a distribuição mensal da pool solidária.
  *
- * @param {string} monthInput Mes no formato `YYYY-MM`.
- * @param {string} createdByUserId Identificador do admin que executa a distribuicao.
- * @returns {Promise<{ distribution: object }>} Distribuicao persistida.
- * @throws {Error} Quando o mes ja existe ou nao ha associacoes elegiveis.
+ * @param {string} monthInput Mês no formato `YYYY-MM`.
+ * @param {string} createdByUserId Identificador do admin que executa a distribuição.
+ * @returns {Promise<{ distribution: object }>} Distribuição persistida.
+ * @throws {Error} Quando o mês já existe ou não há associações elegíveis.
  */
 export async function runMonthlyDistribution(monthInput, createdByUserId) {
   const db = await getDb();
@@ -246,12 +302,12 @@ export async function runMonthlyDistribution(monthInput, createdByUserId) {
   const now = new Date();
   const existing = await db.collection("pool_distributions").findOne({ month });
   if (existing) {
-    const error = new Error("Distribuicao deste mes ja existe.");
+    const error = new Error("Distribuição deste mês já existe.");
     error.statusCode = 409;
     throw error;
   }
 
-  // Apenas subscricoes pagas ativas contribuem para receita; trials nao entram na pool.
+  // Apenas subscrições pagas ativas contribuem para receita; trials não entram na pool.
   const subscriptions = await db.collection("subscriptions").find({
     status: "active",
     currentPeriodEnd: { $gt: now },
@@ -259,7 +315,7 @@ export async function runMonthlyDistribution(monthInput, createdByUserId) {
   const plans = await db.collection("subscription_plans").find({ active: true }).toArray();
   const planByCode = new Map(plans.map((plan) => [plan.code, plan]));
 
-  // O calculo e sempre feito em centimos para evitar erros de ponto flutuante.
+  // O calculo e sempre feito em cêntimos para evitar erros de ponto flutuante.
   const totalPoolCents = subscriptions.reduce((total, subscription) => {
     const plan = planByCode.get(subscription.planCode);
     if (!plan) return total;
@@ -272,14 +328,14 @@ export async function runMonthlyDistribution(monthInput, createdByUserId) {
   }).sort({ approvedAt: 1 }).toArray();
 
   if (charities.length === 0) {
-    const error = new Error("Nao existem associacoes elegiveis.");
+    const error = new Error("Não existem associações elegíveis.");
     error.statusCode = 409;
     throw error;
   }
 
   const lastRun = await db.collection("pool_distributions").findOne({}, { sort: { month: -1 } });
   const offset = nextRotationOffset(charities, lastRun);
-  // A lista rodada torna visivel que a prioridade muda entre meses.
+  // A lista rodada torna visível que a prioridade muda entre meses.
   const rotated = [...charities.slice(offset), ...charities.slice(0, offset)];
   const items = splitCents(totalPoolCents, rotated);
 
@@ -297,18 +353,18 @@ export async function runMonthlyDistribution(monthInput, createdByUserId) {
 }
 
 /**
- * Consulta uma distribuicao mensal ja persistida.
+ * Consulta uma distribuição mensal já persistida.
  *
- * @param {string} monthInput Mes no formato `YYYY-MM`.
- * @returns {Promise<{ distribution: object }>} Distribuicao encontrada.
- * @throws {Error} Quando o mes nao existe.
+ * @param {string} monthInput Mês no formato `YYYY-MM`.
+ * @returns {Promise<{ distribution: object }>} Distribuição encontrada.
+ * @throws {Error} Quando o mês não existe.
  */
 export async function getDistributionByMonth(monthInput) {
   const db = await getDb();
   const month = assertDistributionMonth(monthInput);
   const run = await db.collection("pool_distributions").findOne({ month });
   if (!run) {
-    const error = new Error("Distribuicao nao encontrada.");
+    const error = new Error("Distribuição não encontrada.");
     error.statusCode = 404;
     throw error;
   }
@@ -316,27 +372,27 @@ export async function getDistributionByMonth(monthInput) {
 }
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicação do código ou da decisão.
 
-Todo o dinheiro fica em centimos. A funcao `splitCents` reparte tambem os centimos sobrantes, garantindo que a soma dos itens e igual ao total da pool. A funcao `nextRotationOffset` olha para a primeira associacao do ultimo mes e comeca o mes seguinte na associacao seguinte. Assim, se houver centimos sobrantes, o extra nao vai sempre para a mesma entidade. O filtro de subscricoes usa apenas `status: "active"` e `currentPeriodEnd` futuro, porque trials gratuitos nao entram na receita da pool.
+Todo o dinheiro fica em cêntimos. A função `splitCents` reparte também os cêntimos sobrantes, garantindo que a soma dos itens e igual ao total da pool. A função `nextRotationOffset` olha para a primeira associação do ultimo mês e comeca o mês seguinte na associação seguinte. Assim, se houver cêntimos sobrantes, o extra não vai sempre para a mesma entidade. O filtro de subscrições usa apenas `status: "active"` e `currentPeriodEnd` futuro, porque trials gratuitos não entram na receita da pool.
 
-6. Validacao do passo.
+6. Validação do passo.
 
 ```bash
 node -e "import('./src/modules/charities/pool-distribution.service.js').then((m) => console.log(typeof m.runMonthlyDistribution, typeof m.getDistributionByMonth))"
 ```
 
-Depois de existirem pelo menos duas associacoes elegiveis, executa dois meses diferentes e confirma que `items[0].charityId` muda de um mes para o outro.
+Depois de existirem pelo menos duas associações elegíveis, executa dois meses diferentes e confirma que `items[0].charityId` muda de um mês para o outro.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Sem indice unico por mes, um clique repetido podia duplicar a distribuicao.
+Sem indice único por mês, um clique repetido podia duplicar a distribuição.
 
-### Passo 3 - Criar endpoints admin de distribuicao
+### Passo 3 - Criar endpoints admin de distribuição
 
 1. Objetivo do passo.
 
-Permitir ao admin executar e consultar distribuicao mensal.
+Permitir ao admin executar e consultar distribuição mensal.
 
 2. Ficheiros envolvidos.
     - CRIAR: `backend/src/modules/charities/pool-distribution.controller.js`
@@ -347,18 +403,24 @@ Permitir ao admin executar e consultar distribuicao mensal.
 
 Acrescenta rotas admin ao router existente.
 
-4. Codigo completo.
+4. Código completo.
 
 `backend/src/modules/charities/pool-distribution.controller.js`
 
 ```js
+/**
+ * Módulo de controllers HTTP para a distribuição mensal da pool.
+ *
+ * Expõe comandos administrativos para executar e consultar distribuições,
+ * mantendo cálculo e persistência concentrados no service.
+ */
 import {
   getDistributionByMonth,
   runMonthlyDistribution,
 } from "./pool-distribution.service.js";
 
 /**
- * Executa uma nova distribuicao mensal por pedido admin.
+ * Executa uma nova distribuição mensal por pedido admin.
  *
  * @param {import("express").Request} req Pedido com `body.month` e `user.id`.
  * @param {import("express").Response} res Resposta HTTP.
@@ -369,7 +431,7 @@ export async function postMonthlyDistribution(req, res) {
 }
 
 /**
- * Devolve uma distribuicao mensal existente.
+ * Devolve uma distribuição mensal existente.
  *
  * @param {import("express").Request} req Pedido com `params.month`.
  * @param {import("express").Response} res Resposta HTTP.
@@ -405,11 +467,11 @@ import { ensurePoolDistributionIndexes } from "./modules/charities/pool-distribu
 await ensurePoolDistributionIndexes();
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicação do código ou da decisão.
 
-A execucao e admin porque mexe em valores de distribuicao. A consulta fica admin neste BK; a visao por associacao entra no `BK-MF4-06`.
+A execução e admin porque mexe em valores de distribuição. A consulta fica admin neste BK; a visao por associação entra no `BK-MF4-06`.
 
-6. Validacao do passo.
+6. Validação do passo.
 
 ```bash
 curl -i -X POST http://localhost:3000/api/charities/pool/distributions \
@@ -421,13 +483,13 @@ Sem admin deve devolver `401` ou `403`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Execucao aberta permitiria qualquer utilizador gerar registos financeiros.
+Execução aberta permitiria qualquer utilizador gerar registos financeiros.
 
-### Passo 4 - Criar painel admin de distribuicao
+### Passo 4 - Criar painel admin de distribuição
 
 1. Objetivo do passo.
 
-Dar ao admin uma UI minima para executar o mes e ver resultado.
+Dar ao admin uma UI mínima para executar o mês e ver resultado.
 
 2. Ficheiros envolvidos.
     - EDITAR: `frontend/src/services/api/charitiesApi.js`
@@ -438,25 +500,25 @@ Dar ao admin uma UI minima para executar o mes e ver resultado.
 
 Acrescenta `runDistribution` e `getDistribution`.
 
-4. Codigo completo.
+4. Código completo.
 
 Adicionar a `charitiesApi`:
 
 ```js
 /**
- * Executa a distribuicao mensal no backend.
+ * Executa a distribuição mensal no backend.
  *
- * @param {string} month Mes no formato `YYYY-MM`.
- * @returns {Promise<{ distribution: object }>} Distribuicao criada.
+ * @param {string} month Mês no formato `YYYY-MM`.
+ * @returns {Promise<{ distribution: object }>} Distribuição criada.
  */
 runDistribution(month) {
   return apiClient.post("/api/charities/pool/distributions", { month });
 },
 /**
- * Consulta uma distribuicao mensal ja criada.
+ * Consulta uma distribuição mensal já criada.
  *
- * @param {string} month Mes no formato `YYYY-MM`.
- * @returns {Promise<{ distribution: object }>} Distribuicao existente.
+ * @param {string} month Mês no formato `YYYY-MM`.
+ * @returns {Promise<{ distribution: object }>} Distribuição existente.
  */
 getDistribution(month) {
   return apiClient.get(`/api/charities/pool/distributions/${encodeURIComponent(month)}`);
@@ -466,14 +528,20 @@ getDistribution(month) {
 `frontend/src/pages/AdminPoolDistributionPage.jsx`
 
 ```jsx
+/**
+ * Módulo da página administrativa de distribuição da pool.
+ *
+ * Permite executar ou consultar uma distribuição mensal e mostra o resultado
+ * persistido sem recalcular valores críticos no browser.
+ */
 import { useState } from "react";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
 /**
- * Painel administrativo para executar e consultar a distribuicao mensal.
+ * Painel administrativo para executar e consultar a distribuição mensal.
  *
- * @returns {JSX.Element} Formulario mensal e resultado persistido.
+ * @returns {JSX.Element} Formulário mensal e resultado persistido.
  */
 export function AdminPoolDistributionPage() {
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
@@ -482,9 +550,9 @@ export function AdminPoolDistributionPage() {
   const [submitting, setSubmitting] = useState(false);
 
   /**
-   * Executa a distribuicao no backend e mostra o resultado gravado.
+   * Executa a distribuição no backend e mostra o resultado gravado.
    *
-   * @param {React.FormEvent<HTMLFormElement>} event Evento do formulario.
+   * @param {React.FormEvent<HTMLFormElement>} event Evento do formulário.
    * @returns {Promise<void>}
    */
   async function handleRun(event) {
@@ -504,11 +572,11 @@ export function AdminPoolDistributionPage() {
 
   return (
     <main>
-      <h1>Distribuicao mensal</h1>
+      <h1>Distribuição mensal</h1>
       {error && <p role="alert">{error}</p>}
       <form onSubmit={handleRun}>
-        <label>Mes<input type="month" value={month} onChange={(event) => setMonth(event.target.value)} required /></label>
-        <button type="submit" disabled={submitting}>{submitting ? "A executar..." : "Executar distribuicao"}</button>
+        <label>Mês<input type="month" value={month} onChange={(event) => setMonth(event.target.value)} required /></label>
+        <button type="submit" disabled={submitting}>{submitting ? "A executar..." : "Executar distribuição"}</button>
       </form>
       {distribution && (
         <section>
@@ -527,54 +595,54 @@ export function AdminPoolDistributionPage() {
 }
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicação do código ou da decisão.
 
-A UI nao recalcula valores no browser. Mostra apenas o resultado produzido pelo backend.
+A UI não recalcula valores no browser. Mostra apenas o resultado produzido pelo backend.
 
-6. Validacao do passo.
+6. Validação do passo.
 
-Executar um mes e repetir o mesmo mes.
+Executar um mês e repetir o mesmo mês.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
 Calcular no frontend abriria divergencia entre interface e dados persistidos.
 
-## Criterios de aceite (mensuraveis)
+## Critérios de aceite (mensuráveis)
 
-- Um mes valido cria uma unica distribuicao.
-- Segunda execucao do mesmo mes devolve `409`.
+- Um mês valido cria uma unica distribuição.
+- Segunda execução do mesmo mês devolve `409`.
 - Soma dos `items.amountCents` e igual a `totalPoolCents`.
-- Em dois meses consecutivos com as mesmas associacoes elegiveis, o primeiro `items[0].charityId` muda.
-- Associacoes com `poolStatus` diferente de `eligible` nao recebem valor.
-- Subscricoes expiradas, canceladas, `past_due` ou `trialing` nao entram no total da pool.
+- Em dois meses consecutivos com as mesmas associações elegíveis, o primeiro `items[0].charityId` muda.
+- Associações com `poolStatus` diferente de `eligible` não recebem valor.
+- Subscrições expiradas, canceladas, `past_due` ou `trialing` não entram no total da pool.
 - Sem admin, endpoints devolvem `401` ou `403`.
 
-## Validacao final
+## Validação final
 
 ```bash
 cd backend
 npm test
 ```
 
-Executar distribuicao com associacoes elegiveis, repetir o mesmo mes, executar o mes seguinte e validar reconciliacao e rotacao.
+Executar distribuição com associações elegíveis, repetir o mesmo mês, executar o mês seguinte e validar reconciliação e rotação.
 
 ## Evidence para PR/defesa
 
-- `pr`: commit/PR com service e painel admin de distribuicao.
+- `pr`: commit/PR com service e painel admin de distribuição.
 - `proof`: JSON de duas distribuicoes mensais com soma reconciliada e primeiro beneficiario diferente.
-- `neg`: duplicacao do mes, sem associacoes elegiveis e pedido sem admin.
+- `neg`: duplicação do mês, sem associações elegíveis e pedido sem admin.
 
 ## Handoff
 
-O `BK-MF4-06` deve ler `pool_distributions` para relatorios, historico por associacao e pagina publica agregada.
+O `BK-MF4-06` deve ler `pool_distributions` para relatórios, histórico por associação e página pública agregada.
 
-## Snippet tecnico aplicavel
+## Snippet técnico aplicável
 
 ```js
-// A primeira associacao do mes seguinte avanca uma posicao para tornar a rotacao verificavel.
+// A primeira associação do mês seguinte avança uma posicao para tornar a rotação verificavel.
 return (previousIndex + 1) % charities.length;
 ```
 
 ## Changelog
 
-- `2026-06-13`: guia reescrito com algoritmo mensal, idempotencia, rotacao, endpoints admin, UI e negativos.
+- `2026-06-13`: guia reescrito com algoritmo mensal, idempotência, rotação, endpoints admin, UI e negativos.

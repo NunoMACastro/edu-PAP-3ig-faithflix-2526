@@ -1,4 +1,4 @@
-# BK-MF4-08 - Notificacoes transacionais e preferencias
+# BK-MF4-08 - Notificações transacionais e preferências
 
 ## Header
 
@@ -10,7 +10,7 @@
 - `prioridade`: `P1`
 - `estado`: `TODO`
 - `esforco`: `M`
-- `dependencias`: `BK-MF4-01`
+- `dependencias`: `BK-MF4-02,BK-MF2-05`
 - `rf_rnf`: `RF52, RF53, RF54`
 - `fase_documental`: `Fase 2`
 - `sprint`: `S07`
@@ -19,59 +19,114 @@
 - `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-08-notificacoes-transacionais-e-preferencias.md`
 - `last_updated`: `2026-06-13`
 
-## Bloco pedagogico (obrigatorio)
+## Bloco pedagógico (obrigatório)
 
-Neste BK vais criar notificacoes internas para eventos de subscricao, trial e continuidade, com preferencias por utilizador. O MVP guarda notificacoes na base de dados e mostra-as no frontend; envio real de email fica fora deste BK.
+Neste BK vais criar notificações internas para eventos de subscrição, trial e continuidade, com preferências por utilizador. O MVP guarda notificações na base de dados e mostra-as no frontend; envio real de email fica fora deste BK.
 
-### Objetivo pedagogico
+### Objetivo pedagógico
 
-- Criar notificacoes transacionais auditaveis.
-- Permitir que o utilizador configure preferencias.
-- Evitar envio de notificacoes sensiveis para canais desligados.
-- Preparar operacao futura sem depender de fornecedor externo.
+- Criar notificações transacionais auditáveis.
+- Permitir que o utilizador configure preferências.
+- Evitar criação de notificações sensíveis para canais desligados.
+- Preparar operação futura sem depender de fornecedor externo.
+
+### Importância funcional
+
+- Notificações ajudam o utilizador a perceber eventos importantes sem consultar manualmente todas as páginas.
+- Preferências reduzem ruído e respeitam escolhas individuais.
+- Este BK integra eventos de subscrição, trial e continuidade sem criar fornecedor externo de email.
+
+### Scope-in
+
+- Criar notificações internas `in_app`.
+- Criar preferências por utilizador.
+- Marcar notificações como lidas com ownership.
+- Criar alerta de continuidade a partir do progresso de reprodução.
+- Integrar eventos de subscrição e trial com o módulo de notificações.
+
+### Scope-out
+
+- Não enviar email real, SMS, push notifications ou mensagens externas.
+- Não guardar tokens, dados de pagamento ou cookies em notificações.
+- Não notificar administradores sobre candidaturas, salvo evolução futura com contrato próprio.
+- Não alterar a lógica de recomendação.
 
 ### Tempo estimado
 
 - 2 blocos de 90 minutos.
-- Se a equipa quiser email real, registar como evolucao posterior e manter este BK interno.
+- Se a equipa quiser email real, registar como evolução posterior e manter este BK interno.
 
-### Conceitos essenciais
+### Glossário rápido
 
-- Notificacao transacional nasce de um evento do sistema: pagamento aprovado, pagamento falhado, trial iniciado ou alerta de continuidade.
-- Preferencia controla canais; no MVP o canal real e `in_app`.
-- `CANONICO`: RF52 exige notificacoes transacionais; RF53 preferencias; RF54 alertas de continuidade.
-- `DERIVADO`: `email` pode ficar como preferencia futura, mas nao ha envio externo neste BK.
+- Notificação transacional: mensagem causada por evento concreto do sistema.
+- Preferência: escolha do utilizador sobre que tipos de alerta quer receber.
+- Deduplicação: regra que evita criar alertas repetidos para o mesmo evento.
+- Ownership: garantia de que uma notificação só é lida pelo respetivo utilizador.
+
+### Conceitos teóricos essenciais
+
+- Domínio FaithFlix: notificações explicam eventos de subscrição, trial e continuidade sem expor dados sensíveis.
+- Backend: o service verifica preferências, aplica deduplicação e grava a notificação.
+- Frontend: a página lista notificações, mostra estados e permite alterar preferências.
+- Segurança: todas as operações usam `req.user.id`; marcar notificação de outro utilizador devolve erro.
+- Dados: `notifications` guarda mensagens; `notification_preferences` guarda escolhas por utilizador.
+- `CANONICO`: RF52 exige notificações transacionais; RF53 preferências; RF54 alertas de continuidade.
+- `DERIVADO`: `email` pode ficar como preferência futura, mas não há envio externo neste BK.
 
 ### Erros comuns
 
 - Prometer email real sem fornecedor configurado.
-- Guardar tokens ou dados de pagamento dentro da notificacao.
-- Ignorar preferencias do utilizador.
-- Criar notificacoes sem ownership.
+- Guardar tokens ou dados de pagamento dentro da notificação.
+- Ignorar preferências do utilizador.
+- Criar notificações sem ownership.
 
-### Check de compreensao
+### Check de compreensão
 
-- [ ] Sei explicar o que torna uma notificacao transacional.
-- [ ] Sei provar que cada notificacao pertence a um utilizador.
-- [ ] Sei alterar preferencias e ver o efeito em novas notificacoes.
+- [ ] Sei explicar o que torna uma notificação transacional.
+- [ ] Sei provar que cada notificação pertence a um utilizador.
+- [ ] Sei alterar preferências e ver o efeito em novas notificações.
 
-## Bloco operacional (obrigatorio)
+## Bloco operacional (obrigatório)
 
-### Pre-condicoes
+### Pré-condições
 
-- `BK-MF4-01` executado com subscricoes.
+- `BK-MF4-01` executado com subscrições.
 - `BK-MF4-02` executado com checkout simulado, trial e `grantTrialSubscription`.
 - `BK-MF2-05` executado com `savePlaybackProgress`.
 - `BK-MF2-01` executado com `req.user`.
-- `apiClient` disponivel.
+- `apiClient` disponível.
 
-### Guia de execucao (passo-a-passo)
+### Arquitetura do BK
 
-### Passo 1 - Criar validacao de preferencias e tipos
+- Backend: módulo `notifications` com validação, service, controller e router.
+- Persistência: `notifications` e `notification_preferences` guardam mensagens e escolhas.
+- Frontend: `notificationsApi` e `NotificationsPage` mostram lista, leitura e preferências.
+- Segurança: endpoints exigem login e aplicam ownership no filtro de base de dados.
+- Integração: services de pagamentos, subscrições e playback chamam `createNotification` ou `createContinueWatchingNotification`.
+
+### Ficheiros a criar, editar e rever
+
+- CRIAR: `backend/src/modules/notifications/notifications.validation.js`
+- CRIAR: `backend/src/modules/notifications/notifications.service.js`
+- CRIAR: `backend/src/modules/notifications/notifications.controller.js`
+- CRIAR: `backend/src/modules/notifications/notifications.routes.js`
+- CRIAR: `frontend/src/services/api/notificationsApi.js`
+- CRIAR: `frontend/src/pages/NotificationsPage.jsx`
+- EDITAR: `backend/src/app.js`
+- EDITAR: `backend/src/server.js`
+- EDITAR: `backend/src/modules/payments/payments.service.js`
+- EDITAR: `backend/src/modules/subscriptions/subscriptions.service.js`
+- EDITAR: `backend/src/modules/playback/playback.service.js`
+- EDITAR: `frontend/src/routes/AppRoutes.jsx`
+- REVER: `BK-MF4-01`, `BK-MF4-02`, `BK-MF2-05`, `RF52`, `RF53`, `RF54`, `RNF19`
+
+### Guia de execução (passo-a-passo)
+
+### Passo 1 - Criar validação de preferências e tipos
 
 1. Objetivo do passo.
 
-Definir tipos de notificacao e canais aceites.
+Definir tipos de notificação e canais aceites.
 
 2. Ficheiros envolvidos.
     - CRIAR: `backend/src/modules/notifications/notifications.validation.js`
@@ -79,14 +134,14 @@ Definir tipos de notificacao e canais aceites.
 
 3. Instrucoes concretas.
 
-Cria o modulo `notifications`.
+Cria o módulo `notifications`.
 
-4. Codigo completo.
+4. Código completo.
 
 ```js
 /**
- * Tipos de notificacao gerados pelo backend.
- * A lista fechada evita grafias diferentes para o mesmo evento de negocio.
+ * Tipos de notificação gerados pelo backend.
+ * A lista fechada evita grafias diferentes para o mesmo evento de negócio.
  */
 export const NOTIFICATION_TYPES = [
   "subscription_activated",
@@ -96,10 +151,10 @@ export const NOTIFICATION_TYPES = [
 ];
 
 /**
- * Cria um erro HTTP previsivel para validacao de notificacoes.
+ * Cria um erro HTTP previsivel para validação de notificações.
  *
  * @param {string} message Mensagem segura para o cliente.
- * @param {number} [statusCode=400] Codigo HTTP de validacao.
+ * @param {number} [statusCode=400] Código HTTP de validação.
  * @returns {Error} Erro com `statusCode`.
  */
 function httpError(message, statusCode = 400) {
@@ -109,26 +164,26 @@ function httpError(message, statusCode = 400) {
 }
 
 /**
- * Garante que o tipo recebido pertence ao contrato publico do modulo.
+ * Garante que o tipo recebido pertence ao contrato público do módulo.
  *
  * @param {string} type Tipo recebido no evento.
  * @returns {string} Tipo normalizado.
- * @throws {Error} Quando o tipo nao existe na lista fechada.
+ * @throws {Error} Quando o tipo não existe na lista fechada.
  */
 export function assertNotificationType(type) {
   const value = String(type ?? "").trim();
   if (!NOTIFICATION_TYPES.includes(value)) {
-    throw httpError("Tipo de notificacao invalido.");
+    throw httpError("Tipo de notificação inválido.");
   }
   return value;
 }
 
 /**
- * Valida texto obrigatorio usado em titulo e mensagem.
+ * Valida texto obrigatório usado em titulo e mensagem.
  *
  * @param {string} value Valor recebido.
  * @param {string} field Nome do campo para mensagem de erro.
- * @param {number} min Tamanho minimo.
+ * @param {number} min Tamanho mínimo.
  * @param {number} max Tamanho maximo.
  * @returns {string} Texto normalizado.
  */
@@ -141,10 +196,10 @@ function requiredNotificationText(value, field, min, max) {
 }
 
 /**
- * Valida o conteudo visivel de uma notificacao.
+ * Valida o conteúdo visível de uma notificação.
  *
  * @param {object} input Dados recebidos pelo service.
- * @returns {{ title: string, message: string }} Conteudo seguro para persistir.
+ * @returns {{ title: string, message: string }} Conteúdo seguro para persistir.
  */
 export function assertNotificationContent(input) {
   return {
@@ -154,10 +209,10 @@ export function assertNotificationContent(input) {
 }
 
 /**
- * Normaliza preferencias de notificacao guardadas por utilizador.
+ * Normaliza preferências de notificação guardadas por utilizador.
  *
- * @param {object} input Preferencias recebidas da UI.
- * @returns {{ inApp: boolean, email: boolean, continueWatching: boolean }} Preferencias persistiveis.
+ * @param {object} input Preferências recebidas da UI.
+ * @returns {{ inApp: boolean, email: boolean, continueWatching: boolean }} Preferências persistiveis.
  */
 export function assertPreferencePayload(input) {
   return {
@@ -168,11 +223,11 @@ export function assertPreferencePayload(input) {
 }
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicação do código ou da decisão.
 
-Tipos fechados evitam nomes diferentes para o mesmo evento. A validacao de titulo e mensagem impede notificacoes vazias, demasiado longas ou pouco claras. `email` fica como preferencia guardada, mas sem envio real.
+Tipos fechados evitam nomes diferentes para o mesmo evento. A validação de titulo e mensagem impede notificações vazias, demasiado longas ou pouco claras. `email` fica como preferência guardada, mas sem envio real.
 
-6. Validacao do passo.
+6. Validação do passo.
 
 ```bash
 node -e "import('./src/modules/notifications/notifications.validation.js').then(({ assertNotificationType }) => console.log(assertNotificationType('trial_started')))"
@@ -182,11 +237,11 @@ node -e "import('./src/modules/notifications/notifications.validation.js').then(
 
 Sem tipos fechados, um evento podia ficar como `trial`, outro como `trialStart` e outro como `trial_started`.
 
-### Passo 2 - Criar service de notificacoes
+### Passo 2 - Criar service de notificações
 
 1. Objetivo do passo.
 
-Guardar preferencias, criar notificacoes e listar notificacoes do utilizador autenticado.
+Guardar preferências, criar notificações e listar notificações do utilizador autenticado.
 
 2. Ficheiros envolvidos.
     - CRIAR: `backend/src/modules/notifications/notifications.service.js`
@@ -196,9 +251,15 @@ Guardar preferencias, criar notificacoes e listar notificacoes do utilizador aut
 
 Cria o service abaixo.
 
-4. Codigo completo.
+4. Código completo.
 
 ```js
+/**
+ * Módulo de serviço para notificações internas e preferências do utilizador.
+ *
+ * Centraliza ownership, deduplicação e validação de tipos para garantir que cada
+ * utilizador só lê e altera notificações pertencentes à sua própria sessão.
+ */
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import {
@@ -210,13 +271,13 @@ import {
 /**
  * Converte o utilizador autenticado para `ObjectId`.
  *
- * @param {string} userId Identificador vindo da sessao.
+ * @param {string} userId Identificador vindo da sessão.
  * @returns {ObjectId} Identificador MongoDB.
- * @throws {Error} Quando o identificador e invalido.
+ * @throws {Error} Quando o identificador e inválido.
  */
 function asUserObjectId(userId) {
   if (!ObjectId.isValid(userId)) {
-    const error = new Error("Utilizador invalido.");
+    const error = new Error("Utilizador inválido.");
     error.statusCode = 400;
     throw error;
   }
@@ -224,15 +285,15 @@ function asUserObjectId(userId) {
 }
 
 /**
- * Converte o identificador da notificacao para `ObjectId`.
+ * Converte o identificador da notificação para `ObjectId`.
  *
  * @param {string} notificationId Identificador recebido na rota.
  * @returns {ObjectId} Identificador MongoDB.
- * @throws {Error} Quando o identificador e invalido.
+ * @throws {Error} Quando o identificador e inválido.
  */
 function asNotificationObjectId(notificationId) {
   if (!ObjectId.isValid(notificationId)) {
-    const error = new Error("Notificacao invalida.");
+    const error = new Error("Notificação inválida.");
     error.statusCode = 400;
     throw error;
   }
@@ -240,10 +301,10 @@ function asNotificationObjectId(notificationId) {
 }
 
 /**
- * Remove campos internos antes de devolver uma notificacao ao frontend.
+ * Remove campos internos antes de devolver uma notificação ao frontend.
  *
  * @param {object} notification Documento MongoDB.
- * @returns {object} Notificacao publica.
+ * @returns {object} Notificação pública.
  */
 function publicNotification(notification) {
   return {
@@ -257,7 +318,7 @@ function publicNotification(notification) {
 }
 
 /**
- * Cria indices para preferencias, listagem e deduplicacao de eventos.
+ * Cria indices para preferências, listagem e deduplicacao de eventos.
  *
  * @returns {Promise<void>}
  */
@@ -272,10 +333,10 @@ export async function ensureNotificationIndexes() {
 }
 
 /**
- * Obtem preferencias do utilizador autenticado com valores por defeito.
+ * Obtem preferências do utilizador autenticado com valores por defeito.
  *
  * @param {string} userId Identificador do utilizador.
- * @returns {Promise<{ preferences: object }>} Preferencias atuais.
+ * @returns {Promise<{ preferences: object }>} Preferências atuais.
  */
 export async function getPreferences(userId) {
   const db = await getDb();
@@ -287,17 +348,17 @@ export async function getPreferences(userId) {
 }
 
 /**
- * Atualiza preferencias de notificacao do utilizador autenticado.
+ * Atualiza preferências de notificação do utilizador autenticado.
  *
  * @param {string} userId Identificador do utilizador.
- * @param {object} input Preferencias recebidas da UI.
- * @returns {Promise<{ preferences: object }>} Preferencias guardadas.
+ * @param {object} input Preferências recebidas da UI.
+ * @returns {Promise<{ preferences: object }>} Preferências guardadas.
  */
 export async function updatePreferences(userId, input) {
   const db = await getDb();
   const userObjectId = asUserObjectId(userId);
   const settings = assertPreferencePayload(input);
-  // `upsert` cria preferencias na primeira visita sem exigir passo de inicializacao.
+  // `upsert` cria preferências na primeira visita sem exigir passo de inicializacao.
   await db.collection("notification_preferences").updateOne(
     { userId: userObjectId },
     { $set: { settings, updatedAt: new Date() }, $setOnInsert: { userId: userObjectId, createdAt: new Date() } },
@@ -307,24 +368,24 @@ export async function updatePreferences(userId, input) {
 }
 
 /**
- * Cria uma notificacao interna respeitando preferencias e deduplicacao.
+ * Cria uma notificação interna respeitando preferências e deduplicacao.
  *
  * @param {string} userId Identificador do utilizador destinatario.
- * @param {object} input Evento e conteudo da notificacao.
- * @returns {Promise<{ notification: object | null, skipped: boolean }>} Notificacao criada ou motivo de omissao.
+ * @param {object} input Evento e conteúdo da notificação.
+ * @returns {Promise<{ notification: object | null, skipped: boolean }>} Notificação criada ou motivo de omissao.
  */
 export async function createNotification(userId, input) {
   const db = await getDb();
   const userObjectId = asUserObjectId(userId);
   const { preferences } = await getPreferences(userId);
 
-  // Se o utilizador desligou notificacoes internas, o evento fica sem entrega in-app.
+  // Se o utilizador desligou notificações internas, o evento fica sem entrega in-app.
   if (!preferences.inApp) {
     return { notification: null, skipped: true };
   }
 
   const type = assertNotificationType(input.type);
-  // A preferencia granular so bloqueia alertas de continuidade, nao eventos transacionais.
+  // A preferência granular só bloqueia alertas de continuidade, não eventos transacionais.
   if (type === "continue_watching" && !preferences.continueWatching) {
     return { notification: null, skipped: true };
   }
@@ -333,7 +394,7 @@ export async function createNotification(userId, input) {
   const dedupeKey = input.dedupeKey ? String(input.dedupeKey).trim() : null;
 
   if (dedupeKey) {
-    // A deduplicacao evita repetir alertas para o mesmo conteudo ou evento.
+    // A deduplicacao evita repetir alertas para o mesmo conteúdo ou evento.
     const existing = await db.collection("notifications").findOne({
       userId: userObjectId,
       type,
@@ -360,18 +421,18 @@ export async function createNotification(userId, input) {
 }
 
 /**
- * Cria alerta para conteudo iniciado e ainda nao terminado.
+ * Cria alerta para conteúdo iniciado e ainda não terminado.
  *
  * @param {string} userId Identificador do utilizador.
- * @param {object} input Dados minimos do conteudo.
+ * @param {object} input Dados minimos do conteúdo.
  * @returns {Promise<{ notification: object | null, skipped: boolean }>} Resultado da criacao.
  */
 export async function createContinueWatchingNotification(userId, input) {
   const contentId = String(input.contentId ?? "").trim();
-  const contentTitle = String(input.contentTitle ?? "um conteudo").trim();
+  const contentTitle = String(input.contentTitle ?? "um conteúdo").trim();
 
   if (!contentId) {
-    const error = new Error("Conteudo invalido para alerta de continuidade.");
+    const error = new Error("Conteúdo inválido para alerta de continuidade.");
     error.statusCode = 400;
     throw error;
   }
@@ -385,7 +446,7 @@ export async function createContinueWatchingNotification(userId, input) {
 }
 
 /**
- * Lista as notificacoes recentes do utilizador autenticado.
+ * Lista as notificações recentes do utilizador autenticado.
  *
  * @param {string} userId Identificador do utilizador.
  * @returns {Promise<{ notifications: object[] }>} Lista ordenada da mais recente para a mais antiga.
@@ -397,22 +458,22 @@ export async function listMyNotifications(userId) {
 }
 
 /**
- * Marca uma notificacao como lida, aplicando ownership no filtro.
+ * Marca uma notificação como lida, aplicando ownership no filtro.
  *
  * @param {string} userId Identificador do utilizador autenticado.
- * @param {string} notificationId Identificador da notificacao.
- * @returns {Promise<{ notification: object }>} Notificacao atualizada.
+ * @param {string} notificationId Identificador da notificação.
+ * @returns {Promise<{ notification: object }>} Notificação atualizada.
  */
 export async function markNotificationAsRead(userId, notificationId) {
   const db = await getDb();
-  // O filtro por `userId` impede marcar notificacoes pertencentes a outro utilizador.
+  // O filtro por `userId` impede marcar notificações pertencentes a outro utilizador.
   const notification = await db.collection("notifications").findOneAndUpdate(
     { _id: asNotificationObjectId(notificationId), userId: asUserObjectId(userId) },
     { $set: { readAt: new Date() } },
     { returnDocument: "after" },
   );
   if (!notification) {
-    const error = new Error("Notificacao nao encontrada.");
+    const error = new Error("Notificação não encontrada.");
     error.statusCode = 404;
     throw error;
   }
@@ -420,13 +481,13 @@ export async function markNotificationAsRead(userId, notificationId) {
 }
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicação do código ou da decisão.
 
-O service aplica ownership em todos os acessos. Notificacoes nao incluem dados sensiveis: apenas titulo, mensagem e tipo. `dedupeKey` evita repetir alertas de continuidade para o mesmo conteudo.
+O service aplica ownership em todos os acessos. Notificações não incluem dados sensíveis: apenas titulo, mensagem e tipo. `dedupeKey` evita repetir alertas de continuidade para o mesmo conteúdo.
 
-`findOneAndUpdate` devolve o documento atualizado ou `null` na versao atual do driver MongoDB usada pelo projeto. Por isso, `markNotificationAsRead` valida diretamente `notification` e nao acede a `.value`.
+`findOneAndUpdate` devolve o documento atualizado ou `null` na versão atual do driver MongoDB usada pelo projeto. Por isso, `markNotificationAsRead` valida diretamente `notification` e não acede a `.value`.
 
-6. Validacao do passo.
+6. Validação do passo.
 
 ```bash
 node -e "import('./src/modules/notifications/notifications.service.js').then((m) => console.log(typeof m.createNotification, typeof m.createContinueWatchingNotification, typeof m.updatePreferences))"
@@ -434,13 +495,13 @@ node -e "import('./src/modules/notifications/notifications.service.js').then((m)
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Sem filtro por `userId`, um utilizador podia marcar notificacoes de outro como lidas. Sem validacao de `notificationId`, um ID invalido podia rebentar como erro tecnico em vez de devolver `400`.
+Sem filtro por `userId`, um utilizador podia marcar notificações de outro como lidas. Sem validação de `notificationId`, um ID inválido podia rebentar como erro técnico em vez de devolver `400`.
 
 ### Passo 3 - Criar endpoints
 
 1. Objetivo do passo.
 
-Expor preferencias e notificacoes do utilizador autenticado.
+Expor preferências e notificações do utilizador autenticado.
 
 2. Ficheiros envolvidos.
     - CRIAR: `backend/src/modules/notifications/notifications.controller.js`
@@ -452,11 +513,17 @@ Expor preferencias e notificacoes do utilizador autenticado.
 
 Monta router em `/api/notifications`.
 
-4. Codigo completo.
+4. Código completo.
 
 `backend/src/modules/notifications/notifications.controller.js`
 
 ```js
+/**
+ * Módulo de controllers HTTP para notificações internas.
+ *
+ * Recebe pedidos autenticados e delega no service a validação de ownership,
+ * leitura, marcação como lida e atualização de preferências.
+ */
 import {
   getPreferences,
   listMyNotifications,
@@ -465,7 +532,7 @@ import {
 } from "./notifications.service.js";
 
 /**
- * Lista notificacoes do utilizador autenticado.
+ * Lista notificações do utilizador autenticado.
  *
  * @param {import("express").Request} req Pedido autenticado.
  * @param {import("express").Response} res Resposta HTTP.
@@ -476,7 +543,7 @@ export async function getMyNotifications(req, res) {
 }
 
 /**
- * Marca uma notificacao do proprio utilizador como lida.
+ * Marca uma notificação do proprio utilizador como lida.
  *
  * @param {import("express").Request} req Pedido com `params.id`.
  * @param {import("express").Response} res Resposta HTTP.
@@ -487,7 +554,7 @@ export async function patchReadNotification(req, res) {
 }
 
 /**
- * Devolve preferencias atuais do utilizador autenticado.
+ * Devolve preferências atuais do utilizador autenticado.
  *
  * @param {import("express").Request} req Pedido autenticado.
  * @param {import("express").Response} res Resposta HTTP.
@@ -498,9 +565,9 @@ export async function getMyPreferences(req, res) {
 }
 
 /**
- * Atualiza preferencias atuais do utilizador autenticado.
+ * Atualiza preferências atuais do utilizador autenticado.
  *
- * @param {import("express").Request} req Pedido com corpo de preferencias.
+ * @param {import("express").Request} req Pedido com corpo de preferências.
  * @param {import("express").Response} res Resposta HTTP.
  * @returns {Promise<void>}
  */
@@ -512,6 +579,12 @@ export async function putMyPreferences(req, res) {
 `backend/src/modules/notifications/notifications.routes.js`
 
 ```js
+/**
+ * Módulo de rotas de notificações.
+ *
+ * Protege todos os endpoints com autenticação porque notificações e preferências
+ * são dados privados associados ao utilizador da sessão.
+ */
 import { Router } from "express";
 import { requireAuth } from "../auth/auth.middleware.js";
 import { asyncHandler } from "../../utils/async-handler.js";
@@ -523,8 +596,8 @@ import {
 } from "./notifications.controller.js";
 
 /**
- * Router de notificacoes internas.
- * Todas as rotas usam `requireAuth` porque preferencias e mensagens pertencem a um utilizador.
+ * Router de notificações internas.
+ * Todas as rotas usam `requireAuth` porque preferências e mensagens pertencem a um utilizador.
  */
 export const notificationsRouter = Router();
 
@@ -550,11 +623,11 @@ import { ensureNotificationIndexes } from "./modules/notifications/notifications
 await ensureNotificationIndexes();
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicação do código ou da decisão.
 
-Todas as rotas exigem login porque notificacoes e preferencias pertencem ao utilizador.
+Todas as rotas exigem login porque notificações e preferências pertencem ao utilizador.
 
-6. Validacao do passo.
+6. Validação do passo.
 
 ```bash
 curl -i http://localhost:3000/api/notifications
@@ -564,13 +637,13 @@ Sem cookie deve devolver `401`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Rota publica de notificacoes exporia mensagens privadas.
+Rota pública de notificações exporia mensagens privadas.
 
-### Passo 4 - Criar frontend de notificacoes e preferencias
+### Passo 4 - Criar frontend de notificações e preferências
 
 1. Objetivo do passo.
 
-Mostrar notificacoes e permitir editar preferencias.
+Mostrar notificações e permitir editar preferências.
 
 2. Ficheiros envolvidos.
     - CRIAR: `frontend/src/services/api/notificationsApi.js`
@@ -581,44 +654,50 @@ Mostrar notificacoes e permitir editar preferencias.
 
 Cria rota `/notifications`.
 
-4. Codigo completo.
+4. Código completo.
 
 `frontend/src/services/api/notificationsApi.js`
 
 ```js
+/**
+ * Módulo cliente para a API de notificações.
+ *
+ * Agrupa chamadas HTTP de leitura, marcação como lida e preferências, usando o
+ * `apiClient` para preservar cookies HttpOnly sem expor tokens no frontend.
+ */
 import { apiClient } from "./apiClient.js";
 
 export const notificationsApi = {
   /**
-   * Lista notificacoes do utilizador autenticado.
+   * Lista notificações do utilizador autenticado.
    *
-   * @returns {Promise<{ notifications: object[] }>} Notificacoes recentes.
+   * @returns {Promise<{ notifications: object[] }>} Notificações recentes.
    */
   list() {
     return apiClient.get("/api/notifications");
   },
   /**
-   * Marca uma notificacao como lida.
+   * Marca uma notificação como lida.
    *
-   * @param {string} id Identificador da notificacao.
-   * @returns {Promise<object>} Notificacao atualizada.
+   * @param {string} id Identificador da notificação.
+   * @returns {Promise<object>} Notificação atualizada.
    */
   markAsRead(id) {
     return apiClient.patch(`/api/notifications/${encodeURIComponent(id)}/read`);
   },
   /**
-   * Obtem preferencias de notificacao.
+   * Obtem preferências de notificação.
    *
-   * @returns {Promise<{ preferences: object }>} Preferencias atuais.
+   * @returns {Promise<{ preferences: object }>} Preferências atuais.
    */
   getPreferences() {
     return apiClient.get("/api/notifications/preferences/me");
   },
   /**
-   * Atualiza preferencias de notificacao no backend.
+   * Atualiza preferências de notificação no backend.
    *
-   * @param {object} input Preferencias escolhidas pelo utilizador.
-   * @returns {Promise<{ preferences: object }>} Preferencias guardadas.
+   * @param {object} input Preferências escolhidas pelo utilizador.
+   * @returns {Promise<{ preferences: object }>} Preferências guardadas.
    */
   updatePreferences(input) {
     return apiClient.put("/api/notifications/preferences/me", input);
@@ -629,14 +708,20 @@ export const notificationsApi = {
 `frontend/src/pages/NotificationsPage.jsx`
 
 ```jsx
+/**
+ * Módulo da página de notificações e preferências.
+ *
+ * Carrega mensagens e preferências do utilizador autenticado, permitindo alterar
+ * opções sem expor dados de outros utilizadores ou depender de estado local como fonte de verdade.
+ */
 import { useEffect, useState } from "react";
 import { notificationsApi } from "../services/api/notificationsApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
 /**
- * Pagina de notificacoes e preferencias do utilizador autenticado.
+ * Página de notificações e preferências do utilizador autenticado.
  *
- * @returns {JSX.Element} Interface de leitura e configuracao de notificacoes.
+ * @returns {JSX.Element} Interface de leitura e configuracao de notificações.
  */
 export function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
@@ -645,7 +730,7 @@ export function NotificationsPage() {
   const [error, setError] = useState("");
 
   /**
-   * Carrega notificacoes e preferencias em paralelo.
+   * Carrega notificações e preferências em paralelo.
    *
    * @returns {Promise<void>}
    */
@@ -671,9 +756,9 @@ export function NotificationsPage() {
   }, []);
 
   /**
-   * Atualiza uma preferencia e guarda a alteracao no backend.
+   * Atualiza uma preferência e guarda a alteracao no backend.
    *
-   * @param {"inApp" | "continueWatching"} field Preferencia alterada.
+   * @param {"inApp" | "continueWatching"} field Preferência alterada.
    * @param {boolean} value Novo valor.
    * @returns {Promise<void>}
    */
@@ -688,9 +773,9 @@ export function NotificationsPage() {
   }
 
   /**
-   * Marca uma notificacao como lida e recarrega a lista.
+   * Marca uma notificação como lida e recarrega a lista.
    *
-   * @param {string} id Identificador da notificacao.
+   * @param {string} id Identificador da notificação.
    * @returns {Promise<void>}
    */
   async function markAsRead(id) {
@@ -705,17 +790,17 @@ export function NotificationsPage() {
 
   return (
     <main>
-      <h1>Notificacoes</h1>
+      <h1>Notificações</h1>
       {error && <p role="alert">{error}</p>}
       <section>
-        <h2>Preferencias</h2>
-        <label><input type="checkbox" checked={preferences.inApp} onChange={(e) => updatePreference("inApp", e.target.checked)} /> Notificacoes internas</label>
+        <h2>Preferências</h2>
+        <label><input type="checkbox" checked={preferences.inApp} onChange={(e) => updatePreference("inApp", e.target.checked)} /> Notificações internas</label>
         <label><input type="checkbox" checked={preferences.continueWatching} onChange={(e) => updatePreference("continueWatching", e.target.checked)} /> Alertas de continuidade</label>
       </section>
       <section>
         <h2>Recentes</h2>
-        {loading && <p>A carregar notificacoes...</p>}
-        {!loading && notifications.length === 0 && !error && <p>Sem notificacoes.</p>}
+        {loading && <p>A carregar notificações...</p>}
+        {!loading && notifications.length === 0 && !error && <p>Sem notificações.</p>}
         {notifications.map((notification) => (
           <article key={notification.id}>
             <h3>{notification.title}</h3>
@@ -729,23 +814,23 @@ export function NotificationsPage() {
 }
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicação do código ou da decisão.
 
-A pagina mostra estado vazio, erro e preferencias. Nao usa `localStorage`; tudo fica no backend por utilizador.
+A página mostra estado vazio, erro e preferências. Não usa `localStorage`; tudo fica no backend por utilizador.
 
-6. Validacao do passo.
+6. Validação do passo.
 
-Entrar, abrir `/notifications`, alterar preferencias e marcar uma notificacao como lida.
+Entrar, abrir `/notifications`, alterar preferências e marcar uma notificação como lida.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Guardar preferencias no browser perderia sincronizacao entre dispositivos e nao serviria para o backend decidir se cria notificacao.
+Guardar preferências no browser perderia sincronizacao entre dispositivos e não serviria para o backend decidir se cria notificação.
 
-### Passo 5 - Integrar eventos de subscricao e trial
+### Passo 5 - Integrar eventos de subscrição e trial
 
 1. Objetivo do passo.
 
-Mostrar onde os BKs anteriores devem chamar o service de notificacoes.
+Mostrar onde os BKs anteriores devem chamar o service de notificações.
 
 2. Ficheiros envolvidos.
     - EDITAR: `backend/src/modules/payments/payments.service.js`
@@ -754,11 +839,11 @@ Mostrar onde os BKs anteriores devem chamar o service de notificacoes.
 
 3. Instrucoes concretas.
 
-Edita as funcoes completas indicadas abaixo. O checkout aprovado nao cria uma segunda notificacao dentro de `payments.service.js`, porque chama `activateSubscription` e essa funcao passa a ser o ponto unico que notifica subscricao ativa. O checkout falhado cria `payment_failed` no proprio modulo de pagamentos. O trial cria `trial_started` depois de gravar o trial.
+Edita as funções completas indicadas abaixo. O checkout aprovado não cria uma segunda notificação dentro de `payments.service.js`, porque chama `activateSubscription` e essa função passa a ser o ponto único que notifica subscrição ativa. O checkout falhado cria `payment_failed` no proprio módulo de pagamentos. O trial cria `trial_started` depois de gravar o trial.
 
-4. Codigo completo.
+4. Código completo.
 
-No topo de `backend/src/modules/payments/payments.service.js`, acrescenta o import de notificacoes mantendo os imports anteriores:
+No topo de `backend/src/modules/payments/payments.service.js`, acrescenta o import de notificações mantendo os imports anteriores:
 
 ```js
 import { ObjectId } from "mongodb";
@@ -771,11 +856,11 @@ import {
 import { assertCheckoutPayload } from "./payments.validation.js";
 ```
 
-Ainda em `backend/src/modules/payments/payments.service.js`, substitui a funcao `createSimulatedCheckout` completa por esta versao:
+Ainda em `backend/src/modules/payments/payments.service.js`, substitui a função `createSimulatedCheckout` completa por esta versão:
 
 ```js
 /**
- * Regista checkout simulado e cria notificacao quando o pagamento e recusado.
+ * Regista checkout simulado e cria notificação quando o pagamento e recusado.
  *
  * @param {string} userId Identificador do utilizador autenticado.
  * @param {object} input Dados do checkout simulado.
@@ -792,7 +877,7 @@ export async function createSimulatedCheckout(userId, input) {
   });
 
   if (!plan) {
-    const error = new Error("Plano nao encontrado.");
+    const error = new Error("Plano não encontrado.");
     error.statusCode = 404;
     throw error;
   }
@@ -809,11 +894,11 @@ export async function createSimulatedCheckout(userId, input) {
 
   const result = await db.collection("payment_attempts").insertOne(attempt);
   if (attempt.status === "failed") {
-    // Pagamento recusado pertence ao modulo de pagamentos, por isso a notificacao nasce aqui.
+    // Pagamento recusado pertence ao módulo de pagamentos, por isso a notificação nasce aqui.
     await createNotification(userId, {
       type: "payment_failed",
       title: "Pagamento recusado",
-      message: "O pagamento simulado foi recusado. Podes tentar novamente com outro metodo de teste.",
+      message: "O pagamento simulado foi recusado. Podes tentar novamente com outro método de teste.",
     });
 
     return { paymentAttemptId: String(result.insertedId), status: "failed", message: attempt.failureReason };
@@ -824,14 +909,14 @@ export async function createSimulatedCheckout(userId, input) {
 }
 ```
 
-No mesmo ficheiro, substitui a funcao `startTrial` completa por esta versao:
+No mesmo ficheiro, substitui a função `startTrial` completa por esta versão:
 
 ```js
 /**
- * Inicia trial unico e notifica o utilizador quando o acesso gratuito fica ativo.
+ * Inicia trial único e notifica o utilizador quando o acesso gratuito fica ativo.
  *
  * @param {string} userId Identificador do utilizador autenticado.
- * @returns {Promise<object>} Trial e subscricao temporaria.
+ * @returns {Promise<object>} Trial e subscrição temporária.
  */
 export async function startTrial(userId) {
   const db = await getDb();
@@ -845,7 +930,7 @@ export async function startTrial(userId) {
   });
 
   if (activePaidSubscription) {
-    const error = new Error("Utilizador ja tem uma subscricao ativa.");
+    const error = new Error("Utilizador já tem uma subscrição ativa.");
     error.statusCode = 409;
     throw error;
   }
@@ -859,11 +944,11 @@ export async function startTrial(userId) {
   };
 
   try {
-    // O indice unico continua a garantir que o trial so e criado uma vez por utilizador.
+    // O indice único continua a garantir que o trial só e criado uma vez por utilizador.
     await db.collection("trials").insertOne(trial);
   } catch (error) {
     if (error.code === 11000) {
-      const alreadyUsed = new Error("Trial ja utilizado por este utilizador.");
+      const alreadyUsed = new Error("Trial já utilizado por este utilizador.");
       alreadyUsed.statusCode = 409;
       throw alreadyUsed;
     }
@@ -885,7 +970,7 @@ export async function startTrial(userId) {
 }
 ```
 
-No topo de `backend/src/modules/subscriptions/subscriptions.service.js`, acrescenta o import de notificacoes mantendo os imports existentes:
+No topo de `backend/src/modules/subscriptions/subscriptions.service.js`, acrescenta o import de notificações mantendo os imports existentes:
 
 ```js
 import { ObjectId } from "mongodb";
@@ -898,21 +983,21 @@ import {
 } from "./subscriptions.validation.js";
 ```
 
-Ainda em `backend/src/modules/subscriptions/subscriptions.service.js`, substitui apenas a funcao `activateSubscription` completa por esta versao, preservando a funcao `grantTrialSubscription` adicionada no `BK-MF4-02`:
+Ainda em `backend/src/modules/subscriptions/subscriptions.service.js`, substitui apenas a função `activateSubscription` completa por esta versão, preservando a função `grantTrialSubscription` adicionada no `BK-MF4-02`:
 
 ```js
 /**
- * Ativa uma subscricao paga e cria a notificacao transacional correspondente.
+ * Ativa uma subscrição paga e cria a notificação transacional correspondente.
  *
  * @param {string} userId Identificador do utilizador autenticado.
- * @param {string} planCode Codigo do plano ativo.
- * @returns {Promise<{ subscription: object }>} Subscricao publica atualizada.
+ * @param {string} planCode Código do plano ativo.
+ * @returns {Promise<{ subscription: object }>} Subscrição pública atualizada.
  */
 export async function activateSubscription(userId, planCode) {
   const db = await getDb();
   const plan = await db.collection("subscription_plans").findOne({ code: String(planCode), active: true });
   if (!plan) {
-    const error = new Error("Plano nao encontrado.");
+    const error = new Error("Plano não encontrado.");
     error.statusCode = 404;
     throw error;
   }
@@ -936,42 +1021,42 @@ export async function activateSubscription(userId, planCode) {
     { upsert: true },
   );
 
-  // A notificacao de subscricao ativa fica centralizada para evitar duplicacao no checkout aprovado.
+  // A notificação de subscrição ativa fica centralizada para evitar duplicação no checkout aprovado.
   await createNotification(userId, {
     type: "subscription_activated",
-    title: "Subscricao ativa",
-    message: "A tua subscricao FaithFlix ficou ativa.",
+    title: "Subscrição ativa",
+    message: "A tua subscrição FaithFlix ficou ativa.",
   });
 
   return { subscription: publicSubscription(subscription, plan) };
 }
 ```
 
-No topo de `backend/src/modules/playback/playback.service.js`, acrescenta o import de notificacoes mantendo os imports existentes:
+No topo de `backend/src/modules/playback/playback.service.js`, acrescenta o import de notificações mantendo os imports existentes:
 
 ```js
 import { createContinueWatchingNotification } from "../notifications/notifications.service.js";
 ```
 
-Ainda em `backend/src/modules/playback/playback.service.js`, substitui a funcao `savePlaybackProgress` completa por esta versao:
+Ainda em `backend/src/modules/playback/playback.service.js`, substitui a função `savePlaybackProgress` completa por esta versão:
 
 ```js
 /**
  * Guarda progresso de visualizacao e cria alerta de continuidade quando faz sentido.
  *
- * @param {string} contentId Identificador do conteudo.
+ * @param {string} contentId Identificador do conteúdo.
  * @param {string} userId Identificador do utilizador autenticado.
  * @param {object} input Progresso recebido da UI.
- * @returns {Promise<object>} Progresso publico atualizado.
+ * @returns {Promise<object>} Progresso público atualizado.
  */
 export async function savePlaybackProgress(contentId, userId, input) {
   const db = await getDb();
-  const contentObjectId = asObjectId(contentId, "Conteudo");
+  const contentObjectId = asObjectId(contentId, "Conteúdo");
   const userObjectId = asObjectId(userId, "Utilizador");
   const content = await db.collection("contents").findOne({ _id: contentObjectId, status: "published" });
 
   if (!content) {
-    const error = new Error("Conteudo nao encontrado.");
+    const error = new Error("Conteúdo não encontrado.");
     error.statusCode = 404;
     throw error;
   }
@@ -989,7 +1074,7 @@ export async function savePlaybackProgress(contentId, userId, input) {
   );
 
   if (!progress.completed && progress.currentTimeSeconds >= 60) {
-    // O alerta so nasce depois de haver progresso real e fica deduplicado por conteudo.
+    // O alerta só nasce depois de haver progresso real e fica deduplicado por conteúdo.
     await createContinueWatchingNotification(userId, {
       contentId,
       contentTitle: content.title,
@@ -1000,54 +1085,54 @@ export async function savePlaybackProgress(contentId, userId, input) {
 }
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicação do código ou da decisão.
 
-A notificacao nasce no backend, perto da regra de negocio. Assim, se no futuro existir app mobile, a regra continua central. `activateSubscription` fica como ponto unico para a notificacao `subscription_activated`, por isso um checkout aprovado nao duplica notificacoes. O checkout falhado e o trial usam eventos proprios porque pertencem ao modulo de pagamentos. O alerta `continue_watching` nasce em `savePlaybackProgress`, que e o ponto onde a app sabe que o utilizador deixou conteudo por terminar; `dedupeKey` evita criar o mesmo alerta repetidamente.
+A notificação nasce no backend, perto da regra de negócio. Assim, se no futuro existir app mobile, a regra continua central. `activateSubscription` fica como ponto único para a notificação `subscription_activated`, por isso um checkout aprovado não duplica notificações. O checkout falhado e o trial usam eventos proprios porque pertencem ao módulo de pagamentos. O alerta `continue_watching` nasce em `savePlaybackProgress`, que e o ponto onde a app sabe que o utilizador deixou conteúdo por terminar; `dedupeKey` evita criar o mesmo alerta repetidamente.
 
-A validacao do plano no checkout preserva a regra do `BK-MF4-02`: um `planCode` invalido falha antes de gravar a tentativa, evitando uma tentativa aprovada sem subscricao associada.
+A validação do plano no checkout preserva a regra do `BK-MF4-02`: um `planCode` inválido falha antes de gravar a tentativa, evitando uma tentativa aprovada sem subscrição associada.
 
-6. Validacao do passo.
+6. Validação do passo.
 
-Executar checkout simulado aprovado e confirmar uma notificacao `subscription_activated` em `/api/notifications`. Depois executar checkout simulado falhado e confirmar `payment_failed`. Por fim, iniciar trial e confirmar `trial_started` e `subscription.status: "trialing"`. Guardar progresso com `currentTimeSeconds >= 60` e `completed: false` deve criar uma notificacao `continue_watching`.
+Executar checkout simulado aprovado e confirmar uma notificação `subscription_activated` em `/api/notifications`. Depois executar checkout simulado falhado e confirmar `payment_failed`. Por fim, iniciar trial e confirmar `trial_started` e `subscription.status: "trialing"`. Guardar progresso com `currentTimeSeconds >= 60` e `completed: false` deve criar uma notificação `continue_watching`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Criar notificacao apenas no frontend faria desaparecer o evento se o utilizador fechasse a pagina. Criar notificacao em `payments.service.js` e tambem em `activateSubscription` para o mesmo checkout aprovado duplicaria a mensagem.
+Criar notificação apenas no frontend faria desaparecer o evento se o utilizador fechasse a página. Criar notificação em `payments.service.js` e também em `activateSubscription` para o mesmo checkout aprovado duplicaria a mensagem.
 
-## Criterios de aceite (mensuraveis)
+## Critérios de aceite (mensuráveis)
 
-- `GET /api/notifications` exige login e devolve apenas notificacoes do utilizador.
-- `PUT /api/notifications/preferences/me` guarda preferencias por utilizador.
-- Checkout/trial cria notificacao interna quando `inApp` esta ativo.
-- Trial devolve tambem `subscription.status: "trialing"` e reutiliza o acesso premium do `BK-MF4-01`.
-- `PUT /api/playback/:contentId/progress` com progresso incompleto acima de 60 segundos cria uma notificacao `continue_watching`.
-- Preferencia `continueWatching: false` bloqueia notificacoes desse tipo.
-- Repetir progresso no mesmo conteudo nao duplica alerta `continue_watching`.
-- Marcar notificacao de outro utilizador devolve `404` ou `403`; ID invalido devolve `400`.
+- `GET /api/notifications` exige login e devolve apenas notificações do utilizador.
+- `PUT /api/notifications/preferences/me` guarda preferências por utilizador.
+- Checkout/trial cria notificação interna quando `inApp` esta ativo.
+- Trial devolve também `subscription.status: "trialing"` e reutiliza o acesso premium do `BK-MF4-01`.
+- `PUT /api/playback/:contentId/progress` com progresso incompleto acima de 60 segundos cria uma notificação `continue_watching`.
+- Preferência `continueWatching: false` bloqueia notificações desse tipo.
+- Repetir progresso no mesmo conteúdo não duplica alerta `continue_watching`.
+- Marcar notificação de outro utilizador devolve `404` ou `403`; ID inválido devolve `400`.
 
-## Validacao final
+## Validação final
 
 ```bash
 cd backend
 npm test
 ```
 
-Testar listagem, preferencias, criacao por evento, trial com subscricao `trialing`, progresso a gerar `continue_watching`, deduplicacao e ownership.
+Testar listagem, preferências, criacao por evento, trial com subscrição `trialing`, progresso a gerar `continue_watching`, deduplicacao e ownership.
 
 ## Evidence para PR/defesa
 
-- `pr`: commit/PR com modulo `notifications`.
-- `proof`: captura da pagina de notificacoes, JSON de preferencias e eventos `subscription_activated`, `trial_started` e `continue_watching`.
-- `neg`: sem login, notificacao de outro utilizador, ID invalido, preferencias a bloquear alerta e tentativa repetida sem duplicar `continue_watching`.
+- `pr`: commit/PR com módulo `notifications`.
+- `proof`: captura da página de notificações, JSON de preferências e eventos `subscription_activated`, `trial_started` e `continue_watching`.
+- `neg`: sem login, notificação de outro utilizador, ID inválido, preferências a bloquear alerta e tentativa repetida sem duplicar `continue_watching`.
 
 ## Handoff
 
-O `BK-MF4-03` continua a pool de associacoes. Se a equipa quiser notificar admins sobre nova candidatura, deve chamar `createNotification` apenas para utilizadores admin existentes, sem criar canal externo. Manter `grantTrialSubscription` do `BK-MF4-02` quando este BK for implementado para nao perder o acesso premium do trial.
+O `BK-MF4-03` continua a pool de associações. Se a equipa quiser notificar admins sobre nova candidatura, deve chamar `createNotification` apenas para utilizadores admin existentes, sem criar canal externo. Manter `grantTrialSubscription` do `BK-MF4-02` quando este BK for implementado para não perder o acesso premium do trial.
 
-## Snippet tecnico aplicavel
+## Snippet técnico aplicável
 
 ```js
-// O alerta de continuidade nasce no progresso e e deduplicado por conteudo.
+// O alerta de continuidade nasce no progresso e e deduplicado por conteúdo.
 await createContinueWatchingNotification(userId, {
   contentId,
   contentTitle: content.title,
@@ -1056,4 +1141,4 @@ await createContinueWatchingNotification(userId, {
 
 ## Changelog
 
-- `2026-06-13`: guia reescrito com notificacoes internas, preferencias, ownership, frontend e integracao com eventos.
+- `2026-06-13`: guia reescrito com notificações internas, preferências, ownership, frontend e integração com eventos.

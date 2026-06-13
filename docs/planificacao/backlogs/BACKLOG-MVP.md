@@ -210,13 +210,13 @@ Estado do guia indica a fase de criacao documental.
 
 | BK          | Titulo                                    | Owner   | Apoio   | Pri | Estado | Esforco | Dependencias | RF/RNF                 |
 | ----------- | ----------------------------------------- | ------- | ------- | --- | ------ | ------- | ------------ | ---------------------- |
-| `BK-MF4-01` | Planos e ciclo de subscricao              | Matheus | Davi    | P0  | TODO   | L       | `BK-MF2-01`  | RF35, RF36, RF38, RF39 |
+| `BK-MF4-01` | Planos e ciclo de subscricao              | Matheus | Davi    | P0  | TODO   | L       | `BK-MF2-01,BK-MF2-05`  | RF35, RF36, RF38, RF39 |
 | `BK-MF4-02` | Metodos de pagamento simulados e trial    | Davi    | Matheus | P0  | TODO   | M       | `BK-MF4-01`  | RF37, RF40             |
-| `BK-MF4-03` | Candidaturas de associacoes               | Kaue    | Davi    | P0  | TODO   | M       | `BK-MF1-04`  | RF41                   |
+| `BK-MF4-03` | Candidaturas de associacoes               | Kaue    | Davi    | P0  | TODO   | M       | `BK-MF2-02`  | RF41                   |
 | `BK-MF4-04` | Aprovacao e entrada na pool               | Matheus | Kaue    | P0  | TODO   | M       | `BK-MF4-03`  | RF42, RF43             |
-| `BK-MF4-05` | Distribuicao mensal e rotacao             | Davi    | Matheus | P0  | TODO   | L       | `BK-MF4-04`  | RF44, RF45             |
+| `BK-MF4-05` | Distribuicao mensal e rotacao             | Davi    | Matheus | P0  | TODO   | L       | `BK-MF4-04,BK-MF4-02`  | RF44, RF45             |
 | `BK-MF4-06` | Relatorios e historico por associacao     | Kaue    | Mateus  | P1  | TODO   | M       | `BK-MF4-05`  | RF46, RF47, RF48       |
-| `BK-MF4-08` | Notificacoes transacionais e preferencias | Mateus  | Davi    | P1  | TODO   | M       | `BK-MF4-01`  | RF52, RF53, RF54       |
+| `BK-MF4-08` | Notificacoes transacionais e preferencias | Mateus  | Davi    | P1  | TODO   | M       | `BK-MF4-02,BK-MF2-05`  | RF52, RF53, RF54       |
 
 ---
 

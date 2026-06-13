@@ -47,13 +47,13 @@ Nota de escopo:
 | BK-MF3-04 | Mateus | P1 | BK-MF3-03 | RF23, RF24, RF25 |
 | BK-MF3-05 | Davi | P1 | BK-MF3-01,BK-MF2-07 | RF26, RF27 |
 | BK-MF3-06 | Mateus | P2 | BK-MF3-05 | RF28, RNF34 |
-| BK-MF4-01 | Matheus | P0 | BK-MF2-01 | RF35, RF36, RF38, RF39 |
+| BK-MF4-01 | Matheus | P0 | BK-MF2-01,BK-MF2-05 | RF35, RF36, RF38, RF39 |
 | BK-MF4-02 | Davi | P0 | BK-MF4-01 | RF37, RF40 |
-| BK-MF4-03 | Kaue | P0 | BK-MF1-04 | RF41 |
+| BK-MF4-03 | Kaue | P0 | BK-MF2-02 | RF41 |
 | BK-MF4-04 | Matheus | P0 | BK-MF4-03 | RF42, RF43 |
-| BK-MF4-05 | Davi | P0 | BK-MF4-04 | RF44, RF45 |
+| BK-MF4-05 | Davi | P0 | BK-MF4-04,BK-MF4-02 | RF44, RF45 |
 | BK-MF4-06 | Kaue | P1 | BK-MF4-05 | RF46, RF47, RF48 |
-| BK-MF4-08 | Mateus | P1 | BK-MF4-01 | RF52, RF53, RF54 |
+| BK-MF4-08 | Mateus | P1 | BK-MF4-02,BK-MF2-05 | RF52, RF53, RF54 |
 | BK-MF5-01 | Matheus | P0 | BK-MF2-01 | RF55 |
 | BK-MF5-02 | Matheus | P0 | BK-MF5-01 | RF56 |
 | BK-MF5-03 | Mateus | P0 | BK-MF2-01 | RF57 |
