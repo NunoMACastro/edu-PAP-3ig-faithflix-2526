@@ -6,7 +6,7 @@
  * antes de persistir dados de subscrição.
  */
 export const PLAN_INTERVALS = ["monthly", "yearly"];
-export const SUBSCRIPTION_STATUS = ["active", "past_due", "expired", "canceled"];
+export const SUBSCRIPTION_STATUS = ["active", "trialing", "past_due", "expired", "canceled"];
 
 /**
  * Cria um erro HTTP simples para validacoes de subscrição.
