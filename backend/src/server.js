@@ -6,12 +6,15 @@ import { ensureTaxonomyIndexes } from "./modules/catalog/taxonomy.service.js";
 import { ensureLibraryIndexes } from "./modules/library/library.service.js";
 import { ensurePlaybackIndexes } from "./modules/playback/playback.service.js";
 import { logger } from "./utils/logger.js";
+import { ensureSubscriptionIndexes } from "./modules/subscriptions/subscriptions.service.js";
+
 
 await ensureAuthIndexes();
 await ensureCatalogIndexes();
 await ensureTaxonomyIndexes();
 await ensurePlaybackIndexes();
 await ensureLibraryIndexes();
+await ensureSubscriptionIndexes();
 
 const app = createApp();
 
