@@ -186,6 +186,60 @@ export async function activateSubscription(userId, planCode) {
 }
 
 /**
+ * Cria uma subscrição temporária de trial para um utilizador sem subscrição paga ativa.
+ *
+ * @param {string} userId Identificador do utilizador autenticado.
+ * @param {Date | string} endsAt Data em que o acesso gratuito termina.
+ * @returns {Promise<{ subscription: object }>} Subscrição pública no formato do módulo de subscrições.
+ * @throws {Error} Quando a data e inválida ou o utilizador já tem subscrição paga ativa.
+ */
+export async function grantTrialSubscription(userId, endsAt) {
+  const db = await getDb();
+  const now = new Date();
+  const periodEnd = new Date(endsAt);
+
+  if (Number.isNaN(periodEnd.getTime()) || periodEnd <= now) {
+    const error = new Error("Data de fim de trial inválida.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const userIdObject = userObjectId(userId);
+  // Trial não deve substituir uma subscrição paga em vigor.
+  const activePaidSubscription = await db.collection("subscriptions").findOne({
+    userId: userIdObject,
+    status: "active",
+    currentPeriodEnd: { $gt: now },
+  });
+
+  if (activePaidSubscription) {
+    const error = new Error("Utilizador já tem uma subscrição ativa.");
+    error.statusCode = 409;
+    throw error;
+  }
+
+  const subscription = {
+    userId: userIdObject,
+    planCode: "trial",
+    status: "trialing",
+    currentPeriodStart: now,
+    currentPeriodEnd: periodEnd,
+    cancelAtPeriodEnd: true,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  // Mantém uma unica subscrição por utilizador, tal como o fluxo pago do BK anterior.
+  await db.collection("subscriptions").updateOne(
+    { userId: userIdObject },
+    { $set: subscription },
+    { upsert: true },
+  );
+
+  return { subscription: publicSubscription(subscription) };
+}
+
+/**
  * Devolve a subscrição do utilizador autenticado.
  *
  * @param {string} userId - Identificador vindo da sessão segura.
