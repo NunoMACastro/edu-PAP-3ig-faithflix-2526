@@ -14,7 +14,7 @@
     },
     "dependencies": {
         "express": "^4.19.2",
-        "mongodb": "^6.16.0"
+        "mongodb": "^6.21.0"
     },
     "engines": {
         "node": ">=20"

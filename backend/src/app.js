@@ -19,6 +19,7 @@ import { ratingsRouter } from "./modules/ratings/ratings.routes.js";
 import { recommendationsRouter } from "./modules/recommendations/recommendations.routes.js";
 import { searchRouter } from "./modules/search/search.routes.js";
 import { userRouter } from "./modules/users/user.routes.js";
+import { subscriptionsRouter } from "./modules/subscriptions/subscriptions.routes.js";
 
 /**
  * Creates the Express application without opening a network port.
@@ -54,6 +55,9 @@ export function createApp() {
     // Error middlewares remain last so they see all unmatched routes and failures.
     app.use(notFoundHandler);
     app.use(errorHandler);
+
+    //Rota da page de subscrições
+    app.use("/api/subscriptions", subscriptionsRouter);
 
     return app;
 }
