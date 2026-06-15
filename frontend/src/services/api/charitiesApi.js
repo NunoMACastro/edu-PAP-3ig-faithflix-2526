@@ -5,7 +5,6 @@
  * @param {object} input Decisão e motivo opcional.
  * @returns {Promise<object>} Resultado da revisão.
  */
-
-export function reviewApplication(id, input) {
-return apiClient.patch(`/api/charities/applications/${encodeURIComponent(id)}/review`, input);
+reviewApplication(id, input) {
+  return apiClient.patch(`/api/charities/applications/${encodeURIComponent(id)}/review`, input);
 }
