@@ -8,3 +8,22 @@
 reviewApplication(id, input) {
   return apiClient.patch(`/api/charities/applications/${encodeURIComponent(id)}/review`, input);
 }
+
+/**
+ * Executa a distribuição mensal no backend.
+ *
+ * @param {string} month Mês no formato `YYYY-MM`.
+ * @returns {Promise<{ distribution: object }>} Distribuição criada.
+ */
+runDistribution(month) {
+  return apiClient.post("/api/charities/pool/distributions", { month });
+},
+/**
+ * Consulta uma distribuição mensal já criada.
+ *
+ * @param {string} month Mês no formato `YYYY-MM`.
+ * @returns {Promise<{ distribution: object }>} Distribuição existente.
+ */
+getDistribution(month) {
+  return apiClient.get(`/api/charities/pool/distributions/${encodeURIComponent(month)}`);
+}
