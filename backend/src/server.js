@@ -29,3 +29,7 @@ app.listen(env.port, () => {
         port: env.port,
     });
 });
+
+import { ensureCharityIndexes } from "./modules/charities/charity-review.service.js";
+
+await ensureCharityIndexes();
