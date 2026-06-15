@@ -10,6 +10,7 @@ import { ensureSubscriptionIndexes } from "./modules/subscriptions/subscriptions
 import { ensurePaymentIndexes } from "./modules/payments/payments.service.js";
 import { ensureNotificationIndexes } from "./modules/notifications/notifications.service.js";
 import { ensureCharityIndexes } from "./modules/charities/charity-review.service.js";
+import { ensurePoolDistributionIndexes } from "./modules/charities/pool-distribution.service.js";
 
 
 
@@ -22,6 +23,8 @@ await ensureSubscriptionIndexes();
 await ensurePaymentIndexes();
 await ensureNotificationIndexes();
 await ensureCharityIndexes();
+await ensurePoolDistributionIndexes();
+
 
 
 const app = createApp();
