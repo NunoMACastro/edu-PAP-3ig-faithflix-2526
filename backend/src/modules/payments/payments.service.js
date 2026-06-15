@@ -7,6 +7,7 @@
  */
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
+import { createNotification } from "../notifications/notifications.service.js";
 import {
   activateSubscription,
   grantTrialSubscription,
@@ -61,11 +62,18 @@ export async function ensurePaymentIndexes() {
  * @returns {Promise<object>} Resultado da tentativa e, quando aprovado, subscrição pública.
  * @throws {Error} Quando o plano não existe ou o payload e inválido.
  */
+/**
+ * Regista checkout simulado e cria notificação quando o pagamento e recusado.
+ *
+ * @param {string} userId Identificador do utilizador autenticado.
+ * @param {object} input Dados do checkout simulado.
+ * @returns {Promise<object>} Resultado da tentativa.
+ */
 export async function createSimulatedCheckout(userId, input) {
   const db = await getDb();
   const payload = assertCheckoutPayload(input);
   const now = new Date();
-  // A tentativa só e gravada depois de confirmar que o plano existe e esta ativo.
+  // O plano e validado antes de gravar a tentativa para evitar registos incoerentes.
   const plan = await db.collection("subscription_plans").findOne({
     code: payload.planCode,
     active: true,
@@ -89,7 +97,13 @@ export async function createSimulatedCheckout(userId, input) {
 
   const result = await db.collection("payment_attempts").insertOne(attempt);
   if (attempt.status === "failed") {
-    // O caminho negativo fica auditável sem criar subscrição nem guardar dados financeiros.
+    // Pagamento recusado pertence ao módulo de pagamentos, por isso a notificação nasce aqui.
+    await createNotification(userId, {
+      type: "payment_failed",
+      title: "Pagamento recusado",
+      message: "O pagamento simulado foi recusado. Podes tentar novamente com outro método de teste.",
+    });
+
     return { paymentAttemptId: String(result.insertedId), status: "failed", message: attempt.failureReason };
   }
 
@@ -104,12 +118,17 @@ export async function createSimulatedCheckout(userId, input) {
  * @returns {Promise<object>} Dados do trial e subscrição temporária.
  * @throws {Error} Quando já existe subscrição paga ativa ou trial utilizado.
  */
+/**
+ * Inicia trial único e notifica o utilizador quando o acesso gratuito fica ativo.
+ *
+ * @param {string} userId Identificador do utilizador autenticado.
+ * @returns {Promise<object>} Trial e subscrição temporária.
+ */
 export async function startTrial(userId) {
   const db = await getDb();
   const now = new Date();
   const userIdObject = userObjectId(userId);
 
-  // Utilizadores que já pagam não precisam de consumir trial.
   const activePaidSubscription = await db.collection("subscriptions").findOne({
     userId: userIdObject,
     status: "active",
@@ -131,7 +150,7 @@ export async function startTrial(userId) {
   };
 
   try {
-    // O indice único em `trials.userId` e a garantia contra repeticao do período gratuito.
+    // O indice único continua a garantir que o trial só e criado uma vez por utilizador.
     await db.collection("trials").insertOne(trial);
   } catch (error) {
     if (error.code === 11000) {
@@ -143,6 +162,12 @@ export async function startTrial(userId) {
   }
 
   const subscription = await grantTrialSubscription(userId, trial.endsAt);
+
+  await createNotification(userId, {
+    type: "trial_started",
+    title: "Trial iniciado",
+    message: "O teu trial FaithFlix ficou ativo durante 14 dias.",
+  });
 
   return {
     trial: { status: trial.status, startedAt: trial.startedAt, endsAt: trial.endsAt },

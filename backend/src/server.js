@@ -8,6 +8,7 @@ import { ensurePlaybackIndexes } from "./modules/playback/playback.service.js";
 import { logger } from "./utils/logger.js";
 import { ensureSubscriptionIndexes } from "./modules/subscriptions/subscriptions.service.js";
 import { ensurePaymentIndexes } from "./modules/payments/payments.service.js";
+import { ensureNotificationIndexes } from "./modules/notifications/notifications.service.js";
 
 
 
@@ -18,6 +19,8 @@ await ensurePlaybackIndexes();
 await ensureLibraryIndexes();
 await ensureSubscriptionIndexes();
 await ensurePaymentIndexes();
+await ensureNotificationIndexes();
+
 
 const app = createApp();
 
