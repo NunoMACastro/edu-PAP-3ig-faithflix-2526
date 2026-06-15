@@ -9,6 +9,7 @@ import { logger } from "./utils/logger.js";
 import { ensureSubscriptionIndexes } from "./modules/subscriptions/subscriptions.service.js";
 import { ensurePaymentIndexes } from "./modules/payments/payments.service.js";
 import { ensureNotificationIndexes } from "./modules/notifications/notifications.service.js";
+import { ensureCharityIndexes } from "./modules/charities/charity-review.service.js";
 
 
 
@@ -20,6 +21,7 @@ await ensureLibraryIndexes();
 await ensureSubscriptionIndexes();
 await ensurePaymentIndexes();
 await ensureNotificationIndexes();
+await ensureCharityIndexes();
 
 
 const app = createApp();
