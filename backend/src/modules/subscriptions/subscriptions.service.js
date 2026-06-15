@@ -7,6 +7,7 @@
  */
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
+import { createNotification } from "../notifications/notifications.service.js";
 import {
   addBillingCycle,
   assertPlanInterval,
@@ -152,6 +153,13 @@ export async function listPlans() {
  * @returns {Promise<{subscription: object}>} Subscrição pública criada/atualizada.
  * @throws {Error} Quando o plano não existe ou esta inativo.
  */
+/**
+ * Ativa uma subscrição paga e cria a notificação transacional correspondente.
+ *
+ * @param {string} userId Identificador do utilizador autenticado.
+ * @param {string} planCode Código do plano ativo.
+ * @returns {Promise<{ subscription: object }>} Subscrição pública atualizada.
+ */
 export async function activateSubscription(userId, planCode) {
   const db = await getDb();
   const plan = await db.collection("subscription_plans").findOne({ code: String(planCode), active: true });
@@ -164,7 +172,6 @@ export async function activateSubscription(userId, planCode) {
   const now = new Date();
   const interval = assertPlanInterval(plan.interval);
   const subscription = {
-    // O userId vem da sessão para impedir subscrições em nome de outra pessoa.
     userId: userObjectId(userId),
     planCode: plan.code,
     status: "active",
@@ -175,12 +182,18 @@ export async function activateSubscription(userId, planCode) {
     updatedAt: now,
   };
 
-  // Existe uma unica subscrição por utilizador; isto simplifica guards e relatórios.
   await db.collection("subscriptions").updateOne(
     { userId: subscription.userId },
     { $set: subscription },
     { upsert: true },
   );
+
+  // A notificação de subscrição ativa fica centralizada para evitar duplicação no checkout aprovado.
+  await createNotification(userId, {
+    type: "subscription_activated",
+    title: "Subscrição ativa",
+    message: "A tua subscrição FaithFlix ficou ativa.",
+  });
 
   return { subscription: publicSubscription(subscription, plan) };
 }

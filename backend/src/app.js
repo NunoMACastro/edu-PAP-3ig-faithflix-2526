@@ -21,6 +21,7 @@ import { searchRouter } from "./modules/search/search.routes.js";
 import { userRouter } from "./modules/users/user.routes.js";
 import { subscriptionsRouter } from "./modules/subscriptions/subscriptions.routes.js";
 import { paymentsRouter } from "./modules/payments/payments.routes.js";
+import { notificationsRouter } from "./modules/notifications/notifications.routes.js";
 
 /**
  * Creates the Express application without opening a network port.
@@ -53,14 +54,12 @@ export function createApp() {
     app.use("/api/discovery", discoveryRouter);
     app.use("/api/recommendations", recommendationsRouter);
     app.use("/api/payments", paymentsRouter);
-
+    app.use("/api/notifications", notificationsRouter);
+    app.use("/api/subscriptions", subscriptionsRouter);
 
     // Error middlewares remain last so they see all unmatched routes and failures.
     app.use(notFoundHandler);
     app.use(errorHandler);
-
-    //Rota da page de subscrições
-    app.use("/api/subscriptions", subscriptionsRouter);
-
+    
     return app;
 }

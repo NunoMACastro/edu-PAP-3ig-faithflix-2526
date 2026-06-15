@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
+import { createContinueWatchingNotification } from "../notifications/notifications.service.js";
 import {
     getMediaPreferences,
     ensureMediaPreferenceIndexes,
@@ -167,38 +168,47 @@ export async function getPlayback(contentId, userId) {
  * @param {{ currentTimeSeconds?: unknown }} input - Progress payload.
  * @returns {Promise<ReturnType<typeof publicProgress>>} Saved progress.
  */
+/**
+ * Guarda progresso de visualizacao e cria alerta de continuidade quando faz sentido.
+ *
+ * @param {string} contentId Identificador do conteúdo.
+ * @param {string} userId Identificador do utilizador autenticado.
+ * @param {object} input Progresso recebido da UI.
+ * @returns {Promise<object>} Progresso público atualizado.
+ */
 export async function savePlaybackProgress(contentId, userId, input) {
-    await ensurePlaybackIndexes();
+  const db = await getDb();
+  const contentObjectId = asObjectId(contentId, "Conteúdo");
+  const userObjectId = asObjectId(userId, "Utilizador");
+  const content = await db.collection("contents").findOne({ _id: contentObjectId, status: "published" });
 
-    const db = await getDb();
-    const contentObjectId = asObjectId(contentId, "Conteudo");
-    const userObjectId = asObjectId(userId, "Utilizador");
-    const content = await db.collection("contents").findOne({
-        _id: contentObjectId,
-        status: "published",
+  if (!content) {
+    const error = new Error("Conteúdo não encontrado.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const progress = assertProgressPayload(input, content.durationSeconds);
+  const now = new Date();
+
+  await db.collection("playback_progress").updateOne(
+    { userId: userObjectId, contentId: contentObjectId },
+    {
+      $set: { ...progress, lastWatchedAt: now, updatedAt: now },
+      $setOnInsert: { userId: userObjectId, contentId: contentObjectId, createdAt: now },
+    },
+    { upsert: true },
+  );
+
+  if (!progress.completed && progress.currentTimeSeconds >= 60) {
+    // O alerta só nasce depois de haver progresso real e fica deduplicado por conteúdo.
+    await createContinueWatchingNotification(userId, {
+      contentId,
+      contentTitle: content.title,
     });
+  }
 
-    if (!content) {
-        throw new HttpError(404, "Conteudo nao encontrado.");
-    }
-
-    const progress = assertProgressPayload(input, content.durationSeconds);
-    const now = new Date();
-
-    await db.collection("playback_progress").updateOne(
-        { userId: userObjectId, contentId: contentObjectId },
-        {
-            $set: { ...progress, lastWatchedAt: now, updatedAt: now },
-            $setOnInsert: {
-                userId: userObjectId,
-                contentId: contentObjectId,
-                createdAt: now,
-            },
-        },
-        { upsert: true },
-    );
-
-    return publicProgress({ ...progress, lastWatchedAt: now }, content.durationSeconds);
+  return publicProgress({ ...progress, lastWatchedAt: now }, content.durationSeconds);
 }
 
 /**
