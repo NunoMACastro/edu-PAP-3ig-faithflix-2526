@@ -8,7 +8,7 @@ export default defineConfig({
         ["list"],
         [
             "html",
-            { outputFolder: "test-results/mf2-html-report", open: "never" },
+            { outputFolder: "playwright-report/e2e-html-report", open: "never" },
         ],
     ],
     use: {
@@ -32,7 +32,7 @@ export default defineConfig({
         },
         {
             command:
-                "npm --prefix real_dev/frontend run dev -- --host 127.0.0.1 --port 5173",
+                "VITE_API_BASE_URL=http://127.0.0.1:3000 npm --prefix real_dev/frontend run dev -- --host 127.0.0.1 --port 5173",
             url: "http://127.0.0.1:5173",
             reuseExistingServer: true,
             timeout: 30_000,

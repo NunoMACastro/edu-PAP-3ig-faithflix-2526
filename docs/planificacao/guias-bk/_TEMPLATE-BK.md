@@ -1,4 +1,8 @@
-# BK-MF*-** - Titulo do BK
+# BK-MF*-** - Titulo claro do BK
+
+> Template obrigatorio para guias BK FaithFlix.
+> Usa como modelo estrutural BKs hidratados completos, especialmente o padrao de tutorial tecnico linear com codigo, explicacao, validacao, negativos, evidence e handoff.
+> Nao removas secoes. Se uma seccao nao se aplicar, escreve "Nao aplicavel" e justifica.
 
 ## Header
 
@@ -13,56 +17,157 @@
 - `dependencias`: `BK-...|-`
 - `rf_rnf`: `RFxx|RNFxx|RFxx,RNFyy`
 - `fase_documental`: `Fase 1|Fase 2|Fase 3`
-- `sprint`: `Sxx`
+- `sprint`: `Sxx|Sxx-Syy`
 - `core_or_reforco`: `Core|Reforco`
 - `proximo_bk`: `BK-...|-`
-- `guia_path`: `docs/planificacao/guias-bk/MF*/BK-MF*-**-slug.md`
+- `guia_path`: `docs/planificacao/guias-bk/MF*/BK-MF*-**-slug-semantico.md`
 - `last_updated`: `YYYY-MM-DD`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
-### Objetivo pedagogico
+Explica, em 2 a 4 paragrafos, o que o aluno vai construir neste BK e que resultado observavel fica na app.
 
-- Explicar o objetivo especifico do BK com referencia direta ao requisito.
-- Explicar o resultado esperado no contexto da sprint/macro.
+#### Importancia
 
-### Tempo estimado
+Explica porque este BK existe no produto FaithFlix, que RF/RNF cumpre, que problema resolve e que BKs seguintes ficam desbloqueados.
 
-- Planeamento recomendado para este BK.
-- Limiar de remediacao quando houver desvio.
+#### Scope-in
 
-### Erros comuns
+- Lista fechada do que este BK implementa, corrige ou prepara.
+- Incluir backend, frontend, dados, testes e evidence quando aplicavel.
 
-- Listar erros frequentes especificos do BK.
+#### Scope-out
 
-### Check de compreensao
+- Lista fechada do que este BK nao implementa.
+- Nao antecipar funcionalidades de MF futura, pagamentos reais, CDN/DRM, IA avancada, RAG ou embeddings sem contrato documental.
 
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei quais sao entradas, saidas e criterio de sucesso.
-- [ ] Sei o handoff para o proximo BK.
+#### Estado antes e depois
 
-## Bloco operacional (obrigatorio)
+- Estado antes: que contratos, ficheiros ou funcionalidades ja existem.
+- Estado depois: que novo contrato fica implementavel e validavel.
 
-### Pre-condicoes
+#### Pre-requisitos
 
-### Execucao
+- RF/RNF aplicaveis.
+- BKs anteriores obrigatorios.
+- Documentos canonicos a consultar.
+- Ficheiros reais em `real_dev/backend` e `real_dev/frontend`, se existirem.
 
-### Outputs
+#### Glossario
 
-### Validacao
+- Termos de dominio FaithFlix usados no BK.
+- Termos tecnicos que o aluno precisa de compreender antes de copiar codigo.
 
-### Handoff
+#### Conceitos teoricos essenciais
 
-## Snippet tecnico aplicavel
+Explica a teoria minima para o aluno perceber o raciocinio: ownership por utilizador/perfil, catalogo, historico, favoritos, watchlist, subscricoes, pool solidaria, recomendacao baseline, validacao, cookies/sessao, ou outro conceito aplicavel.
 
-```text
-# Trecho tecnico real e aplicavel ao BK
+#### Arquitetura do BK
+
+- Endpoint(s):
+- Modelo/schema:
+- Service(s):
+- Controller/route:
+- Guard/middleware:
+- Cliente API:
+- Pagina/componente:
+- Testes:
+- Handoff para o proximo BK:
+
+#### Ficheiros a criar/editar/rever
+
+- CRIAR: `real_dev/backend/...`
+- EDITAR: `real_dev/backend/...`
+- CRIAR: `real_dev/frontend/...`
+- EDITAR: `real_dev/frontend/...`
+- REVER: `docs/planificacao/guias-bk/MF*/BK-...md`
+
+#### Tutorial tecnico linear
+
+Cada passo deve ser executavel por ordem. O aluno nao deve precisar de adivinhar imports, helpers, DTOs, services, componentes, rotas, testes ou comandos.
+
+Regra obrigatoria para passos com codigo:
+
+- Todo bloco de codigo deve estar completo para o contexto do BK.
+- Depois de cada bloco de codigo deve existir `Explicacao do codigo`.
+- Bloco com 8 ou mais linhas nao vazias: pelo menos 1 comentario didatico dentro do codigo.
+- Bloco com 20 ou mais linhas nao vazias: pelo menos 2 comentarios didaticos dentro do codigo.
+- Mesmo com menos de 8 linhas, e obrigatorio comentario didatico se houver autenticacao, autorizacao, ownership, validacao, async, queries, estado React, testes, logs, privacidade, subscricoes, pool solidaria ou regra de dominio FaithFlix.
+- Comentario didatico explica intencao, contrato, risco evitado ou invariante. Nao repete a sintaxe.
+
+### Passo 1 - Nome claro
+
+1. Objetivo funcional do passo no contexto da app.
+
+Texto especifico: o que este passo entrega no FaithFlix.
+
+2. Ficheiros envolvidos.
+
+- CRIAR/EDITAR/REVER: `caminho/exato`
+- LOCALIZACAO: modulo, pasta ou bloco onde a alteracao entra.
+
+3. Instrucoes do que fazer.
+
+Explica a ordem de trabalho e as decisoes `CANONICO`, `DERIVADO` ou `TODO (BLOCKER)`.
+
+4. Codigo completo, correto e integrado com a app final.
+
+```ts
+// Codigo real ou "Sem codigo neste passo."
 ```
 
-## Criterios de aceite (mensuraveis)
+5. Explicacao do codigo.
 
-## Evidence para PR/defesa
+Deve cobrir:
 
-## Proximo BK recomendado
+- o que o codigo faz;
+- porque existe neste BK;
+- que contrato tecnico, RF/RNF, criterio de aceite ou handoff cumpre;
+- que ficheiros ou BKs anteriores usa;
+- que ficheiros ou BKs seguintes prepara;
+- que dados entram e saem;
+- que validacoes e regras de seguranca/ownership/permissao aplica;
+- que erro comum, bug, duplicacao, vulnerabilidade ou incoerencia evita;
+- como testar;
+- que partes o aluno pode adaptar com seguranca e que partes nao deve alterar.
 
-## Changelog
+6. Validacao do passo.
+
+- Comando, request/response, screenshot ou verificacao objetiva.
+- Resultado esperado.
+
+7. Cenario negativo/erro esperado.
+
+- Erro que deve acontecer.
+- Codigo HTTP, mensagem, estado UI ou assert esperado.
+
+### Passo 2 - Nome claro
+
+Repetir exatamente a estrutura do Passo 1.
+
+#### Criterios de aceite
+
+- Criterios mensuraveis, ligados a RF/RNF e aos passos.
+- Incluir negativos obrigatorios quando houver backend, dados, auth, privacidade, pagamentos/subscricoes, IA ou pool solidaria.
+
+#### Validacao final
+
+- Comandos reais do package aplicavel.
+- Smoke principal.
+- Negativos de sessao ausente, acesso cruzado, dados invalidos e permissao insuficiente quando aplicavel.
+
+#### Evidence para PR/defesa
+
+- `pr`: referencia do PR/commit ou pacote de entrega.
+- `proof`: request/response, screenshot ou log controlado do fluxo principal.
+- `neg`: cenarios negativos executados.
+- `fonte`: RF/RNF/BK/documento que prova o contrato.
+
+#### Handoff
+
+- O que este BK entrega ao proximo BK.
+- Campos, endpoints, componentes, estados, permissao, payloads e riscos restantes.
+
+#### Changelog
+
+- `YYYY-MM-DD`: alteracao feita e motivo.

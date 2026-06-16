@@ -1,4 +1,4 @@
-# BK-MF5-05 - Painel de metricas admin
+# BK-MF5-05 - Painel de métricas admin
 
 ## Header
 
@@ -17,169 +17,630 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF5-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-05-painel-de-metricas-admin.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-06-16`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
-### Objetivo pedagogico
+Neste BK vais implementar um painel de métricas administrativas agregadas. O administrador deve conseguir ver indicadores básicos de operação sem aceder a dados pessoais desnecessários.
 
-- Consolidar a entrega de `Painel de metricas admin` com rastreabilidade explicita para `RF59`.
-- Executar o BK `BK-MF5-05` no contexto da macro `MF5` e da sprint `S09`.
+`CANONICO`: este BK cobre `RF59 - Painel de métricas` e depende de `BK-MF5-04`.
 
-### Tempo estimado
+`DERIVADO`: como os documentos não definem métricas exatas, este guia cria métricas agregadas de utilizadores, catálogo, subscrições, pool solidária, notificações e privacidade, usando apenas contagens e somatórios.
 
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
+#### Importância
 
-### Erros comuns
+Um painel de métricas ajuda a perceber se a aplicação está operacional: quantos utilizadores existem, quantas subscrições estão ativas, quantos conteúdos publicados existem e se há eventos de privacidade recentes.
 
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
+Como se trata de administração, a regra é minimizar exposição. O painel não lista emails, nomes, comentários ou histórico individual. Mostra apenas números agregados.
 
-### Check de compreensao
+#### Scope-in
 
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
+- Criar módulo backend `admin-metrics`.
+- Criar endpoint admin `GET /api/admin/metrics`.
+- Validar intervalo temporal opcional.
+- Agregar contagens por coleção.
+- Criar cliente frontend `metricsApi`.
+- Criar página `/admin/metricas`.
+- Adicionar rota frontend.
+- Criar teste unitário da validação de datas.
 
+#### Scope-out
 
-## O que vamos fazer neste BK
+- Gráficos avançados.
+- Exportação PDF/CSV.
+- Dados pessoais individuais.
+- Monitorização técnica de infraestrutura.
+- Alertas automáticos.
 
-Entregar `Painel de metricas admin` cobrindo `RF59` na `MF5`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+#### Estado antes e depois
 
-## Porque isto e importante
+Antes deste BK, a administração consegue gerir utilizadores, associações e pool, mas não tem visão agregada de operação.
 
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF5-06`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+Depois deste BK, existe um endpoint admin com métricas agregadas e uma página frontend para leitura rápida.
 
-## Bloco operacional (obrigatorio)
+#### Pre-requisitos
 
-### Pre-condicoes
+- `BK-MF5-04` protege rotas admin com `requireRole(["admin"])`.
+- `BK-MF2` criou catálogo, histórico e biblioteca.
+- `BK-MF4` criou subscrições, notificações e pool solidária.
+- `real_dev/frontend/src/routes/AppRoutes.jsx` já tem rotas admin.
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+#### Glossário
 
-### Execucao
+- Métrica: número usado para observar estado da aplicação.
+- Agregação: cálculo sobre vários registos sem mostrar detalhes individuais.
+- Intervalo temporal: janela `from`/`to` usada para contar eventos recentes.
+- Minimização: mostrar apenas o necessário para operação.
+- Indicador operacional: valor que ajuda o admin a tomar decisões sem invadir privacidade.
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+#### Conceitos teóricos essenciais
 
-### Outputs
+No domínio FaithFlix, métricas admin respondem a perguntas como: há utilizadores ativos, conteúdos publicados, subscrições ativas e notificações recentes? Elas não respondem "que utilizador viu o quê".
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+No backend, o service consulta coleções e devolve contagens. A autorização admin fica na rota. A validação de datas impede intervalos inválidos ou demasiado longos.
 
-### Validacao
+No frontend, a página mostra cards simples com loading, erro e estado vazio. Cards são adequados aqui porque cada item é uma métrica independente.
 
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
+Na privacidade, todas as respostas são agregadas. Isto reduz risco de exposição de dados pessoais e prepara a revisão de hardening na MF6.
 
-### Handoff
+#### Arquitetura do BK
 
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
+| Camada | Contrato |
+| --- | --- |
+| Backend route | `GET /api/admin/metrics?from=&to=` |
+| Autorização | `requireRole(["admin"])` |
+| Validator | `assertMetricsRange(query)` |
+| Service | `getAdminMetrics(query)` |
+| Frontend API | `metricsApi.getAdminMetrics(filters)` |
+| Página | `AdminMetricsPage` em `/admin/metricas` |
+| Teste | `mf5-admin-metrics.validation.test.js` |
 
+#### Ficheiros a criar/editar/rever
 
-## Pre-condicoes de entrada
+- CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.validation.js`
+- CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.service.js`
+- CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.controller.js`
+- CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.routes.js`
+- EDITAR: `real_dev/backend/src/app.js`
+- CRIAR: `real_dev/frontend/src/services/api/metricsApi.js`
+- CRIAR: `real_dev/frontend/src/pages/AdminMetricsPage.jsx`
+- EDITAR: `real_dev/frontend/src/routes/AppRoutes.jsx`
+- CRIAR: `real_dev/backend/tests/unit/mf5-admin-metrics.validation.test.js`
+- REVER: `RF59`, `RNF19`, `RNF30`, `BK-MF5-04`
 
-- Dependencias declaradas: `BK-MF5-04`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+#### Tutorial técnico linear
 
-## O que entra (scope)
+### Passo 1 - Validar intervalo temporal de métricas
 
-- Entrega funcional de `Painel de metricas admin` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
+1. Objetivo funcional do passo no contexto da app.
 
-## O que nao entra (scope-out)
+Garantir que filtros `from` e `to` são datas válidas e numa ordem correta.
 
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
+2. Ficheiros envolvidos:
+    - CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.validation.js`
+    - LOCALIZAÇÃO: ficheiro completo
 
-## Como saber que isto ficou bem
+3. Instruções do que fazer.
 
-- Fluxo principal de `BK-MF5-05` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P1`.
-- Evidence documentada e pronta para auditoria de gate.
+Cria a pasta `admin-metrics` e adiciona o validator.
 
-## Pre-leitura minima (10-15 min)
+4. Código completo, correto e integrado com a app final.
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RF59`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF5-05`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
+```js
+// real_dev/backend/src/modules/admin-metrics/admin-metrics.validation.js
+import { HttpError } from "../../utils/http-error.js";
 
-## Guia de execucao (passo-a-passo)
+const MAX_RANGE_DAYS = 366;
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Painel de metricas admin`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P1`.
-6. Atualizar evidence e preparar handoff para `BK-MF5-06`.
+/**
+ * Converte uma data opcional de query string.
+ *
+ * @param {unknown} value Valor recebido.
+ * @param {string} field Nome do campo.
+ * @returns {Date | null} Data validada ou null.
+ * @throws {HttpError} Quando a data é inválida.
+ */
+function optionalDate(value, field) {
+    if (!value) return null;
 
-## Outputs esperados
+    const date = new Date(String(value));
 
-- Output funcional de `BK-MF5-05` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
+    if (Number.isNaN(date.getTime())) {
+        throw new HttpError(400, `${field} deve ser uma data válida.`);
+    }
 
-## Snippet tecnico aplicavel
+    return date;
+}
 
-```text
-# pseudo-checklist BK-MF5-05
-precondicoes_ok = validar_dependencias(["BK-MF5-04"])
-assert precondicoes_ok == true
+/**
+ * Valida filtros temporais do painel admin.
+ *
+ * @param {{ from?: unknown, to?: unknown }} query Query string recebida.
+ * @returns {{ from: Date, to: Date }} Intervalo validado.
+ */
+export function assertMetricsRange(query = {}) {
+    const now = new Date();
+    const to = optionalDate(query.to, "to") ?? now;
+    const from =
+        optionalDate(query.from, "from") ??
+        new Date(to.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-resultado = executar_fluxo_principal("Painel de metricas admin")
-assert resultado.status == "OK"
+    if (from > to) {
+        throw new HttpError(400, "from deve ser anterior ou igual a to.");
+    }
 
-negativos = executar_negativos(prioridade="P1", minimo=3)
-assert negativos.passados >= 3
+    const rangeDays = (to.getTime() - from.getTime()) / (24 * 60 * 60 * 1000);
 
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
+    if (rangeDays > MAX_RANGE_DAYS) {
+        throw new HttpError(400, "O intervalo máximo é de 366 dias.");
+    }
+
+    return { from, to };
+}
 ```
 
-## Checklist de validacao
+5. Explicação do código.
 
-### Smoke
+O validator aceita filtros opcionais. Sem filtros, usa os últimos 30 dias. Um limite anual evita consultas demasiado largas em ambiente escolar.
 
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
+6. Validação do passo.
 
-### Negativos
+Executa:
 
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
-### Tecnico
+```bash
+cd real_dev/backend
+node -e "import('./src/modules/admin-metrics/admin-metrics.validation.js').then(({ assertMetricsRange }) => console.log(assertMetricsRange({}).from instanceof Date))"
+```
 
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
+O resultado esperado é `true`.
 
-## Criterios de aceite (mensuraveis)
+7. Cenário negativo/erro esperado.
 
-- Condicao: fluxo principal de `BK-MF5-05` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P1`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+`from=2026-12-01&to=2026-01-01` deve devolver `400`, porque o intervalo está invertido.
 
-## Evidence para PR/defesa
+### Passo 2 - Criar service de métricas agregadas
 
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
+1. Objetivo funcional do passo no contexto da app.
 
-## Proximo BK recomendado
+Calcular números agregados sem expor linhas individuais.
 
-`BK-MF5-06`
+2. Ficheiros envolvidos:
+    - CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.service.js`
+    - LOCALIZAÇÃO: ficheiro completo
 
-## Changelog
+3. Instruções do que fazer.
 
-- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+Cria o service abaixo.
+
+4. Código completo, correto e integrado com a app final.
+
+```js
+// real_dev/backend/src/modules/admin-metrics/admin-metrics.service.js
+import { getDb } from "../../config/database.js";
+import { assertMetricsRange } from "./admin-metrics.validation.js";
+
+/**
+ * Conta documentos com fallback seguro para coleções vazias.
+ *
+ * @param {import("mongodb").Db} db Ligação MongoDB.
+ * @param {string} collectionName Nome da coleção.
+ * @param {Record<string, unknown>} query Filtro MongoDB.
+ * @returns {Promise<number>} Total de documentos.
+ */
+async function count(db, collectionName, query = {}) {
+    return db.collection(collectionName).countDocuments(query);
+}
+
+/**
+ * Soma valores monetários em cêntimos sem devolver documentos individuais.
+ *
+ * @param {import("mongodb").Db} db Ligação MongoDB.
+ * @param {string} collectionName Nome da coleção.
+ * @param {Record<string, unknown>} match Filtro MongoDB.
+ * @param {string} field Campo numérico a somar.
+ * @returns {Promise<number>} Soma em cêntimos.
+ */
+async function sumCents(db, collectionName, match, field) {
+    const [result] = await db
+        .collection(collectionName)
+        .aggregate([
+            { $match: match },
+            { $group: { _id: null, total: { $sum: `$${field}` } } },
+        ])
+        .toArray();
+
+    return result?.total ?? 0;
+}
+
+/**
+ * Calcula métricas agregadas para administração.
+ *
+ * @param {{ from?: unknown, to?: unknown }} query Query string validável.
+ * @returns {Promise<Record<string, unknown>>} Métricas agregadas.
+ */
+export async function getAdminMetrics(query = {}) {
+    const { from, to } = assertMetricsRange(query);
+    const db = await getDb();
+    const createdInRange = { createdAt: { $gte: from, $lte: to } };
+
+    const [
+        usersTotal,
+        usersActive,
+        usersBlocked,
+        contentsPublished,
+        activeSubscriptions,
+        trialSubscriptions,
+        notificationsCreated,
+        deletionRequests,
+        consentEvents,
+        approvedCharities,
+        solidarityCents,
+    ] = await Promise.all([
+        count(db, "users"),
+        count(db, "users", { accountStatus: { $ne: "blocked" } }),
+        count(db, "users", { accountStatus: "blocked" }),
+        count(db, "contents", { status: "published" }),
+        count(db, "subscriptions", { status: "active" }),
+        count(db, "subscriptions", { status: "trialing" }),
+        count(db, "notifications", createdInRange),
+        count(db, "privacy_deletion_requests", createdInRange),
+        count(db, "user_consent_events", createdInRange),
+        count(db, "charities", { status: "active", poolStatus: "eligible" }),
+        sumCents(db, "pool_distributions", createdInRange, "totalPoolCents"),
+    ]);
+
+    return {
+        range: {
+            from: from.toISOString(),
+            to: to.toISOString(),
+        },
+        users: {
+            total: usersTotal,
+            active: usersActive,
+            blocked: usersBlocked,
+        },
+        content: {
+            published: contentsPublished,
+        },
+        subscriptions: {
+            active: activeSubscriptions,
+            trialing: trialSubscriptions,
+        },
+        notifications: {
+            created: notificationsCreated,
+        },
+        privacy: {
+            deletionRequests,
+            consentEvents,
+        },
+        charities: {
+            approvedInPool: approvedCharities,
+            solidarityCents,
+        },
+    };
+}
+```
+
+5. Explicação do código.
+
+O service devolve apenas números. `createdInRange` limita eventos recentes para notificações, eliminações e consentimentos. A soma solidária usa `totalPoolCents`, que é o campo gravado por `BK-MF4-05` em `pool_distributions`, e devolve apenas total em cêntimos.
+
+6. Validação do passo.
+
+Executa:
+
+```bash
+cd real_dev/backend
+node -e "import('./src/modules/admin-metrics/admin-metrics.service.js').then(({ getAdminMetrics }) => console.log(typeof getAdminMetrics))"
+```
+
+O resultado esperado é `function`.
+
+7. Cenário negativo/erro esperado.
+
+Se o service devolvesse listas de utilizadores ou emails, o painel violaria minimização. Aqui só há contagens.
+
+### Passo 3 - Criar controller, rota e montagem
+
+1. Objetivo funcional do passo no contexto da app.
+
+Expor métricas agregadas apenas para administradores.
+
+2. Ficheiros envolvidos:
+    - CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.controller.js`
+    - CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.routes.js`
+    - EDITAR: `real_dev/backend/src/app.js`
+    - LOCALIZAÇÃO: ficheiros completos e montagem de rota
+
+3. Instruções do que fazer.
+
+Cria controller/route e monta no prefixo `/api/admin/metrics`.
+
+4. Código completo, correto e integrado com a app final.
+
+```js
+// real_dev/backend/src/modules/admin-metrics/admin-metrics.controller.js
+import { getAdminMetrics } from "./admin-metrics.service.js";
+
+/**
+ * Devolve métricas agregadas para administradores.
+ *
+ * @param {import("express").Request} req Pedido atual.
+ * @param {import("express").Response} res Resposta HTTP.
+ * @returns {Promise<import("express").Response>} Métricas agregadas.
+ */
+export async function getAdminMetricsController(req, res) {
+    return res.status(200).json({
+        metrics: await getAdminMetrics(req.query),
+    });
+}
+```
+
+```js
+// real_dev/backend/src/modules/admin-metrics/admin-metrics.routes.js
+import { Router } from "express";
+import { asyncHandler } from "../../utils/async-handler.js";
+import { requireRole } from "../auth/auth.middleware.js";
+import { getAdminMetricsController } from "./admin-metrics.controller.js";
+
+export const adminMetricsRouter = Router();
+
+adminMetricsRouter.get(
+    "/",
+    requireRole(["admin"]),
+    asyncHandler(getAdminMetricsController),
+);
+```
+
+```js
+// real_dev/backend/src/app.js
+import { adminMetricsRouter } from "./modules/admin-metrics/admin-metrics.routes.js";
+
+// Dentro de createApp(), junto das restantes rotas /api:
+app.use("/api/admin/metrics", adminMetricsRouter);
+```
+
+5. Explicação do código.
+
+A rota fica sob `/api/admin` para deixar claro que é administrativa. `requireRole(["admin"])` aplica autorização no backend.
+
+6. Validação do passo.
+
+Com sessão admin, `GET /api/admin/metrics` deve devolver `{ metrics: ... }`.
+
+7. Cenário negativo/erro esperado.
+
+Com utilizador sem admin, a rota deve devolver `403`.
+
+### Passo 4 - Criar frontend do painel de métricas
+
+1. Objetivo funcional do passo no contexto da app.
+
+Mostrar métricas agregadas numa página admin.
+
+2. Ficheiros envolvidos:
+    - CRIAR: `real_dev/frontend/src/services/api/metricsApi.js`
+    - CRIAR: `real_dev/frontend/src/pages/AdminMetricsPage.jsx`
+    - EDITAR: `real_dev/frontend/src/routes/AppRoutes.jsx`
+    - LOCALIZAÇÃO: ficheiros completos e rota nova
+
+3. Instruções do que fazer.
+
+Cria o cliente API, a página e adiciona a rota `/admin/metricas`.
+
+4. Código completo, correto e integrado com a app final.
+
+```js
+// real_dev/frontend/src/services/api/metricsApi.js
+import { apiClient } from "./apiClient.js";
+
+export const metricsApi = {
+    /**
+     * Carrega métricas administrativas agregadas.
+     *
+     * @param {{ from?: string, to?: string }} filters Filtros temporais.
+     * @returns {Promise<{ metrics: Record<string, unknown> }>} Métricas agregadas.
+     */
+    getAdminMetrics(filters = {}) {
+        const params = new URLSearchParams();
+
+        if (filters.from) params.set("from", filters.from);
+        if (filters.to) params.set("to", filters.to);
+
+        const query = params.toString();
+        return apiClient.get(`/api/admin/metrics${query ? `?${query}` : ""}`);
+    },
+};
+```
+
+```jsx
+// real_dev/frontend/src/pages/AdminMetricsPage.jsx
+import { useEffect, useState } from "react";
+import { metricsApi } from "../services/api/metricsApi.js";
+
+/**
+ * Página admin com métricas agregadas de operação.
+ *
+ * @returns {JSX.Element} Painel de métricas.
+ */
+export function AdminMetricsPage() {
+    const [metrics, setMetrics] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        metricsApi
+            .getAdminMetrics()
+            .then((response) => setMetrics(response.metrics))
+            .catch((requestError) => setError(requestError.message))
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) {
+        return (
+            <section className="page-section">
+                <p>A carregar métricas...</p>
+            </section>
+        );
+    }
+
+    return (
+        <section className="page-section">
+            <p className="section-kicker">Admin</p>
+            <h1>Métricas</h1>
+            {error ? <p role="alert">{error}</p> : null}
+            {!error && metrics ? (
+                <div className="metric-grid">
+                    <article>
+                        <h2>Utilizadores</h2>
+                        <p>Total: {metrics.users.total}</p>
+                        <p>Ativos: {metrics.users.active}</p>
+                        <p>Bloqueados: {metrics.users.blocked}</p>
+                    </article>
+                    <article>
+                        <h2>Conteúdos</h2>
+                        <p>Publicados: {metrics.content.published}</p>
+                    </article>
+                    <article>
+                        <h2>Subscrições</h2>
+                        <p>Ativas: {metrics.subscriptions.active}</p>
+                        <p>Trial: {metrics.subscriptions.trialing}</p>
+                    </article>
+                    <article>
+                        <h2>Privacidade</h2>
+                        <p>Eliminações: {metrics.privacy.deletionRequests}</p>
+                        <p>Eventos de consentimento: {metrics.privacy.consentEvents}</p>
+                    </article>
+                    <article>
+                        <h2>Associações</h2>
+                        <p>Elegíveis: {metrics.charities.approvedInPool}</p>
+                        <p>Total solidário: {(metrics.charities.solidarityCents / 100).toFixed(2)} EUR</p>
+                    </article>
+                </div>
+            ) : null}
+        </section>
+    );
+}
+```
+
+```jsx
+// real_dev/frontend/src/routes/AppRoutes.jsx
+import { AdminMetricsPage } from "../pages/AdminMetricsPage.jsx";
+
+// Dentro de <Routes>:
+<Route path="/admin/metricas" element={<AdminMetricsPage />} />
+```
+
+5. Explicação do código.
+
+A página usa `metricsApi` e mostra apenas agregados. Não há tabela com pessoas individuais. Se a API falhar, o erro aparece em `role="alert"`.
+
+6. Validação do passo.
+
+Abre `/admin/metricas` como admin. A página deve mostrar cards de métricas.
+
+7. Cenário negativo/erro esperado.
+
+Sem permissão admin, o backend devolve `403` e a página mostra erro.
+
+### Passo 5 - Testar validação de datas
+
+1. Objetivo funcional do passo no contexto da app.
+
+Garantir que intervalos inválidos são rejeitados.
+
+2. Ficheiros envolvidos:
+    - CRIAR: `real_dev/backend/tests/unit/mf5-admin-metrics.validation.test.js`
+    - LOCALIZAÇÃO: ficheiro completo
+
+3. Instruções do que fazer.
+
+Cria o teste abaixo.
+
+4. Código completo, correto e integrado com a app final.
+
+```js
+// real_dev/backend/tests/unit/mf5-admin-metrics.validation.test.js
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { assertMetricsRange } from "../../src/modules/admin-metrics/admin-metrics.validation.js";
+
+test("MF5 valida intervalo temporal das métricas admin", () => {
+    const range = assertMetricsRange({
+        from: "2026-06-01",
+        to: "2026-06-16",
+    });
+
+    assert.equal(range.from instanceof Date, true);
+    assert.equal(range.to instanceof Date, true);
+    assert.throws(
+        () => assertMetricsRange({ from: "2026-12-01", to: "2026-01-01" }),
+        /from/,
+    );
+    assert.throws(() => assertMetricsRange({ from: "data" }), /data válida/);
+});
+```
+
+5. Explicação do código.
+
+O teste cobre intervalo válido, datas invertidas e data inválida. Isto impede queries sem sentido.
+
+6. Validação do passo.
+
+Executa:
+
+```bash
+cd real_dev/backend
+node --test tests/unit/mf5-admin-metrics.validation.test.js
+```
+
+O resultado esperado é `pass`.
+
+7. Cenário negativo/erro esperado.
+
+Se `from` for posterior a `to`, o teste falha de propósito porque o backend deve rejeitar.
+
+#### Critérios de aceite
+
+- `GET /api/admin/metrics` existe.
+- A rota exige admin.
+- Filtros temporais são validados.
+- A resposta contém apenas métricas agregadas.
+- A métrica solidária soma `pool_distributions.totalPoolCents`, alinhada com `BK-MF4-05`.
+- A página `/admin/metricas` mostra loading, erro e cards de métricas.
+- Não são expostos nomes, emails, comentários ou histórico individual.
+- Existe teste unitário para datas.
+
+#### Validação final
+
+Executa:
+
+```bash
+cd real_dev/backend
+node --test tests/unit/mf5-admin-metrics.validation.test.js
+node -e "import('./src/modules/admin-metrics/admin-metrics.routes.js').then(({ adminMetricsRouter }) => console.log(typeof adminMetricsRouter))"
+```
+
+Depois valida no browser:
+
+- admin abre `/admin/metricas`;
+- utilizador sem admin recebe erro;
+- filtros temporais inválidos devolvem `400`.
+
+#### Evidence para PR/defesa
+
+- `pr`: referência do commit ou PR.
+- `proof`: output do teste de validação.
+- `proof`: captura de `/admin/metricas`.
+- `neg`: utilizador sem admin recebe `403`.
+- `neg`: data inválida devolve `400`.
+- `neg`: resposta não contém lista de emails ou nomes.
+
+#### Handoff
+
+`BK-MF5-06` deve reutilizar a autorização admin e a navegação administrativa. `BK-MF6-01` pode usar `/api/admin/metrics` como uma das rotas de regressão backend.
+
+#### Changelog
+
+- `2026-04-13`: criado guia base com contrato pedagógico v3.
+- `2026-06-16`: guia reescrito com métricas agregadas, rota admin, frontend e teste.
