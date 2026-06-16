@@ -98,14 +98,14 @@ Na privacidade, o objetivo é reduzir dados pessoais. O service apaga documentos
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `real_dev/backend/src/modules/privacy/privacy.validation.js`
-- EDITAR: `real_dev/backend/src/modules/privacy/privacy.service.js`
-- EDITAR: `real_dev/backend/src/modules/privacy/privacy.controller.js`
-- EDITAR: `real_dev/backend/src/modules/privacy/privacy.routes.js`
-- EDITAR: `real_dev/frontend/src/services/api/privacyApi.js`
-- CRIAR: `real_dev/frontend/src/components/privacy/PrivacyDangerZone.jsx`
-- EDITAR: `real_dev/frontend/src/pages/AccountPage.jsx`
-- CRIAR: `real_dev/backend/tests/unit/mf5-privacy-delete.validation.test.js`
+- CRIAR: `apps/backend/src/modules/privacy/privacy.validation.js`
+- EDITAR: `apps/backend/src/modules/privacy/privacy.service.js`
+- EDITAR: `apps/backend/src/modules/privacy/privacy.controller.js`
+- EDITAR: `apps/backend/src/modules/privacy/privacy.routes.js`
+- EDITAR: `apps/frontend/src/services/api/privacyApi.js`
+- CRIAR: `apps/frontend/src/components/privacy/PrivacyDangerZone.jsx`
+- EDITAR: `apps/frontend/src/pages/AccountPage.jsx`
+- CRIAR: `apps/backend/tests/unit/mf5-privacy-delete.validation.test.js`
 - REVER: `BK-MF5-01`, `RF56`, `RNF15`, `RNF17`, `RNF19`, `RNF37`
 
 #### Tutorial técnico linear
@@ -117,7 +117,7 @@ Na privacidade, o objetivo é reduzir dados pessoais. O service apaga documentos
 Impedir eliminações acidentais com uma confirmação textual clara.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/src/modules/privacy/privacy.validation.js`
+    - CRIAR: `apps/backend/src/modules/privacy/privacy.validation.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -127,7 +127,7 @@ Cria o ficheiro de validação do módulo `privacy`.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.validation.js
+// apps/backend/src/modules/privacy/privacy.validation.js
 import { HttpError } from "../../utils/http-error.js";
 
 export const DELETE_ACCOUNT_CONFIRMATION = "ELIMINAR CONTA";
@@ -162,7 +162,7 @@ A constante evita grafias diferentes entre backend e frontend. O validator trans
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/privacy/privacy.validation.js').then(({ assertDeleteAccountPayload }) => console.log(assertDeleteAccountPayload({ confirmation: 'ELIMINAR CONTA' }).confirmation))"
 ```
 
@@ -179,7 +179,7 @@ Com `{ confirmation: "eliminar conta" }`, o validator deve falhar. A operação 
 Eliminar dados pessoais diretos, anonimizar a conta e revogar sessões.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/modules/privacy/privacy.service.js`
+    - EDITAR: `apps/backend/src/modules/privacy/privacy.service.js`
     - LOCALIZAÇÃO: imports e funções novas no fim do ficheiro
 
 3. Instruções do que fazer.
@@ -189,7 +189,7 @@ Importa `assertDeleteAccountPayload` no topo e acrescenta as funções abaixo ao
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.service.js
+// apps/backend/src/modules/privacy/privacy.service.js
 import { assertDeleteAccountPayload } from "./privacy.validation.js";
 
 const PERSONAL_COLLECTIONS_TO_DELETE = [
@@ -318,7 +318,7 @@ export async function deleteMyAccount(userId, input) {
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/privacy/privacy.service.js').then(({ deleteMyAccount }) => console.log(typeof deleteMyAccount))"
 ```
 
@@ -335,8 +335,8 @@ Se o service eliminasse sessões antes de validar a confirmação, um pedido err
 Ligar a eliminação ao endpoint HTTP autenticado.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/modules/privacy/privacy.controller.js`
-    - EDITAR: `real_dev/backend/src/modules/privacy/privacy.routes.js`
+    - EDITAR: `apps/backend/src/modules/privacy/privacy.controller.js`
+    - EDITAR: `apps/backend/src/modules/privacy/privacy.routes.js`
     - LOCALIZAÇÃO: imports e funções novas
 
 3. Instruções do que fazer.
@@ -346,7 +346,7 @@ Adiciona o controller e a rota `DELETE /account`.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.controller.js
+// apps/backend/src/modules/privacy/privacy.controller.js
 import { deleteMyAccount } from "./privacy.service.js";
 
 /**
@@ -364,7 +364,7 @@ export async function deleteMyAccountController(req, res) {
 ```
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.routes.js
+// apps/backend/src/modules/privacy/privacy.routes.js
 import { deleteMyAccountController } from "./privacy.controller.js";
 
 privacyRouter.delete(
@@ -401,9 +401,9 @@ Sem sessão, o endpoint deve devolver `401`. Com confirmação errada, deve devo
 Dar ao utilizador uma interface clara para pedir eliminação, com confirmação consciente.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/frontend/src/services/api/privacyApi.js`
-    - CRIAR: `real_dev/frontend/src/components/privacy/PrivacyDangerZone.jsx`
-    - EDITAR: `real_dev/frontend/src/pages/AccountPage.jsx`
+    - EDITAR: `apps/frontend/src/services/api/privacyApi.js`
+    - CRIAR: `apps/frontend/src/components/privacy/PrivacyDangerZone.jsx`
+    - EDITAR: `apps/frontend/src/pages/AccountPage.jsx`
     - LOCALIZAÇÃO: API completa atualizada, componente completo e import/JSX na página
 
 3. Instruções do que fazer.
@@ -413,7 +413,7 @@ Adiciona `deleteMyAccount` ao cliente `privacyApi`, cria `PrivacyDangerZone` e i
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/frontend/src/services/api/privacyApi.js
+// apps/frontend/src/services/api/privacyApi.js
 import { apiClient } from "./apiClient.js";
 
 export const privacyApi = {
@@ -439,7 +439,7 @@ export const privacyApi = {
 ```
 
 ```jsx
-// real_dev/frontend/src/components/privacy/PrivacyDangerZone.jsx
+// apps/frontend/src/components/privacy/PrivacyDangerZone.jsx
 import { useState } from "react";
 import { privacyApi } from "../../services/api/privacyApi.js";
 
@@ -505,7 +505,7 @@ export function PrivacyDangerZone() {
 ```
 
 ```jsx
-// real_dev/frontend/src/pages/AccountPage.jsx
+// apps/frontend/src/pages/AccountPage.jsx
 import { PrivacyDangerZone } from "../components/privacy/PrivacyDangerZone.jsx";
 
 // Dentro do return principal, depois de <PrivacyExportPanel />:
@@ -531,7 +531,7 @@ Se alguém alterar o HTML no browser e enviar confirmação errada, o backend co
 Garantir que a confirmação forte é obrigatória.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/tests/unit/mf5-privacy-delete.validation.test.js`
+    - CRIAR: `apps/backend/tests/unit/mf5-privacy-delete.validation.test.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -541,7 +541,7 @@ Cria o teste abaixo.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/tests/unit/mf5-privacy-delete.validation.test.js
+// apps/backend/tests/unit/mf5-privacy-delete.validation.test.js
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
@@ -571,7 +571,7 @@ O teste confirma o caso positivo e o caso negativo mais importante. A grafia exa
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-privacy-delete.validation.test.js
 ```
 
@@ -598,7 +598,7 @@ Se o validator aceitar texto em minúsculas, o teste falha. Essa falha é corret
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-privacy-delete.validation.test.js
 node -e "import('./src/modules/privacy/privacy.routes.js').then(({ privacyRouter }) => console.log(typeof privacyRouter))"
 ```

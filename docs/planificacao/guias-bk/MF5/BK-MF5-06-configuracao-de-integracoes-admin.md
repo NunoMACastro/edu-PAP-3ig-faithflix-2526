@@ -100,15 +100,15 @@ Na segurança, alterações exigem admin e ficam em `admin_audit_logs`. Segredos
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `real_dev/backend/src/modules/integrations/integrations.validation.js`
-- CRIAR: `real_dev/backend/src/modules/integrations/integrations.service.js`
-- CRIAR: `real_dev/backend/src/modules/integrations/integrations.controller.js`
-- CRIAR: `real_dev/backend/src/modules/integrations/integrations.routes.js`
-- EDITAR: `real_dev/backend/src/app.js`
-- CRIAR: `real_dev/frontend/src/services/api/integrationsApi.js`
-- CRIAR: `real_dev/frontend/src/pages/AdminIntegrationsPage.jsx`
-- EDITAR: `real_dev/frontend/src/routes/AppRoutes.jsx`
-- CRIAR: `real_dev/backend/tests/unit/mf5-integrations.validation.test.js`
+- CRIAR: `apps/backend/src/modules/integrations/integrations.validation.js`
+- CRIAR: `apps/backend/src/modules/integrations/integrations.service.js`
+- CRIAR: `apps/backend/src/modules/integrations/integrations.controller.js`
+- CRIAR: `apps/backend/src/modules/integrations/integrations.routes.js`
+- EDITAR: `apps/backend/src/app.js`
+- CRIAR: `apps/frontend/src/services/api/integrationsApi.js`
+- CRIAR: `apps/frontend/src/pages/AdminIntegrationsPage.jsx`
+- EDITAR: `apps/frontend/src/routes/AppRoutes.jsx`
+- CRIAR: `apps/backend/tests/unit/mf5-integrations.validation.test.js`
 - REVER: `RF60`, `RNF17`, `RNF19`, `BK-MF5-04`, `BK-MF6-01`, `BK-MF6-02`
 
 #### Tutorial técnico linear
@@ -120,7 +120,7 @@ Na segurança, alterações exigem admin e ficam em `admin_audit_logs`. Segredos
 Criar uma lista fechada de integrações e validar alterações.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/src/modules/integrations/integrations.validation.js`
+    - CRIAR: `apps/backend/src/modules/integrations/integrations.validation.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -130,7 +130,7 @@ Cria a pasta `integrations` e adiciona o validator.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/integrations/integrations.validation.js
+// apps/backend/src/modules/integrations/integrations.validation.js
 import { HttpError } from "../../utils/http-error.js";
 
 export const INTEGRATION_DEFINITIONS = {
@@ -225,7 +225,7 @@ A lista fechada impede que o frontend invente integrações. `envVars` mostra no
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/integrations/integrations.validation.js').then(({ assertIntegrationKey }) => console.log(assertIntegrationKey('simulated_payments')))"
 ```
 
@@ -242,7 +242,7 @@ O resultado esperado é `simulated_payments`.
 Listar e alterar configurações de integração com auditoria.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/src/modules/integrations/integrations.service.js`
+    - CRIAR: `apps/backend/src/modules/integrations/integrations.service.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -252,7 +252,7 @@ Cria o service abaixo.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/integrations/integrations.service.js
+// apps/backend/src/modules/integrations/integrations.service.js
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
@@ -364,7 +364,7 @@ export async function updateIntegrationSetting(actorUserId, key, input) {
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/integrations/integrations.service.js').then(({ listIntegrationSettings }) => console.log(typeof listIntegrationSettings))"
 ```
 
@@ -381,9 +381,9 @@ Se o frontend enviar uma chave desconhecida, o service devolve `404`. Isto evita
 Expor configuração de integrações apenas para administradores.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/src/modules/integrations/integrations.controller.js`
-    - CRIAR: `real_dev/backend/src/modules/integrations/integrations.routes.js`
-    - EDITAR: `real_dev/backend/src/app.js`
+    - CRIAR: `apps/backend/src/modules/integrations/integrations.controller.js`
+    - CRIAR: `apps/backend/src/modules/integrations/integrations.routes.js`
+    - EDITAR: `apps/backend/src/app.js`
     - LOCALIZAÇÃO: ficheiros completos e montagem de rota
 
 3. Instruções do que fazer.
@@ -393,7 +393,7 @@ Cria controller/route e monta em `/api/admin/integrations`.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/integrations/integrations.controller.js
+// apps/backend/src/modules/integrations/integrations.controller.js
 import {
     listIntegrationSettings,
     updateIntegrationSetting,
@@ -431,7 +431,7 @@ export async function patchIntegration(req, res) {
 ```
 
 ```js
-// real_dev/backend/src/modules/integrations/integrations.routes.js
+// apps/backend/src/modules/integrations/integrations.routes.js
 import { Router } from "express";
 import { asyncHandler } from "../../utils/async-handler.js";
 import { requireRole } from "../auth/auth.middleware.js";
@@ -445,7 +445,7 @@ integrationsRouter.patch("/:key", asyncHandler(patchIntegration));
 ```
 
 ```js
-// real_dev/backend/src/app.js
+// apps/backend/src/app.js
 import { integrationsRouter } from "./modules/integrations/integrations.routes.js";
 
 // Dentro de createApp(), junto das restantes rotas admin:
@@ -471,9 +471,9 @@ Com utilizador normal, a resposta deve ser `403`.
 Permitir ao administrador ver e alterar configurações públicas de integração.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/frontend/src/services/api/integrationsApi.js`
-    - CRIAR: `real_dev/frontend/src/pages/AdminIntegrationsPage.jsx`
-    - EDITAR: `real_dev/frontend/src/routes/AppRoutes.jsx`
+    - CRIAR: `apps/frontend/src/services/api/integrationsApi.js`
+    - CRIAR: `apps/frontend/src/pages/AdminIntegrationsPage.jsx`
+    - EDITAR: `apps/frontend/src/routes/AppRoutes.jsx`
     - LOCALIZAÇÃO: ficheiros completos e rota nova
 
 3. Instruções do que fazer.
@@ -483,7 +483,7 @@ Cria cliente API, página e rota `/admin/integracoes`.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/frontend/src/services/api/integrationsApi.js
+// apps/frontend/src/services/api/integrationsApi.js
 import { apiClient } from "./apiClient.js";
 
 export const integrationsApi = {
@@ -513,7 +513,7 @@ export const integrationsApi = {
 ```
 
 ```jsx
-// real_dev/frontend/src/pages/AdminIntegrationsPage.jsx
+// apps/frontend/src/pages/AdminIntegrationsPage.jsx
 import { useEffect, useState } from "react";
 import { integrationsApi } from "../services/api/integrationsApi.js";
 
@@ -632,7 +632,7 @@ export function AdminIntegrationsPage() {
 ```
 
 ```jsx
-// real_dev/frontend/src/routes/AppRoutes.jsx
+// apps/frontend/src/routes/AppRoutes.jsx
 import { AdminIntegrationsPage } from "../pages/AdminIntegrationsPage.jsx";
 
 // Dentro de <Routes>:
@@ -658,7 +658,7 @@ Se o backend devolver `403`, a página deve mostrar erro e não deve fingir que 
 Provar que chaves e modos fora do contrato são rejeitados.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/tests/unit/mf5-integrations.validation.test.js`
+    - CRIAR: `apps/backend/tests/unit/mf5-integrations.validation.test.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -668,7 +668,7 @@ Cria o teste abaixo.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/tests/unit/mf5-integrations.validation.test.js
+// apps/backend/tests/unit/mf5-integrations.validation.test.js
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
@@ -712,7 +712,7 @@ O teste confirma que apenas chaves conhecidas e modos fechados entram no sistema
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-integrations.validation.test.js
 ```
 
@@ -739,7 +739,7 @@ Uma integração desconhecida deve falhar com `404`. Um modo desconhecido deve f
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-integrations.validation.test.js
 node -e "import('./src/modules/integrations/integrations.routes.js').then(({ integrationsRouter }) => console.log(typeof integrationsRouter))"
 ```

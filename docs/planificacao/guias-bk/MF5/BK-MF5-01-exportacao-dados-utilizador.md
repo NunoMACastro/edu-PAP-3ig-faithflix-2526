@@ -99,18 +99,18 @@ Nos testes, validas pelo menos dois pontos: utilizador sem sessão recebe `401`,
 | Resposta | `{ export: { generatedAt, user, sections } }` |
 | Frontend API | `privacyApi.exportMyData()` |
 | UI | `PrivacyExportPanel` dentro de `AccountPage` |
-| Teste | `real_dev/backend/tests/unit/mf5-privacy-export.test.js` |
+| Teste | `apps/backend/tests/unit/mf5-privacy-export.test.js` |
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `real_dev/backend/src/modules/privacy/privacy.service.js`
-- CRIAR: `real_dev/backend/src/modules/privacy/privacy.controller.js`
-- CRIAR: `real_dev/backend/src/modules/privacy/privacy.routes.js`
-- EDITAR: `real_dev/backend/src/app.js`
-- CRIAR: `real_dev/frontend/src/services/api/privacyApi.js`
-- CRIAR: `real_dev/frontend/src/components/privacy/PrivacyExportPanel.jsx`
-- EDITAR: `real_dev/frontend/src/pages/AccountPage.jsx`
-- CRIAR: `real_dev/backend/tests/unit/mf5-privacy-export.test.js`
+- CRIAR: `apps/backend/src/modules/privacy/privacy.service.js`
+- CRIAR: `apps/backend/src/modules/privacy/privacy.controller.js`
+- CRIAR: `apps/backend/src/modules/privacy/privacy.routes.js`
+- EDITAR: `apps/backend/src/app.js`
+- CRIAR: `apps/frontend/src/services/api/privacyApi.js`
+- CRIAR: `apps/frontend/src/components/privacy/PrivacyExportPanel.jsx`
+- EDITAR: `apps/frontend/src/pages/AccountPage.jsx`
+- CRIAR: `apps/backend/tests/unit/mf5-privacy-export.test.js`
 - REVER: `BK-MF2-01`, `BK-MF2-07`, `BK-MF3-01`, `BK-MF3-02`, `BK-MF4-01`, `BK-MF4-08`, `RF55`, `RNF15`, `RNF17`, `RNF19`, `RNF37`
 
 #### Tutorial técnico linear
@@ -122,17 +122,17 @@ Nos testes, validas pelo menos dois pontos: utilizador sem sessão recebe `401`,
 Criar a função que reúne dados do utilizador autenticado e remove campos que não devem sair da aplicação.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/src/modules/privacy/privacy.service.js`
+    - CRIAR: `apps/backend/src/modules/privacy/privacy.service.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
 
-Cria a pasta `real_dev/backend/src/modules/privacy/`. Dentro dela, cria `privacy.service.js` com o código abaixo.
+Cria a pasta `apps/backend/src/modules/privacy/`. Dentro dela, cria `privacy.service.js` com o código abaixo.
 
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.service.js
+// apps/backend/src/modules/privacy/privacy.service.js
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
@@ -285,7 +285,7 @@ O código remove `passwordHash`, `tokenHash`, `sessionToken` e `cookie`. Isto ev
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/privacy/privacy.service.js').then(() => console.log('privacy service ok'))"
 ```
 
@@ -302,8 +302,8 @@ Se chamares `buildUserDataExport("id-invalido")`, o service deve lançar `Utiliz
 Expor a exportação através de uma rota HTTP protegida por sessão.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/src/modules/privacy/privacy.controller.js`
-    - CRIAR: `real_dev/backend/src/modules/privacy/privacy.routes.js`
+    - CRIAR: `apps/backend/src/modules/privacy/privacy.controller.js`
+    - CRIAR: `apps/backend/src/modules/privacy/privacy.routes.js`
     - LOCALIZAÇÃO: ficheiros completos
 
 3. Instruções do que fazer.
@@ -313,7 +313,7 @@ Cria o controller e a rota. A rota deve usar `requireAuth` antes do controller.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.controller.js
+// apps/backend/src/modules/privacy/privacy.controller.js
 import { buildUserDataExport } from "./privacy.service.js";
 
 /**
@@ -331,7 +331,7 @@ export async function getMyDataExport(req, res) {
 ```
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.routes.js
+// apps/backend/src/modules/privacy/privacy.routes.js
 import { Router } from "express";
 import { asyncHandler } from "../../utils/async-handler.js";
 import { requireAuth } from "../auth/auth.middleware.js";
@@ -351,7 +351,7 @@ O controller não recebe `userId` de `req.params`, `req.query` ou `req.body`. A 
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/privacy/privacy.routes.js').then(({ privacyRouter }) => console.log(typeof privacyRouter))"
 ```
 
@@ -368,7 +368,7 @@ Um pedido sem cookie de sessão para `GET /api/privacy/export` deve devolver `40
 Registar a rota de privacidade na aplicação real.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/app.js`
+    - EDITAR: `apps/backend/src/app.js`
     - LOCALIZAÇÃO: imports do topo e zona de montagem das rotas dentro de `createApp`
 
 3. Instruções do que fazer.
@@ -378,7 +378,7 @@ Adiciona o import de `privacyRouter` e monta-o com prefixo `/api/privacy`.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/app.js
+// apps/backend/src/app.js
 import { privacyRouter } from "./modules/privacy/privacy.routes.js";
 
 // Dentro de createApp(), junto das restantes rotas /api:
@@ -394,7 +394,7 @@ O prefixo `/api/privacy` separa operações de privacidade da rota genérica de 
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/app.js').then(({ createApp }) => console.log(typeof createApp))"
 ```
 
@@ -411,9 +411,9 @@ Se esqueceres esta montagem, o service e a rota existem, mas `GET /api/privacy/e
 Permitir ao utilizador descarregar a exportação a partir da área da conta.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/frontend/src/services/api/privacyApi.js`
-    - CRIAR: `real_dev/frontend/src/components/privacy/PrivacyExportPanel.jsx`
-    - EDITAR: `real_dev/frontend/src/pages/AccountPage.jsx`
+    - CRIAR: `apps/frontend/src/services/api/privacyApi.js`
+    - CRIAR: `apps/frontend/src/components/privacy/PrivacyExportPanel.jsx`
+    - EDITAR: `apps/frontend/src/pages/AccountPage.jsx`
     - LOCALIZAÇÃO: ficheiros completos para os novos ficheiros; import e JSX final em `AccountPage`
 
 3. Instruções do que fazer.
@@ -423,7 +423,7 @@ Cria o cliente `privacyApi`, cria o componente `PrivacyExportPanel` e adiciona `
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/frontend/src/services/api/privacyApi.js
+// apps/frontend/src/services/api/privacyApi.js
 import { apiClient } from "./apiClient.js";
 
 export const privacyApi = {
@@ -439,7 +439,7 @@ export const privacyApi = {
 ```
 
 ```jsx
-// real_dev/frontend/src/components/privacy/PrivacyExportPanel.jsx
+// apps/frontend/src/components/privacy/PrivacyExportPanel.jsx
 import { useState } from "react";
 import { privacyApi } from "../../services/api/privacyApi.js";
 
@@ -501,7 +501,7 @@ export function PrivacyExportPanel() {
 ```
 
 ```jsx
-// real_dev/frontend/src/pages/AccountPage.jsx
+// apps/frontend/src/pages/AccountPage.jsx
 import { PrivacyExportPanel } from "../components/privacy/PrivacyExportPanel.jsx";
 
 // Dentro do return principal, depois do bloco de dados da conta:
@@ -527,7 +527,7 @@ Se a sessão expirar, o botão deve mostrar a mensagem devolvida pelo backend, n
 Provar que a exportação não devolve campos sensíveis nem dados de outro utilizador.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/tests/unit/mf5-privacy-export.test.js`
+    - CRIAR: `apps/backend/tests/unit/mf5-privacy-export.test.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -537,7 +537,7 @@ Cria um teste com base de dados em memória, seguindo o padrão dos testes de `M
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/tests/unit/mf5-privacy-export.test.js
+// apps/backend/tests/unit/mf5-privacy-export.test.js
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { ObjectId } from "mongodb";
@@ -637,7 +637,7 @@ O teste cria dois utilizadores em termos de dados: um é o dono da exportação 
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-privacy-export.test.js
 ```
 
@@ -662,7 +662,7 @@ Se removeres o filtro `{ userId: userObjectId }`, o teste passa a devolver notif
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-privacy-export.test.js
 node -e "import('./src/app.js').then(({ createApp }) => console.log(typeof createApp))"
 ```
@@ -670,7 +670,7 @@ node -e "import('./src/app.js').then(({ createApp }) => console.log(typeof creat
 Depois executa no frontend:
 
 ```bash
-cd real_dev/frontend
+cd apps/frontend
 npm run build
 ```
 

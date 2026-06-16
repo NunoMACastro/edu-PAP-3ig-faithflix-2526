@@ -96,14 +96,14 @@ Na segurança e privacidade, cada consulta usa `req.user.id`. O histórico não 
 
 #### Ficheiros a criar/editar/rever
 
-- EDITAR: `real_dev/backend/src/modules/privacy/privacy.validation.js`
-- EDITAR: `real_dev/backend/src/modules/privacy/privacy.service.js`
-- EDITAR: `real_dev/backend/src/modules/privacy/privacy.controller.js`
-- EDITAR: `real_dev/backend/src/modules/privacy/privacy.routes.js`
-- EDITAR: `real_dev/frontend/src/services/api/privacyApi.js`
-- CRIAR: `real_dev/frontend/src/components/privacy/PrivacyConsentsPanel.jsx`
-- EDITAR: `real_dev/frontend/src/pages/AccountPage.jsx`
-- CRIAR: `real_dev/backend/tests/unit/mf5-privacy-consents.validation.test.js`
+- EDITAR: `apps/backend/src/modules/privacy/privacy.validation.js`
+- EDITAR: `apps/backend/src/modules/privacy/privacy.service.js`
+- EDITAR: `apps/backend/src/modules/privacy/privacy.controller.js`
+- EDITAR: `apps/backend/src/modules/privacy/privacy.routes.js`
+- EDITAR: `apps/frontend/src/services/api/privacyApi.js`
+- CRIAR: `apps/frontend/src/components/privacy/PrivacyConsentsPanel.jsx`
+- EDITAR: `apps/frontend/src/pages/AccountPage.jsx`
+- CRIAR: `apps/backend/tests/unit/mf5-privacy-consents.validation.test.js`
 - REVER: `RF57`, `RNF15`, `RNF17`, `RNF37`, `BK-MF3-05`, `BK-MF4-08`
 
 #### Tutorial técnico linear
@@ -115,7 +115,7 @@ Na segurança e privacidade, cada consulta usa `req.user.id`. O histórico não 
 Definir o contrato de consentimentos aceites pelo backend.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/modules/privacy/privacy.validation.js`
+    - EDITAR: `apps/backend/src/modules/privacy/privacy.validation.js`
     - LOCALIZAÇÃO: acrescentar constantes e função no fim do ficheiro
 
 3. Instruções do que fazer.
@@ -125,7 +125,7 @@ Mantém a validação de eliminação criada no BK anterior e acrescenta o contr
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.validation.js
+// apps/backend/src/modules/privacy/privacy.validation.js
 export const CONSENT_VERSION = "faithflix-privacy-v1";
 
 export const DEFAULT_CONSENTS = {
@@ -180,7 +180,7 @@ export function assertConsentPayload(input) {
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/privacy/privacy.validation.js').then(({ assertConsentPayload }) => console.log(assertConsentPayload({ personalizedRecommendations: true, operationalNotifications: true, anonymousMetrics: false }).anonymousMetrics))"
 ```
 
@@ -197,7 +197,7 @@ Se `anonymousMetrics` vier como `"sim"`, o backend devolve `400`. Isto evita gua
 Persistir consentimentos atuais e histórico de alterações por utilizador.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/modules/privacy/privacy.service.js`
+    - EDITAR: `apps/backend/src/modules/privacy/privacy.service.js`
     - LOCALIZAÇÃO: imports e funções novas no fim do ficheiro
 
 3. Instruções do que fazer.
@@ -207,7 +207,7 @@ Importa `assertConsentPayload`, `CONSENT_VERSION` e `DEFAULT_CONSENTS`. Acrescen
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.service.js
+// apps/backend/src/modules/privacy/privacy.service.js
 import {
     assertConsentPayload,
     CONSENT_VERSION,
@@ -297,7 +297,7 @@ export async function updateMyConsents(userId, input) {
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/privacy/privacy.service.js').then(({ getMyConsents, updateMyConsents }) => console.log(typeof getMyConsents, typeof updateMyConsents))"
 ```
 
@@ -314,8 +314,8 @@ Se a função atualizasse só o estado atual e não criasse evento, a equipa nã
 Disponibilizar leitura e atualização de consentimentos via API autenticada.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/modules/privacy/privacy.controller.js`
-    - EDITAR: `real_dev/backend/src/modules/privacy/privacy.routes.js`
+    - EDITAR: `apps/backend/src/modules/privacy/privacy.controller.js`
+    - EDITAR: `apps/backend/src/modules/privacy/privacy.routes.js`
     - LOCALIZAÇÃO: imports, funções e rotas novas
 
 3. Instruções do que fazer.
@@ -325,7 +325,7 @@ Adiciona os controllers e as rotas `GET /consents` e `PUT /consents`.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.controller.js
+// apps/backend/src/modules/privacy/privacy.controller.js
 import { getMyConsents, updateMyConsents } from "./privacy.service.js";
 
 /**
@@ -356,7 +356,7 @@ export async function putMyConsentsController(req, res) {
 ```
 
 ```js
-// real_dev/backend/src/modules/privacy/privacy.routes.js
+// apps/backend/src/modules/privacy/privacy.routes.js
 import {
     getMyConsentsController,
     putMyConsentsController,
@@ -393,9 +393,9 @@ Com um campo em falta no `PUT`, o backend devolve `400`. Isto impede estados inc
 Permitir que o utilizador veja e altere os consentimentos na área de conta.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/frontend/src/services/api/privacyApi.js`
-    - CRIAR: `real_dev/frontend/src/components/privacy/PrivacyConsentsPanel.jsx`
-    - EDITAR: `real_dev/frontend/src/pages/AccountPage.jsx`
+    - EDITAR: `apps/frontend/src/services/api/privacyApi.js`
+    - CRIAR: `apps/frontend/src/components/privacy/PrivacyConsentsPanel.jsx`
+    - EDITAR: `apps/frontend/src/pages/AccountPage.jsx`
     - LOCALIZAÇÃO: API atualizada, componente completo e inclusão na página
 
 3. Instruções do que fazer.
@@ -405,7 +405,7 @@ Substitui o conteúdo de `privacyApi.js` pela versão completa abaixo, preservan
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/frontend/src/services/api/privacyApi.js
+// apps/frontend/src/services/api/privacyApi.js
 import { apiClient } from "./apiClient.js";
 
 export const privacyApi = {
@@ -452,7 +452,7 @@ export const privacyApi = {
 ```
 
 ```jsx
-// real_dev/frontend/src/components/privacy/PrivacyConsentsPanel.jsx
+// apps/frontend/src/components/privacy/PrivacyConsentsPanel.jsx
 import { useEffect, useState } from "react";
 import { privacyApi } from "../../services/api/privacyApi.js";
 
@@ -565,7 +565,7 @@ export function PrivacyConsentsPanel() {
 ```
 
 ```jsx
-// real_dev/frontend/src/pages/AccountPage.jsx
+// apps/frontend/src/pages/AccountPage.jsx
 import { PrivacyConsentsPanel } from "../components/privacy/PrivacyConsentsPanel.jsx";
 
 // Dentro do return principal, antes de <PrivacyDangerZone />:
@@ -591,7 +591,7 @@ Se o backend estiver desligado, o painel deve mostrar erro em vez de assumir suc
 Garantir que o backend não aceita estados ambíguos.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/tests/unit/mf5-privacy-consents.validation.test.js`
+    - CRIAR: `apps/backend/tests/unit/mf5-privacy-consents.validation.test.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -601,7 +601,7 @@ Cria o teste abaixo.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/tests/unit/mf5-privacy-consents.validation.test.js
+// apps/backend/tests/unit/mf5-privacy-consents.validation.test.js
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { assertConsentPayload } from "../../src/modules/privacy/privacy.validation.js";
@@ -643,7 +643,7 @@ O teste valida a fronteira do módulo. O backend aceita booleanos reais e rejeit
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-privacy-consents.validation.test.js
 ```
 
@@ -669,7 +669,7 @@ Se o frontend enviar `"false"` como string, o teste mostra porque o backend deve
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-privacy-consents.validation.test.js
 node -e "import('./src/modules/privacy/privacy.routes.js').then(({ privacyRouter }) => console.log(typeof privacyRouter))"
 ```

@@ -25,7 +25,7 @@ Neste BK vais completar a gestão administrativa de utilizadores. O administrado
 
 `CANONICO`: este BK cobre `RF58 - Gestão de utilizadores`, depende de `BK-MF2-02` e pertence à área de operação e privacidade.
 
-`DERIVADO`: a implementação reutiliza `real_dev/backend/src/modules/users`, já existente na app, para evitar duplicar o domínio de utilizadores.
+`DERIVADO`: a implementação reutiliza `apps/backend/src/modules/users`, já existente na app, para evitar duplicar o domínio de utilizadores.
 
 #### Importância
 
@@ -61,8 +61,8 @@ Depois deste BK, o administrador consegue operar utilizadores com contrato backe
 
 - `BK-MF2-02` criou roles base.
 - `BK-MF1-04` criou sessão segura.
-- `real_dev/backend/src/modules/users` existe com `user.routes.js`, `user.controller.js`, `user.service.js` e `user.validation.js`.
-- `real_dev/frontend/src/pages/AdminUsersPage.jsx` existe.
+- `apps/backend/src/modules/users` existe com `user.routes.js`, `user.controller.js`, `user.service.js` e `user.validation.js`.
+- `apps/frontend/src/pages/AdminUsersPage.jsx` existe.
 
 #### Glossário
 
@@ -97,13 +97,13 @@ Na auditoria, cada alteração guarda ator, alvo, alteração e data. O log não
 
 #### Ficheiros a criar/editar/rever
 
-- EDITAR: `real_dev/backend/src/modules/users/user.validation.js`
-- EDITAR: `real_dev/backend/src/modules/users/user.service.js`
-- EDITAR: `real_dev/backend/src/modules/users/user.controller.js`
-- EDITAR: `real_dev/backend/src/modules/users/user.routes.js`
-- EDITAR: `real_dev/frontend/src/services/api/userApi.js`
-- EDITAR: `real_dev/frontend/src/pages/AdminUsersPage.jsx`
-- CRIAR: `real_dev/backend/tests/unit/mf5-admin-users.validation.test.js`
+- EDITAR: `apps/backend/src/modules/users/user.validation.js`
+- EDITAR: `apps/backend/src/modules/users/user.service.js`
+- EDITAR: `apps/backend/src/modules/users/user.controller.js`
+- EDITAR: `apps/backend/src/modules/users/user.routes.js`
+- EDITAR: `apps/frontend/src/services/api/userApi.js`
+- EDITAR: `apps/frontend/src/pages/AdminUsersPage.jsx`
+- CRIAR: `apps/backend/tests/unit/mf5-admin-users.validation.test.js`
 - REVER: `RF58`, `RNF19`, `BK-MF2-02`
 
 #### Tutorial técnico linear
@@ -115,7 +115,7 @@ Na auditoria, cada alteração guarda ator, alvo, alteração e data. O log não
 Definir que roles, estados e filtros podem ser usados por um administrador.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/modules/users/user.validation.js`
+    - EDITAR: `apps/backend/src/modules/users/user.validation.js`
     - LOCALIZAÇÃO: constantes e função nova no fim do ficheiro
 
 3. Instruções do que fazer.
@@ -125,7 +125,7 @@ Mantém `VALID_ROLES`, acrescenta estados operacionais e valida filtros de lista
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/users/user.validation.js
+// apps/backend/src/modules/users/user.validation.js
 export const VALID_ACCOUNT_STATUSES = ["active", "blocked"];
 const MAX_ADMIN_SEARCH_LENGTH = 80;
 
@@ -219,7 +219,7 @@ O validator aceita alteração parcial: só role, só estado ou ambos. Valores f
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/users/user.validation.js').then(({ assertAdminUserUpdate, assertAdminUserFilters }) => console.log(assertAdminUserUpdate({ role: 'moderator', accountStatus: 'active' }).role, assertAdminUserFilters({ search: 'ana.*', status: 'active' }).status))"
 ```
 
@@ -236,7 +236,7 @@ O resultado esperado é `moderator active`.
 Permitir listagem filtrada e alteração administrativa segura.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/modules/users/user.service.js`
+    - EDITAR: `apps/backend/src/modules/users/user.service.js`
     - LOCALIZAÇÃO: imports, substituição de `listUsers` e adição de `updateUserByAdmin` mantendo `updateUserRole` para compatibilidade da rota antiga
 
 3. Instruções do que fazer.
@@ -246,7 +246,7 @@ Importa `assertAdminUserUpdate`, substitui a listagem simples por listagem filtr
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/users/user.service.js
+// apps/backend/src/modules/users/user.service.js
 import {
     assertAdminUserFilters,
     assertAdminUserUpdate,
@@ -371,7 +371,7 @@ export async function updateUserByAdmin(actorUserId, targetUserId, input) {
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/users/user.service.js').then(({ listUsers, updateUserByAdmin }) => console.log(typeof listUsers, typeof updateUserByAdmin))"
 ```
 
@@ -388,8 +388,8 @@ Se um admin tentar alterar a própria role para `user`, o backend deve devolver 
 Ligar filtros e atualização administrativa à API.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/modules/users/user.controller.js`
-    - EDITAR: `real_dev/backend/src/modules/users/user.routes.js`
+    - EDITAR: `apps/backend/src/modules/users/user.controller.js`
+    - EDITAR: `apps/backend/src/modules/users/user.routes.js`
     - LOCALIZAÇÃO: funções e rotas admin
 
 3. Instruções do que fazer.
@@ -399,7 +399,7 @@ Atualiza `getUsers` para passar `req.query` e cria `patchUserAdmin`. No import d
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/users/user.controller.js
+// apps/backend/src/modules/users/user.controller.js
 import {
     getMyProfile,
     listUsers,
@@ -435,7 +435,7 @@ export async function patchUserAdmin(req, res) {
 ```
 
 ```js
-// real_dev/backend/src/modules/users/user.routes.js
+// apps/backend/src/modules/users/user.routes.js
 import {
     getMe,
     getUsers,
@@ -471,8 +471,8 @@ Com utilizador normal, `PATCH /api/users/:id/admin` deve devolver `403`.
 Dar ao administrador uma UI para procurar e alterar utilizadores.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/frontend/src/services/api/userApi.js`
-    - EDITAR: `real_dev/frontend/src/pages/AdminUsersPage.jsx`
+    - EDITAR: `apps/frontend/src/services/api/userApi.js`
+    - EDITAR: `apps/frontend/src/pages/AdminUsersPage.jsx`
     - LOCALIZAÇÃO: cliente API e componente completo
 
 3. Instruções do que fazer.
@@ -482,7 +482,7 @@ Adiciona métodos com filtros e substitui a página por uma versão com pesquisa
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/frontend/src/services/api/userApi.js
+// apps/frontend/src/services/api/userApi.js
 listUsers(filters = {}) {
     const params = new URLSearchParams();
 
@@ -502,7 +502,7 @@ updateUserAdmin(userId, input) {
 ```
 
 ```jsx
-// real_dev/frontend/src/pages/AdminUsersPage.jsx
+// apps/frontend/src/pages/AdminUsersPage.jsx
 import { useEffect, useState } from "react";
 import { userApi } from "../services/api/userApi.js";
 
@@ -665,7 +665,7 @@ Se tentares aceder com utilizador sem role admin, o backend devolve `403` e a p�
 Provar que roles, estados e filtros fora do contrato são rejeitados.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/tests/unit/mf5-admin-users.validation.test.js`
+    - CRIAR: `apps/backend/tests/unit/mf5-admin-users.validation.test.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -675,7 +675,7 @@ Cria o teste abaixo.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/tests/unit/mf5-admin-users.validation.test.js
+// apps/backend/tests/unit/mf5-admin-users.validation.test.js
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
@@ -715,7 +715,7 @@ O teste cobre caso válido, pesquisa literal escapada, role inválida, estado in
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-admin-users.validation.test.js
 ```
 
@@ -744,7 +744,7 @@ Se o validator aceitar `{}`, o service poderia gravar auditoria sem alteração 
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-admin-users.validation.test.js
 node -e "import('./src/modules/users/user.routes.js').then(({ userRouter }) => console.log(typeof userRouter))"
 ```

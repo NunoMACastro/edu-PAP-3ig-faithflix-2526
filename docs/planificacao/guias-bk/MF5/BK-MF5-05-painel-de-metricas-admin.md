@@ -63,7 +63,7 @@ Depois deste BK, existe um endpoint admin com métricas agregadas e uma página 
 - `BK-MF5-04` protege rotas admin com `requireRole(["admin"])`.
 - `BK-MF2` criou catálogo, histórico e biblioteca.
 - `BK-MF4` criou subscrições, notificações e pool solidária.
-- `real_dev/frontend/src/routes/AppRoutes.jsx` já tem rotas admin.
+- `apps/frontend/src/routes/AppRoutes.jsx` já tem rotas admin.
 
 #### Glossário
 
@@ -97,15 +97,15 @@ Na privacidade, todas as respostas são agregadas. Isto reduz risco de exposiç�
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.validation.js`
-- CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.service.js`
-- CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.controller.js`
-- CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.routes.js`
-- EDITAR: `real_dev/backend/src/app.js`
-- CRIAR: `real_dev/frontend/src/services/api/metricsApi.js`
-- CRIAR: `real_dev/frontend/src/pages/AdminMetricsPage.jsx`
-- EDITAR: `real_dev/frontend/src/routes/AppRoutes.jsx`
-- CRIAR: `real_dev/backend/tests/unit/mf5-admin-metrics.validation.test.js`
+- CRIAR: `apps/backend/src/modules/admin-metrics/admin-metrics.validation.js`
+- CRIAR: `apps/backend/src/modules/admin-metrics/admin-metrics.service.js`
+- CRIAR: `apps/backend/src/modules/admin-metrics/admin-metrics.controller.js`
+- CRIAR: `apps/backend/src/modules/admin-metrics/admin-metrics.routes.js`
+- EDITAR: `apps/backend/src/app.js`
+- CRIAR: `apps/frontend/src/services/api/metricsApi.js`
+- CRIAR: `apps/frontend/src/pages/AdminMetricsPage.jsx`
+- EDITAR: `apps/frontend/src/routes/AppRoutes.jsx`
+- CRIAR: `apps/backend/tests/unit/mf5-admin-metrics.validation.test.js`
 - REVER: `RF59`, `RNF19`, `RNF30`, `BK-MF5-04`
 
 #### Tutorial técnico linear
@@ -117,7 +117,7 @@ Na privacidade, todas as respostas são agregadas. Isto reduz risco de exposiç�
 Garantir que filtros `from` e `to` são datas válidas e numa ordem correta.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.validation.js`
+    - CRIAR: `apps/backend/src/modules/admin-metrics/admin-metrics.validation.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -127,7 +127,7 @@ Cria a pasta `admin-metrics` e adiciona o validator.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/admin-metrics/admin-metrics.validation.js
+// apps/backend/src/modules/admin-metrics/admin-metrics.validation.js
 import { HttpError } from "../../utils/http-error.js";
 
 const MAX_RANGE_DAYS = 366;
@@ -188,7 +188,7 @@ O validator aceita filtros opcionais. Sem filtros, usa os últimos 30 dias. Um l
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/admin-metrics/admin-metrics.validation.js').then(({ assertMetricsRange }) => console.log(assertMetricsRange({}).from instanceof Date))"
 ```
 
@@ -205,7 +205,7 @@ O resultado esperado é `true`.
 Calcular números agregados sem expor linhas individuais.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.service.js`
+    - CRIAR: `apps/backend/src/modules/admin-metrics/admin-metrics.service.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -215,7 +215,7 @@ Cria o service abaixo.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/admin-metrics/admin-metrics.service.js
+// apps/backend/src/modules/admin-metrics/admin-metrics.service.js
 import { getDb } from "../../config/database.js";
 import { assertMetricsRange } from "./admin-metrics.validation.js";
 
@@ -331,7 +331,7 @@ O service devolve apenas números. `createdInRange` limita eventos recentes para
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node -e "import('./src/modules/admin-metrics/admin-metrics.service.js').then(({ getAdminMetrics }) => console.log(typeof getAdminMetrics))"
 ```
 
@@ -348,9 +348,9 @@ Se o service devolvesse listas de utilizadores ou emails, o painel violaria mini
 Expor métricas agregadas apenas para administradores.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.controller.js`
-    - CRIAR: `real_dev/backend/src/modules/admin-metrics/admin-metrics.routes.js`
-    - EDITAR: `real_dev/backend/src/app.js`
+    - CRIAR: `apps/backend/src/modules/admin-metrics/admin-metrics.controller.js`
+    - CRIAR: `apps/backend/src/modules/admin-metrics/admin-metrics.routes.js`
+    - EDITAR: `apps/backend/src/app.js`
     - LOCALIZAÇÃO: ficheiros completos e montagem de rota
 
 3. Instruções do que fazer.
@@ -360,7 +360,7 @@ Cria controller/route e monta no prefixo `/api/admin/metrics`.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/admin-metrics/admin-metrics.controller.js
+// apps/backend/src/modules/admin-metrics/admin-metrics.controller.js
 import { getAdminMetrics } from "./admin-metrics.service.js";
 
 /**
@@ -378,7 +378,7 @@ export async function getAdminMetricsController(req, res) {
 ```
 
 ```js
-// real_dev/backend/src/modules/admin-metrics/admin-metrics.routes.js
+// apps/backend/src/modules/admin-metrics/admin-metrics.routes.js
 import { Router } from "express";
 import { asyncHandler } from "../../utils/async-handler.js";
 import { requireRole } from "../auth/auth.middleware.js";
@@ -394,7 +394,7 @@ adminMetricsRouter.get(
 ```
 
 ```js
-// real_dev/backend/src/app.js
+// apps/backend/src/app.js
 import { adminMetricsRouter } from "./modules/admin-metrics/admin-metrics.routes.js";
 
 // Dentro de createApp(), junto das restantes rotas /api:
@@ -420,9 +420,9 @@ Com utilizador sem admin, a rota deve devolver `403`.
 Mostrar métricas agregadas numa página admin.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/frontend/src/services/api/metricsApi.js`
-    - CRIAR: `real_dev/frontend/src/pages/AdminMetricsPage.jsx`
-    - EDITAR: `real_dev/frontend/src/routes/AppRoutes.jsx`
+    - CRIAR: `apps/frontend/src/services/api/metricsApi.js`
+    - CRIAR: `apps/frontend/src/pages/AdminMetricsPage.jsx`
+    - EDITAR: `apps/frontend/src/routes/AppRoutes.jsx`
     - LOCALIZAÇÃO: ficheiros completos e rota nova
 
 3. Instruções do que fazer.
@@ -432,7 +432,7 @@ Cria o cliente API, a página e adiciona a rota `/admin/metricas`.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/frontend/src/services/api/metricsApi.js
+// apps/frontend/src/services/api/metricsApi.js
 import { apiClient } from "./apiClient.js";
 
 export const metricsApi = {
@@ -455,7 +455,7 @@ export const metricsApi = {
 ```
 
 ```jsx
-// real_dev/frontend/src/pages/AdminMetricsPage.jsx
+// apps/frontend/src/pages/AdminMetricsPage.jsx
 import { useEffect, useState } from "react";
 import { metricsApi } from "../services/api/metricsApi.js";
 
@@ -525,7 +525,7 @@ export function AdminMetricsPage() {
 ```
 
 ```jsx
-// real_dev/frontend/src/routes/AppRoutes.jsx
+// apps/frontend/src/routes/AppRoutes.jsx
 import { AdminMetricsPage } from "../pages/AdminMetricsPage.jsx";
 
 // Dentro de <Routes>:
@@ -551,7 +551,7 @@ Sem permissão admin, o backend devolve `403` e a página mostra erro.
 Garantir que intervalos inválidos são rejeitados.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/tests/unit/mf5-admin-metrics.validation.test.js`
+    - CRIAR: `apps/backend/tests/unit/mf5-admin-metrics.validation.test.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -561,7 +561,7 @@ Cria o teste abaixo.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/tests/unit/mf5-admin-metrics.validation.test.js
+// apps/backend/tests/unit/mf5-admin-metrics.validation.test.js
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { assertMetricsRange } from "../../src/modules/admin-metrics/admin-metrics.validation.js";
@@ -591,7 +591,7 @@ O teste cobre intervalo válido, datas invertidas e data inválida. Isto impede 
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-admin-metrics.validation.test.js
 ```
 
@@ -618,7 +618,7 @@ Se `from` for posterior a `to`, o teste falha de propósito porque o backend dev
 Executa:
 
 ```bash
-cd real_dev/backend
+cd apps/backend
 node --test tests/unit/mf5-admin-metrics.validation.test.js
 node -e "import('./src/modules/admin-metrics/admin-metrics.routes.js').then(({ adminMetricsRouter }) => console.log(typeof adminMetricsRouter))"
 ```
