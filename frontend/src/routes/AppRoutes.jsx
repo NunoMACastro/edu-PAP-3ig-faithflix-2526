@@ -18,6 +18,10 @@ import {
     PlansPage,
 } from "../pages/pages.jsx";
 import { AdminPoolDistributionPage } from "../pages/AdminPoolDistributionPage.jsx";
+import { CharityHistoryPage } from "../pages/CharityHistoryPage.jsx";
+import { PublicCharitiesPage } from "../pages/PublicCharitiesPage.jsx";
+import { AdminPoolDashboardPage } from "../pages/AdminPoolDashboardPage.jsx";
+import { AdminCharityMembershipsPage } from "../pages/AdminCharityMembershipsPage.jsx";
 
 /**
  * Declares the route table for the MF1 frontend foundation.
@@ -44,6 +48,10 @@ export function AppRoutes() {
                 <Route path="/pesquisa" element={<SearchPage />} />
                 <Route path="*" element={<NotFoundPage />} />
                 <Route path="/caridade" element={ <AdminPoolDistributionPage />} />
+                <Route path="/caridade/:charityId/historico" element={<CharityHistoryPage />} />
+                <Route path="/caridade/dashboard" element={<AdminPoolDashboardPage />} />
+                <Route path="/caridade/associacoes" element={<PublicCharitiesPage />} />
+                <Route path="/caridade/membros" element={<AdminCharityMembershipsPage />} />
             </Routes>
         </AppLayout>
     );

@@ -11,7 +11,7 @@ import { ensurePaymentIndexes } from "./modules/payments/payments.service.js";
 import { ensureNotificationIndexes } from "./modules/notifications/notifications.service.js";
 import { ensureCharityIndexes } from "./modules/charities/charity-review.service.js";
 import { ensurePoolDistributionIndexes } from "./modules/charities/pool-distribution.service.js";
-
+import { ensureCharityReportIndexes } from "./modules/charities/charity-reports.service.js";
 
 
 await ensureAuthIndexes();
@@ -24,7 +24,7 @@ await ensurePaymentIndexes();
 await ensureNotificationIndexes();
 await ensureCharityIndexes();
 await ensurePoolDistributionIndexes();
-
+await ensureCharityReportIndexes();
 
 
 const app = createApp();
@@ -34,7 +34,3 @@ app.listen(env.port, () => {
         port: env.port,
     });
 });
-
-import { ensureCharityIndexes } from "./modules/charities/charity-review.service.js";
-
-await ensureCharityIndexes();

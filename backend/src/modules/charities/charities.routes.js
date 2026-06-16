@@ -1,3 +1,10 @@
+// A rota pública vem antes de `/:id/...` para evitar ambiguidades de routing.
+charitiesRouter.get("/public", asyncHandler(getPublicCharities));
+charitiesRouter.get("/pool/dashboard", requireRole(["admin"]), asyncHandler(getPoolDashboardController));
+charitiesRouter.post("/:id/members", requireRole(["admin"]), asyncHandler(postCharityMember));
+charitiesRouter.get("/:id/history", requireAuth, asyncHandler(getCharityHistoryController));
+charitiesRouter.get("/:id/history.csv", requireAuth, asyncHandler(getCharityHistoryCsv));
+
 // A rota fica protegida por role admin porque altera estado operacional e entrada na pool.
 charitiesRouter.patch(
   "/applications/:id/review",
@@ -17,3 +24,4 @@ charitiesRouter.get(
   requireRole(["admin"]),
   asyncHandler(getMonthlyDistribution),
 );
+
