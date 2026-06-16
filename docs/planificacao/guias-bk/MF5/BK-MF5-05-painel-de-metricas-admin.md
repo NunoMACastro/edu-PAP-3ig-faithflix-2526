@@ -277,7 +277,8 @@ export async function getAdminMetrics(query = {}) {
         solidarityCents,
     ] = await Promise.all([
         count(db, "users"),
-        count(db, "users", { accountStatus: { $ne: "blocked" } }),
+        // Contas eliminadas deixam de representar utilização activa da plataforma.
+        count(db, "users", { accountStatus: { $nin: ["blocked", "deleted"] } }),
         count(db, "users", { accountStatus: "blocked" }),
         count(db, "contents", { status: "published" }),
         count(db, "subscriptions", { status: "active" }),
@@ -323,7 +324,7 @@ export async function getAdminMetrics(query = {}) {
 
 5. Explicação do código.
 
-O service devolve apenas números. `createdInRange` limita eventos recentes para notificações, eliminações e consentimentos. A soma solidária usa `totalPoolCents`, que é o campo gravado por `BK-MF4-05` em `pool_distributions`, e devolve apenas total em cêntimos.
+O service devolve apenas números. `createdInRange` limita eventos recentes para notificações, eliminações e consentimentos. `users.active` exclui contas `blocked` e `deleted`, porque uma conta eliminada já não representa utilização activa da plataforma. A soma solidária usa `totalPoolCents`, que é o campo gravado por `BK-MF4-05` em `pool_distributions`, e devolve apenas total em cêntimos.
 
 6. Validação do passo.
 
@@ -606,6 +607,7 @@ Se `from` for posterior a `to`, o teste falha de propósito porque o backend dev
 - A rota exige admin.
 - Filtros temporais são validados.
 - A resposta contém apenas métricas agregadas.
+- Utilizadores activos excluem contas `blocked` e `deleted`.
 - A métrica solidária soma `pool_distributions.totalPoolCents`, alinhada com `BK-MF4-05`.
 - A página `/admin/metricas` mostra loading, erro e cards de métricas.
 - Não são expostos nomes, emails, comentários ou histórico individual.

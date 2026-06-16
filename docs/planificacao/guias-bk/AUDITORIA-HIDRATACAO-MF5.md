@@ -13,7 +13,7 @@
 - `strict_scope`: `true`
 - `check_mf_coherence`: `true`
 - `run_commands`: `true`
-- `status`: `concluido_com_findings`
+- `status`: `concluido_auditado`
 - `acao_sobre_bks`: nenhuma. Esta execução apenas actualiza o relatório.
 - `ficheiro_gerado`: `docs/planificacao/guias-bk/AUDITORIA-HIDRATACAO-MF5.md`
 
@@ -28,13 +28,21 @@ Foram auditados os 6 BKs da `MF5 - Operação e privacidade`:
 - `BK-MF5-05` - Painel de métricas admin
 - `BK-MF5-06` - Configuração de integrações admin
 
-Contagem desta execução:
+Contagem observada no início desta execução:
 
 | OK | PARCIAL | CRITICO |
 | --- | --- | --- |
-| 2 | 4 | 0 |
+| 6 | 0 | 0 |
 
-Resumo: os BKs estão globalmente estruturados, autocontidos e coerentes com `RF55..RF60`, `MF4` e `MF6`. A auditoria reabre 4 findings `PARCIAL`: um risco técnico de validação em filtros admin, um desalinhamento de métrica de utilizadores activos com contas eliminadas e duas lacunas pedagógicas em blocos de teste sem comentários didácticos suficientes.
+Contagem depois desta execução:
+
+| OK | PARCIAL | CRITICO |
+| --- | --- | --- |
+| 6 | 0 | 0 |
+
+Resumo: o estado actual dos BKs MF5 está pedagogicamente estruturado, autocontido e coerente com `RF55..RF60`, `MF4` e `MF6`. Esta execução não editou guias BK por estar em `MODO=auditar_apenas`; apenas confirmou que os 4 findings que existiam no relatório anterior já se encontram fechados no conteúdo actual.
+
+Nota de workspace: antes desta auditoria já existiam alterações não commitadas em `BK-MF5-03`, `BK-MF5-04`, `BK-MF5-05`, `BK-MF5-06` e neste relatório. Foram tratadas como estado actual do repositório e não foram revertidas.
 
 ## Documentos consultados
 
@@ -86,6 +94,7 @@ Resumo: os BKs estão globalmente estruturados, autocontidos e coerentes com `RF
 - `CANONICO`: `BK-MF6-01` e `BK-MF6-02` dependem de contratos entregues por `BK-MF5-06`.
 - `CANONICO`: operações administrativas críticas devem ter auditoria (`RNF19`).
 - `CANONICO`: segredos devem ficar fora do código fonte e fora da base de dados (`RNF17`).
+- `CANONICO`: a stack real validada usa Express 4, ES Modules, MongoDB driver oficial, React 18, Vite 5 e `fetch/apiClient`.
 
 ## Decisões DERIVADO observadas
 
@@ -100,30 +109,32 @@ Resumo: os BKs estão globalmente estruturados, autocontidos e coerentes com `RF
 
 | BK | Estado | Justificação |
 | --- | --- | --- |
-| `BK-MF5-01` | OK | Exportação usa `req.user.id`, remove campos sensíveis, inclui `content_comments`, `media_preferences` e contratos relevantes das MFs anteriores. |
-| `BK-MF5-02` | OK | Eliminação exige confirmação forte, revoga sessões, limpa dados pessoais e anonimiza conta/comentários sem apagar histórico operacional agregado. |
-| `BK-MF5-03` | PARCIAL | O fluxo está correcto, mas o teste final tem 27 linhas e não cumpre a regra rígida de comentários didácticos para blocos de teste com 20+ linhas. |
-| `BK-MF5-04` | PARCIAL | A gestão admin cobre roles, estado e auditoria, mas o filtro `search` entra directamente em `$regex` sem escape/limite/validator próprio. |
-| `BK-MF5-05` | PARCIAL | As métricas são agregadas e protegidas por admin, mas `users.active` conta contas com `accountStatus: "deleted"` porque usa apenas `{ accountStatus: { $ne: "blocked" } }`. |
-| `BK-MF5-06` | PARCIAL | A configuração de integrações está alinhada com o MVP, não guarda segredos e usa lista fechada, mas o teste final tem 27 linhas e não cumpre a regra rígida de comentários didácticos para blocos de teste com 20+ linhas. |
+| `BK-MF5-01` | OK | Exportação usa `req.user.id`, remove campos sensíveis, inclui `content_comments`, `media_preferences` e contratos relevantes das MFs anteriores. O guia tem estrutura completa, passos 1 a 7 e teste de minimização. |
+| `BK-MF5-02` | OK | Eliminação exige confirmação forte, revoga sessões, limpa dados pessoais e anonimiza conta/comentários sem apagar histórico operacional agregado. O fluxo prepara consentimentos e métricas sem expor dados pessoais. |
+| `BK-MF5-03` | OK | Consentimentos usam sessão, validação booleana, histórico versionado e UI com loading/erro/sucesso. O teste final tem comentários didácticos suficientes no estado actual. |
+| `BK-MF5-04` | OK | Gestão admin valida roles, estados e filtros; a pesquisa é escapada antes de `$regex`; a acção exige `requireRole(["admin"])` e regista `admin_audit_logs`. |
+| `BK-MF5-05` | OK | Métricas são agregadas, protegidas por admin e excluem contas `blocked` e `deleted` da métrica `users.active`. A soma solidária usa `pool_distributions.totalPoolCents`. |
+| `BK-MF5-06` | OK | Integrações usam lista fechada, não guardam segredos, exigem admin e preparam regressão MF6. O teste final tem comentários didácticos suficientes no estado actual. |
 
 ## Findings
 
-| ID | Severidade | BK | Evidência | Impacto | Recomendação | Estado |
-| --- | --- | --- | --- | --- | --- | --- |
-| `MF5-AUD-01` | MEDIA | `BK-MF5-03` | `BK-MF5-03:603-633` | O teste de consentimentos é executável, mas não ensina a intenção dos asserts nem cumpre a regra de 2 comentários didácticos em blocos com 20+ linhas. | Acrescentar comentários didácticos junto do caso positivo e do cenário negativo. Opcionalmente extrair fixtures nomeadas se melhorar a leitura. | PARCIAL |
-| `MF5-AUD-02` | ALTA | `BK-MF5-04` | `BK-MF5-04:214-221` usa `{ $regex: search, $options: "i" }` com `search` vindo de `req.query`. | Um admin pode enviar padrões regex arbitrários ou muito pesados. Mesmo em rota admin, isto enfraquece validação de input e pode causar pesquisa inesperada ou custo desnecessário. | Criar validator de filtros admin: normalizar `search`, impor tamanho máximo, escapar caracteres regex ou usar pesquisa literal segura, e validar `status` contra lista fechada. | PARCIAL |
-| `MF5-AUD-03` | MEDIA | `BK-MF5-05` | `BK-MF5-05:280` conta activos com `{ accountStatus: { $ne: "blocked" } }`; `BK-MF5-02:289` cria `accountStatus: "deleted"`. | Contas eliminadas podem ser contadas como activas no painel admin, distorcendo a métrica de operação e a prova de privacidade. | Alterar a métrica para excluir `deleted`, por exemplo `$nin: ["blocked", "deleted"]`, ou definir explicitamente a semântica de `active`. | PARCIAL |
-| `MF5-AUD-04` | BAIXA | `BK-MF5-06` | `BK-MF5-06:670-700` | O teste de integrações é executável, mas não cumpre totalmente a regra formal de comentários didácticos para blocos de teste com 20+ linhas. | Acrescentar comentários didácticos no caso válido e nos dois negativos. | PARCIAL |
+Não existem findings abertos nesta execução.
 
-## Continuidade de findings anteriores
+## Findings anteriores reavaliados
 
-O relatório anterior indicava correcções já aplicadas aos BKs MF5. Esta auditoria confirmou que esses pontos continuam alinhados:
+| ID | Severidade | BK | Evidência actual | Impacto | Estado |
+| --- | --- | --- | --- | --- | --- |
+| `MF5-AUD-01` | MEDIA | `BK-MF5-03` | `BK-MF5-03:610` e `BK-MF5-03:624` explicam caso positivo e cenário negativo. | Lacuna pedagógica de comentários didácticos deixou de se reproduzir. | CORRIGIDO_SEM_VALIDACAO_TOTAL |
+| `MF5-AUD-02` | ALTA | `BK-MF5-04` | `BK-MF5-04:127-198`, `BK-MF5-04:219-251`, `BK-MF5-04:692-707` validam filtros com `assertAdminUserFilters`, limite de 80 caracteres, escape literal para `$regex` e estado fechado. | Risco de regex arbitrária e filtros fora do contrato deixou de se reproduzir. | CORRIGIDO_SEM_VALIDACAO_TOTAL |
+| `MF5-AUD-03` | MEDIA | `BK-MF5-05` | `BK-MF5-05:281-282` usa `{ accountStatus: { $nin: ["blocked", "deleted"] } }`. | Contas eliminadas deixam de aparecer como activas no painel admin. | CORRIGIDO_SEM_VALIDACAO_TOTAL |
+| `MF5-AUD-04` | BAIXA | `BK-MF5-06` | `BK-MF5-06:680`, `BK-MF5-06:683`, `BK-MF5-06:697` explicam chave válida, configuração pública e negativos fora do MVP. | Lacuna pedagógica de comentários didácticos deixou de se reproduzir. | CORRIGIDO_SEM_VALIDACAO_TOTAL |
 
-- `content_comments` é usado em exportação e eliminação.
-- `media_preferences` está incluído em exportação e limpeza.
-- `privacyApi.js` preserva métodos anteriores ao acrescentar consentimentos.
-- `BK-MF5-04` preserva compatibilidade com `patchUserRole`/`updateUserRole`.
+## Continuidade de contratos anteriores
+
+- `content_comments` é usado em exportação e eliminação, alinhado com MF3.
+- `media_preferences` está incluído em exportação e limpeza, alinhado com MF2.
+- `privacyApi.js` preserva métodos de exportação e eliminação ao acrescentar consentimentos.
+- `BK-MF5-04` preserva compatibilidade com `patchUserRole`/`updateUserRole`, mas define o contrato novo `PATCH /api/users/:id/admin`.
 - `BK-MF5-05` usa `pool_distributions.totalPoolCents`, alinhado com `BK-MF4-05`.
 
 ## Mapa de integração da MF
@@ -133,7 +144,7 @@ O relatório anterior indicava correcções já aplicadas aos BKs MF5. Esta audi
 | `BK-MF5-01` | `privacy.service.js`, `privacy.controller.js`, `privacy.routes.js`, `privacyApi.js`, `PrivacyExportPanel.jsx`, `AccountPage.jsx`, teste unitário | `buildUserDataExport`, `getMyDataExport`, `privacyRouter`, `privacyApi.exportMyData` | `GET /api/privacy/export` | `requireAuth`, ownership por `req.user.id`, minimização de campos sensíveis | `BK-MF5-02`, `BK-MF5-03`, `MF6` |
 | `BK-MF5-02` | `privacy.validation.js`, extensões de `privacy.service/controller/routes`, `PrivacyDangerZone.jsx`, teste unitário | `assertDeleteAccountPayload`, `deleteMyAccount`, `deleteMyAccountController` | `DELETE /api/privacy/account` | `requireAuth`, confirmação forte, revogação de sessões, anonimização | `BK-MF5-03`, `MF6` |
 | `BK-MF5-03` | extensões de `privacy.validation/service/controller/routes`, `PrivacyConsentsPanel.jsx`, teste unitário | `assertConsentPayload`, `getMyConsents`, `updateMyConsents` | `GET /api/privacy/consents`, `PUT /api/privacy/consents` | `requireAuth`, ownership por sessão, histórico sem dados sensíveis | `BK-MF5-04`, `MF6` |
-| `BK-MF5-04` | `user.validation.js`, `user.service.js`, `user.controller.js`, `user.routes.js`, `userApi.js`, `AdminUsersPage.jsx`, teste unitário | `assertAdminUserUpdate`, `listUsers(filters)`, `updateUserByAdmin` | `GET /api/users?search=&status=`, `PATCH /api/users/:id/admin` | `requireRole(["admin"])`, protecção contra auto-bloqueio, `admin_audit_logs` | `BK-MF5-05`, `BK-MF5-06` |
+| `BK-MF5-04` | `user.validation.js`, `user.service.js`, `user.controller.js`, `user.routes.js`, `userApi.js`, `AdminUsersPage.jsx`, teste unitário | `assertAdminUserUpdate`, `assertAdminUserFilters`, `listUsers(filters)`, `updateUserByAdmin` | `GET /api/users?search=&status=`, `PATCH /api/users/:id/admin` | `requireRole(["admin"])`, validação de filtros, protecção contra auto-bloqueio, `admin_audit_logs` | `BK-MF5-05`, `BK-MF5-06` |
 | `BK-MF5-05` | `admin-metrics.*`, `metricsApi.js`, `AdminMetricsPage.jsx`, `AppRoutes.jsx`, teste unitário | `assertMetricsRange`, `getAdminMetrics`, `adminMetricsRouter` | `GET /api/admin/metrics` | `requireRole(["admin"])`, métricas agregadas sem dados pessoais | `BK-MF5-06`, `BK-MF6-01`, `BK-MF6-02` |
 | `BK-MF5-06` | `integrations.*`, `integrationsApi.js`, `AdminIntegrationsPage.jsx`, `AppRoutes.jsx`, teste unitário | `assertIntegrationKey`, `assertIntegrationUpdate`, `listIntegrationSettings`, `updateIntegrationSetting` | `GET /api/admin/integrations`, `PATCH /api/admin/integrations/:key` | `requireRole(["admin"])`, lista fechada, sem segredos em BD, `admin_audit_logs` | `BK-MF6-01`, `BK-MF6-02`, `BK-MF6-03` |
 
@@ -146,9 +157,10 @@ O relatório anterior indicava correcções já aplicadas aos BKs MF5. Esta audi
 | Frontend chama endpoints declarados no guia | PASS: cada cliente API novo aponta para endpoint declarado no respectivo BK. |
 | Ownership em fluxos privados | PASS documental: exportação, eliminação e consentimentos usam `req.user.id`. |
 | Roles admin | PASS documental: gestão de utilizadores, métricas e integrações exigem `requireRole(["admin"])`. |
-| Validação de input | PARCIAL: alteração admin é validada, mas filtros de listagem admin precisam de validator próprio. |
-| Métricas coerentes com eliminação | PARCIAL: conta eliminada pode entrar em `users.active`. |
-| Preparação para MF6 | PASS_COM_NOTA: MF6 recebe endpoints claros, mas deve incluir regressão para filtros admin e métricas de contas eliminadas. |
+| Validação de input | PASS: alteração admin e filtros de listagem admin têm validators documentados. |
+| Métricas coerentes com eliminação | PASS: conta `deleted` fica excluída de `users.active`. |
+| Preparação para MF6 | PASS: MF6 recebe endpoints claros e regressões específicas para filtros admin, métricas e integrações. |
+| Mockup UI | PASS_COM_NOTA: `/minha-conta`, preferências de notificações e zona destrutiva foram usados apenas como referência visual/fluxo. |
 
 ## Coerência MF anterior -> MF alvo -> MF seguinte
 
@@ -164,10 +176,9 @@ O relatório anterior indicava correcções já aplicadas aos BKs MF5. Esta audi
 
 ## Riscos restantes
 
-- `PARCIAL`: corrigir `BK-MF5-04` antes de o considerar pronto para alunos, porque a validação de filtros admin é uma fronteira de backend.
-- `PARCIAL`: corrigir `BK-MF5-05` para excluir contas eliminadas da métrica `active`.
-- `PARCIAL`: hidratar comentários didácticos nos blocos de teste de `BK-MF5-03` e `BK-MF5-06`.
-- A implementação real não foi alterada; esta execução apenas audita guias BK e relatório, conforme `STRICT_SCOPE=true`.
+- A implementação real não foi alterada; esta execução apenas auditou guias BK e actualizou o relatório, conforme `STRICT_SCOPE=true`.
+- As alterações não commitadas nos BKs MF5-03..06 já existiam no início desta execução e permanecem no workspace.
+- O drift documental de `_TEMPLATE-BK.md`, `docs/RNF.md` e `mockup/src/app/FAITHFLIX_INTERFACE_SPECS.md` permanece fora do scope desta auditoria.
 
 ## Verificações executadas
 
@@ -178,7 +189,7 @@ O relatório anterior indicava correcções já aplicadas aos BKs MF5. Esta audi
 | Pesquisa estática proporcional em `real_dev/backend` e `real_dev/frontend` | PASS_COM_NOTA: ocorrências de `password`, `token` e `cookie` pertencem a auth/sessão/testes ou documentação; `localStorage`/`sessionStorage` aparecem no README como comportamento fora de scope. |
 | Estrutura obrigatória das secções | PASS: os 6 BKs têm as secções de `#### Objetivo` a `#### Changelog`. |
 | Passos técnicos | PASS: os 6 BKs têm 5 passos e cada passo contém pontos 1 a 7. |
-| Auditoria automática de blocos de código | PARCIAL: detectados blocos de teste com 20+ linhas e comentários didácticos insuficientes em `BK-MF5-03` e `BK-MF5-06`. |
+| Auditoria automática de blocos de código | PASS: todos os blocos com 8+ e 20+ linhas não vazias cumprem a regra mínima de comentários didácticos. |
 | `git diff --check` | PASS. |
 | `bash scripts/validate-planificacao.sh` | PASS: `checked_bks: 55`, `checked_guides: 55`, `errors: []`. |
 
@@ -192,5 +203,5 @@ Nenhum. `MODO=auditar_apenas`.
 
 ## TODOs e blockers restantes
 
-- `TODO`: em próxima execução `hidratar_corrigir`, corrigir `MF5-AUD-01`, `MF5-AUD-02`, `MF5-AUD-03` e `MF5-AUD-04`.
+- `TODO`: nenhum dentro do scope desta execução.
 - `BLOCKER`: nenhum blocker documental indispensável dentro do scope `MF5`.

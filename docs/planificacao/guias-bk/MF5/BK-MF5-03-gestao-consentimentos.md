@@ -607,6 +607,7 @@ import { test } from "node:test";
 import { assertConsentPayload } from "../../src/modules/privacy/privacy.validation.js";
 
 test("MF5 valida consentimentos booleanos", () => {
+    // O caso positivo prova que só booleanos reais entram no contrato persistido.
     assert.deepEqual(
         assertConsentPayload({
             personalizedRecommendations: true,
@@ -620,6 +621,7 @@ test("MF5 valida consentimentos booleanos", () => {
         },
     );
 
+    // O cenário negativo impede que texto de formulário seja aceite como consentimento.
     assert.throws(
         () =>
             assertConsentPayload({

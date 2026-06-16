@@ -677,7 +677,10 @@ import {
 } from "../../src/modules/integrations/integrations.validation.js";
 
 test("MF5 valida integração admin controlada", () => {
+    // A chave válida confirma que só integrações da lista fechada podem avançar.
     assert.equal(assertIntegrationKey("internal_notifications"), "internal_notifications");
+
+    // A atualização válida mostra que apenas configuração pública entra no contrato.
     assert.deepEqual(
         assertIntegrationUpdate({
             enabled: true,
@@ -691,6 +694,7 @@ test("MF5 valida integração admin controlada", () => {
         },
     );
 
+    // Os negativos impedem fornecedores reais ou modos fora do MVP.
     assert.throws(() => assertIntegrationKey("provider_real"), /Integração/);
     assert.throws(
         () => assertIntegrationUpdate({ enabled: true, mode: "real" }),
