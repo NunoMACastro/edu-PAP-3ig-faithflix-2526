@@ -27,6 +27,8 @@ import { subscriptionsRouter } from "./modules/subscriptions/subscriptions.route
 import { paymentsRouter } from "./modules/payments/payments.routes.js";
 import { notificationsRouter } from "./modules/notifications/notifications.routes.js";
 import { charitiesRouter } from "./modules/charities/charities.routes.js";
+import { privacyRouter } from "./modules/privacy/privacy.routes.js";
+
 
 /**
  * Cria a aplicação Express com middlewares e routers principais.
@@ -62,6 +64,8 @@ export function createApp() {
     app.use("/api/notifications", notificationsRouter);
     app.use("/api/subscriptions", subscriptionsRouter);
     app.use("/api/charities", charitiesRouter);
+    app.use("/api/privacy", privacyRouter);
+
 
     // Os middlewares de erro ficam no fim para receberem rotas sem correspondencia e falhas.
     app.use(notFoundHandler);
