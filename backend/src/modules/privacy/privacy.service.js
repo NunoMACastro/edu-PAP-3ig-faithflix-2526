@@ -2,6 +2,11 @@ import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
 import { assertDeleteAccountPayload } from "./privacy.validation.js";
+import {
+    assertConsentPayload,
+    CONSENT_VERSION,
+    DEFAULT_CONSENTS,
+} from "./privacy.validation.js";
 
 
 const USER_EXPORT_COLLECTIONS = [
@@ -254,4 +259,77 @@ export async function buildUserDataExport(userId) {
         user: toExportableUser(user),
         sections: Object.fromEntries(sectionEntries),
     };
+}
+
+/**
+ * Constrói o documento público de consentimentos.
+ *
+ * @param {Record<string, unknown> | null} document Documento persistido.
+ * @returns {{ version: string, consents: typeof DEFAULT_CONSENTS, updatedAt: string | null }} Estado visível.
+ */
+function toPublicConsents(document) {
+    return {
+        version: document?.version ?? CONSENT_VERSION,
+        consents: {
+            ...DEFAULT_CONSENTS,
+            ...(document?.consents ?? {}),
+        },
+        updatedAt: document?.updatedAt?.toISOString?.() ?? null,
+    };
+}
+
+/**
+ * Lê consentimentos atuais do utilizador autenticado.
+ *
+ * @param {string} userId Id do utilizador obtido pela sessão.
+ * @returns {Promise<ReturnType<typeof toPublicConsents>>} Estado atual.
+ */
+export async function getMyConsents(userId) {
+    const db = await getDb();
+    const userObjectId = asUserObjectId(userId);
+    const document = await db
+        .collection("user_consents")
+        .findOne({ userId: userObjectId });
+
+    return toPublicConsents(document);
+}
+
+/**
+ * Atualiza consentimentos atuais e cria evento histórico.
+ *
+ * @param {string} userId Id do utilizador obtido pela sessão.
+ * @param {Record<string, unknown>} input Dados recebidos do frontend.
+ * @returns {Promise<ReturnType<typeof toPublicConsents>>} Estado atualizado.
+ */
+export async function updateMyConsents(userId, input) {
+    const consents = assertConsentPayload(input);
+    const db = await getDb();
+    const userObjectId = asUserObjectId(userId);
+    const now = new Date();
+
+    await db.collection("user_consents").updateOne(
+        { userId: userObjectId },
+        {
+            $set: {
+                consents,
+                version: CONSENT_VERSION,
+                updatedAt: now,
+            },
+            $setOnInsert: {
+                userId: userObjectId,
+                createdAt: now,
+            },
+        },
+        { upsert: true },
+    );
+
+    await db.collection("user_consent_events").insertOne({
+        userId: userObjectId,
+        consents,
+        version: CONSENT_VERSION,
+        createdAt: now,
+        source: "account_page",
+    });
+
+    return getMyConsents(userId);
 }

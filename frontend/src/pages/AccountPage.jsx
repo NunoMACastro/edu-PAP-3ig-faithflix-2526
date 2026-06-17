@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import { userApi } from "../services/api/userApi.js";
 import { PrivacyExportPanel } from "../components/privacy/PrivacyExportPanel.jsx";
+import { PrivacyConsentsPanel } from "../components/privacy/PrivacyConsentsPanel.jsx";
 import { PrivacyDangerZone } from "../components/privacy/PrivacyDangerZone.jsx";
 
 
@@ -124,6 +125,7 @@ export function AccountPage() {
             ) : null}
 
             <PrivacyExportPanel />
+            <PrivacyConsentsPanel />
             <PrivacyDangerZone />
         </section>
             
