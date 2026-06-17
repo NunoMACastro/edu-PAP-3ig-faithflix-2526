@@ -4,6 +4,8 @@
 
 import { useEffect, useState } from "react";
 import { userApi } from "../services/api/userApi.js";
+import { PrivacyExportPanel } from "../components/privacy/PrivacyExportPanel.jsx";
+
 
 /**
  * Authenticated account page with profile and parental settings.
@@ -119,6 +121,9 @@ export function AccountPage() {
                     <dd>{user.role}</dd>
                 </dl>
             ) : null}
+
+            <PrivacyExportPanel />
         </section>
+            
     );
 }
