@@ -22,3 +22,47 @@ export function assertDeleteAccountPayload(input) {
 
     return { confirmation };
 }
+
+export const CONSENT_VERSION = "faithflix-privacy-v1";
+
+export const DEFAULT_CONSENTS = {
+    personalizedRecommendations: false,
+    operationalNotifications: true,
+    anonymousMetrics: false,
+};
+
+/**
+ * Valida uma opção booleana de consentimento.
+ *
+ * @param {Record<string, unknown>} input Dados recebidos.
+ * @param {string} key Nome da categoria.
+ * @returns {boolean} Valor booleano validado.
+ * @throws {HttpError} Quando o valor não é booleano.
+ */
+function assertConsentBoolean(input, key) {
+    if (typeof input?.[key] !== "boolean") {
+        throw new HttpError(400, `${key} deve ser verdadeiro ou falso.`);
+    }
+
+    return input[key];
+}
+
+/**
+ * Valida as escolhas opcionais de consentimento.
+ *
+ * @param {Record<string, unknown>} input Dados recebidos do frontend.
+ * @returns {{ personalizedRecommendations: boolean, operationalNotifications: boolean, anonymousMetrics: boolean }} Consentimentos persistíveis.
+ */
+export function assertConsentPayload(input) {
+    return {
+        personalizedRecommendations: assertConsentBoolean(
+            input,
+            "personalizedRecommendations",
+        ),
+        operationalNotifications: assertConsentBoolean(
+            input,
+            "operationalNotifications",
+        ),
+        anonymousMetrics: assertConsentBoolean(input, "anonymousMetrics"),
+    };
+}
