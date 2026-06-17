@@ -10,4 +10,14 @@ export const privacyApi = {
     exportMyData() {
         return apiClient.get("/api/privacy/export");
     },
+
+    /**
+     * Pede a eliminação da própria conta.
+     *
+     * @param {{ confirmation: string }} input Confirmação textual.
+     * @returns {Promise<{ deleted: boolean }>} Resultado da eliminação.
+     */
+    deleteMyAccount(input) {
+        return apiClient.del("/api/privacy/account", { body: input });
+    },
 };

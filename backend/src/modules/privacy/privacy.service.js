@@ -1,6 +1,8 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
+import { assertDeleteAccountPayload } from "./privacy.validation.js";
+
 
 const USER_EXPORT_COLLECTIONS = [
     "playback_progress",
@@ -14,6 +16,122 @@ const USER_EXPORT_COLLECTIONS = [
     "notification_preferences",
     "notifications",
 ];
+
+const PERSONAL_COLLECTIONS_TO_DELETE = [
+    "playback_progress",
+    "media_preferences",
+    "user_content_lists",
+    "content_ratings",
+    "notification_preferences",
+    "notifications",
+];
+
+/**
+ * Cria um email técnico que já não identifica a pessoa.
+ *
+ * @param {ObjectId} userObjectId Id da conta eliminada.
+ * @returns {string} Email anonimizado e estável.
+ */
+function anonymizedEmail(userObjectId) {
+    return `deleted-${String(userObjectId)}@faithflix.local`;
+}
+
+/**
+ * Remove dados pessoais de coleções cujo conteúdo pertence só ao utilizador.
+ *
+ * @param {import("mongodb").Db} db Ligação MongoDB.
+ * @param {ObjectId} userObjectId Id do utilizador autenticado.
+ * @returns {Promise<Record<string, number>>} Contagem de documentos removidos por coleção.
+ */
+async function deletePersonalCollections(db, userObjectId) {
+    const entries = await Promise.all(
+        PERSONAL_COLLECTIONS_TO_DELETE.map(async (collectionName) => {
+            const result = await db
+                .collection(collectionName)
+                .deleteMany({ userId: userObjectId });
+
+            return [collectionName, result.deletedCount ?? 0];
+        }),
+    );
+
+    return Object.fromEntries(entries);
+}
+
+/**
+ * Anonimiza comentários para manter discussão sem expor autoria pessoal.
+ *
+ * @param {import("mongodb").Db} db Ligação MongoDB.
+ * @param {ObjectId} userObjectId Id do utilizador autenticado.
+ * @returns {Promise<number>} Número de comentários anonimizados.
+ */
+async function anonymizeComments(db, userObjectId) {
+    const result = await db.collection("content_comments").updateMany(
+        { userId: userObjectId },
+        {
+            $set: {
+                body: "Comentário removido por eliminação de conta.",
+                authorName: "Conta eliminada",
+                deletedByUser: true,
+                updatedAt: new Date(),
+            },
+        },
+    );
+
+    return result.modifiedCount ?? 0;
+}
+
+/**
+ * Elimina a própria conta com confirmação forte e limpeza controlada.
+ *
+ * @param {string} userId Id do utilizador obtido pela sessão.
+ * @param {{ confirmation?: unknown }} input Dados recebidos do frontend.
+ * @returns {Promise<{ deleted: true, deletedCollections: Record<string, number>, anonymizedComments: number }>} Resumo seguro da operação.
+ * @throws {HttpError} Quando a confirmação falha ou a conta não existe.
+ */
+export async function deleteMyAccount(userId, input) {
+    assertDeleteAccountPayload(input);
+
+    const db = await getDb();
+    const userObjectId = asUserObjectId(userId);
+    const now = new Date();
+    const user = await db.collection("users").findOne({ _id: userObjectId });
+
+    if (!user) {
+        throw new HttpError(404, "Utilizador não encontrado.");
+    }
+
+    const deletedCollections = await deletePersonalCollections(db, userObjectId);
+    const anonymizedComments = await anonymizeComments(db, userObjectId);
+
+    await db.collection("sessions").deleteMany({ userId: userObjectId });
+
+    await db.collection("users").updateOne(
+        { _id: userObjectId },
+        {
+            $set: {
+                name: "Conta eliminada",
+                email: anonymizedEmail(userObjectId),
+                accountStatus: "deleted",
+                deletedAt: now,
+                updatedAt: now,
+            },
+            $unset: {
+                passwordHash: "",
+                resetTokenHash: "",
+            },
+        },
+    );
+
+    await db.collection("privacy_deletion_requests").insertOne({
+        userId: userObjectId,
+        requestedAt: now,
+        status: "completed",
+        deletedCollections,
+        anonymizedComments,
+    });
+
+    return { deleted: true, deletedCollections, anonymizedComments };
+}
 
 /**
  * Converte o id vindo da sessão para `ObjectId`.
