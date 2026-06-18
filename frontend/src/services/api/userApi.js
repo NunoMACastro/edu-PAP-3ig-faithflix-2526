@@ -36,9 +36,23 @@ export const userApi = {
      * Documenta `listUsers`, mantendo explícita a responsabilidade desta função no módulo.
      * @returns {unknown} Resultado devolvido por `listUsers`.
      */
-    listUsers() {
-        return apiClient.get("/api/users");
-    },
+    // apps/frontend/src/services/api/userApi.js
+listUsers(filters = {}) {
+    const params = new URLSearchParams();
+
+    if (filters.search) params.set("search", filters.search);
+    if (filters.status) params.set("status", filters.status);
+
+    const query = params.toString();
+    return apiClient.get(`/api/users${query ? `?${query}` : ""}`);
+},
+
+updateUserAdmin(userId, input) {
+    return apiClient.patch(
+        `/api/users/${encodeURIComponent(userId)}/admin`,
+        input,
+    );
+},
     /**
      * Documenta `updateRole`, mantendo explícita a responsabilidade desta função no módulo.
      *
