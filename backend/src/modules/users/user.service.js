@@ -7,6 +7,8 @@ import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
 import { toPublicUser as toSessionPublicUser } from "../auth/session.service.js";
 import {
+    assertAdminUserFilters,
+    assertAdminUserUpdate,
     assertParentalSettings,
     assertProfileUpdate,
     assertRoleUpdate,
@@ -110,15 +112,21 @@ export async function updateParentalSettings(userId, input) {
  *
  * @returns {Promise<Array<ReturnType<typeof toPublicUser>>>} Lista pública de utilizadores.
  */
-export async function listUsers() {
+export async function listUsers(filters = {}) {
     const db = await getDb();
+
     const users = await db
         .collection("users")
-        .find({}, { projection: { passwordHash: 0 } })
+        .find(buildAdminUserQuery(filters), {
+            projection: { passwordHash: 0 },
+        })
         .sort({ createdAt: -1 })
         .toArray();
 
-    return users.map(toPublicUser);
+    return users.map((user) => ({
+        ...toPublicUser(user),
+        accountStatus: user.accountStatus ?? "active",
+    }));
 }
 
 /**
@@ -142,4 +150,71 @@ export async function updateUserRole(targetUserId, input) {
     }
 
     return toPublicUser(user);
+}
+/**
+ * Atualiza role ou estado de uma conta através de administrador.
+ *
+ * @param {string} actorUserId
+ * @param {string} targetUserId
+ * @param {{ role?: unknown, accountStatus?: unknown }} input
+ * @returns {Promise<ReturnType<typeof toPublicUser> & { accountStatus: string }>}
+ */
+export async function updateUserByAdmin(
+    actorUserId,
+    targetUserId,
+    input,
+) {
+    const update = assertAdminUserUpdate(input);
+    const db = await getDb();
+
+    const actorObjectId = asUserObjectId(actorUserId);
+    const targetObjectId = asUserObjectId(targetUserId);
+
+    if (actorObjectId.equals(targetObjectId)) {
+        if (update.role && update.role !== "admin") {
+            throw new HttpError(
+                400,
+                "Nao podes retirar o teu proprio acesso admin.",
+            );
+        }
+
+        if (update.accountStatus === "blocked") {
+            throw new HttpError(
+                400,
+                "Nao podes bloquear a tua propria conta.",
+            );
+        }
+    }
+
+    const user = await db.collection("users").findOneAndUpdate(
+        {
+            _id: targetObjectId,
+            accountStatus: { $ne: "deleted" },
+        },
+        {
+            $set: {
+                ...update,
+                updatedAt: new Date(),
+            },
+        },
+        {
+            returnDocument: "after",
+        },
+    );
+
+    if (!user) {
+        throw new HttpError(404, "Utilizador nao encontrado.");
+    }
+
+    await writeAdminAuditLog(db, {
+        actorUserId: actorObjectId,
+        targetUserId: targetObjectId,
+        action: "user_admin_update",
+        changes: update,
+    });
+
+    return {
+        ...toPublicUser(user),
+        accountStatus: user.accountStatus ?? "active",
+    };
 }

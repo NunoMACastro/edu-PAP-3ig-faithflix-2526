@@ -7,6 +7,7 @@ import {
     listUsers,
     updateMyProfile,
     updateParentalSettings,
+    updateUserByAdmin,
     updateUserRole,
 } from "./user.service.js";
 
@@ -54,8 +55,10 @@ export async function patchMyParentalSettings(req, res) {
  * @param {import("express").Response} res - Resposta HTTP.
  * @returns {Promise<import("express").Response>} Resposta com lista de utilizadores.
  */
-export async function getUsers(_req, res) {
-    return res.status(200).json({ users: await listUsers() });
+export async function getUsers(req, res) {
+    return res.status(200).json({
+        users: await listUsers(req.query),
+    });
 }
 
 /**
@@ -68,5 +71,21 @@ export async function getUsers(_req, res) {
 export async function patchUserRole(req, res) {
     return res.status(200).json({
         user: await updateUserRole(req.params.id, req.body),
+    });
+}
+/**
+ * Atualiza role ou estado de uma conta por administrador.
+ *
+ * @param {import("express").Request & { user: { id: string } }} req - Pedido atual.
+ * @param {import("express").Response} res - Resposta HTTP.
+ * @returns {Promise<import("express").Response>} Resposta com utilizador atualizado.
+ */
+export async function patchUserAdmin(req, res) {
+    return res.status(200).json({
+        user: await updateUserByAdmin(
+            req.user.id,
+            req.params.id,
+            req.body,
+        ),
     });
 }

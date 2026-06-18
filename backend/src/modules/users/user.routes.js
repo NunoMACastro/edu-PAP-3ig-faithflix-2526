@@ -5,13 +5,21 @@
 import { Router } from "express";
 import { asyncHandler } from "../../utils/async-handler.js";
 import { requireAuth, requireRole } from "../auth/auth.middleware.js";
+// apps/backend/src/modules/users/user.routes.js
 import {
     getMe,
     getUsers,
     patchMe,
     patchMyParentalSettings,
+    patchUserAdmin,
     patchUserRole,
 } from "./user.controller.js";
+
+userRouter.patch(
+    "/:id/admin",
+    requireRole(["admin"]),
+    asyncHandler(patchUserAdmin),
+);
 
 export const userRouter = Router();
 
