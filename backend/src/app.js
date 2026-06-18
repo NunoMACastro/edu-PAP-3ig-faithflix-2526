@@ -29,6 +29,7 @@ import { notificationsRouter } from "./modules/notifications/notifications.route
 import { charitiesRouter } from "./modules/charities/charities.routes.js";
 import { privacyRouter } from "./modules/privacy/privacy.routes.js";
 import { adminMetricsRouter } from "./modules/admin-metrics/admin-metrics.routes.js";
+import { integrationsRouter } from "./modules/integrations/integrations.routes.js";
 
 
 
@@ -68,6 +69,7 @@ export function createApp() {
     app.use("/api/charities", charitiesRouter);
     app.use("/api/privacy", privacyRouter);
     app.use("/api/admin/metrics", adminMetricsRouter);
+    app.use("/api/admin/integrations", integrationsRouter);
 
 
     // Os middlewares de erro ficam no fim para receberem rotas sem correspondencia e falhas.

@@ -29,6 +29,7 @@ import { SearchPage } from "../pages/SearchPage.jsx";
 import { SubscriptionPage } from "../pages/SubscriptionPage.jsx";
 import { NotFoundPage } from "../pages/pages.jsx";
 import { AdminMetricsPage } from "../pages/AdminMetricsPage.jsx";
+import { AdminIntegrationsPage } from "../pages/AdminIntegrationsPage.jsx";
 
 /**
  * Declara a árvore de rotas renderizada dentro do layout partilhado.
@@ -61,6 +62,7 @@ export function AppRoutes() {
         <Route path="/admin/charity-members" element={<AdminCharityMembersPage />} />
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/admin/metricas" element={<AdminMetricsPage />} />
+        <Route path="/admin/integracoes" element={<AdminIntegrationsPage />} />
       </Routes>
     </AppLayout>
   );
