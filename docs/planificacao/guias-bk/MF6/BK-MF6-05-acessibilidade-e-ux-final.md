@@ -97,24 +97,24 @@ Depois deste BK, a aplicação tem um `SkipLink`, um `main` semântico com desti
 
 | Camada | Decisão |
 | --- | --- |
-| Novo componente | `real_dev/frontend/src/components/a11y/SkipLink.jsx` |
-| Layout editado | `real_dev/frontend/src/layouts/AppLayout.jsx` |
-| CSS editado | `real_dev/frontend/src/styles/global.css` |
-| Navegação revista | `real_dev/frontend/src/components/layout/AppHeader.jsx` |
-| Player revisto | `real_dev/frontend/src/pages/PlaybackPage.jsx` |
-| Componentes a rever | `real_dev/frontend/src/components/ui/BaseButton.jsx` e formulários visíveis |
+| Novo componente | `frontend/src/components/a11y/SkipLink.jsx` |
+| Layout editado | `frontend/src/layouts/AppLayout.jsx` |
+| CSS editado | `frontend/src/styles/global.css` |
+| Navegação revista | `frontend/src/components/layout/AppHeader.jsx` |
+| Player revisto | `frontend/src/pages/PlaybackPage.jsx` |
+| Componentes a rever | `frontend/src/components/ui/BaseButton.jsx` e formulários visíveis |
 | Validação | teclado, responsividade, build Vite e checklist manual |
 | Evidence | `docs/evidence/MF6/BK-MF6-05-acessibilidade-ux.md` |
 | Handoff | `BK-MF6-06` consome esta evidence no gate final |
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `real_dev/frontend/src/components/a11y/SkipLink.jsx`
-- EDITAR: `real_dev/frontend/src/layouts/AppLayout.jsx`
-- EDITAR: `real_dev/frontend/src/styles/global.css`
-- EDITAR: `real_dev/frontend/src/components/layout/AppHeader.jsx`
-- EDITAR: `real_dev/frontend/src/pages/PlaybackPage.jsx`
-- REVER: `real_dev/frontend/src/components/ui/BaseButton.jsx`
+- CRIAR: `frontend/src/components/a11y/SkipLink.jsx`
+- EDITAR: `frontend/src/layouts/AppLayout.jsx`
+- EDITAR: `frontend/src/styles/global.css`
+- EDITAR: `frontend/src/components/layout/AppHeader.jsx`
+- EDITAR: `frontend/src/pages/PlaybackPage.jsx`
+- REVER: `frontend/src/components/ui/BaseButton.jsx`
 - REVER: páginas com formulários, estados vazios, loading, erro e sucesso.
 - CRIAR: `docs/evidence/MF6/BK-MF6-05-acessibilidade-ux.md`
 
@@ -127,17 +127,17 @@ Depois deste BK, a aplicação tem um `SkipLink`, um `main` semântico com desti
 Permitir que utilizadores de teclado saltem diretamente para o conteúdo principal sem atravessar todos os links do header em cada página.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/frontend/src/components/a11y/SkipLink.jsx`
+    - CRIAR: `frontend/src/components/a11y/SkipLink.jsx`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
 
-Cria a pasta `real_dev/frontend/src/components/a11y/` e adiciona o componente abaixo. Mantém o `targetId` igual ao `id` que será usado no `main` no Passo 2.
+Cria a pasta `frontend/src/components/a11y/` e adiciona o componente abaixo. Mantém o `targetId` igual ao `id` que será usado no `main` no Passo 2.
 
 4. Código completo, correto e integrado com a app final.
 
 ```jsx
-// real_dev/frontend/src/components/a11y/SkipLink.jsx
+// frontend/src/components/a11y/SkipLink.jsx
 /**
  * @file Link de salto acessível para navegação por teclado.
  */
@@ -184,7 +184,7 @@ Se o link aparecer sempre no topo sem foco, a página ganha ruído visual. Se nu
 Garantir que o link aponta para um `main` real, semântico e focável.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/frontend/src/layouts/AppLayout.jsx`
+    - EDITAR: `frontend/src/layouts/AppLayout.jsx`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -194,7 +194,7 @@ Substitui o ficheiro por esta versão. Preserva `AppHeader`, `AppFooter` e o con
 4. Código completo, correto e integrado com a app final.
 
 ```jsx
-// real_dev/frontend/src/layouts/AppLayout.jsx
+// frontend/src/layouts/AppLayout.jsx
 /**
  * @file Layout principal partilhado pelas páginas FaithFlix.
  */
@@ -253,7 +253,7 @@ Se o `id` do `main` não corresponder ao `href` do link, o browser não consegue
 Fazer o skip link ficar fora do fluxo visual em repouso e ficar legível quando recebe foco por teclado.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/frontend/src/styles/global.css`
+    - EDITAR: `frontend/src/styles/global.css`
     - LOCALIZAÇÃO: adicionar bloco depois da regra `a { color: inherit; }`
 
 3. Instruções do que fazer.
@@ -263,7 +263,7 @@ Adiciona este bloco ao CSS global. Não removas a regra global `:focus-visible`,
 4. Código completo, correto e integrado com a app final.
 
 ```css
-/* real_dev/frontend/src/styles/global.css */
+/* frontend/src/styles/global.css */
 .skip-link {
     position: absolute;
     left: var(--space-page);
@@ -311,9 +311,9 @@ Se o link receber foco mas não se mover para dentro do ecrã, uma pessoa que us
 Transformar a revisão UX final em alterações concretas nos componentes onde o utilizador lê navegação e controla o player.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/frontend/src/components/layout/AppHeader.jsx`
-    - EDITAR: `real_dev/frontend/src/pages/PlaybackPage.jsx`
-    - REVER: `real_dev/frontend/src/components/ui/BaseButton.jsx`
+    - EDITAR: `frontend/src/components/layout/AppHeader.jsx`
+    - EDITAR: `frontend/src/pages/PlaybackPage.jsx`
+    - REVER: `frontend/src/components/ui/BaseButton.jsx`
     - LOCALIZAÇÃO: ficheiro completo `AppHeader.jsx`; zona exata `div.player-controls` e elemento `<video>` em `PlaybackPage.jsx`; componente completo `BaseButton`
 
 3. Instruções do que fazer.
@@ -323,7 +323,7 @@ Atualiza a navegação para português de Portugal com acentuação, `aria-label
 4. Código completo, correto e integrado com a app final.
 
 ```jsx
-// real_dev/frontend/src/components/layout/AppHeader.jsx
+// frontend/src/components/layout/AppHeader.jsx
 /**
  * @file Cabeçalho principal com navegação FaithFlix.
  */
@@ -403,7 +403,7 @@ export function AppHeader() {
 ```
 
 ```jsx
-// real_dev/frontend/src/pages/PlaybackPage.jsx
+// frontend/src/pages/PlaybackPage.jsx
 // Substitui a zona que começa em <div className="player-controls"...> e termina no </video>.
 <div className="player-controls" aria-label="Opções de média">
     <label>
@@ -533,7 +533,7 @@ Executa build e valida manualmente três larguras: `390px`, `768px` e `1280px`. 
 
 | Comando | Resultado real | Evidence anexada |
 | --- | --- | --- |
-| `cd real_dev/frontend && npm run build` | PREENCHER_COM_PASS_OU_FAIL | PREENCHER_COM_OUTPUT_RESUMIDO |
+| `cd frontend && npm run build` | PREENCHER_COM_PASS_OU_FAIL | PREENCHER_COM_OUTPUT_RESUMIDO |
 
 ## Proof
 
@@ -576,7 +576,7 @@ Podes acrescentar linhas se a equipa testar mais páginas, mas não apagues os n
 6. Validação do passo.
 
 ```bash
-cd real_dev/frontend
+cd frontend
 npm run build
 ```
 
@@ -602,7 +602,7 @@ Se algum botão não tiver foco visível, se uma mensagem de erro não explicar 
 #### Validação final
 
 ```bash
-cd real_dev/frontend
+cd frontend
 npm run build
 ```
 

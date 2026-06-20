@@ -85,7 +85,7 @@ Depois deste BK, existe uma matriz final da MF6 com comandos, estados, responsá
 - `CANONICO`: `docs/planificacao/README.md` define `bash scripts/validate-planificacao.sh` como comando oficial e exige validação humana no fecho de gate.
 - `DERIVADO`: o estado `GO_COM_RESSALVAS` é uma decisão prática para diferenciar falhas não críticas de bloqueios reais.
 - Um gate não é só lista de comandos. Ele cruza resultado técnico, risco, responsável e impacto na macrofase seguinte.
-- Um comando só é reproduzível quando diz onde deve ser executado. `npm run build` na raiz do repositório não prova o frontend, porque o build Vite pertence a `real_dev/frontend`.
+- Um comando só é reproduzível quando diz onde deve ser executado. `npm run build` na raiz do repositório não prova o frontend, porque o build Vite pertence a `frontend`.
 - Um placeholder protege a equipa contra sucesso antecipado. Enquanto existir `PREENCHER_COM_*`, a linha ainda não é evidence final.
 - A MF7 depende deste BK para construir matrizes de cobertura RF/RNF com provas reais, não apenas intenção documental.
 
@@ -112,8 +112,8 @@ Depois deste BK, existe uma matriz final da MF6 com comandos, estados, responsá
 - REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
 - REVER: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
 - REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-- REVER: `real_dev/backend/package.json`
-- REVER: `real_dev/frontend/package.json`
+- REVER: `backend/package.json`
+- REVER: `frontend/package.json`
 
 #### Tutorial técnico linear
 
@@ -161,13 +161,13 @@ Garantir que o gate executa cada comando no diretório onde o script e as depend
 
 2. Ficheiros envolvidos:
     - REVER: `package.json`
-    - REVER: `real_dev/backend/package.json`
-    - REVER: `real_dev/frontend/package.json`
+    - REVER: `backend/package.json`
+    - REVER: `frontend/package.json`
     - LOCALIZAÇÃO: secção `scripts` de cada ficheiro.
 
 3. Instruções do que fazer.
 
-Confirma que os comandos de backend correm em `real_dev/backend`, os comandos de frontend correm em `real_dev/frontend` e os comandos documentais correm na raiz do repositório.
+Confirma que os comandos de backend correm em `backend`, os comandos de frontend correm em `frontend` e os comandos documentais correm na raiz do repositório.
 
 4. Código completo, correto e integrado com a app final.
 
@@ -175,7 +175,7 @@ Sem código neste passo. A tarefa é de verificação operacional dos scripts ex
 
 5. Explicação do código.
 
-O backend e o frontend têm `package.json` próprios. Isto significa que um comando curto como `npm run build` só é correto se for executado dentro de `real_dev/frontend` ou se usar `npm --prefix real_dev/frontend run build`.
+O backend e o frontend têm `package.json` próprios. Isto significa que um comando curto como `npm run build` só é correto se for executado dentro de `frontend` ou se usar `npm --prefix frontend run build`.
 
 Esta distinção evita um erro comum no gate: registar sucesso para um comando que não correu no local certo. O gate deve ser repetível por qualquer colega, por isso cada linha precisa de diretório, comando e resultado real.
 
@@ -184,12 +184,12 @@ Esta distinção evita um erro comum no gate: registar sucesso para um comando q
 Confirma esta correspondência:
 
 - raiz do repositório: `git diff --check` e `bash scripts/validate-planificacao.sh`;
-- `real_dev/backend`: `node --test`, `npm test`, `npm run smoke`, scripts de regressão e scripts de hardening/performance;
-- `real_dev/frontend`: `node scripts/check-frontend-regression.mjs` e `npm run build`.
+- `backend`: `node --test`, `npm test`, `npm run smoke`, scripts de regressão e scripts de hardening/performance;
+- `frontend`: `node scripts/check-frontend-regression.mjs` e `npm run build`.
 
 7. Cenário negativo/erro esperado.
 
-Se `npm run build` for executado na raiz, o comando não valida o frontend. O resultado deve ficar `FAIL` ou `PENDENTE`, com nota a indicar que o comando correto é `cd real_dev/frontend && npm run build`.
+Se `npm run build` for executado na raiz, o comando não valida o frontend. O resultado deve ficar `FAIL` ou `PENDENTE`, com nota a indicar que o comando correto é `cd frontend && npm run build`.
 
 ### Passo 3 - Criar ficheiro do gate S12 da MF6
 
@@ -239,13 +239,13 @@ Cria o ficheiro abaixo e substitui cada `PREENCHER_COM_*` apenas depois de consu
 | --- | --- | --- | --- |
 | Raiz do repositório | `git diff --check` | PREENCHER_COM_PASS_OU_FAIL | PREENCHER_COM_OUTPUT_REAL |
 | Raiz do repositório | `bash scripts/validate-planificacao.sh` | PREENCHER_COM_PASS_OU_FAIL | PREENCHER_COM_OUTPUT_REAL |
-| `real_dev/backend` | `node --test tests/regression/mf6-backend-regression.test.js` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
-| `real_dev/backend` | `npm test` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
-| `real_dev/backend` | `npm run smoke` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
-| `real_dev/backend` | `node scripts/check-security-baseline.mjs` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
-| `real_dev/backend` | `FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE=*** node scripts/measure-performance-baseline.mjs` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_SEM_COOKIE |
-| `real_dev/frontend` | `node scripts/check-frontend-regression.mjs` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
-| `real_dev/frontend` | `npm run build` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
+| `backend` | `node --test tests/regression/mf6-backend-regression.test.js` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
+| `backend` | `npm test` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
+| `backend` | `npm run smoke` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
+| `backend` | `node scripts/check-security-baseline.mjs` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
+| `backend` | `FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE=*** node scripts/measure-performance-baseline.mjs` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_SEM_COOKIE |
+| `frontend` | `node scripts/check-frontend-regression.mjs` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
+| `frontend` | `npm run build` | PREENCHER_COM_PASS_OU_FAIL_OU_PENDENTE | PREENCHER_COM_OUTPUT_REAL |
 
 ## Negativos consolidados
 
@@ -294,10 +294,10 @@ Confirmar que a documentação, o diff e os comandos de gate estão limpos antes
 
 2. Ficheiros envolvidos:
     - REVER: `scripts/validate-planificacao.sh`
-    - REVER: `real_dev/backend/package.json`
-    - REVER: `real_dev/frontend/package.json`
+    - REVER: `backend/package.json`
+    - REVER: `frontend/package.json`
     - REVER: alterações locais da entrega
-    - LOCALIZAÇÃO: raiz do repositório, `real_dev/backend` e `real_dev/frontend`.
+    - LOCALIZAÇÃO: raiz do repositório, `backend` e `frontend`.
 
 3. Instruções do que fazer.
 
@@ -319,7 +319,7 @@ O erro que este passo evita é fechar a MF6 com comandos escritos no papel, mas 
 git diff --check
 bash scripts/validate-planificacao.sh
 
-cd real_dev/backend
+cd backend
 node --test tests/regression/mf6-backend-regression.test.js
 npm test
 npm run smoke
@@ -394,7 +394,7 @@ Se algum guia apontar para BK inexistente ou fora de ordem, o gate fica bloquead
 git diff --check
 bash scripts/validate-planificacao.sh
 
-cd real_dev/backend
+cd backend
 node --test tests/regression/mf6-backend-regression.test.js
 npm test
 npm run smoke

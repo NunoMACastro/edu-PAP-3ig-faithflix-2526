@@ -23,7 +23,7 @@
 
 Neste BK vais criar uma verificação de regressão frontend para confirmar que as rotas principais, o cliente API e os ficheiros visuais essenciais continuam presentes antes do hardening de segurança e privacidade.
 
-O resultado final é um script sem dependências novas em `real_dev/frontend/scripts/check-frontend-regression.mjs`, executado em conjunto com `npm run build`.
+O resultado final é um script sem dependências novas em `frontend/scripts/check-frontend-regression.mjs`, executado em conjunto com `npm run build`.
 
 #### Importância
 
@@ -84,7 +84,7 @@ Depois deste BK, a equipa tem uma regressão frontend rápida: primeiro valida a
 
 | Camada | Decisão |
 | --- | --- |
-| Frontend | `real_dev/frontend` |
+| Frontend | `frontend` |
 | Script novo | `scripts/check-frontend-regression.mjs` |
 | Build | `npm run build` |
 | Rotas verificadas | catálogo, detalhe, player, login, conta, biblioteca, planos, associações, pesquisa, admin |
@@ -92,11 +92,11 @@ Depois deste BK, a equipa tem uma regressão frontend rápida: primeiro valida a
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `real_dev/frontend/scripts/check-frontend-regression.mjs`
-- REVER: `real_dev/frontend/src/routes/AppRoutes.jsx`
-- REVER: `real_dev/frontend/src/pages/LoginPage.jsx`
-- REVER: `real_dev/frontend/src/services/api/apiClient.js`
-- REVER: `real_dev/frontend/package.json`
+- CRIAR: `frontend/scripts/check-frontend-regression.mjs`
+- REVER: `frontend/src/routes/AppRoutes.jsx`
+- REVER: `frontend/src/pages/LoginPage.jsx`
+- REVER: `frontend/src/services/api/apiClient.js`
+- REVER: `frontend/package.json`
 
 #### Tutorial técnico linear
 
@@ -107,20 +107,20 @@ Depois deste BK, a equipa tem uma regressão frontend rápida: primeiro valida a
 Verificar automaticamente se as rotas, páginas e o cliente API essenciais continuam alinhados.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/frontend/scripts/check-frontend-regression.mjs`
-    - REVER: `real_dev/frontend/src/routes/AppRoutes.jsx`
-    - REVER: `real_dev/frontend/src/pages/LoginPage.jsx`
-    - REVER: `real_dev/frontend/src/services/api/apiClient.js`
+    - CRIAR: `frontend/scripts/check-frontend-regression.mjs`
+    - REVER: `frontend/src/routes/AppRoutes.jsx`
+    - REVER: `frontend/src/pages/LoginPage.jsx`
+    - REVER: `frontend/src/services/api/apiClient.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
 
-Cria a pasta `real_dev/frontend/scripts/` se ainda não existir. Depois cria o script abaixo.
+Cria a pasta `frontend/scripts/` se ainda não existir. Depois cria o script abaixo.
 
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/frontend/scripts/check-frontend-regression.mjs
+// frontend/scripts/check-frontend-regression.mjs
 /**
  * @file Verificação de regressão frontend da MF6.
  *
@@ -215,7 +215,7 @@ Este script não substitui testes de interação, mas evita uma falha comum em p
 6. Validação do passo.
 
 ```bash
-cd real_dev/frontend
+cd frontend
 node scripts/check-frontend-regression.mjs
 ```
 
@@ -223,7 +223,7 @@ Resultado esperado: `Regressão frontend MF6: PASS`.
 
 7. Cenário negativo/erro esperado.
 
-Remove temporariamente a rota `/login` de `real_dev/frontend/src/routes/AppRoutes.jsx` ou altera temporariamente a expectativa no script para `path="/login-inexistente"`. Não removas a entrada do array `requiredRoutes`, porque isso apenas deixaria o script de verificar essa rota. A verificação deve falhar com uma mensagem sobre a rota em falta. Reverte a alteração antes de fechar o BK.
+Remove temporariamente a rota `/login` de `frontend/src/routes/AppRoutes.jsx` ou altera temporariamente a expectativa no script para `path="/login-inexistente"`. Não removas a entrada do array `requiredRoutes`, porque isso apenas deixaria o script de verificar essa rota. A verificação deve falhar com uma mensagem sobre a rota em falta. Reverte a alteração antes de fechar o BK.
 
 ### Passo 2 - Executar build Vite
 
@@ -232,9 +232,9 @@ Remove temporariamente a rota `/login` de `real_dev/frontend/src/routes/AppRoute
 Confirmar que JSX, imports, CSS e dependências frontend compilam no pacote real.
 
 2. Ficheiros envolvidos:
-    - REVER: `real_dev/frontend/package.json`
-    - REVER: `real_dev/frontend/vite.config.js`
-    - LOCALIZAÇÃO: comandos executados na raiz `real_dev/frontend`
+    - REVER: `frontend/package.json`
+    - REVER: `frontend/vite.config.js`
+    - LOCALIZAÇÃO: comandos executados na raiz `frontend`
 
 3. Instruções do que fazer.
 
@@ -251,7 +251,7 @@ O Vite valida imports e JSX de forma mais realista do que uma leitura estática.
 6. Validação do passo.
 
 ```bash
-cd real_dev/frontend
+cd frontend
 node scripts/check-frontend-regression.mjs
 npm run build
 ```
@@ -269,10 +269,10 @@ Escreve temporariamente um import inexistente numa cópia local de uma página e
 Garantir que as páginas principais têm UI mínima para falha, ausência de dados e carregamento.
 
 2. Ficheiros envolvidos:
-    - REVER: `real_dev/frontend/src/pages/CatalogPage.jsx`
-    - REVER: `real_dev/frontend/src/pages/SearchPage.jsx`
-    - REVER: `real_dev/frontend/src/pages/ForYouPage.jsx`
-    - REVER: `real_dev/frontend/src/pages/AccountPage.jsx`
+    - REVER: `frontend/src/pages/CatalogPage.jsx`
+    - REVER: `frontend/src/pages/SearchPage.jsx`
+    - REVER: `frontend/src/pages/ForYouPage.jsx`
+    - REVER: `frontend/src/pages/AccountPage.jsx`
     - LOCALIZAÇÃO: componentes de página completos
 
 3. Instruções do que fazer.
@@ -365,7 +365,7 @@ Se a evidence tiver `PASS` sem output real ou sem `PR/entrega`, o gate deve reje
 #### Validação final
 
 ```bash
-cd real_dev/frontend
+cd frontend
 node scripts/check-frontend-regression.mjs
 npm run build
 ```

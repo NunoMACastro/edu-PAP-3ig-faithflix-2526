@@ -23,7 +23,7 @@
 
 Neste BK vais fechar a otimização de performance crítica do FaithFlix sem trocar a stack, sem remover validações e sem contornar autenticação. O foco é tornar mensuráveis os pontos de performance ligados a `RNF09`, `RNF10`, `RNF11` e `RNF12`: catálogo, pesquisa, recomendações baseline e capacidade local mínima da API.
 
-O resultado final é a correção do limite no catálogo público, um medidor local em `real_dev/backend/scripts/measure-performance-baseline.mjs`, uma evidence segura em `docs/evidence/MF6/BK-MF6-04-performance.md` e uma validação frontend com `npm run build`.
+O resultado final é a correção do limite no catálogo público, um medidor local em `backend/scripts/measure-performance-baseline.mjs`, uma evidence segura em `docs/evidence/MF6/BK-MF6-04-performance.md` e uma validação frontend com `npm run build`.
 
 #### Importância
 
@@ -91,25 +91,25 @@ Depois deste BK, o catálogo passa a responder com `page`, `limit`, `total` e `i
 | Camada | Decisão |
 | --- | --- |
 | Backend | Fechar paginação em `catalog.validation.js`, `catalog.controller.js` e `catalog.service.js` |
-| Script | `real_dev/backend/scripts/measure-performance-baseline.mjs` |
+| Script | `backend/scripts/measure-performance-baseline.mjs` |
 | API base | `FAITHFLIX_API_BASE_URL` ou `http://127.0.0.1:3000` |
 | Sessão | `FAITHFLIX_SESSION_COOKIE` com `faithflix_session=...` apenas no terminal local |
 | Endpoints medidos | `/health`, `/api/catalog?limit=12`, `/api/search?q=fe&limit=12`, `/api/recommendations/me` |
-| Build frontend | `npm run build` em `real_dev/frontend` |
+| Build frontend | `npm run build` em `frontend` |
 | Evidence | `docs/evidence/MF6/BK-MF6-04-performance.md` |
 
 #### Ficheiros a criar/editar/rever
 
-- EDITAR: `real_dev/backend/src/modules/catalog/catalog.validation.js`
-- EDITAR: `real_dev/backend/src/modules/catalog/catalog.controller.js`
-- EDITAR: `real_dev/backend/src/modules/catalog/catalog.service.js`
-- CRIAR: `real_dev/backend/scripts/measure-performance-baseline.mjs`
+- EDITAR: `backend/src/modules/catalog/catalog.validation.js`
+- EDITAR: `backend/src/modules/catalog/catalog.controller.js`
+- EDITAR: `backend/src/modules/catalog/catalog.service.js`
+- CRIAR: `backend/scripts/measure-performance-baseline.mjs`
 - CRIAR: `docs/evidence/MF6/BK-MF6-04-performance.md`
-- REVER: `real_dev/backend/src/modules/search/search.service.js`
-- REVER: `real_dev/backend/src/modules/recommendations/recommendations.routes.js`
-- REVER: `real_dev/frontend/src/pages/CatalogPage.jsx`
-- REVER: `real_dev/frontend/src/pages/SearchPage.jsx`
-- REVER: `real_dev/frontend/src/pages/ForYouPage.jsx`
+- REVER: `backend/src/modules/search/search.service.js`
+- REVER: `backend/src/modules/recommendations/recommendations.routes.js`
+- REVER: `frontend/src/pages/CatalogPage.jsx`
+- REVER: `frontend/src/pages/SearchPage.jsx`
+- REVER: `frontend/src/pages/ForYouPage.jsx`
 
 #### Tutorial técnico linear
 
@@ -120,9 +120,9 @@ Depois deste BK, o catálogo passa a responder com `page`, `limit`, `total` e `i
 Garantir que `GET /api/catalog?limit=12` devolve um payload limitado e mensurável para `RNF09`.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `real_dev/backend/src/modules/catalog/catalog.validation.js`
-    - EDITAR: `real_dev/backend/src/modules/catalog/catalog.controller.js`
-    - EDITAR: `real_dev/backend/src/modules/catalog/catalog.service.js`
+    - EDITAR: `backend/src/modules/catalog/catalog.validation.js`
+    - EDITAR: `backend/src/modules/catalog/catalog.controller.js`
+    - EDITAR: `backend/src/modules/catalog/catalog.service.js`
     - LOCALIZAÇÃO: função nova `parseCatalogPagination`, função completa `getCatalog` e função completa `listPublishedCatalog`
 
 3. Instruções do que fazer.
@@ -132,7 +132,7 @@ Adiciona a validação de paginação ao módulo de catálogo, liga o controller
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/src/modules/catalog/catalog.validation.js
+// backend/src/modules/catalog/catalog.validation.js
 /**
  * Valida parâmetros públicos de paginação do catálogo.
  *
@@ -158,7 +158,7 @@ export function parseCatalogPagination(input = {}) {
 ```
 
 ```js
-// real_dev/backend/src/modules/catalog/catalog.controller.js
+// backend/src/modules/catalog/catalog.controller.js
 /**
  * Devolve conteúdo publicado com paginação pública.
  *
@@ -173,7 +173,7 @@ export async function getCatalog(req, res) {
 ```
 
 ```js
-// real_dev/backend/src/modules/catalog/catalog.service.js
+// backend/src/modules/catalog/catalog.service.js
 import {
     assertCatalogPayload,
     assertStatus,
@@ -182,7 +182,7 @@ import {
 ```
 
 ```js
-// real_dev/backend/src/modules/catalog/catalog.service.js
+// backend/src/modules/catalog/catalog.service.js
 /**
  * Lista conteúdo público publicado com paginação segura.
  *
@@ -248,17 +248,17 @@ Resultado esperado: HTTP `400` com mensagem de limite inválido.
 Medir endpoints críticos com thresholds explícitos, incluindo recomendações autenticadas para fechar `RNF11`.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/scripts/measure-performance-baseline.mjs`
+    - CRIAR: `backend/scripts/measure-performance-baseline.mjs`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
 
-Cria a pasta `real_dev/backend/scripts/` se ainda não existir e adiciona o ficheiro abaixo. Antes de executar, arranca o backend em outro terminal. Depois faz login no frontend local e copia apenas o par `faithflix_session=...` do cabeçalho `Cookie` para a variável `FAITHFLIX_SESSION_COOKIE`. Não coloques o valor do cookie na evidence.
+Cria a pasta `backend/scripts/` se ainda não existir e adiciona o ficheiro abaixo. Antes de executar, arranca o backend em outro terminal. Depois faz login no frontend local e copia apenas o par `faithflix_session=...` do cabeçalho `Cookie` para a variável `FAITHFLIX_SESSION_COOKIE`. Não coloques o valor do cookie na evidence.
 
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/scripts/measure-performance-baseline.mjs
+// backend/scripts/measure-performance-baseline.mjs
 /**
  * @file Medição local de performance para a MF6.
  *
@@ -407,7 +407,7 @@ O negativo sem sessão confirma que `/api/recommendations/me` continua protegido
 6. Validação do passo.
 
 ```bash
-cd real_dev/backend
+cd backend
 FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE="faithflix_session=VALOR_LOCAL" node scripts/measure-performance-baseline.mjs
 ```
 
@@ -424,9 +424,9 @@ Executa o script sem `FAITHFLIX_SESSION_COOKIE`. Resultado esperado: falha contr
 Confirmar que os endpoints medidos falham de forma controlada quando recebem pedidos inválidos.
 
 2. Ficheiros envolvidos:
-    - REVER: `real_dev/backend/src/modules/catalog/catalog.validation.js`
-    - REVER: `real_dev/backend/src/modules/search/search.validation.js`
-    - REVER: `real_dev/backend/src/modules/recommendations/recommendations.routes.js`
+    - REVER: `backend/src/modules/catalog/catalog.validation.js`
+    - REVER: `backend/src/modules/search/search.validation.js`
+    - REVER: `backend/src/modules/recommendations/recommendations.routes.js`
     - LOCALIZAÇÃO: validators e route guard dos endpoints medidos
 
 3. Instruções do que fazer.
@@ -489,7 +489,7 @@ Cria o ficheiro abaixo e substitui cada `PREENCHER_COM_*` apenas depois de execu
 | Comando | Resultado |
 | --- | --- |
 | `FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE=*** node scripts/measure-performance-baseline.mjs` | PREENCHER_COM_PASS_OU_FAIL |
-| `npm run build` em `real_dev/frontend` | PREENCHER_COM_PASS_OU_FAIL |
+| `npm run build` em `frontend` | PREENCHER_COM_PASS_OU_FAIL |
 
 ## Baseline local
 
@@ -536,10 +536,10 @@ Se a evidence contiver `faithflix_session=` com valor real, apaga esse valor ant
 Confirmar que alterações de performance não quebram páginas visíveis.
 
 2. Ficheiros envolvidos:
-    - REVER: `real_dev/frontend/src/pages/CatalogPage.jsx`
-    - REVER: `real_dev/frontend/src/pages/SearchPage.jsx`
-    - REVER: `real_dev/frontend/src/pages/ForYouPage.jsx`
-    - LOCALIZAÇÃO: comandos na raiz `real_dev/frontend`
+    - REVER: `frontend/src/pages/CatalogPage.jsx`
+    - REVER: `frontend/src/pages/SearchPage.jsx`
+    - REVER: `frontend/src/pages/ForYouPage.jsx`
+    - LOCALIZAÇÃO: comandos na raiz `frontend`
 
 3. Instruções do que fazer.
 
@@ -556,7 +556,7 @@ Otimização frontend pode quebrar imports, estado React ou JSX. O build é a pr
 6. Validação do passo.
 
 ```bash
-cd real_dev/frontend
+cd frontend
 npm run build
 ```
 
@@ -577,12 +577,12 @@ Se o build falhar por import removido ou por alteração de shape da resposta, c
 - A rajada local de 20 pedidos a `/health` regista P95 abaixo de 2000ms.
 - A evidence tem valores reais ou placeholders `PREENCHER_COM_*`, nunca `0ms`/`PASS` fictícios.
 - Nenhuma validação, guard, ownership ou auditoria foi removida para melhorar tempo.
-- `npm run build` em `real_dev/frontend` termina sem erro.
+- `npm run build` em `frontend` termina sem erro.
 
 #### Validação final
 
 ```bash
-cd real_dev/backend
+cd backend
 FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE="faithflix_session=VALOR_LOCAL" node scripts/measure-performance-baseline.mjs
 
 cd ../frontend

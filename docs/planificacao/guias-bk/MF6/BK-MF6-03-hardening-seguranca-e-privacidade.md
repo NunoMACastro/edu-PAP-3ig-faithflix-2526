@@ -23,7 +23,7 @@
 
 Neste BK vais endurecer a aplicação contra falhas comuns de segurança e privacidade, validando password hashing, validação de input, proteção de dados sensíveis, auditoria administrativa, backups e uso restrito dos dados de recomendação.
 
-O resultado final é um script de análise estática em `real_dev/backend/scripts/check-security-baseline.mjs`, uma checklist manual objetiva e evidence para o gate S12.
+O resultado final é um script de análise estática em `backend/scripts/check-security-baseline.mjs`, uma checklist manual objetiva e evidence para o gate S12.
 
 #### Importância
 
@@ -87,22 +87,22 @@ Depois deste BK, existe uma análise estática simples, uma checklist manual e e
 
 | Camada | Decisão |
 | --- | --- |
-| Script | `real_dev/backend/scripts/check-security-baseline.mjs` |
-| Alvos | `real_dev/backend/src` e `real_dev/frontend/src` |
+| Script | `backend/scripts/check-security-baseline.mjs` |
+| Alvos | `backend/src` e `frontend/src` |
 | Revisão manual | auth, users, privacy, subscriptions, integrations, recommendations |
 | Evidence | `docs/evidence/MF6/BK-MF6-03-hardening-seguranca.md` |
 | Handoff | `BK-MF6-04` só mede performance depois de segurança base estar verificada |
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `real_dev/backend/scripts/check-security-baseline.mjs`
-- REVER: `real_dev/backend/src/modules/auth/auth.password.js`
-- REVER: `real_dev/backend/src/modules/users/user.service.js`
-- REVER: `real_dev/backend/src/modules/privacy/privacy.service.js`
-- REVER: `real_dev/backend/src/modules/integrations/integrations.validation.js`
-- REVER: `real_dev/backend/src/modules/recommendations/recommendations.service.js`
-- REVER: `real_dev/backend/src/utils/logger.js`
-- REVER: `real_dev/frontend/src/services/api/apiClient.js`
+- CRIAR: `backend/scripts/check-security-baseline.mjs`
+- REVER: `backend/src/modules/auth/auth.password.js`
+- REVER: `backend/src/modules/users/user.service.js`
+- REVER: `backend/src/modules/privacy/privacy.service.js`
+- REVER: `backend/src/modules/integrations/integrations.validation.js`
+- REVER: `backend/src/modules/recommendations/recommendations.service.js`
+- REVER: `backend/src/utils/logger.js`
+- REVER: `frontend/src/services/api/apiClient.js`
 
 #### Tutorial técnico linear
 
@@ -113,17 +113,17 @@ Depois deste BK, existe uma análise estática simples, uma checklist manual e e
 Detetar padrões perigosos antes de fechar hardening, sem depender de ferramentas externas.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/scripts/check-security-baseline.mjs`
+    - CRIAR: `backend/scripts/check-security-baseline.mjs`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
 
-Cria o ficheiro abaixo no backend. O script deve ser executado a partir de `real_dev/backend`.
+Cria o ficheiro abaixo no backend. O script deve ser executado a partir de `backend`.
 
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/scripts/check-security-baseline.mjs
+// backend/scripts/check-security-baseline.mjs
 /**
  * @file Verificação estática de segurança e privacidade da MF6.
  *
@@ -309,14 +309,14 @@ if (failures.length > 0) {
 
 O script percorre `backend/src` e `frontend/src`, ignora ficheiros fora do código fonte e procura sinais de risco: armazenamento de sessão no browser, HTML injetado diretamente, execução dinâmica, remoção sem filtro, connection strings MongoDB não locais e segredos literais prováveis. As strings de armazenamento do browser são construídas por concatenação para o próprio guia não ser confundido com uma ocorrência real durante a auditoria textual.
 
-A deteção de segredos é feita linha a linha. Isto evita falsos positivos importantes no `real_dev`: o fallback local `mongodb://127.0.0.1:27017`, variáveis locais chamadas `password` usadas antes de hash/verificação e referências de formulário como `form.password`. O script continua a falhar quando encontra um valor literal como `password=123` ou `const secret = "valor-real"`.
+A deteção de segredos é feita linha a linha. Isto evita falsos positivos importantes no projeto: o fallback local `mongodb://127.0.0.1:27017`, variáveis locais chamadas `password` usadas antes de hash/verificação e referências de formulário como `form.password`. O script continua a falhar quando encontra um valor literal como `password=123` ou `const secret = "valor-real"`.
 
 O script não prova que toda a aplicação é segura. Ele bloqueia padrões que não devem chegar ao gate final e obriga a equipa a justificar qualquer exceção.
 
 6. Validação do passo.
 
 ```bash
-cd real_dev/backend
+cd backend
 node scripts/check-security-baseline.mjs
 ```
 
@@ -333,11 +333,11 @@ Cria temporariamente uma cópia local de um ficheiro com `password=123` num come
 Confirmar que os módulos de maior risco aplicam validação, autorização, auditoria e proteção de dados.
 
 2. Ficheiros envolvidos:
-    - REVER: `real_dev/backend/src/modules/auth/auth.password.js`
-    - REVER: `real_dev/backend/src/modules/users/user.service.js`
-    - REVER: `real_dev/backend/src/modules/privacy/privacy.service.js`
-    - REVER: `real_dev/backend/src/modules/integrations/integrations.validation.js`
-    - REVER: `real_dev/backend/src/modules/recommendations/recommendations.service.js`
+    - REVER: `backend/src/modules/auth/auth.password.js`
+    - REVER: `backend/src/modules/users/user.service.js`
+    - REVER: `backend/src/modules/privacy/privacy.service.js`
+    - REVER: `backend/src/modules/integrations/integrations.validation.js`
+    - REVER: `backend/src/modules/recommendations/recommendations.service.js`
     - LOCALIZAÇÃO: funções exportadas principais
 
 3. Instruções do que fazer.
@@ -453,9 +453,9 @@ Se a evidence disser apenas "segurança verificada" ou "fazer backup" sem proof,
 Fechar segurança com análise estática e garantir que a regressão backend continua verde.
 
 2. Ficheiros envolvidos:
-    - REVER: `real_dev/backend/scripts/check-security-baseline.mjs`
-    - REVER: `real_dev/backend/tests/regression/mf6-backend-regression.test.js`
-    - LOCALIZAÇÃO: comandos na raiz `real_dev/backend`
+    - REVER: `backend/scripts/check-security-baseline.mjs`
+    - REVER: `backend/tests/regression/mf6-backend-regression.test.js`
+    - LOCALIZAÇÃO: comandos na raiz `backend`
 
 3. Instruções do que fazer.
 
@@ -472,7 +472,7 @@ Hardening sem regressão pode introduzir quebra funcional. Por isso, a validaç�
 6. Validação do passo.
 
 ```bash
-cd real_dev/backend
+cd backend
 node scripts/check-security-baseline.mjs
 node --test tests/regression/mf6-backend-regression.test.js
 ```
@@ -495,7 +495,7 @@ Se o script encontrar credencial provável em código fonte, a validação deve 
 #### Validação final
 
 ```bash
-cd real_dev/backend
+cd backend
 node scripts/check-security-baseline.mjs
 node --test tests/regression/mf6-backend-regression.test.js
 ```

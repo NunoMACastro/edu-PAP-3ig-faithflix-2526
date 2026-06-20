@@ -23,7 +23,7 @@
 
 Neste BK vais criar uma suite de regressão backend para garantir que a API FaithFlix continua a cumprir os contratos críticos de `RNF29`: autenticação, criação e cancelamento de subscrições, reprodução básica de conteúdo e rotação mensal de associações.
 
-O resultado final é o ficheiro `real_dev/backend/tests/regression/mf6-backend-regression.test.js`, executado com `node --test`, e a evidence `docs/evidence/MF6/BK-MF6-01-regressao-backend.md` pronta para o gate S12.
+O resultado final é o ficheiro `backend/tests/regression/mf6-backend-regression.test.js`, executado com `node --test`, e a evidence `docs/evidence/MF6/BK-MF6-01-regressao-backend.md` pronta para o gate S12.
 
 #### Importância
 
@@ -66,7 +66,7 @@ Depois deste BK, a equipa passa a ter uma regressão backend com cinco áreas: a
 - `BK-MF4-01` e `BK-MF4-02` criaram contratos de subscrição e pagamento simulado.
 - `BK-MF4-05` criou distribuição mensal e rotação da pool solidária.
 - `BK-MF5-06` fechou integrações admin e entregou para MF6 os endpoints `/api/admin/integrations` e `/api/admin/metrics`.
-- O package `real_dev/backend/package.json` já tem `"test": "node --test"` e `"smoke": "node --test tests/smoke/*.test.js"`.
+- O package `backend/package.json` já tem `"test": "node --test"` e `"smoke": "node --test tests/smoke/*.test.js"`.
 
 #### Glossário
 
@@ -94,7 +94,7 @@ Depois deste BK, a equipa passa a ter uma regressão backend com cinco áreas: a
 
 | Camada | Decisão |
 | --- | --- |
-| Backend | `real_dev/backend` |
+| Backend | `backend` |
 | Test runner | `node --test` |
 | Novo ficheiro | `tests/regression/mf6-backend-regression.test.js` |
 | Dados de teste | Base em memória ligada por `setDbForTests` |
@@ -104,11 +104,11 @@ Depois deste BK, a equipa passa a ter uma regressão backend com cinco áreas: a
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `real_dev/backend/tests/regression/mf6-backend-regression.test.js`
+- CRIAR: `backend/tests/regression/mf6-backend-regression.test.js`
 - CRIAR: `docs/evidence/MF6/BK-MF6-01-regressao-backend.md`
-- REVER: `real_dev/backend/package.json`
-- REVER: `real_dev/backend/tests/smoke/app.smoke.test.js`
-- REVER: `real_dev/backend/tests/unit/mf5-validation.test.js`
+- REVER: `backend/package.json`
+- REVER: `backend/tests/smoke/app.smoke.test.js`
+- REVER: `backend/tests/unit/mf5-validation.test.js`
 - REVER: `docs/planificacao/guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md`
 
 #### Tutorial técnico linear
@@ -120,17 +120,17 @@ Depois deste BK, a equipa passa a ter uma regressão backend com cinco áreas: a
 Criar um teste automatizado que protege os fluxos mínimos de `RNF29` e confirma o handoff backend de `BK-MF5-06`, sem ligar a serviços externos.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `real_dev/backend/tests/regression/mf6-backend-regression.test.js`
+    - CRIAR: `backend/tests/regression/mf6-backend-regression.test.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
 
-Cria a pasta `real_dev/backend/tests/regression/` se ainda não existir. Depois cria o ficheiro abaixo exatamente com este conteúdo.
+Cria a pasta `backend/tests/regression/` se ainda não existir. Depois cria o ficheiro abaixo exatamente com este conteúdo.
 
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// real_dev/backend/tests/regression/mf6-backend-regression.test.js
+// backend/tests/regression/mf6-backend-regression.test.js
 /**
  * @file Suite de regressão backend da MF6.
  *
@@ -593,7 +593,7 @@ Os dados entram como objetos de teste controlados: `userId`, plano mensal, subsc
 6. Validação do passo.
 
 ```bash
-cd real_dev/backend
+cd backend
 node --test tests/regression/mf6-backend-regression.test.js
 ```
 
@@ -610,9 +610,9 @@ Altera temporariamente `paymentMethod: "cartao-real"` para `paymentMethod: "card
 Confirmar que a nova suite convive com os testes já existentes e que o backend continua operacional.
 
 2. Ficheiros envolvidos:
-    - REVER: `real_dev/backend/package.json`
-    - REVER: `real_dev/backend/tests/smoke/app.smoke.test.js`
-    - LOCALIZAÇÃO: comandos executados na raiz `real_dev/backend`
+    - REVER: `backend/package.json`
+    - REVER: `backend/tests/smoke/app.smoke.test.js`
+    - LOCALIZAÇÃO: comandos executados na raiz `backend`
 
 3. Instruções do que fazer.
 
@@ -631,7 +631,7 @@ Não existe código novo porque a app já expõe `npm test` e `npm run smoke`. A
 6. Validação do passo.
 
 ```bash
-cd real_dev/backend
+cd backend
 npm test
 npm run smoke
 ```
@@ -762,7 +762,7 @@ Se a equipa não souber dizer que fluxo backend protege cada página frontend, e
 #### Validação final
 
 ```bash
-cd real_dev/backend
+cd backend
 node --test tests/regression/mf6-backend-regression.test.js
 npm test
 npm run smoke
