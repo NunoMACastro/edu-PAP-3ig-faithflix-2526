@@ -6,6 +6,11 @@ import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
 import { assertCatalogPayload, assertStatus } from "./catalog.validation.js";
+import {
+    assertCatalogPayload,
+    assertStatus,
+    parseCatalogPagination,
+} from "./catalog.validation.js";
 
 /**
  * Converte um id de conteúdo num ObjectId MongoDB.
@@ -406,4 +411,37 @@ export async function getPublishedContentDetail(idOrSlug) {
     }
 
     return publicContent(content);
+}
+
+/**
+ * Lista conteúdo público publicado com paginação segura.
+ *
+ * @param {Record<string, unknown>} [queryParams={}] Query params recebidos pela rota pública.
+ * @returns {Promise<{ page: number, limit: number, total: number, items: Record<string, unknown>[] }>} Página pública do catálogo.
+ */
+export async function listPublishedCatalog(queryParams = {}) {
+    const { page, limit } = parseCatalogPagination(queryParams);
+    const db = await getDb();
+    // O catálogo público nunca deve incluir rascunhos ou conteúdos arquivados.
+    const filter = { status: "published" };
+
+    const [contents, total] = await Promise.all([
+        db
+            .collection("contents")
+            .find(filter)
+            .sort({ publishedAt: -1, title: 1 })
+            // A paginação é feita no MongoDB para evitar carregar o catálogo inteiro em memória.
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .toArray(),
+        // O total é contado em paralelo para manter a resposta útil sem duplicar a query de listagem.
+        db.collection("contents").countDocuments(filter),
+    ]);
+
+    return {
+        page,
+        limit,
+        total,
+        items: contents.map(publicContent),
+    };
 }
