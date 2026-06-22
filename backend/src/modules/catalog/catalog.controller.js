@@ -143,3 +143,16 @@ export async function getCatalogDetail(req, res) {
         content: await getPublishedContentDetail(req.params.idOrSlug),
     });
 }
+
+// backend/src/modules/catalog/catalog.controller.js
+/**
+ * Devolve conteúdo publicado com paginação pública.
+ *
+ * @param {import("express").Request} req Pedido HTTP com query params de paginação.
+ * @param {import("express").Response} res Resposta HTTP enviada ao frontend.
+ * @returns {Promise<unknown>} Resposta com `items`, `page`, `limit` e `total`.
+ */
+export async function getCatalog(req, res) {
+    // A query fica no controller, mas a validação continua no service para proteger a API mesmo sem frontend.
+    return res.status(200).json(await listPublishedCatalog(req.query));
+}

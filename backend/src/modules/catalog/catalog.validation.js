@@ -240,3 +240,26 @@ export function assertTaxonomyPayload(input = {}) {
         description: optionalText(input.description),
     };
 }
+
+/**
+ * Valida parâmetros públicos de paginação do catálogo.
+ *
+ * @param {Record<string, unknown>} input - Parâmetros brutos de query.
+ * @returns {{ page: number, limit: number }} Página e limite seguros.
+ */
+export function parseCatalogPagination(input = {}) {
+    const page = Number(input.page ?? 1);
+    const limit = Number(input.limit ?? 12);
+
+    // A página nunca pode ser zero ou negativa, porque isso criaria offsets inválidos na query MongoDB.
+    if (!Number.isInteger(page) || page < 1) {
+        throw new HttpError(400, "Pagina invalida.");
+    }
+
+    // O limite máximo protege RNF09 ao impedir que um pedido público descarregue o catálogo inteiro.
+    if (!Number.isInteger(limit) || limit < 1 || limit > 24) {
+        throw new HttpError(400, "Limite invalido.");
+    }
+
+    return { page, limit };
+}
