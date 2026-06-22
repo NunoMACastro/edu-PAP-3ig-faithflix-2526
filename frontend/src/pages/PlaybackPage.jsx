@@ -216,79 +216,82 @@ export function PlaybackPage() {
     return (
         <section className="page-section">
             <h1>{playback.content.title}</h1>
-            <div className="player-controls" aria-label="Opcoes de media">
+            // frontend/src/pages/PlaybackPage.jsx
+            
+            <div className="player-controls" aria-label="Opções de média">
                 <label>
-                    Legendas
-                    <select
-                        value={preferences.subtitleLanguage}
-                        onChange={(event) =>
-                            updatePreference(
-                                "subtitleLanguage",
-                                event.target.value,
-                            )
-                        }
-                    >
-                        <option value="">Sem legendas</option>
-                        {playback.content.tracks.subtitles.map((track) => (
-                            <option key={track.language} value={track.language}>
-                                {track.label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <label>
-                    Audio
-                    <select
-                        value={audioValue}
-                        onChange={(event) =>
-                            updatePreference("audioLanguage", event.target.value)
-                        }
-                    >
-                        <option value="">Original</option>
-                        {playback.content.tracks.audio.map((track) => (
-                            <option key={track.language} value={track.language}>
-                                {track.label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <label>
-                    Qualidade
-                    <select
-                        value={qualityValue}
-                        onChange={(event) =>
-                            updatePreference("quality", event.target.value)
-                        }
-                    >
-                        <option value="">Automatica</option>
-                        {playback.content.qualityOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-            </div>
-            <video
-                ref={videoRef}
-                controls
-                data-testid="faithflix-player"
-                src={videoSrc}
-                onLoadedMetadata={handleLoadedMetadata}
-                onTimeUpdate={handleTimeUpdate}
-                onPause={handlePause}
-            >
-                {playback.content.tracks.subtitles.map((track) => (
-                    <track
-                        key={track.language}
-                        kind="subtitles"
-                        srcLang={track.language}
-                        label={track.label}
-                        src={track.src}
-                    />
-                ))}
-                O teu browser nao suporta video HTML5.
-            </video>
+                Legendas
+                <select
+              value={preferences.subtitleLanguage}
+              onChange={(event) =>
+                  updatePreference(
+                    "subtitleLanguage",
+                    event.target.value,
+                )
+            }
+        >
+            <option value="">Sem legendas</option>
+            {playback.content.tracks.subtitles.map((track) => (
+                <option key={track.language} value={track.language}>
+                    {track.label}
+                </option>
+            ))}
+        </select>
+    </label>
+    <label>
+        Áudio
+        <select
+            value={audioValue}
+            onChange={(event) =>
+                updatePreference("audioLanguage", event.target.value)
+            }
+        >
+            <option value="">Original</option>
+            {playback.content.tracks.audio.map((track) => (
+                <option key={track.language} value={track.language}>
+                    {track.label}
+                </option>
+            ))}
+        </select>
+    </label>
+    <label>
+        Qualidade
+        <select
+            value={qualityValue}
+            onChange={(event) =>
+                updatePreference("quality", event.target.value)
+            }
+        >
+            <option value="">Automática</option>
+            {playback.content.qualityOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                    {option.label}
+                </option>
+            ))}
+        </select>
+    </label>
+                    </div>
+    <video
+    ref={videoRef}
+    controls
+    data-testid="faithflix-player"
+    src={videoSrc}
+    onLoadedMetadata={handleLoadedMetadata}
+    onTimeUpdate={handleTimeUpdate}
+    onPause={handlePause}
+>
+    {/* As tracks continuam no video para preservar legendas criadas nos BKs de streaming. */}
+    {playback.content.tracks.subtitles.map((track) => (
+        <track
+            key={track.language}
+            kind="subtitles"
+            srcLang={track.language}
+            label={track.label}
+            src={track.src}
+        />
+    ))}
+    O teu browser não suporta vídeo HTML5.
+    </video>    
         </section>
     );
 }
