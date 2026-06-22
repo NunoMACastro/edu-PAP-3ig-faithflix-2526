@@ -1,28 +1,29 @@
+// frontend/src/components/layout/AppHeader.jsx
 /**
- * @file Ficheiro `real_dev/frontend/src/components/layout/AppHeader.jsx` da implementação real_dev.
+ * @file Cabeçalho principal com navegação FaithFlix.
  */
 
 import { NavLink } from "react-router-dom";
 
 const navItems = [
-    { to: "/", label: "Inicio" },
-    { to: "/catalogo", label: "Catalogo" },
+    { to: "/", label: "Início" },
+    { to: "/catalogo", label: "Catálogo" },
     { to: "/biblioteca", label: "Biblioteca" },
     { to: "/pesquisa", label: "Pesquisa" },
     { to: "/para-si", label: "Para si" },
-    { to: "/associacoes", label: "Associacoes" },
+    { to: "/associacoes", label: "Associações" },
     { to: "/planos", label: "Planos" },
     { to: "/conta", label: "Conta" },
-    { to: "/admin/catalogo", label: "Admin catalogo" },
-    { to: "/admin/utilizadores", label: "Admin users" },
-    { to: "/admin/metricas", label: "Metricas" },
-    { to: "/admin/integracoes", label: "Integracoes" },
+    { to: "/admin/catalogo", label: "Admin catálogo" },
+    { to: "/admin/utilizadores", label: "Admin utilizadores" },
+    { to: "/admin/metricas", label: "Métricas" },
+    { to: "/admin/integracoes", label: "Integrações" },
 ];
 
 /**
  * Devolve a classe CSS de um item de navegação conforme o estado da rota.
  *
- * @param {{ isActive: boolean }} routeState - Estado passado pelo React Router.
+ * @param {{ isActive: boolean }} routeState Estado passado pelo React Router.
  * @returns {string} Lista de classes CSS da ligação de navegação.
  */
 function getNavLinkClassName({ isActive }) {
@@ -32,7 +33,7 @@ function getNavLinkClassName({ isActive }) {
 /**
  * Renderiza uma ligação de navegação a partir da lista de rotas.
  *
- * @param {{ to: string, label: string }} item - Navigation item definition.
+ * @param {{ to: string, label: string }} item Item de navegação com rota e texto visível.
  * @returns {JSX.Element} Ligação de navegação do React Router.
  */
 function renderNavItem(item) {
@@ -42,15 +43,16 @@ function renderNavItem(item) {
             className={getNavLinkClassName}
             to={item.to}
         >
+            {/* O texto visível fica em português de Portugal para cumprir clareza e localização da interface. */}
             {item.label}
         </NavLink>
     );
 }
 
 /**
- * Main application header with brand link and primary navigation.
+ * Renderiza o cabeçalho visível em todas as páginas.
  *
- * @returns {JSX.Element} Cabeçalho visível em todas as páginas.
+ * @returns {JSX.Element} Cabeçalho com marca e navegação principal.
  */
 export function AppHeader() {
     return (
@@ -58,7 +60,7 @@ export function AppHeader() {
             <NavLink
                 className="brand-link"
                 to="/"
-                aria-label="FaithFlix - inicio"
+                aria-label="FaithFlix - início"
             >
                 <span className="brand-mark" aria-hidden="true">
                     F
@@ -66,7 +68,8 @@ export function AppHeader() {
                 <span className="brand-name">FaithFlix</span>
             </NavLink>
 
-            <nav className="main-nav" aria-label="Navegacao principal">
+            {/* A label do nav descreve a região para quem navega por leitor de ecrã. */}
+            <nav className="main-nav" aria-label="Navegação principal">
                 {navItems.map(renderNavItem)}
             </nav>
         </header>
