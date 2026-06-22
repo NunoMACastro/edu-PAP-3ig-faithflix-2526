@@ -1,4 +1,4 @@
-# BK-MF7-02 - Matriz de cobertura RNF -> validacao
+# BK-MF7-02 - Matriz de cobertura RNF -> validação
 
 ## Header
 
@@ -17,169 +17,271 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF7-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-02-matriz-de-cobertura-rnf-validacao.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-06-22`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
-### Objetivo pedagogico
+Neste BK vais criar a matriz final de cobertura dos RNF que ficaram atribuídos à MF7. A matriz deve provar compatibilidade, responsividade, API estável, exportações, manutenção, ética de recomendação, localização e formatos europeus.
 
-- Consolidar a entrega de `Matriz de cobertura RNF -> validacao` com rastreabilidade explicita para `RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40`.
-- Executar o BK `BK-MF7-02` no contexto da macro `MF7` e da sprint `S11`.
+O resultado observável é o ficheiro `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`, com uma linha por RNF deste BK, evidence consultada, comando ou verificação, negativos e estado final.
 
-### Tempo estimado
+#### Importância
 
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
+Os RNF são a diferença entre "a funcionalidade existe" e "a funcionalidade é defensável como produto". Um catálogo pode listar conteúdos, mas a defesa também precisa de compatibilidade, API consistente, privacidade, manutenção e interface em português de Portugal.
 
-### Erros comuns
+Este BK prepara a demo final para não depender apenas de navegação visual. Ele dá argumentos técnicos para explicar limitações do MVP sem inventar integrações ou maturidade operacional que não foram implementadas.
 
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
+#### Scope-in
 
-### Check de compreensao
+- Validar `RNF21`, `RNF22`, `RNF23`, `RNF24`, `RNF25`, `RNF26`, `RNF32`, `RNF33`, `RNF35`, `RNF36`, `RNF38`, `RNF39` e `RNF40`.
+- Criar `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`.
+- Cruzar cada RNF com evidence técnica, manual ou documental.
+- Distinguir validação real, validação com ressalva, pendência e falha.
+- Registar pelo menos 3 negativos para este BK P0.
+- Preparar handoff para o roteiro de demo final.
 
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
+#### Scope-out
 
+- Implementar nova arquitetura de deployment.
+- Trocar a stack React + Vite + Express + MongoDB.
+- Criar fornecedor real de pagamentos.
+- Criar serviço externo de vídeo.
+- Criar sistema avançado de recomendação.
+- Alterar o texto oficial dos RNF sem decisão documental.
 
-## O que vamos fazer neste BK
+#### Estado antes e depois
 
-Entregar `Matriz de cobertura RNF -> validacao` cobrindo os RNF remanescentes da consolidacao final (`RNF21..RNF26`, `RNF32`, `RNF33`, `RNF35`, `RNF36`, `RNF38..RNF40`) na `MF7`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+- Estado antes: `BK-MF6-06` consolidou validações técnicas e `BK-MF7-01` estruturou cobertura funcional.
+- Estado antes: os RNF deste BK existem em `docs/RNF.md`, mas a evidence final da MF7 ainda não está organizada.
+- Estado depois: a equipa tem uma matriz RNF com fonte, proof, negativos, estado e ressalvas.
+- Estado depois: `BK-MF7-03` consegue transformar requisitos e limitações numa demo honesta.
 
-## Porque isto e importante
+#### Pre-requisitos
 
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF7-03`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+- `BK-MF6-06` revisto.
+- `BK-MF7-01` criado ou em revisão.
+- `docs/RNF.md` consultado para texto e prioridade dos RNF.
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` consultado para confirmar atribuição dos RNF a este BK.
+- `docs/evidence/MF6/` revisto para regressão, segurança, performance, UX e gate.
+- `backend/package.json` e `frontend/package.json` revistos para comandos reais.
 
-## Bloco operacional (obrigatorio)
+#### Glossário
 
-### Pre-condicoes
+- RNF: requisito não funcional de qualidade, segurança, compatibilidade, manutenção ou operação.
+- Compatibilidade: capacidade de funcionar de forma previsível em ambientes suportados.
+- Responsividade: adaptação da interface a tamanhos diferentes de ecrã.
+- API estável: contrato HTTP consistente entre frontend e backend.
+- Exportação: geração de ficheiro ou resposta consumível fora da aplicação.
+- Rollback: capacidade operacional de regressar a uma versão anterior com dados protegidos.
+- Ressalva: limitação conhecida, explícita e aceite na defesa.
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+#### Conceitos teóricos essenciais
 
-### Execucao
+- `CANONICO`: `RNF21..RNF26`, `RNF32`, `RNF33`, `RNF35`, `RNF36` e `RNF38..RNF40` pertencem a `BK-MF7-02` na matriz canónica.
+- `CANONICO`: a política de negativos exige pelo menos 3 negativos para BK P0.
+- `DERIVADO`: os RNF que dependem de serviços externos ou operação real devem ser classificados por evidence disponível, nunca por intenção.
+- Compatibilidade não se prova só com uma página aberta no computador do aluno. A matriz deve indicar browsers, resoluções ou limitação de ambiente.
+- API estável significa manter endpoints, payloads, códigos HTTP e mensagens previsíveis para o frontend e futuros clientes.
+- Ética de recomendação, localização e formatos europeus são verificações de produto: texto, datas, filtros de catálogo e explicações têm de ser observáveis.
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+#### Arquitetura do BK
 
-### Outputs
+| Área | Entrada | Saída |
+| --- | --- | --- |
+| RNF | `docs/RNF.md` | Lista fechada de RNF deste BK |
+| Qualidade técnica | `docs/evidence/MF6/` | Evidence reutilizada de hardening e regressão |
+| Produto | rotas frontend e endpoints backend já existentes | Provas de compatibilidade, API e localização |
+| Matriz final | `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md` | Estado RNF auditável |
+| Handoff | riscos e ressalvas | Base para `BK-MF7-03` |
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+#### Ficheiros a criar/editar/rever
 
-### Validacao
+- CRIAR: `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`
+- REVER: `docs/RNF.md`
+- REVER: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- REVER: `docs/evidence/MF6/GATE-S12-MF6.md`
+- REVER: `docs/evidence/MF6/BK-MF6-02-regressao-frontend.md`
+- REVER: `docs/evidence/MF6/BK-MF6-03-hardening-seguranca.md`
+- REVER: `docs/evidence/MF6/BK-MF6-04-performance.md`
+- REVER: `docs/evidence/MF6/BK-MF6-05-acessibilidade-ux.md`
+- REVER: `backend/package.json`
+- REVER: `frontend/package.json`
 
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
+#### Tutorial técnico linear
 
-### Handoff
+### Passo 1 - Confirmar RNF alvo
 
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
+1. Objetivo funcional do passo no contexto da app.
 
+Criar a lista fechada de RNF que este BK valida, mantendo o texto oficial e a prioridade original.
 
-## Pre-condicoes de entrada
+2. Ficheiros envolvidos:
+    - REVER: `docs/RNF.md`
+    - REVER: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
+    - LOCALIZAÇÃO: secções de compatibilidade, manutenção, ética e localização.
 
-- Dependencias declaradas: `BK-MF6-06`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+3. Instruções do que fazer.
 
-## O que entra (scope)
+Lê cada RNF alvo em `docs/RNF.md`. Copia para a tua matriz o ID, a descrição curta, o tipo e a prioridade. Depois confirma na matriz canónica que todos pertencem a `BK-MF7-02`.
 
-- Entrega funcional de `Matriz de cobertura RNF -> validacao` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
+4. Código completo, correto e integrado com a app final.
 
-## O que nao entra (scope-out)
+Sem código neste passo. O output é a lista oficial de RNF deste BK.
 
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
+5. Explicação do código.
 
-## Como saber que isto ficou bem
+Não há código porque o passo define o contrato de validação. A entrada é `docs/RNF.md`; a saída é a lista controlada que será testada ou justificada.
 
-- Fluxo principal de `BK-MF7-02` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P0`.
-- Evidence documentada e pronta para auditoria de gate.
+Isto evita validar requisitos errados, esquecer RNF de operação ou declarar como implementado um requisito que ainda precisa de ressalva.
 
-## Pre-leitura minima (10-15 min)
+6. Validação do passo.
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RNF21..RNF26`, `RNF32`, `RNF33`, `RNF35`, `RNF36`, `RNF38..RNF40`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-02`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
+Confirma que a lista contém exatamente 13 RNF: `RNF21`, `RNF22`, `RNF23`, `RNF24`, `RNF25`, `RNF26`, `RNF32`, `RNF33`, `RNF35`, `RNF36`, `RNF38`, `RNF39` e `RNF40`.
 
-## Guia de execucao (passo-a-passo)
+7. Cenário negativo/erro esperado.
 
-1. Criar/atualizar tabela de cobertura RNF com colunas minimas: `RNF`, `BK fonte`, `evidencia`, `status`, `responsavel`.
-2. Consolidar evidencias dos BKs que cobrem os RNF desta fase e normalizar formato de referencia (`pr/proof/neg`).
-3. Validar que cada RNF tem pelo menos uma evidencia objetiva e que o link/referencia e resolvivel.
-4. Executar revisao cruzada com `BACKLOG-MVP` e `MATRIZ-CANONICA-BK` para garantir ausencia de drift.
-5. Marcar lacunas (se existirem) com acao corretiva e dono antes do fecho do gate.
-6. Atualizar evidence final e preparar handoff para `BK-MF7-03`.
+Se `RNF29` aparecer nesta matriz, remove-o: regressão automatizada pertence a MF6 e só pode entrar aqui como evidence consultada.
 
-## Outputs esperados
+### Passo 2 - Associar evidence a cada RNF
 
-- Output funcional de `BK-MF7-02` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
+1. Objetivo funcional do passo no contexto da app.
 
-## Snippet tecnico aplicavel
+Ligar cada RNF a uma prova verificável ou a uma ressalva explícita.
 
-```text
-# pseudo-checklist BK-MF7-02
-precondicoes_ok = validar_dependencias(["BK-MF6-06"])
-assert precondicoes_ok == true
+2. Ficheiros envolvidos:
+    - CRIAR: `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`
+    - REVER: `docs/evidence/MF6/`
+    - REVER: `backend/package.json`
+    - REVER: `frontend/package.json`
+    - LOCALIZAÇÃO: tabela principal da matriz RNF.
 
-resultado = executar_fluxo_principal("Matriz de cobertura RNF -> validacao")
-assert resultado.status == "OK"
+3. Instruções do que fazer.
 
-negativos = executar_negativos(prioridade="P0", minimo=3)
-assert negativos.passados >= 3
+Cria a matriz com estas colunas:
 
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
-```
+| Coluna | Conteúdo esperado |
+| --- | --- |
+| RNF | ID do requisito |
+| Tipo | categoria oficial do RNF |
+| Verificação | comando, revisão manual, captura ou documento |
+| Evidence | caminho do ficheiro ou referência da prova |
+| Negativo | falha esperada ou limitação testada |
+| Estado | `VALIDADO`, `VALIDADO_COM_RESSALVA`, `PENDENTE` ou `FALHA` |
+| Decisão | explicação curta da classificação |
 
-## Checklist de validacao
+4. Código completo, correto e integrado com a app final.
 
-### Smoke
+Sem código neste passo. O artefacto criado é uma matriz Markdown.
 
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
+5. Explicação do código.
 
-### Negativos
+A matriz RNF não precisa de implementar novos módulos. Ela precisa de mostrar que a qualidade foi verificada com critérios observáveis.
 
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: RNF sem evidencia associada e sinalizado como `FAIL` com acao corretiva.
-- [ ] Negativo 2: referencia de evidencia quebrada/invalida e detetada na validacao.
-- [ ] Negativo 3: conflito de rastreabilidade (RNF mapeado de forma contraditoria) e resolvido antes do fecho.
-### Tecnico
+Um RNF pode usar evidence de MF6, como regressão frontend, hardening ou performance. Mesmo assim, a linha final deve explicar por que essa evidence serve para este RNF e que limite permanece.
 
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
+6. Validação do passo.
 
-## Criterios de aceite (mensuraveis)
+Escolhe 3 RNF de categorias diferentes e confirma que cada um tem evidence, negativo e decisão. Nenhuma linha pode ficar `VALIDADO` só com opinião.
 
-- Condicao: cobertura RNF da fase final esta completa e auditavel.
-- Metrica/Limiar: 100% dos RNF de `BK-MF7-02` com `status` definido e evidencia valida.
-- Evidencia esperada: `proof` com matriz final preenchida e links/resumos verificaveis.
-- Condicao: coerencia entre matriz de cobertura, backlog e rastreabilidade canonica.
-- Metrica/Limiar: 0 divergencias abertas em `owner`, `rf_rnf`, `dependencias` no fecho do BK.
-- Evidencia esperada: `proof` com resultado da verificacao cruzada e assinatura de revisao.
-- Condicao: tratamento de lacunas e falhas de evidencia robusto.
-- Metrica/Limiar: 3/3 negativos obrigatorios executados com classificacao e acao corretiva quando aplicavel.
-- Evidencia esperada: `neg` com lista de falhas simuladas/detetadas e respetiva resolucao.
+7. Cenário negativo/erro esperado.
 
-## Evidence para PR/defesa
+Se `RNF32` for marcado como `VALIDADO` sem plano de rollback, script, documento operacional ou decisão do orientador, altera para `PENDENTE`.
 
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
+### Passo 3 - Tratar ressalvas sem inventar maturidade
 
-## Proximo BK recomendado
+1. Objetivo funcional do passo no contexto da app.
 
-`BK-MF7-03`
+Garantir que RNF com dependência operacional ou fornecedor externo são explicados de forma honesta no MVP.
 
-## Changelog
+2. Ficheiros envolvidos:
+    - EDITAR: `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`
+    - REVER: `docs/RNF.md`
+    - REVER: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
+    - LOCALIZAÇÃO: linhas `RNF23`, `RNF24`, `RNF32`, `RNF33`, `RNF36` e `RNF39`.
 
-- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+3. Instruções do que fazer.
+
+Para cada RNF que dependa de infraestrutura ou operação futura, escreve uma decisão objetiva. Usa `VALIDADO_COM_RESSALVA` apenas quando existe uma versão MVP demonstrável e a limitação está clara.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo. O trabalho é de classificação técnica.
+
+5. Explicação do código.
+
+Este passo protege a defesa contra promessas excessivas. Uma PAP pode ter pagamento simulado, recomendação por regras simples e execução local, desde que a matriz não finja maturidade de produção.
+
+A decisão deve explicar o que existe, o que não existe e que risco passa para MF8 ou para trabalho futuro.
+
+6. Validação do passo.
+
+Revê todas as linhas com `VALIDADO_COM_RESSALVA` e confirma que a ressalva tem impacto, owner e próxima ação.
+
+7. Cenário negativo/erro esperado.
+
+Se uma linha disser que há integração real sem prova de integração, a classificação deve mudar para `PENDENTE` ou `FALHA`.
+
+### Passo 4 - Fechar negativos e preparar demo
+
+1. Objetivo funcional do passo no contexto da app.
+
+Transformar a matriz RNF em material direto para a demo final e para perguntas técnicas.
+
+2. Ficheiros envolvidos:
+    - EDITAR: `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`
+    - REVER: `docs/planificacao/guias-bk/MF7/BK-MF7-03-roteiro-de-demo-final.md`
+    - LOCALIZAÇÃO: secções `Negativos consolidados`, `Ressalvas` e `Handoff`.
+
+3. Instruções do que fazer.
+
+Regista no final da matriz três negativos mínimos: browser/resolução não testada, RNF sem evidence e requisito com limitação não explicada. Depois escreve 5 perguntas prováveis de defesa e a linha RNF que responde a cada uma.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo. O output é a secção final de validação.
+
+5. Explicação do código.
+
+Os negativos mostram domínio técnico: a equipa sabe distinguir "não testado", "falhou" e "validado com limitação".
+
+O handoff para a demo é importante porque o roteiro deve mostrar algumas provas no ecrã e explicar outras de forma verbal, sem interromper a narrativa do produto.
+
+6. Validação do passo.
+
+Pede a outro colega para responder a uma pergunta sobre compatibilidade, uma sobre API e uma sobre localização usando apenas a matriz.
+
+7. Cenário negativo/erro esperado.
+
+Se o colega precisar de procurar uma justificação fora da matriz, a linha desse RNF ainda está incompleta.
+
+#### Critérios de aceite
+
+- A matriz contém exatamente os 13 RNF alvo.
+- Cada RNF tem evidence ou ressalva objetiva.
+- Pelo menos 3 negativos P0 estão registados.
+- Nenhum requisito dependente de operação externa é apresentado como produção sem prova.
+- As decisões técnicas distinguem `CANONICO` e `DERIVADO` no raciocínio da matriz.
+- O handoff para `BK-MF7-03` indica provas a mostrar na demo e provas a explicar verbalmente.
+
+#### Validação final
+
+- Executar `bash scripts/validate-planificacao.sh` na raiz do projeto.
+- Executar `git diff --check` na raiz do projeto.
+- Rever manualmente se todos os RNF alvo têm linha e estado.
+- Confirmar que as ressalvas não contradizem `docs/RNF.md`.
+
+#### Evidence para PR/defesa
+
+- `pr`: referência da entrega onde `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md` foi criado.
+- `proof`: matriz RNF completa, outputs de validação e capturas necessárias.
+- `neg`: resolução não testada rejeitada; RNF sem evidence rejeitado; limitação não explicada reclassificada.
+- `fonte`: `docs/RNF.md`, `MATRIZ-CANONICA-BK.md`, `BK-MF6-06` e evidence MF6.
+
+#### Handoff
+
+Este BK entrega as decisões não funcionais para a demo. `BK-MF7-03` deve escolher provas visuais e verbais a partir desta matriz, mantendo ressalvas explícitas.
+
+#### Changelog
+
+- `2026-06-22`: guia reescrito para matriz RNF validável, com estados, ressalvas, negativos e handoff para demo final.

@@ -17,169 +17,261 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF7-04`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-03-roteiro-de-demo-final.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-06-22`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
-### Objetivo pedagogico
+Neste BK vais transformar a matriz de cobertura funcional num roteiro de demo final claro, realista e treinável.
 
-- Consolidar a entrega de `Roteiro de demo final` com rastreabilidade explicita para `transversal`.
-- Executar o BK `BK-MF7-03` no contexto da macro `MF7` e da sprint `S12`.
+O resultado observável é o ficheiro `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md`, com história de utilizador, sequência de ecrãs, ações, dados preparados, provas a mostrar e negativos a demonstrar ou explicar.
 
-### Tempo estimado
+#### Importância
 
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
+Uma demo final não deve ser uma navegação improvisada. Ela precisa de contar a história do produto, provar requisitos importantes e mostrar que a equipa conhece limites, segurança e riscos.
 
-### Erros comuns
+Este BK cria uma narrativa técnica: visitante descobre conteúdos, utilizador autenticado interage, subscrição/pool solidária entram como domínio de negócio e admin valida operação. A demo passa a ter ritmo, responsáveis e evidence.
 
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
+#### Scope-in
 
-### Check de compreensao
+- Escolher a narrativa principal da demo final.
+- Ligar passos da demo à matriz RF criada no `BK-MF7-01`.
+- Identificar rotas, ecrãs, dados e contas necessárias.
+- Preparar provas visuais e verbais para requisitos transversais.
+- Registar negativos mínimos para BK P1.
+- Preparar o ensaio técnico do `BK-MF7-04`.
 
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
+#### Scope-out
 
+- Criar novas funcionalidades para melhorar a demo.
+- Alterar rotas ou componentes.
+- Escrever dados falsos como se fossem outputs executados.
+- Trocar requisitos por uma apresentação comercial.
+- Esconder limitações conhecidas.
 
-## O que vamos fazer neste BK
+#### Estado antes e depois
 
-Entregar `Roteiro de demo final` cobrindo `transversal` na `MF7`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+- Estado antes: a matriz RF identifica o que deve ser provado, mas ainda não existe uma ordem de apresentação.
+- Estado antes: a equipa tem rotas e funcionalidades implementadas em várias macrofases, mas a defesa precisa de uma narrativa coesa.
+- Estado depois: existe um roteiro com início, percurso principal, provas, negativos e fallback.
+- Estado depois: `BK-MF7-04` pode ensaiar a defesa com tempos e perguntas técnicas.
 
-## Porque isto e importante
+#### Pre-requisitos
 
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF7-04`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+- `BK-MF7-01` criado ou revisto.
+- `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md` disponível para consulta pela equipa.
+- `docs/planificacao/backlogs/MF-VIEWS.md` consultado para a sequência da MF7.
+- `frontend/src/routes/AppRoutes.jsx` revisto para confirmar rotas públicas e privadas existentes.
+- Evidence MF6 revista para saber que provas técnicas não precisam de ser demonstradas integralmente durante a demo.
 
-## Bloco operacional (obrigatorio)
+#### Glossário
 
-### Pre-condicoes
+- Demo final: apresentação guiada do produto com fluxo, dados e prova técnica.
+- Narrativa: ordem lógica que explica por que cada ação aparece.
+- Cena: bloco curto da demo com ecrã, ação, requisito e resultado.
+- Fallback: alternativa controlada caso um serviço, dado ou ambiente falhe.
+- Tempo-alvo: duração máxima de cada cena para manter a defesa focada.
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+#### Conceitos teóricos essenciais
 
-### Execucao
+- `CANONICO`: `BK-MF7-03` é transversal e entra no gate S12 como checklist de evidence.
+- `CANONICO`: `MF-VIEWS.md` define a MF7 como fecho de matriz RF, matriz RNF, roteiro demo, ensaio e feedback.
+- `DERIVADO`: a demo deve seguir uma história de produto, porque a matriz por si só não comunica valor ao júri.
+- Uma demo técnica mostra produto e arquitetura ao mesmo tempo. O aluno deve saber dizer que rota, endpoint ou domínio está por trás de cada ação.
+- Um negativo numa demo não é para "partir" a apresentação. É para mostrar que erros previsíveis são tratados e que a equipa entende segurança e validação.
+- O roteiro deve ser repetível. Outro colega deve conseguir seguir o documento sem depender de memória informal.
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+#### Arquitetura do BK
 
-### Outputs
+| Área | Entrada | Saída |
+| --- | --- | --- |
+| Cobertura RF | `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md` | Requisitos a mostrar |
+| Rotas frontend | `frontend/src/routes/AppRoutes.jsx` | Sequência de ecrãs |
+| Evidence técnica | `docs/evidence/MF6/` | Provas a anexar ou mencionar |
+| Roteiro | `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md` | Script da demo |
+| Handoff | tempos, riscos e perguntas | Base para ensaio técnico |
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+#### Ficheiros a criar/editar/rever
 
-### Validacao
+- CRIAR: `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md`
+- REVER: `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`
+- REVER: `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`
+- REVER: `frontend/src/routes/AppRoutes.jsx`
+- REVER: `docs/planificacao/backlogs/MF-VIEWS.md`
+- REVER: `docs/evidence/MF6/GATE-S12-MF6.md`
 
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
+#### Tutorial técnico linear
 
-### Handoff
+### Passo 1 - Escolher a narrativa da demo
 
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
+1. Objetivo funcional do passo no contexto da app.
 
+Definir uma história única que mostre o valor do FaithFlix sem saltar entre ecrãs sem ligação.
 
-## Pre-condicoes de entrada
+2. Ficheiros envolvidos:
+    - REVER: `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`
+    - REVER: `docs/planificacao/backlogs/MF-VIEWS.md`
+    - LOCALIZAÇÃO: RF principais e sequência da MF7.
 
-- Dependencias declaradas: `BK-MF7-01`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+3. Instruções do que fazer.
 
-## O que entra (scope)
+Escolhe uma narrativa com quatro blocos: descoberta pública, conta autenticada, monetização solidária e operação/admin. Cada bloco deve referenciar RF concretos.
 
-- Entrega funcional de `Roteiro de demo final` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
+4. Código completo, correto e integrado com a app final.
 
-## O que nao entra (scope-out)
+Sem código neste passo. O output é a narrativa do roteiro.
 
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
+5. Explicação do código.
 
-## Como saber que isto ficou bem
+Não há código porque este passo organiza comunicação técnica. A narrativa evita uma demo fragmentada e ajuda o aluno a explicar por que cada ecrã existe.
 
-- Fluxo principal de `BK-MF7-03` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P1`.
-- Evidence documentada e pronta para auditoria de gate.
+O aluno pode adaptar a ordem dos blocos se o orientador pedir, mas não deve remover provas P0 nem esconder lacunas marcadas nas matrizes.
 
-## Pre-leitura minima (10-15 min)
+6. Validação do passo.
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `transversal`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-03`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
+Lê a narrativa em voz alta em 2 minutos. Deve ser possível perceber quem é o utilizador, que problema resolve e que prova será mostrada.
 
-## Guia de execucao (passo-a-passo)
+7. Cenário negativo/erro esperado.
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Roteiro de demo final`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P1`.
-6. Atualizar evidence e preparar handoff para `BK-MF7-04`.
+Se a narrativa começar por admin sem explicar utilizador, catálogo ou subscrição, o júri pode não perceber o produto. Reordena para partir da experiência principal.
 
-## Outputs esperados
+### Passo 2 - Mapear cenas, rotas e evidence
 
-- Output funcional de `BK-MF7-03` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
+1. Objetivo funcional do passo no contexto da app.
 
-## Snippet tecnico aplicavel
+Transformar a narrativa numa sequência de cenas executável.
 
-```text
-# pseudo-checklist BK-MF7-03
-precondicoes_ok = validar_dependencias(["BK-MF7-01"])
-assert precondicoes_ok == true
+2. Ficheiros envolvidos:
+    - CRIAR: `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md`
+    - REVER: `frontend/src/routes/AppRoutes.jsx`
+    - REVER: `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`
+    - LOCALIZAÇÃO: tabela principal do roteiro.
 
-resultado = executar_fluxo_principal("Roteiro de demo final")
-assert resultado.status == "OK"
+3. Instruções do que fazer.
 
-negativos = executar_negativos(prioridade="P1", minimo=3)
-assert negativos.passados >= 3
+No roteiro, cria uma tabela com estas colunas:
 
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
-```
+| Coluna | Conteúdo esperado |
+| --- | --- |
+| Ordem | número da cena |
+| Rota ou artefacto | ecrã, matriz ou evidence |
+| Ação | o que a pessoa demonstra |
+| RF/RNF provado | requisito ou área transversal |
+| Resultado esperado | comportamento observável |
+| Evidence | captura, output, matriz ou ficheiro |
+| Tempo-alvo | duração máxima da cena |
 
-## Checklist de validacao
+4. Código completo, correto e integrado com a app final.
 
-### Smoke
+Sem código neste passo. O artefacto é o roteiro Markdown.
 
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
+5. Explicação do código.
 
-### Negativos
+A tabela transforma a demo num plano executável. Cada linha força a equipa a saber a rota, o requisito e a prova associada.
 
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
-### Tecnico
+Rotas como `/catalogo`, `/pesquisa`, `/para-si`, `/biblioteca`, `/planos`, `/associacoes`, `/conta` e `/admin/metricas` só devem entrar se estiverem prontas no ambiente usado para defesa.
 
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
+6. Validação do passo.
 
-## Criterios de aceite (mensuraveis)
+Confirma que cada cena aponta para pelo menos um RF, RNF ou evidence de gate. Cenas sem requisito devem ser removidas ou fundidas.
 
-- Condicao: fluxo principal de `BK-MF7-03` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P1`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+7. Cenário negativo/erro esperado.
 
-## Evidence para PR/defesa
+Se uma cena depender de conta admin e não houver credencial preparada, marca a cena como `PENDENTE` e cria fallback documental.
 
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
+### Passo 3 - Preparar dados, contas e fallback
 
-## Proximo BK recomendado
+1. Objetivo funcional do passo no contexto da app.
 
-`BK-MF7-04`
+Evitar que a demo falhe por falta de dados, permissões ou ambiente.
 
-## Changelog
+2. Ficheiros envolvidos:
+    - EDITAR: `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md`
+    - REVER: `backend/package.json`
+    - REVER: `frontend/package.json`
+    - LOCALIZAÇÃO: secções `Dados preparados`, `Contas`, `Fallback` e `Riscos`.
 
-- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+3. Instruções do que fazer.
+
+Lista as contas necessárias por papel, os dados mínimos de catálogo, subscrição, biblioteca, pool e admin, e a alternativa caso algum serviço não esteja disponível no momento da defesa.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo. O output é a secção operacional do roteiro.
+
+5. Explicação do código.
+
+Preparar dados é parte da engenharia da demo. Uma funcionalidade pode estar correta e ainda assim falhar na defesa se faltar utilizador, conteúdo publicado ou sessão.
+
+O fallback deve ser honesto: usar evidence guardada ou matriz de validação, não inventar sucesso ao vivo.
+
+6. Validação do passo.
+
+Antes do ensaio, confirma que cada cena tem dado de entrada, estado esperado e alternativa documentada.
+
+7. Cenário negativo/erro esperado.
+
+Se a demo depender de rede ou base de dados indisponível, usa evidence guardada e explica a limitação sem declarar execução ao vivo.
+
+### Passo 4 - Registar negativos e tempos da demo
+
+1. Objetivo funcional do passo no contexto da app.
+
+Fechar o roteiro com controlo de tempo e cenários de erro demonstráveis.
+
+2. Ficheiros envolvidos:
+    - EDITAR: `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md`
+    - REVER: `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`
+    - LOCALIZAÇÃO: secções `Negativos`, `Tempo total` e `Handoff`.
+
+3. Instruções do que fazer.
+
+Regista pelo menos 3 negativos P1: rota desconhecida, ação autenticada sem sessão e operação admin sem papel correto. Define também tempo-alvo por cena e tempo total.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo. O output é a secção final do roteiro.
+
+5. Explicação do código.
+
+Negativos e tempos tornam a demo defensável. A equipa mostra que conhece falhas esperadas e mantém a apresentação dentro do tempo disponível.
+
+O handoff para o ensaio deve incluir perguntas técnicas prováveis, cenas frágeis e evidence que precisa de estar aberta antes da defesa.
+
+6. Validação do passo.
+
+Executa um ensaio curto seguindo só a tabela. O roteiro está bom se a pessoa não precisar de improvisar ordem, rotas ou requisitos.
+
+7. Cenário negativo/erro esperado.
+
+Se a demo exceder o tempo-alvo, corta explicações repetidas e mantém apenas provas P0/P1 e uma ressalva clara.
+
+#### Critérios de aceite
+
+- O roteiro tem narrativa, cenas, rotas, ações, requisitos e evidence.
+- Cada cena tem tempo-alvo e resultado esperado.
+- Existem pelo menos 3 negativos P1.
+- Dados, contas e fallback estão documentados.
+- O roteiro distingue demonstração ao vivo de evidence guardada.
+- `BK-MF7-04` recebe perguntas, riscos e tempos para ensaio.
+
+#### Validação final
+
+- Executar `bash scripts/validate-planificacao.sh` na raiz do projeto.
+- Executar `git diff --check` na raiz do projeto.
+- Fazer leitura cronometrada do roteiro.
+- Confirmar que cada cena tem origem em matriz RF/RNF ou evidence.
+
+#### Evidence para PR/defesa
+
+- `pr`: referência da entrega onde `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md` foi criado.
+- `proof`: roteiro completo com cenas e tempos.
+- `neg`: rota desconhecida, ação sem sessão e operação admin sem papel correto.
+- `fonte`: `BK-MF7-01`, `BK-MF7-02`, `MF-VIEWS.md` e rotas frontend existentes.
+
+#### Handoff
+
+Este BK entrega o script da demo. `BK-MF7-04` deve ensaiar o roteiro, medir tempos, preparar respostas técnicas e transformar falhas encontradas em ações antes da avaliação final.
+
+#### Changelog
+
+- `2026-06-22`: guia reescrito para roteiro de demo final com narrativa, cenas, dados, fallback, negativos e handoff para ensaio.

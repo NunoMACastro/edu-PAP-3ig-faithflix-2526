@@ -1,4 +1,4 @@
-# BK-MF7-05 - Avaliacao final e feedback orientador
+# BK-MF7-05 - Avaliação final e feedback orientador
 
 ## Header
 
@@ -17,169 +17,259 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF8-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-05-avaliacao-final-e-feedback-orientador.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-06-22`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
-### Objetivo pedagogico
+Neste BK vais consolidar a avaliação final da MF7 e registar feedback do orientador com base nas matrizes, roteiro e ensaio técnico.
 
-- Consolidar a entrega de `Avaliacao final e feedback orientador` com rastreabilidade explicita para `transversal`.
-- Executar o BK `BK-MF7-05` no contexto da macro `MF7` e da sprint `S12`.
+O resultado observável é o ficheiro `docs/evidence/MF7/AVALIACAO-FINAL-FEEDBACK-ORIENTADOR.md`, com decisão, score, comentários, ações aceites, bloqueios e handoff para `BK-MF8-01`.
 
-### Tempo estimado
+#### Importância
 
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
+A avaliação final protege o fecho da PAP contra duas falhas comuns: considerar a defesa pronta sem evidência ou empurrar riscos críticos para a fase de buffer sem decisão explícita.
 
-### Erros comuns
+Este BK cria o momento formal em que o orientador cruza produto, documentação, qualidade técnica, demo e maturidade da equipa. O resultado deve ser claro: seguir, seguir com ressalvas ou corrigir antes de avançar.
 
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
+#### Scope-in
 
-### Check de compreensao
+- Rever matriz RF, matriz RNF, roteiro e ensaio técnico.
+- Aplicar critérios de score e feedback do orientador.
+- Registar decisão final da MF7.
+- Separar riscos residuais de bloqueios.
+- Preparar handoff para `BK-MF8-01`.
+- Registar pelo menos 3 negativos P0 de avaliação.
 
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
+#### Scope-out
 
+- Alterar avaliação para esconder falhas.
+- Corrigir produto dentro deste BK.
+- Reabrir requisitos sem decisão canónica.
+- Fechar MF7 com evidence obrigatória em falta.
+- Substituir a decisão humana do orientador por score automático.
 
-## O que vamos fazer neste BK
+#### Estado antes e depois
 
-Entregar `Avaliacao final e feedback orientador` cobrindo `transversal` na `MF7`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+- Estado antes: existem ou estão em revisão as matrizes RF/RNF, roteiro e ensaio técnico.
+- Estado antes: a equipa ainda não tem decisão final do orientador registada.
+- Estado depois: existe avaliação final com decisão, comentários, ações e riscos.
+- Estado depois: `BK-MF8-01` recebe uma lista objetiva de riscos residuais para buffer e fecho.
 
-## Porque isto e importante
+#### Pre-requisitos
 
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF8-01`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+- `BK-MF7-02` concluído ou revisto.
+- `BK-MF7-04` concluído ou revisto.
+- `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md` disponível.
+- `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md` disponível.
+- `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md` disponível.
+- `docs/evidence/MF7/ENSAIO-TECNICO-DEFESA.md` disponível.
+- `docs/planificacao/sprints/SCORECARD-SPRINTS.md` consultado.
 
-## Bloco operacional (obrigatorio)
+#### Glossário
 
-### Pre-condicoes
+- Avaliação final: decisão formal de prontidão da MF7.
+- Feedback do orientador: comentários técnicos e pedagógicos que orientam correções finais.
+- Score: classificação estruturada por critérios definidos.
+- Risco residual: risco aceite e acompanhado na MF8.
+- Bloqueio: falha que impede avançar sem correção.
+- Handoff: entrega objetiva para o próximo BK.
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+#### Conceitos teóricos essenciais
 
-### Execucao
+- `CANONICO`: `BK-MF7-05` depende de `BK-MF7-02` e `BK-MF7-04`.
+- `CANONICO`: `BK-MF8-01` depende de `BK-MF7-05`, por isso a avaliação final alimenta diretamente a lista de riscos residuais.
+- `CANONICO`: `BACKLOG-MVP.md` exige evidence `pr`, `proof` e `neg` para fecho de BK.
+- `DERIVADO`: a decisão final usa estados `GO`, `GO_COM_RESSALVAS` e `NO_GO` para separar avanço limpo, avanço com risco aceite e bloqueio.
+- Feedback útil é específico. "Melhorar demo" é vago; "reduzir cena admin para 2 minutos e citar matriz RNF na pergunta de API" é acionável.
+- Um risco residual só pode seguir para MF8 se não bloquear a defesa. Falhas críticas de evidence, segurança, privacidade ou ownership não devem ser tratadas como detalhe.
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+#### Arquitetura do BK
 
-### Outputs
+| Área | Entrada | Saída |
+| --- | --- | --- |
+| RF/RNF | matrizes MF7 | Cobertura e lacunas |
+| Demo | roteiro e ensaio | Prontidão de apresentação |
+| Score | `SCORECARD-SPRINTS.md` | Avaliação estruturada |
+| Feedback | revisão do orientador | Ações e decisão |
+| Handoff | riscos e bloqueios | Base para `BK-MF8-01` |
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+#### Ficheiros a criar/editar/rever
 
-### Validacao
+- CRIAR: `docs/evidence/MF7/AVALIACAO-FINAL-FEEDBACK-ORIENTADOR.md`
+- REVER: `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`
+- REVER: `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`
+- REVER: `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md`
+- REVER: `docs/evidence/MF7/ENSAIO-TECNICO-DEFESA.md`
+- REVER: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`
+- REVER: `docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md`
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- REVER: `docs/planificacao/guias-bk/MF8/BK-MF8-01-lista-de-riscos-residuais.md`
 
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
+#### Tutorial técnico linear
 
-### Handoff
+### Passo 1 - Consolidar pacote de avaliação
 
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
+1. Objetivo funcional do passo no contexto da app.
 
+Juntar todos os artefactos que o orientador precisa de rever antes da decisão.
 
-## Pre-condicoes de entrada
+2. Ficheiros envolvidos:
+    - CRIAR: `docs/evidence/MF7/AVALIACAO-FINAL-FEEDBACK-ORIENTADOR.md`
+    - REVER: `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`
+    - REVER: `docs/evidence/MF7/MATRIZ-RNF-VALIDACAO.md`
+    - REVER: `docs/evidence/MF7/ROTEIRO-DEMO-FINAL.md`
+    - REVER: `docs/evidence/MF7/ENSAIO-TECNICO-DEFESA.md`
+    - LOCALIZAÇÃO: secção `Pacote revisto`.
 
-- Dependencias declaradas: `BK-MF7-02,BK-MF7-04`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+3. Instruções do que fazer.
 
-## O que entra (scope)
+Cria uma lista de artefactos com estado, owner, última revisão, bloqueios e decisão de aceitar ou devolver. Nenhum artefacto obrigatório pode ficar sem estado.
 
-- Entrega funcional de `Avaliacao final e feedback orientador` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
+4. Código completo, correto e integrado com a app final.
 
-## O que nao entra (scope-out)
+Sem código neste passo. O output é o pacote de avaliação.
 
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
+5. Explicação do código.
 
-## Como saber que isto ficou bem
+Não há código porque a tarefa é de governação. A avaliação começa por garantir que todos os documentos de evidence existem e são rastreáveis.
 
-- Fluxo principal de `BK-MF7-05` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P0`.
-- Evidence documentada e pronta para auditoria de gate.
+Isto evita aprovar MF7 com uma matriz incompleta, uma demo sem ensaio ou feedback sem ligação a provas.
 
-## Pre-leitura minima (10-15 min)
+6. Validação do passo.
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `transversal`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-05`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
+Confirma que os quatro artefactos centrais da MF7 têm estado explícito: matriz RF, matriz RNF, roteiro e ensaio.
 
-## Guia de execucao (passo-a-passo)
+7. Cenário negativo/erro esperado.
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Avaliacao final e feedback orientador`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
-6. Atualizar evidence e preparar handoff para `BK-MF8-01`.
+Se a matriz RNF estiver ausente, a decisão final não pode ser `GO`.
 
-## Outputs esperados
+### Passo 2 - Aplicar score e feedback
 
-- Output funcional de `BK-MF7-05` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
+1. Objetivo funcional do passo no contexto da app.
 
-## Snippet tecnico aplicavel
+Transformar a revisão do orientador em avaliação estruturada e acionável.
 
-```text
-# pseudo-checklist BK-MF7-05
-precondicoes_ok = validar_dependencias(["BK-MF7-02","BK-MF7-04"])
-assert precondicoes_ok == true
+2. Ficheiros envolvidos:
+    - EDITAR: `docs/evidence/MF7/AVALIACAO-FINAL-FEEDBACK-ORIENTADOR.md`
+    - REVER: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`
+    - REVER: `docs/planificacao/sprints/SCORECARD-OFICIAL-POR-SPRINT.md`
+    - LOCALIZAÇÃO: secções `Score` e `Feedback`.
 
-resultado = executar_fluxo_principal("Avaliacao final e feedback orientador")
-assert resultado.status == "OK"
+3. Instruções do que fazer.
 
-negativos = executar_negativos(prioridade="P0", minimo=3)
-assert negativos.passados >= 3
+Avalia cobertura, coerência, pedagogia, adequação ao 12.º ano, governação, carga planeada, carga real, desvio, risco e ação corretiva. Para cada item fraco, escreve feedback com owner e evidência afetada.
 
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
-```
+4. Código completo, correto e integrado com a app final.
 
-## Checklist de validacao
+Sem código neste passo. O output é o score final e feedback.
 
-### Smoke
+5. Explicação do código.
 
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
+O score organiza a conversa. Ele não substitui julgamento técnico, mas obriga a justificar a decisão com critérios comuns.
 
-### Negativos
+O feedback deve ser útil para agir. Comentários vagos geram ansiedade e não melhoram a entrega.
 
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
-### Tecnico
+6. Validação do passo.
 
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
+Confirma que cada ação corretiva tem owner, prazo e critério de fecho.
 
-## Criterios de aceite (mensuraveis)
+7. Cenário negativo/erro esperado.
 
-- Condicao: fluxo principal de `BK-MF7-05` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+Se o feedback disser "melhorar documentação" sem indicar ficheiro, secção ou critério, reescreve até ficar acionável.
 
-## Evidence para PR/defesa
+### Passo 3 - Decidir GO, GO_COM_RESSALVAS ou NO_GO
 
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
+1. Objetivo funcional do passo no contexto da app.
 
-## Proximo BK recomendado
+Emitir uma decisão final honesta sobre a prontidão da MF7.
 
-`BK-MF8-01`
+2. Ficheiros envolvidos:
+    - EDITAR: `docs/evidence/MF7/AVALIACAO-FINAL-FEEDBACK-ORIENTADOR.md`
+    - REVER: `docs/evidence/MF7/ENSAIO-TECNICO-DEFESA.md`
+    - LOCALIZAÇÃO: secção `Decisão final`.
 
-## Changelog
+3. Instruções do que fazer.
 
-- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+Usa `GO` se não houver bloqueios críticos. Usa `GO_COM_RESSALVAS` se houver riscos aceites e não críticos. Usa `NO_GO` se falta evidence obrigatória, se há falha crítica de segurança/privacidade ou se a demo não é defensável.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo. O output é a decisão final.
+
+5. Explicação do código.
+
+A decisão final deve ser compreensível para a equipa. Ela responde: podemos avançar, avançamos com riscos explícitos, ou precisamos corrigir antes?
+
+Esta decisão prepara MF8. Riscos aceites seguem para a lista de riscos residuais; bloqueios ficam para correção antes de avançar.
+
+6. Validação do passo.
+
+Confirma que a decisão cita evidence e não apenas opinião do orientador.
+
+7. Cenário negativo/erro esperado.
+
+Se existir falha crítica de sessão, privacidade ou ownership, a decisão não deve ser `GO_COM_RESSALVAS`; deve ser `NO_GO` até corrigir.
+
+### Passo 4 - Preparar handoff para MF8
+
+1. Objetivo funcional do passo no contexto da app.
+
+Entregar a MF8 uma lista clara de riscos residuais, bugs bloqueantes e decisões aceites.
+
+2. Ficheiros envolvidos:
+    - EDITAR: `docs/evidence/MF7/AVALIACAO-FINAL-FEEDBACK-ORIENTADOR.md`
+    - REVER: `docs/planificacao/guias-bk/MF8/BK-MF8-01-lista-de-riscos-residuais.md`
+    - LOCALIZAÇÃO: secções `Riscos residuais`, `Bloqueios` e `Handoff`.
+
+3. Instruções do que fazer.
+
+Separa riscos residuais de bloqueios. Para cada item, regista origem, impacto, owner, próxima ação e BK de MF8 que o deve tratar.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo. O output é o handoff para MF8.
+
+5. Explicação do código.
+
+Handoff bom evita que a fase de buffer comece às cegas. A equipa sabe o que é risco aceite, o que é bug bloqueante e o que já está decidido.
+
+O aluno não deve empurrar falhas críticas para "risco residual". A diferença entre risco e bloqueio é decisiva para a defesa.
+
+6. Validação do passo.
+
+Confirma que todos os riscos com impacto na defesa têm ação ou decisão explícita.
+
+7. Cenário negativo/erro esperado.
+
+Se um bloqueio não tiver owner, `BK-MF8-01` não consegue começar com segurança.
+
+#### Critérios de aceite
+
+- O pacote de avaliação inclui matriz RF, matriz RNF, roteiro e ensaio.
+- O score usa critérios definidos nos documentos de sprint.
+- O feedback é específico, acionável e ligado a evidence.
+- Existem pelo menos 3 negativos P0 de avaliação.
+- A decisão final é `GO`, `GO_COM_RESSALVAS` ou `NO_GO` com justificação.
+- O handoff para `BK-MF8-01` separa riscos residuais de bloqueios.
+
+#### Validação final
+
+- Executar `bash scripts/validate-planificacao.sh` na raiz do projeto.
+- Executar `git diff --check` na raiz do projeto.
+- Confirmar que todos os artefactos obrigatórios da MF7 têm estado.
+- Confirmar que a decisão final cita evidence e ações.
+
+#### Evidence para PR/defesa
+
+- `pr`: referência da entrega onde `docs/evidence/MF7/AVALIACAO-FINAL-FEEDBACK-ORIENTADOR.md` foi criado.
+- `proof`: score, decisão final e feedback do orientador.
+- `neg`: matriz ausente impede `GO`; feedback vago é rejeitado; falha crítica impede ressalva simples.
+- `fonte`: matrizes MF7, roteiro, ensaio, scorecard e backlog.
+
+#### Handoff
+
+Este BK fecha a MF7 e entrega a `BK-MF8-01` uma lista objetiva de riscos residuais, bloqueios e decisões aceites. A MF8 deve usar este material para priorizar buffer, fecho e empacotamento final.
+
+#### Changelog
+
+- `2026-06-22`: guia reescrito para avaliação final com score, feedback, decisão, negativos e handoff para MF8.

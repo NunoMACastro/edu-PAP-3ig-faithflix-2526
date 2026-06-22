@@ -1,4 +1,4 @@
-# BK-MF7-01 - Matriz de cobertura RF -> evidencia
+# BK-MF7-01 - Matriz de cobertura RF -> evidência
 
 ## Header
 
@@ -17,169 +17,277 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF7-02`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-01-matriz-de-cobertura-rf-evidencia.md`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-06-22`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
-### Objetivo pedagogico
+Neste BK vais construir a matriz final que liga cada requisito funcional ativo do MVP FaithFlix à evidência que prova a sua existência, validação e preparação para defesa.
 
-- Consolidar a entrega de `Matriz de cobertura RF -> evidencia` com rastreabilidade explicita para `RF_ATIVOS_MVP`.
-- Executar o BK `BK-MF7-01` no contexto da macro `MF7` e da sprint `S11`.
+O resultado observável é o ficheiro `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`, com uma linha por RF ativo, o BK que o implementou ou validou, a prova consultada, os negativos mínimos e o estado de cobertura.
 
-### Tempo estimado
+Esta matriz não implementa nova funcionalidade. Ela transforma a aplicação construída nas macrofases anteriores numa prova organizada para o gate S12 e para a defesa PAP.
 
-- Tempo recomendado: `90-180 min` de foco tecnico.
-- Se ultrapassar em `>30 min`, ativar remediacao no guiao docente.
+#### Importância
 
-### Erros comuns
+Uma PAP técnica não é defendida apenas com código existente. A equipa precisa de mostrar que cada requisito funcional documentado tem origem, execução, prova e limitação conhecida.
 
-- Comecar sem validar dependencias.
-- Fechar BK sem `pr/proof/neg`.
-- Ignorar negativos minimos por prioridade.
+Este BK fecha a cadeia `RF -> BK -> evidence -> defesa`. Sem esta matriz, o roteiro de demo pode mostrar ecrãs interessantes, mas não prova que o MVP cobre os requisitos oficiais.
 
-### Check de compreensao
+O próximo BK usa este método para fazer o mesmo com requisitos não funcionais. Por isso, a matriz RF deve ficar clara, auditável e sem claims que não tenham prova.
 
-- [ ] Sei explicar o objetivo do BK em 30 segundos.
-- [ ] Sei distinguir scope e scope-out deste BK.
-- [ ] Sei qual e o handoff para o proximo BK.
+#### Scope-in
 
+- Levantar todos os RF ativos em `docs/RF.md`.
+- Confirmar o BK responsável por cada RF em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+- Ligar cada RF à evidence existente ou ao campo pendente a preencher pela equipa.
+- Criar a estrutura final de `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`.
+- Registar pelo menos 3 negativos para este BK P0.
+- Preparar handoff direto para `BK-MF7-02`.
 
-## O que vamos fazer neste BK
+#### Scope-out
 
-Entregar `Matriz de cobertura RF -> evidencia` cobrindo `RF_ATIVOS_MVP` na `MF7`, com fluxo principal verificavel e evidencia tecnica pronta para gate.
+- Alterar IDs, owners, prioridades, estados ou dependências dos BKs.
+- Reescrever requisitos funcionais.
+- Corrigir código de backend ou frontend.
+- Marcar RF como validado sem evidence objetiva.
+- Criar novos RF fora de `docs/RF.md`.
+- Substituir a revisão do orientador.
 
-## Porque isto e importante
+#### Estado antes e depois
 
-- Fecha capacidade critica desta macro sem criar drift de backlog.
-- Reduz risco tecnico para o proximo BK da sequencia (`BK-MF7-02`).
-- Garante rastreabilidade direta requisito -> BK -> evidencia para defesa.
+- Estado antes: `BK-MF6-06` consolidou o gate técnico da MF6 e deixou a MF7 pronta para organizar evidências de defesa.
+- Estado antes: os RF ativos existem em `docs/RF.md`, mas ainda não há matriz final RF -> evidence da MF7.
+- Estado depois: `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md` mostra todos os RF ativos do MVP com fonte, BK, proof, negativos, estado e lacunas.
+- Estado depois: `BK-MF7-02` pode validar RNF sem repetir o levantamento funcional.
 
-## Bloco operacional (obrigatorio)
+#### Pre-requisitos
 
-### Pre-condicoes
+- `BK-MF6-06` concluído ou revisto pela equipa.
+- `docs/RF.md` consultado para a lista de RF ativos.
+- `docs/planificacao/backlogs/BACKLOG-MVP.md` consultado para macrofases, owners e dependências.
+- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` consultado para o mapeamento requisito -> BK.
+- `docs/planificacao/backlogs/CONTRATO-CAMPOS-BK.md` consultado para confirmar metadata de `BK-MF7-01`.
+- `docs/evidence/MF6/GATE-S12-MF6.md` revisto como evidence de entrada, se já estiver preenchido pela equipa.
 
-- Confirmar dependencias e rastreabilidade antes de executar.
+#### Glossário
 
-### Execucao
+- RF ativo: requisito funcional que continua dentro do escopo PAP após o rebaseline do MVP.
+- Evidence: prova objetiva, como output de teste, captura, log controlado, matriz assinada ou ficheiro revisto.
+- Proof: prova principal de que o fluxo esperado funciona.
+- Negativo: cenário de erro, falta de permissões, dados incompletos ou ausência de prova que deve falhar de forma controlada.
+- Gate S12: validação final antes da defesa e do buffer de fecho.
+- Estado de cobertura: classificação `VALIDADO`, `VALIDADO_COM_RESSALVA`, `PENDENTE` ou `FALHA`.
 
-- Seguir o passo-a-passo do guia, focando primeiro o fluxo principal.
+#### Conceitos teóricos essenciais
 
-### Outputs
+- `CANONICO`: `RF_ATIVOS_MVP` representa os requisitos funcionais que permanecem no escopo PAP em `docs/RF.md`.
+- `CANONICO`: `MATRIZ-CANONICA-BK.md` mantém `91/91` requisitos mapeados, somando RF e RNF.
+- `CANONICO`: `BACKLOG-MVP.md` exige evidence mínima `pr`, `proof` e `neg` por BK.
+- `DERIVADO`: a matriz RF final usa estados explícitos para impedir que um requisito sem prova seja apresentado como concluído.
+- Um RF é uma capacidade de produto, não apenas uma linha documental. Exemplo: `RF16` só fica coberto se houver prova de favoritos, ownership e comportamento esperado.
+- Evidence precisa de fonte. Uma frase como "funciona" não chega; a linha deve indicar ficheiro, comando, captura, output ou decisão assinável.
+- Negativos são parte da defesa. Eles mostram que a equipa sabe explicar limites, permissões, sessão, validação e falhas esperadas.
+- Uma ressalva não é fracasso automático. Se o MVP usa uma versão simplificada documentada, a matriz pode marcar `VALIDADO_COM_RESSALVA`, desde que a limitação esteja clara.
 
-- Entrega funcional + evidence minima (`pr`, `proof`, `neg`).
+#### Arquitetura do BK
 
-### Validacao
+| Área | Entrada | Saída |
+| --- | --- | --- |
+| RF | `docs/RF.md` | Lista de RF ativos |
+| Mapeamento | `MATRIZ-CANONICA-BK.md` e `BACKLOG-MVP.md` | BK responsável por RF |
+| Evidence | `docs/evidence/` e BKs das MF anteriores | Proof e negativos por requisito |
+| Matriz final | `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md` | Cobertura RF auditável |
+| Handoff | matriz RF validada | Base funcional para demo final |
 
-- Fechar checklist de smoke, negativos e criterios mensuraveis.
+#### Ficheiros a criar/editar/rever
 
-### Handoff
+- CRIAR: `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`
+- REVER: `docs/RF.md`
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- REVER: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
+- REVER: `docs/planificacao/backlogs/CONTRATO-CAMPOS-BK.md`
+- REVER: `docs/planificacao/guias-bk/MF0/`
+- REVER: `docs/planificacao/guias-bk/MF1/`
+- REVER: `docs/planificacao/guias-bk/MF2/`
+- REVER: `docs/planificacao/guias-bk/MF3/`
+- REVER: `docs/planificacao/guias-bk/MF4/`
+- REVER: `docs/planificacao/guias-bk/MF5/`
+- REVER: `docs/planificacao/guias-bk/MF6/`
+- REVER: `docs/evidence/MF6/GATE-S12-MF6.md`
 
-- Preparar transicao objetiva para o `Proximo BK recomendado`.
+#### Tutorial técnico linear
 
+### Passo 1 - Levantar todos os RF ativos
 
-## Pre-condicoes de entrada
+1. Objetivo funcional do passo no contexto da app.
 
-- Dependencias declaradas: `BK-MF6-06`.
-- Linha do BK validada em `docs/planificacao/backlogs/BACKLOG-MVP.md`.
-- Mapeamento de requisito validado em `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`.
+Construir a lista fechada de requisitos funcionais que a matriz deve cobrir, sem inventar novos requisitos e sem recuperar RF removidos do escopo PAP.
 
-## O que entra (scope)
+2. Ficheiros envolvidos:
+    - REVER: `docs/RF.md`
+    - REVER: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
+    - LOCALIZAÇÃO: tabelas de requisitos funcionais e secção de validações estruturais.
 
-- Entrega funcional de `Matriz de cobertura RF -> evidencia` com caminho principal completo.
-- Integracao com dependencias diretas e validacao de regressao local.
-- Evidence minima obrigatoria: `pr`, `proof`, `neg`.
+3. Instruções do que fazer.
 
-## O que nao entra (scope-out)
+Lê `docs/RF.md` e copia apenas os RF existentes nas tabelas ativas: `RF01..RF28`, `RF35..RF48`, `RF52..RF60`. Confirma depois em `MATRIZ-CANONICA-BK.md` que estes RF entram na cobertura total.
 
-- Mudanca de RF/RNF, owner, prioridade ou dependencias sem aprovacao.
-- Refatoracao ampla sem impacto direto neste BK.
-- Trabalho de BK futuro fora da cadeia declarada.
+4. Código completo, correto e integrado com a app final.
 
-## Como saber que isto ficou bem
+Sem código neste passo. O trabalho é documental e cria a base da matriz.
 
-- Fluxo principal de `BK-MF7-01` reproduzivel por outro colega.
-- Politica de negativos cumprida para prioridade `P0`.
-- Evidence documentada e pronta para auditoria de gate.
+5. Explicação do código.
 
-## Pre-leitura minima (10-15 min)
+Não há código porque a tarefa é de rastreabilidade. A entrada é a lista oficial de RF; a saída é uma lista controlada para o ficheiro de evidence.
 
-- `docs/RF.md` e `docs/RNF.md` (itens de `RF_ATIVOS_MVP`).
-- `docs/planificacao/backlogs/BACKLOG-MVP.md` (linha de `BK-MF7-01`).
-- `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` (rastreabilidade).
+Este passo evita dois erros graves: deixar RF ativo sem linha de cobertura ou trazer de volta requisitos removidos do MVP. O aluno pode adaptar a descrição curta de cada RF, mas não pode alterar o ID nem o escopo sem decisão do orientador.
 
-## Guia de execucao (passo-a-passo)
+6. Validação do passo.
 
-1. Validar pre-condicoes e dependencias de entrada.
-2. Definir mini-plano tecnico (entrada, processamento, saida, validacao).
-3. Implementar o fluxo principal de `Matriz de cobertura RF -> evidencia`.
-4. Executar smoke e validar integracao com BKs adjacentes.
-5. Executar negativos obrigatorios para `P0`.
-6. Atualizar evidence e preparar handoff para `BK-MF7-02`.
+Conta os RF levantados e confirma que a soma bate certo com a cobertura funcional esperada da PAP. Se um RF não aparecer em `docs/RF.md`, não entra na matriz.
 
-## Outputs esperados
+7. Cenário negativo/erro esperado.
 
-- Output funcional de `BK-MF7-01` concluido sem blocker.
-- Output de validacao com teste/log/captura.
-- Output documental com `pr/proof/neg` para gate.
+Se alguém acrescentar um RF novo diretamente na matriz, a revisão deve marcar `FALHA`: requisito sem fonte oficial.
 
-## Snippet tecnico aplicavel
+### Passo 2 - Ligar cada RF ao BK responsável
 
-```text
-# pseudo-checklist BK-MF7-01
-precondicoes_ok = validar_dependencias(["BK-MF6-06"])
-assert precondicoes_ok == true
+1. Objetivo funcional do passo no contexto da app.
 
-resultado = executar_fluxo_principal("Matriz de cobertura RF -> evidencia")
-assert resultado.status == "OK"
+Garantir que cada requisito funcional aponta para o BK que o implementou, validou ou consolidou.
 
-negativos = executar_negativos(prioridade="P0", minimo=3)
-assert negativos.passados >= 3
+2. Ficheiros envolvidos:
+    - REVER: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
+    - REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+    - REVER: `docs/planificacao/backlogs/CONTRATO-CAMPOS-BK.md`
+    - LOCALIZAÇÃO: linhas de RF e linhas dos BKs das MF0 a MF6.
 
-registar_evidence(pr="link-ou-ref", proof=["teste","log"], neg=negativos.resumo)
-```
+3. Instruções do que fazer.
 
-## Checklist de validacao
+Para cada RF, encontra o BK primário na matriz canónica. Quando a capacidade depende de mais do que uma macrofase, mantém o BK primário e acrescenta uma nota curta com dependências reais.
 
-### Smoke
+4. Código completo, correto e integrado com a app final.
 
-- [ ] Fluxo principal executa sem erro bloqueante.
-- [ ] Integracao com dependencias diretas valida.
-- [ ] Resultado reproduzivel por outro colega.
+Sem código neste passo. O resultado é uma relação documental requisito -> BK.
 
-### Negativos
+5. Explicação do código.
 
-- [ ] Politica obrigatoria aplicada: `P0/P1>=3; P2>=1`.
-- [ ] Negativo 1: cenario de erro/limite executado e documentado.
-- [ ] Negativo 2: cenario de erro/limite executado e documentado.
-- [ ] Negativo 3: cenario de erro/limite executado e documentado.
-### Tecnico
+O BK responsável é a ponte entre planeamento e execução. Sem esta ponte, a defesa fica vulnerável a perguntas simples como "onde foi implementado este requisito?".
 
-- [ ] Metadados alinhados com BACKLOG-MVP e matriz RF/RNF.
-- [ ] Criterios de aceite mensuraveis definidos com limiar claro.
-- [ ] Evidence (`pr`, `proof`, `neg`) pronta para gate.
+O aluno pode acrescentar uma nota de dependência, por exemplo "usa sessão segura da MF1", mas não deve trocar o BK primário sem atualizar documentação canónica.
 
-## Criterios de aceite (mensuraveis)
+6. Validação do passo.
 
-- Condicao: fluxo principal de `BK-MF7-01` concluido ponta-a-ponta.
-- Metrica/Limiar: 100% dos passos de scope sem blocker.
-- Evidencia esperada: `proof` com teste/log/captura objetiva.
-- Condicao: politica de negativos cumprida para `P0`.
-- Metrica/Limiar: minimo de 3 negativo(s) executado(s) com resultado previsivel.
-- Evidencia esperada: `neg` com cenarios e resultado observado.
-- Condicao: coerencia documental com backlog e matriz.
-- Metrica/Limiar: `owner`, `prioridade`, `dependencias`, `rf_rnf` sem divergencia.
-- Evidencia esperada: validacao tecnica aprovada no gate da sprint.
+Escolhe 5 RF de domínios diferentes, por exemplo identidade, catálogo, streaming, subscrições e privacidade, e confirma que cada um aponta para um BK existente.
 
-## Evidence para PR/defesa
+7. Cenário negativo/erro esperado.
 
-- `pr`: link de PR/commit ou referencia de entrega local.
-- `proof`: 2-3 evidencias objetivas (teste, log, captura, output).
-- `neg`: resumo dos cenarios negativos executados (minimo por prioridade).
+Se `RF55` apontar apenas para um BK de catálogo, a linha fica `FALHA`, porque exportação de dados pertence ao domínio de privacidade/RGPD.
 
-## Proximo BK recomendado
+### Passo 3 - Criar a matriz RF -> evidence
 
-`BK-MF7-02`
+1. Objetivo funcional do passo no contexto da app.
 
-## Changelog
+Criar o ficheiro final onde cada RF fica ligado a proof, negativos e estado de cobertura.
 
-- `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
+2. Ficheiros envolvidos:
+    - CRIAR: `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`
+    - REVER: `docs/evidence/MF6/GATE-S12-MF6.md`
+    - LOCALIZAÇÃO: ficheiro completo da matriz RF.
+
+3. Instruções do que fazer.
+
+Cria a pasta `docs/evidence/MF7/` se ainda não existir. No ficheiro da matriz, usa estas colunas obrigatórias:
+
+| Coluna | Conteúdo esperado |
+| --- | --- |
+| RF | ID do requisito funcional |
+| Domínio | identidade, catálogo, streaming, biblioteca, descoberta, monetização, pool, notificações, privacidade ou admin |
+| BK responsável | BK primário confirmado na matriz canónica |
+| Evidence consultada | caminho do ficheiro, comando, captura ou decisão |
+| Proof | prova principal do fluxo positivo |
+| Negativos | cenários negativos executados ou pendentes |
+| Estado | `VALIDADO`, `VALIDADO_COM_RESSALVA`, `PENDENTE` ou `FALHA` |
+| Observação | limitação curta, se existir |
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo. O artefacto é uma matriz Markdown de evidence.
+
+5. Explicação do código.
+
+A matriz é um documento técnico, mas funciona como contrato de defesa. Cada coluna responde a uma pergunta do júri: o que foi pedido, onde foi feito, como se prova, o que falha de forma previsível e que risco fica.
+
+O estado `VALIDADO_COM_RESSALVA` deve ser usado com honestidade: serve para capacidades demonstradas com limitação aceite, não para esconder falta de prova.
+
+6. Validação do passo.
+
+Confirma que nenhum RF ativo ficou sem linha. Depois confirma que nenhuma linha tem proof vazio com estado `VALIDADO`.
+
+7. Cenário negativo/erro esperado.
+
+Se uma linha tiver `VALIDADO` e a coluna `Evidence consultada` estiver vazia, a revisão deve alterar para `PENDENTE`.
+
+### Passo 4 - Fechar negativos e handoff para RNF
+
+1. Objetivo funcional do passo no contexto da app.
+
+Preparar a matriz RF para ser usada no BK seguinte sem repetir levantamento nem transportar lacunas escondidas.
+
+2. Ficheiros envolvidos:
+    - EDITAR: `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md`
+    - REVER: `docs/planificacao/guias-bk/MF7/BK-MF7-02-matriz-de-cobertura-rnf-validacao.md`
+    - LOCALIZAÇÃO: secções finais `Negativos consolidados`, `Riscos` e `Handoff`.
+
+3. Instruções do que fazer.
+
+Regista no final da matriz três negativos mínimos: RF sem BK, RF com BK inexistente e RF marcado como validado sem proof. Fecha também uma lista curta de riscos que o BK de RNF deve considerar.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo. O output é a secção final da matriz.
+
+5. Explicação do código.
+
+Os negativos da matriz são testes de qualidade documental. Eles impedem que a equipa use a matriz como decoração e obrigam a tratar cobertura como prova.
+
+O handoff para RNF deve separar capacidade funcional de qualidade não funcional. Um RF pode estar coberto e, ainda assim, um RNF de compatibilidade, performance ou localização ficar pendente.
+
+6. Validação do passo.
+
+Pede a outro elemento da equipa para escolher 3 RF aleatórios e seguir a cadeia completa até à evidence. O resultado esperado é encontrar fonte, BK, proof e negativo sem pedir explicações fora da matriz.
+
+7. Cenário negativo/erro esperado.
+
+Se o colega não conseguir reproduzir a cadeia de uma linha, essa linha fica `PENDENTE` até ter fonte e proof claros.
+
+#### Critérios de aceite
+
+- Todos os RF ativos em `docs/RF.md` têm uma linha na matriz.
+- Cada linha tem BK responsável existente.
+- Cada linha tem estado explícito e não usa `VALIDADO` sem proof.
+- Existem pelo menos 3 negativos documentais para este BK P0.
+- A matriz distingue prova real, ressalva e pendência.
+- O handoff para `BK-MF7-02` identifica riscos de qualidade não funcional.
+
+#### Validação final
+
+- Executar `bash scripts/validate-planificacao.sh` na raiz do projeto.
+- Executar `git diff --check` na raiz do projeto.
+- Rever manualmente a matriz e confirmar que nenhum RF ativo ficou sem linha.
+- Confirmar que a matriz não altera requisitos oficiais nem metadata dos BKs.
+
+#### Evidence para PR/defesa
+
+- `pr`: referência da entrega onde `docs/evidence/MF7/MATRIZ-RF-EVIDENCIA.md` foi criado.
+- `proof`: matriz RF completa com fonte, BK, evidence e estado por RF.
+- `neg`: RF sem fonte oficial rejeitado; RF com BK inexistente rejeitado; RF validado sem proof reclassificado para `PENDENTE`.
+- `fonte`: `docs/RF.md`, `BACKLOG-MVP.md`, `MATRIZ-CANONICA-BK.md` e `BK-MF6-06`.
+
+#### Handoff
+
+Este BK entrega a cobertura funcional consolidada. `BK-MF7-02` deve usar a mesma lógica para RNF e cruzar qualidade, compatibilidade, manutenção, ética e localização com evidence real.
+
+#### Changelog
+
+- `2026-06-22`: guia reescrito para matriz RF auditável, com estrutura completa, passos lineares, negativos e handoff para RNF.
