@@ -44,7 +44,9 @@
 - docs/evidence/MF8/README.md
 
 ## Decisoes canonicas
-
+- MF7 é refinamento de UI e navegação segura.
+- MF8 concentra evidências finais e defesa.
+- discrepâncias de links admin e perfil bloqueiam antes de discrepâncias estéticas.
 - Mantem-se 12 sprints.
 - Mantem-se limite de 11 pontos por sprint.
 - BK-MF5-04 foi antecipado para S08 para abrir capacidade nas sprints finais.
