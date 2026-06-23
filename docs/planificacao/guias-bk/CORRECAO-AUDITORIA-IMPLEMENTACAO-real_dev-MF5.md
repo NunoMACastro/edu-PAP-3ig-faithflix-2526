@@ -1,12 +1,12 @@
-# Correcao da auditoria de implementacao real_dev - MF5
+# Correcao da auditoria de implementacao referencia_privada_docente - MF5
 
 ## Resultado geral
 
 - Projeto: FaithFlix
 - Macro fase: MF5 - Operacao e privacidade
 - Modo executado: `corrigir_auditoria`
-- Raiz corrigida: `real_dev`
-- Relatorio de origem: `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-real_dev-MF5.md`
+- Raiz corrigida: `referencia_privada_docente`
+- Relatorio de origem: `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF5.md`
 - Data da correcao: 2026-06-18
 - Estado final: `PASS`
 
@@ -55,26 +55,26 @@ Fora de escopo:
 
 Backend:
 
-- `real_dev/backend/src/modules/auth/auth.service.js`
-- `real_dev/backend/src/modules/auth/session.service.js`
-- `real_dev/backend/src/modules/users/user.service.js`
-- `real_dev/backend/src/modules/users/user.controller.js`
-- `real_dev/backend/src/modules/subscriptions/subscriptions.routes.js`
-- `real_dev/backend/src/modules/subscriptions/subscriptions.controller.js`
-- `real_dev/backend/src/modules/admin-metrics/admin-metrics.service.js`
-- `real_dev/backend/src/modules/integrations/integrations.validation.js`
-- `real_dev/backend/tests/unit/mf5-validation.test.js`
-- `real_dev/backend/tests/integration/mf4-http.test.js`
+- `referencia_privada_docente/backend/src/modules/auth/auth.service.js`
+- `referencia_privada_docente/backend/src/modules/auth/session.service.js`
+- `referencia_privada_docente/backend/src/modules/users/user.service.js`
+- `referencia_privada_docente/backend/src/modules/users/user.controller.js`
+- `referencia_privada_docente/backend/src/modules/subscriptions/subscriptions.routes.js`
+- `referencia_privada_docente/backend/src/modules/subscriptions/subscriptions.controller.js`
+- `referencia_privada_docente/backend/src/modules/admin-metrics/admin-metrics.service.js`
+- `referencia_privada_docente/backend/src/modules/integrations/integrations.validation.js`
+- `referencia_privada_docente/backend/tests/unit/mf5-validation.test.js`
+- `referencia_privada_docente/backend/tests/integration/mf4-http.test.js`
 
 Frontend:
 
-- `real_dev/frontend/src/services/api/subscriptionsApi.js`
+- `referencia_privada_docente/frontend/src/services/api/subscriptionsApi.js`
 
 Relatorio tecnico:
 
-- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-real_dev-MF5.md`
+- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF5.md`
 
-Nota: `real_dev/` esta ignorado/fora do tracking principal do repositorio, conforme regra da prompt; isto nao foi tratado como problema.
+Nota: `referencia_privada_docente/` esta ignorado/fora do tracking principal do repositorio, conforme regra da prompt; isto nao foi tratado como problema.
 
 ## Rastreabilidade BK -> RF/RNF -> ficheiros -> testes
 
@@ -114,11 +114,11 @@ Contratos entregues para MF6:
 Checks sintaticos:
 
 ```bash
-node --check real_dev/backend/tests/unit/mf5-validation.test.js
-node --check real_dev/backend/tests/integration/mf4-http.test.js
-node --check real_dev/backend/src/modules/integrations/integrations.validation.js
-node --check real_dev/backend/src/modules/users/user.service.js
-node --check real_dev/backend/src/modules/auth/session.service.js
+node --check referencia_privada_docente/backend/tests/unit/mf5-validation.test.js
+node --check referencia_privada_docente/backend/tests/integration/mf4-http.test.js
+node --check referencia_privada_docente/backend/src/modules/integrations/integrations.validation.js
+node --check referencia_privada_docente/backend/src/modules/users/user.service.js
+node --check referencia_privada_docente/backend/src/modules/auth/session.service.js
 ```
 
 Resultado: `PASS`.
@@ -126,22 +126,22 @@ Resultado: `PASS`.
 Testes e builds:
 
 ```bash
-npm --prefix real_dev/backend test
-npm --prefix real_dev/frontend run build
+npm --prefix pasta_privada_do_professor/backend test
+npm --prefix pasta_privada_do_professor/frontend run build
 npm run smoke
 ```
 
 Resultados:
 
-- `npm --prefix real_dev/backend test`: primeiro falhou na sandbox por `listen EPERM: operation not permitted 127.0.0.1`; repetido fora da sandbox e passou com `43/43`.
-- `npm --prefix real_dev/frontend run build`: `PASS`.
+- `npm --prefix pasta_privada_do_professor/backend test`: primeiro falhou na sandbox por `listen EPERM: operation not permitted 127.0.0.1`; repetido fora da sandbox e passou com `43/43`.
+- `npm --prefix pasta_privada_do_professor/frontend run build`: `PASS`.
 - `npm run smoke`: primeiro falhou na sandbox por `listen EPERM`; repetido fora da sandbox e passou com backend smoke `8/8` e frontend build `PASS`.
 
 Pesquisas estaticas e plano:
 
 ```bash
-rg -n "TODO implementar|FIXME|temporario|temporário|temporary|demo only|implementar depois|pseudo-codigo|payload: unknown|as any|localStorage|sessionStorage|dangerouslySetInnerHTML|eval\(|new Function|password.*console|token.*console|cookie.*console|console\.log\(.*password|console\.log\(.*token|secret|api[_-]?key|stripe|paypal|mb way|webhook|CDN|DRM|streaming adaptativo|embeddings|vector database|RAG|IA generativa|deleteMany\(\{\}\)" real_dev/backend/src real_dev/backend/tests real_dev/backend/scripts real_dev/frontend/src real_dev/frontend/index.html real_dev/frontend/package.json real_dev/backend/package.json
-rg -n "StudyFlow|OPSA|Orelle|companyId|multiempresa|fiscalidade|SNC|SAF-T|IVA|IBAN|cosmetica|cosmética|biometria|turma|professor|sala|disciplina" real_dev/backend/src real_dev/backend/tests real_dev/backend/scripts real_dev/frontend/src
+rg -n "TODO implementar|FIXME|temporario|temporário|temporary|demo only|implementar depois|pseudo-codigo|payload: unknown|as any|localStorage|sessionStorage|dangerouslySetInnerHTML|eval\(|new Function|password.*console|token.*console|cookie.*console|console\.log\(.*password|console\.log\(.*token|secret|api[_-]?key|stripe|paypal|mb way|webhook|CDN|DRM|streaming adaptativo|embeddings|vector database|RAG|IA generativa|deleteMany\(\{\}\)" referencia_privada_docente/backend/src referencia_privada_docente/backend/tests referencia_privada_docente/backend/scripts referencia_privada_docente/frontend/src referencia_privada_docente/frontend/index.html referencia_privada_docente/frontend/package.json referencia_privada_docente/backend/package.json
+rg -n "StudyFlow|OPSA|Orelle|companyId|multiempresa|fiscalidade|SNC|SAF-T|IVA|IBAN|cosmetica|cosmética|biometria|turma|professor|sala|disciplina" referencia_privada_docente/backend/src referencia_privada_docente/backend/tests referencia_privada_docente/backend/scripts referencia_privada_docente/frontend/src
 git diff --check
 bash scripts/validate-planificacao.sh
 ```
@@ -151,7 +151,7 @@ Resultados:
 - Pesquisa de seguranca: apenas falsos positivos defensivos (`logger`, `privacy.service`, `integrations.validation`) e teste negativo `stripe_real`.
 - Pesquisa de drift: sem ocorrencias.
 - `git diff --check`: `PASS`.
-- `validate-planificacao`: `PASS`, 55 BKs/guias verificados, 0 erros.
+- `validate-planificacao`: `PASS` historico antes da reestruturacao MF7/MF8; a contagem canonica atual passa a ser 60 BKs/guias.
 
 ## Blockers e TODOs
 

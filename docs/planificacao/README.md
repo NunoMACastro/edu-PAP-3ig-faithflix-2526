@@ -1,6 +1,6 @@
 # Planificacao - FaithFlix
 
-`last_updated`: `2026-04-17`
+`last_updated`: `2026-06-22`
 
 ## Objetivo
 
@@ -8,7 +8,7 @@ Centralizar a planificacao executavel do FaithFlix com contrato canonico alinhad
 
 ## Baseline de escopo MVP (2026-04-17)
 
-- Backlog ativo final: `55 BK`.
+- Backlog ativo final: `60 BK`.
 - Regra aplicada: BK/RF fora de escopo foram removidos integralmente dos requisitos e da planificacao.
 - Estado operativo esperado: apenas itens em escopo aparecem nos artefactos canónicos.
 

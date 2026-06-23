@@ -6,7 +6,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-06-22`
 
 ## Objetivo
 Consolidar BK, sprint e ownership para validação cruzada rápida.
@@ -50,26 +50,33 @@ Consolidar BK, sprint e ownership para validação cruzada rápida.
 | BK-MF5-01 | MF5 | S09 | Matheus | Kaue | P0 | Reforco | RF55 | BK-MF2-01 | docs/planificacao/guias-bk/MF5/BK-MF5-01-exportacao-dados-utilizador.md |
 | BK-MF5-02 | MF5 | S09 | Matheus | Kaue | P0 | Reforco | RF56 | BK-MF5-01 | docs/planificacao/guias-bk/MF5/BK-MF5-02-eliminacao-conta-dados.md |
 | BK-MF5-03 | MF5 | S09 | Mateus | Matheus | P0 | Reforco | RF57 | BK-MF2-01 | docs/planificacao/guias-bk/MF5/BK-MF5-03-gestao-consentimentos.md |
-| BK-MF5-04 | MF5 | S09 | Kaue | Matheus | P1 | Core | RF58 | BK-MF2-02 | docs/planificacao/guias-bk/MF5/BK-MF5-04-gestao-de-utilizadores-admin.md |
+| BK-MF5-04 | MF5 | S08 | Kaue | Matheus | P1 | Core | RF58 | BK-MF2-02 | docs/planificacao/guias-bk/MF5/BK-MF5-04-gestao-de-utilizadores-admin.md |
 | BK-MF5-05 | MF5 | S09 | Davi | Mateus | P1 | Core | RF59 | BK-MF5-04 | docs/planificacao/guias-bk/MF5/BK-MF5-05-painel-de-metricas-admin.md |
-| BK-MF5-06 | MF5 | S10 | Davi | Matheus | P1 | Core | RF60 | BK-MF5-04 | docs/planificacao/guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md |
+| BK-MF5-06 | MF5 | S09 | Davi | Matheus | P1 | Core | RF60 | BK-MF5-04 | docs/planificacao/guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md |
 | BK-MF6-01 | MF6 | S10 | Kaue | Matheus | P0 | Reforco | RNF29 | BK-MF5-06 | docs/planificacao/guias-bk/MF6/BK-MF6-01-suite-de-regressao-backend.md |
 | BK-MF6-02 | MF6 | S10 | Kaue | Mateus | P0 | Reforco | RNF29 | BK-MF5-06 | docs/planificacao/guias-bk/MF6/BK-MF6-02-suite-de-regressao-frontend.md |
-| BK-MF6-03 | MF6 | S11 | Matheus | Kaue | P0 | Reforco | RNF14, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37 | BK-MF6-01 | docs/planificacao/guias-bk/MF6/BK-MF6-03-hardening-seguranca-e-privacidade.md |
-| BK-MF6-04 | MF6 | S11 | Davi | Mateus | P1 | Core | RNF09, RNF10, RNF11, RNF12 | BK-MF6-02 | docs/planificacao/guias-bk/MF6/BK-MF6-04-otimizacao-de-performance-critica.md |
-| BK-MF6-05 | MF6 | S11 | Mateus | Kaue | P1 | Core | RNF01, RNF02, RNF03, RNF04, RNF06 | BK-MF6-02 | docs/planificacao/guias-bk/MF6/BK-MF6-05-acessibilidade-e-ux-final.md |
+| BK-MF6-03 | MF6 | S10 | Matheus | Kaue | P0 | Reforco | RNF14, RNF16, RNF17, RNF18, RNF19, RNF20, RNF37 | BK-MF6-01 | docs/planificacao/guias-bk/MF6/BK-MF6-03-hardening-seguranca-e-privacidade.md |
+| BK-MF6-04 | MF6 | S10 | Davi | Mateus | P1 | Core | RNF09, RNF10, RNF11, RNF12 | BK-MF6-02 | docs/planificacao/guias-bk/MF6/BK-MF6-04-otimizacao-de-performance-critica.md |
+| BK-MF6-05 | MF6 | S10 | Mateus | Kaue | P1 | Core | RNF01, RNF02, RNF03, RNF04, RNF06 | BK-MF6-02 | docs/planificacao/guias-bk/MF6/BK-MF6-05-acessibilidade-e-ux-final.md |
 | BK-MF6-06 | MF6 | S11 | Nuno | Matheus, Mateus, Davi, Kaue | P0 | Reforco | transversal | BK-MF6-03,BK-MF6-05 | docs/planificacao/guias-bk/MF6/BK-MF6-06-validacao-tecnica-final-por-gate.md |
-| BK-MF7-01 | MF7 | S11 | Kaue | Matheus, Mateus, Davi | P0 | Reforco | RF_ATIVOS_MVP | BK-MF6-06 | docs/planificacao/guias-bk/MF7/BK-MF7-01-matriz-de-cobertura-rf-evidencia.md |
-| BK-MF7-02 | MF7 | S11 | Davi | Kaue | P0 | Reforco | RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40 | BK-MF6-06 | docs/planificacao/guias-bk/MF7/BK-MF7-02-matriz-de-cobertura-rnf-validacao.md |
-| BK-MF7-03 | MF7 | S12 | Mateus | Kaue | P1 | Core | transversal | BK-MF7-01 | docs/planificacao/guias-bk/MF7/BK-MF7-03-roteiro-de-demo-final.md |
-| BK-MF7-04 | MF7 | S12 | Matheus | Davi | P1 | Core | transversal | BK-MF7-03 | docs/planificacao/guias-bk/MF7/BK-MF7-04-ensaio-tecnico-da-defesa.md |
-| BK-MF7-05 | MF7 | S12 | Nuno | Matheus, Mateus, Davi, Kaue | P0 | Reforco | transversal | BK-MF7-02,BK-MF7-04 | docs/planificacao/guias-bk/MF7/BK-MF7-05-avaliacao-final-e-feedback-orientador.md |
-| BK-MF8-01 | MF8 | S12 | Kaue | Davi | P0 | Reforco | transversal | BK-MF7-05 | docs/planificacao/guias-bk/MF8/BK-MF8-01-lista-de-riscos-residuais.md |
-| BK-MF8-02 | MF8 | S12 | Matheus | Mateus, Davi, Kaue | P0 | Reforco | transversal | BK-MF8-01 | docs/planificacao/guias-bk/MF8/BK-MF8-02-correcao-de-bugs-bloqueantes.md |
-| BK-MF8-03 | MF8 | S12 | Nuno | Matheus, Mateus, Davi, Kaue | P0 | Reforco | transversal | BK-MF8-02 | docs/planificacao/guias-bk/MF8/BK-MF8-03-scope-freeze-final.md |
-| BK-MF8-04 | MF8 | S12 | Kaue | Mateus | P1 | Core | transversal | BK-MF8-03 | docs/planificacao/guias-bk/MF8/BK-MF8-04-empacotamento-final-de-entrega.md |
-| BK-MF8-05 | MF8 | S12 | Nuno | Matheus, Mateus, Davi, Kaue | P1 | Core | transversal | BK-MF8-04 | docs/planificacao/guias-bk/MF8/BK-MF8-05-retro-final-e-licoes-aprendidas.md |
+| BK-MF7-01 | MF7 | S11 | Mateus | Kaue | P0 | Reforco | transversal | BK-MF6-06 | docs/planificacao/guias-bk/MF7/BK-MF7-01-inventario-ui-vs-mockup-plano-refinamento.md |
+| BK-MF7-02 | MF7 | S11 | Matheus | Mateus, Kaue | P0 | Reforco | RF02, RF04, RNF13, RNF15, RNF16, RNF19 | BK-MF7-01 | docs/planificacao/guias-bk/MF7/BK-MF7-02-navegacao-segura-por-sessao-e-perfil.md |
+| BK-MF7-03 | MF7 | S11 | Mateus | Kaue | P1 | Core | RNF01, RNF02, RNF03, RNF04, RNF28, RNF38 | BK-MF7-02 | docs/planificacao/guias-bk/MF7/BK-MF7-03-layout-tokens-header-alinhados-mockup.md |
+| BK-MF7-04 | MF7 | S11 | Davi | Mateus | P1 | Core | RNF01, RNF02, RNF03, RNF05, RNF38, RNF40 | BK-MF7-03 | docs/planificacao/guias-bk/MF7/BK-MF7-04-refinamento-paginas-principais-estados-ux.md |
+| BK-MF7-05 | MF7 | S11 | Nuno | Matheus, Mateus, Davi, Kaue | P0 | Reforco | RNF21, RNF22, RNF38, RNF40 | BK-MF7-04 | docs/planificacao/guias-bk/MF7/BK-MF7-05-gate-visual-responsividade-navegacao-segura.md |
+| BK-MF8-01 | MF8 | S11 | Kaue | Matheus, Mateus, Davi | P0 | Reforco | RF_ATIVOS_MVP | BK-MF7-05 | docs/planificacao/guias-bk/MF8/BK-MF8-01-matriz-de-cobertura-rf-evidencia.md |
+| BK-MF8-02 | MF8 | S12 | Davi | Kaue | P0 | Reforco | RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40 | BK-MF8-01 | docs/planificacao/guias-bk/MF8/BK-MF8-02-matriz-de-cobertura-rnf-validacao.md |
+| BK-MF8-03 | MF8 | S12 | Mateus | Kaue | P1 | Core | transversal | BK-MF8-02 | docs/planificacao/guias-bk/MF8/BK-MF8-03-roteiro-de-demo-final.md |
+| BK-MF8-04 | MF8 | S12 | Matheus | Davi | P1 | Core | transversal | BK-MF8-03 | docs/planificacao/guias-bk/MF8/BK-MF8-04-ensaio-tecnico-da-defesa.md |
+| BK-MF8-05 | MF8 | S12 | Nuno | Matheus, Mateus, Davi, Kaue | P0 | Reforco | transversal | BK-MF8-04 | docs/planificacao/guias-bk/MF8/BK-MF8-05-avaliacao-final-e-feedback-orientador.md |
+| BK-MF8-06 | MF8 | S12 | Kaue | Davi | P0 | Reforco | transversal | BK-MF8-05 | docs/planificacao/guias-bk/MF8/BK-MF8-06-lista-de-riscos-residuais.md |
+| BK-MF8-07 | MF8 | S12 | Matheus | Mateus, Davi, Kaue | P0 | Reforco | transversal | BK-MF8-06 | docs/planificacao/guias-bk/MF8/BK-MF8-07-correcao-de-bugs-bloqueantes.md |
+| BK-MF8-08 | MF8 | S12 | Nuno | Matheus, Mateus, Davi, Kaue | P0 | Reforco | transversal | BK-MF8-07 | docs/planificacao/guias-bk/MF8/BK-MF8-08-scope-freeze-final.md |
+| BK-MF8-09 | MF8 | S12 | Kaue | Mateus | P1 | Core | transversal | BK-MF8-08 | docs/planificacao/guias-bk/MF8/BK-MF8-09-empacotamento-final-de-entrega.md |
+| BK-MF8-10 | MF8 | S12 | Nuno | Matheus, Mateus, Davi, Kaue | P1 | Core | transversal | BK-MF8-09 | docs/planificacao/guias-bk/MF8/BK-MF8-10-retro-final-e-licoes-aprendidas.md |
 
 ## Changelog
 - `2026-04-14`: anexo consolidado a partir dos guias BK canónicos.
 - `2026-04-17`: removidos BK fora de escopo e reajustadas dependencias para a baseline final do MVP.
+
+- `2026-06-22`: redistribuidas sprints finais para 60 BK.

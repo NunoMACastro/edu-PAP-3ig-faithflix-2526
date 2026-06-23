@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-06-22`
 
 ## Objetivo
 
@@ -53,11 +53,11 @@ Campos obrigatorios por sprint:
 | S05 | - | - | - | - | - | 8 | - | - | Verde | - |
 | S06 | - | - | - | - | - | 4 | - | - | Verde | - |
 | S07 | - | - | - | - | - | 7 | - | - | Verde | - |
-| S08 | - | - | - | - | - | 9 | - | - | Verde | - |
+| S08 | - | - | - | - | - | 11 | - | - | Verde | - |
 | S09 | - | - | - | - | - | 10 | - | - | Verde | - |
-| S10 | - | - | - | - | - | 6 | - | - | Verde | - |
+| S10 | - | - | - | - | - | 10 | - | - | Verde | - |
 | S11 | - | - | - | - | - | 11 | - | - | Verde | - |
-| S12 | - | - | - | - | - | 9 | - | - | Verde | - |
+| S12 | - | - | - | - | - | 11 | - | - | Verde | - |
 
 ## Regras de semaforo
 
@@ -75,3 +75,5 @@ Campos obrigatorios por sprint:
 
 - `2026-04-14`: scorecard alinhado ao contrato canonicamente unificado (5 criterios, 25/20/25/20/10).
 - `2026-04-17`: cargas planeadas sincronizadas com `PLANO-SPRINTS.md` e com a soma real de pontos dos BK por sprint.
+
+- `2026-06-22`: cargas S08..S12 sincronizadas com reestruturacao MF7/MF8.

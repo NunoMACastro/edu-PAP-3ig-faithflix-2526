@@ -7,11 +7,11 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-06-22`
 
 ## Objetivo
 
-Garantir rastreabilidade canonica requisito -> BK -> evidencia sem aumentar o numero de BKs do backlog atual.
+Garantir rastreabilidade canonica requisito -> BK -> evidencia no backlog atualizado de 60 BKs.
 
 ## Baseline de escopo MVP (2026-04-17)
 
@@ -46,16 +46,16 @@ Garantir rastreabilidade canonica requisito -> BK -> evidencia sem aumentar o nu
 | `RF16` | `BK-MF2-07` | `MF2` | Davi | `P0` | Core streaming e identidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S4) |
 | `RF17` | `BK-MF2-07` | `MF2` | Davi | `P0` | Core streaming e identidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S4) |
 | `RF18` | `BK-MF2-07` | `MF2` | Davi | `P0` | Core streaming e identidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S4) |
-| `RF19` | `BK-MF3-01` | `MF3` | Davi | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RF20` | `BK-MF3-02` | `MF3` | Matheus | `P2` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=1 negativo (P2). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RF21` | `BK-MF3-01` | `MF3` | Davi | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RF22` | `BK-MF3-03` | `MF3` | Davi | `P0` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RF23` | `BK-MF3-04` | `MF3` | Mateus | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RF24` | `BK-MF3-04` | `MF3` | Mateus | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RF25` | `BK-MF3-04` | `MF3` | Mateus | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RF26` | `BK-MF3-05` | `MF3` | Davi | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RF27` | `BK-MF3-05` | `MF3` | Davi | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RF28` | `BK-MF3-06` | `MF3` | Mateus | `P2` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=1 negativo (P2). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
+| `RF19` | `BK-MF3-01` | `MF3` | Davi | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RF20` | `BK-MF3-02` | `MF3` | Matheus | `P2` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=1 negativo (P2). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RF21` | `BK-MF3-01` | `MF3` | Davi | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RF22` | `BK-MF3-03` | `MF3` | Davi | `P0` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RF23` | `BK-MF3-04` | `MF3` | Mateus | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RF24` | `BK-MF3-04` | `MF3` | Mateus | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RF25` | `BK-MF3-04` | `MF3` | Mateus | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RF26` | `BK-MF3-05` | `MF3` | Davi | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RF27` | `BK-MF3-05` | `MF3` | Davi | `P1` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RF28` | `BK-MF3-06` | `MF3` | Mateus | `P2` | Descoberta, recomendacao e comunidade | Fluxo do requisito validado no guia, com smoke completo e >=1 negativo (P2). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
 | `RF35` | `BK-MF4-01` | `MF4` | Matheus | `P0` | Monetizacao solidaria e operacao de conteudo | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S8) |
 | `RF36` | `BK-MF4-01` | `MF4` | Matheus | `P0` | Monetizacao solidaria e operacao de conteudo | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S8) |
 | `RF37` | `BK-MF4-02` | `MF4` | Davi | `P0` | Monetizacao solidaria e operacao de conteudo | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S8) |
@@ -99,30 +99,30 @@ Garantir rastreabilidade canonica requisito -> BK -> evidencia sem aumentar o nu
 | `RNF18` | `BK-MF6-03` | `MF6` | Matheus | `P0` | Seguranca, privacidade e resiliencia | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
 | `RNF19` | `BK-MF6-03` | `MF6` | Matheus | `P0` | Seguranca, privacidade e resiliencia | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
 | `RNF20` | `BK-MF6-03` | `MF6` | Matheus | `P0` | Seguranca, privacidade e resiliencia | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF21` | `BK-MF7-02` | `MF7` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF22` | `BK-MF7-02` | `MF7` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF23` | `BK-MF7-02` | `MF7` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF24` | `BK-MF7-02` | `MF7` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF25` | `BK-MF7-02` | `MF7` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF26` | `BK-MF7-02` | `MF7` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF21` | `BK-MF8-02` | `MF8` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF22` | `BK-MF8-02` | `MF8` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF23` | `BK-MF8-02` | `MF8` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF24` | `BK-MF8-02` | `MF8` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF25` | `BK-MF8-02` | `MF8` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF26` | `BK-MF8-02` | `MF8` | Davi | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
 | `RNF27` | `BK-MF1-01` | `MF1` | Matheus | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S4) |
 | `RNF28` | `BK-MF1-02` | `MF1` | Mateus | `P0` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S4) |
 | `RNF29` | `BK-MF1-06` | `MF1` | Kaue | `P1` | Compatibilidade, arquitetura e testes | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S4) |
 | `RNF30` | `BK-MF1-03` | `MF1` | Mateus | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S4) |
 | `RNF31` | `BK-MF1-05` | `MF1` | Kaue | `P1` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S4) |
-| `RNF32` | `BK-MF7-02` | `MF7` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF33` | `BK-MF7-02` | `MF7` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF34` | `BK-MF3-06` | `MF3` | Mateus | `P2` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=1 negativo (P2). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO real_dev (2026-06-12) |
-| `RNF35` | `BK-MF7-02` | `MF7` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF36` | `BK-MF7-02` | `MF7` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF32` | `BK-MF8-02` | `MF8` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF33` | `BK-MF8-02` | `MF8` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF34` | `BK-MF3-06` | `MF3` | Mateus | `P2` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=1 negativo (P2). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | VALIDADO referencia_privada_docente (2026-06-12) |
+| `RNF35` | `BK-MF8-02` | `MF8` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF36` | `BK-MF8-02` | `MF8` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
 | `RNF37` | `BK-MF6-03` | `MF6` | Matheus | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF38` | `BK-MF7-02` | `MF7` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF39` | `BK-MF7-02` | `MF7` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
-| `RNF40` | `BK-MF7-02` | `MF7` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF38` | `BK-MF8-02` | `MF8` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF39` | `BK-MF8-02` | `MF8` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
+| `RNF40` | `BK-MF8-02` | `MF8` | Davi | `P0` | Observabilidade, CI/CD e governanca de dados | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
 
 ## Cobertura de BKs transversais (sem requisito primario direto)
 
-Estes BKs sao obrigatorios para governance/defesa e entram no gate por conformidade documental.
+Estes BKs sao obrigatorios para governance, refinamento final, defesa e fecho.
 
 | bk_id | macro | owner | prioridade | cobertura_no_gate |
 | --- | --- | --- | --- | --- |
@@ -132,15 +132,17 @@ Estes BKs sao obrigatorios para governance/defesa e entram no gate por conformid
 | `BK-MF0-04` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
 | `BK-MF0-05` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
 | `BK-MF0-06` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF6-06` | `MF6` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF7-03` | `MF7` | Mateus | `P1` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF7-04` | `MF7` | Matheus | `P1` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF7-05` | `MF7` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF8-01` | `MF8` | Kaue | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF8-02` | `MF8` | Matheus | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF8-03` | `MF8` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF8-04` | `MF8` | Kaue | `P1` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF8-05` | `MF8` | Nuno | `P1` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
+| `BK-MF6-06` | `MF6` | Nuno | `P0` | Gate tecnico final antes da MF7 |
+| `BK-MF7-01` | `MF7` | Mateus | `P0` | Inventario UI/mockup e plano de refinamento |
+| `BK-MF7-05` | `MF7` | Nuno | `P0` | Gate visual, responsividade e navegacao segura |
+| `BK-MF8-03` | `MF8` | Mateus | `P1` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
+| `BK-MF8-04` | `MF8` | Matheus | `P1` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
+| `BK-MF8-05` | `MF8` | Nuno | `P0` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
+| `BK-MF8-06` | `MF8` | Kaue | `P0` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
+| `BK-MF8-07` | `MF8` | Matheus | `P0` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
+| `BK-MF8-08` | `MF8` | Nuno | `P0` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
+| `BK-MF8-09` | `MF8` | Kaue | `P1` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
+| `BK-MF8-10` | `MF8` | Nuno | `P1` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
 
 ## BKs com requisito direto cobertos como mapeamento secundario
 
@@ -150,15 +152,19 @@ Estes BKs partilham requisitos com outros BKs de base tecnica e, por isso, entra
 | --- | --- | --- | --- | --- |
 | `BK-MF6-01` | `MF6` | `RNF29` | Kaue | Validar no gate S12 com checklist de regressao backend + `pr/proof/neg` |
 | `BK-MF6-02` | `MF6` | `RNF29` | Kaue | Validar no gate S12 com checklist de regressao frontend + `pr/proof/neg` |
-| `BK-MF7-01` | `MF7` | `RF_ATIVOS_MVP` | Kaue | Validar no gate S12 com matriz RF->evidencia + `pr/proof/neg` |
+| `BK-MF7-02` | `MF7` | `RF02, RF04, RNF13, RNF15, RNF16, RNF19` | Matheus | Validar navegacao segura por sessao/role, mantendo backend como autoridade |
+| `BK-MF7-03` | `MF7` | `RNF01, RNF02, RNF03, RNF04, RNF28, RNF38` | Mateus | Validar layout, tokens, header e hero alinhados ao mockup |
+| `BK-MF7-04` | `MF7` | `RNF01, RNF02, RNF03, RNF05, RNF38, RNF40` | Davi | Validar paginas principais, estados vazios e PT-PT |
+| `BK-MF8-01` | `MF8` | `RF_ATIVOS_MVP` | Kaue | Validar no gate S12 com matriz RF->evidencia + `pr/proof/neg` |
+| `BK-MF8-02` | `MF8` | `RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40` | Davi | Validar no gate S12 com matriz RNF->validacao + `pr/proof/neg` |
 
 ## Validacoes estruturais
 
 - Requisitos mapeados: `91/91`.
-- BKs com requisito direto (primario + secundario): `40`.
-- BKs transversais registados em secao propria: `15`.
-- BKs totais visiveis no artefacto (requisito de cobertura): `55/55`.
-- Sem alteracao de IDs BK e sem aumento do numero de BK no backlog.
+- BKs com requisito direto (primario + secundario): `45`.
+- BKs transversais registados em secao propria: `20`.
+- BKs totais visiveis no artefacto (requisito de cobertura): `60/60`.
+- IDs BK reestruturados em MF7/MF8 conforme baseline de 60 BK, sem alterar requisitos ativos.
 
 ## Changelog
 
@@ -166,3 +172,5 @@ Estes BKs partilham requisitos com outros BKs de base tecnica e, por isso, entra
 - `2026-04-14`: reforcada validacao cruzada com backlog e contrato de fecho por gate.
 - `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral de BK/RF fora de escopo da versao PAP.
 - `2026-05-31`: revista apos correcao de dependencias em `BACKLOG-MVP.md`; cobertura requisito -> BK mantida sem alteracoes.
+
+- `2026-06-22`: atualizada matriz para nova MF7/MF8.

@@ -17,7 +17,7 @@ Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios 
 
 Aplicacao direta do `PLANO-MESTRE-ALTERACOES-PAP.md` ao FaithFlix.
 
-- Universo final de backlog ativo: `55 BK`.
+- Universo final de backlog ativo: `60 BK`.
 - Regra operacional: backlog e planificacao incluem apenas BK em escopo do MVP atual.
 
 ## Contrato de rastreabilidade canonica
@@ -81,7 +81,7 @@ Regras obrigatorias:
 | `MF5` | `TODO` | `0/6`     |
 | `MF6` | `TODO` | `0/6`     |
 | `MF7` | `TODO` | `0/5`     |
-| `MF8` | `TODO` | `0/5`     |
+| `MF8` | `TODO` | `0/10`    |
 
 ---
 
@@ -137,16 +137,21 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF6-04` | `../guias-bk/MF6/BK-MF6-04-otimizacao-de-performance-critica.md` | `CRIADO (Fase 3)` |
 | `BK-MF6-05` | `../guias-bk/MF6/BK-MF6-05-acessibilidade-e-ux-final.md` | `CRIADO (Fase 3)` |
 | `BK-MF6-06` | `../guias-bk/MF6/BK-MF6-06-validacao-tecnica-final-por-gate.md` | `CRIADO (Fase 3)` |
-| `BK-MF7-01` | `../guias-bk/MF7/BK-MF7-01-matriz-de-cobertura-rf-evidencia.md` | `CRIADO (Fase 3)` |
-| `BK-MF7-02` | `../guias-bk/MF7/BK-MF7-02-matriz-de-cobertura-rnf-validacao.md` | `CRIADO (Fase 3)` |
-| `BK-MF7-03` | `../guias-bk/MF7/BK-MF7-03-roteiro-de-demo-final.md` | `CRIADO (Fase 3)` |
-| `BK-MF7-04` | `../guias-bk/MF7/BK-MF7-04-ensaio-tecnico-da-defesa.md` | `CRIADO (Fase 3)` |
-| `BK-MF7-05` | `../guias-bk/MF7/BK-MF7-05-avaliacao-final-e-feedback-orientador.md` | `CRIADO (Fase 3)` |
-| `BK-MF8-01` | `../guias-bk/MF8/BK-MF8-01-lista-de-riscos-residuais.md` | `CRIADO (Fase 3)` |
-| `BK-MF8-02` | `../guias-bk/MF8/BK-MF8-02-correcao-de-bugs-bloqueantes.md` | `CRIADO (Fase 3)` |
-| `BK-MF8-03` | `../guias-bk/MF8/BK-MF8-03-scope-freeze-final.md` | `CRIADO (Fase 3)` |
-| `BK-MF8-04` | `../guias-bk/MF8/BK-MF8-04-empacotamento-final-de-entrega.md` | `CRIADO (Fase 3)` |
-| `BK-MF8-05` | `../guias-bk/MF8/BK-MF8-05-retro-final-e-licoes-aprendidas.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-01` | `../guias-bk/MF7/BK-MF7-01-inventario-ui-vs-mockup-plano-refinamento.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-02` | `../guias-bk/MF7/BK-MF7-02-navegacao-segura-por-sessao-e-perfil.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-03` | `../guias-bk/MF7/BK-MF7-03-layout-tokens-header-alinhados-mockup.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-04` | `../guias-bk/MF7/BK-MF7-04-refinamento-paginas-principais-estados-ux.md` | `CRIADO (Fase 3)` |
+| `BK-MF7-05` | `../guias-bk/MF7/BK-MF7-05-gate-visual-responsividade-navegacao-segura.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-01` | `../guias-bk/MF8/BK-MF8-01-matriz-de-cobertura-rf-evidencia.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-02` | `../guias-bk/MF8/BK-MF8-02-matriz-de-cobertura-rnf-validacao.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-03` | `../guias-bk/MF8/BK-MF8-03-roteiro-de-demo-final.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-04` | `../guias-bk/MF8/BK-MF8-04-ensaio-tecnico-da-defesa.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-05` | `../guias-bk/MF8/BK-MF8-05-avaliacao-final-e-feedback-orientador.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-06` | `../guias-bk/MF8/BK-MF8-06-lista-de-riscos-residuais.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-07` | `../guias-bk/MF8/BK-MF8-07-correcao-de-bugs-bloqueantes.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-08` | `../guias-bk/MF8/BK-MF8-08-scope-freeze-final.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-09` | `../guias-bk/MF8/BK-MF8-09-empacotamento-final-de-entrega.md` | `CRIADO (Fase 3)` |
+| `BK-MF8-10` | `../guias-bk/MF8/BK-MF8-10-retro-final-e-licoes-aprendidas.md` | `CRIADO (Fase 3)` |
 
 ---
 
@@ -246,27 +251,32 @@ Estado do guia indica a fase de criacao documental.
 
 ---
 
-## MF7 - Consolidacao e evidencia PAP
+## MF7 - Refinamento de UI e navegacao segura
 
-| BK          | Titulo                                | Owner   | Apoio                       | Pri | Estado | Esforco | Dependencias            | RF/RNF       |
-| ----------- | ------------------------------------- | ------- | --------------------------- | --- | ------ | ------- | ----------------------- | ------------ |
-| `BK-MF7-01` | Matriz de cobertura RF -> evidencia   | Kaue    | Matheus, Mateus, Davi       | P0  | TODO   | M       | `BK-MF6-06`             | RF_ATIVOS_MVP |
-| `BK-MF7-02` | Matriz de cobertura RNF -> validacao  | Davi    | Kaue                        | P0  | TODO   | M       | `BK-MF6-06`             | RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40 |
-| `BK-MF7-03` | Roteiro de demo final                 | Mateus  | Kaue                        | P1  | TODO   | S       | `BK-MF7-01`             | transversal  |
-| `BK-MF7-04` | Ensaio tecnico da defesa              | Matheus | Davi                        | P1  | TODO   | S       | `BK-MF7-03`             | transversal  |
-| `BK-MF7-05` | Avaliacao final e feedback orientador | Nuno    | Matheus, Mateus, Davi, Kaue | P0  | TODO   | S       | `BK-MF7-02`,`BK-MF7-04` | transversal  |
+| BK          | Titulo | Owner | Apoio | Pri | Estado | Esforco | Dependencias | RF/RNF |
+| ----------- | ------ | ----- | ----- | --- | ------ | ------- | ------------ | ------ |
+| `BK-MF7-01` | Inventario UI vs mockup e plano de refinamento | Mateus | Kaue | P0 | TODO | S | `BK-MF6-06` | transversal |
+| `BK-MF7-02` | Navegacao segura por sessao e perfil | Matheus | Mateus, Kaue | P0 | TODO | M | `BK-MF7-01` | RF02, RF04, RNF13, RNF15, RNF16, RNF19 |
+| `BK-MF7-03` | Layout, tokens e header alinhados ao mockup | Mateus | Kaue | P1 | TODO | M | `BK-MF7-02` | RNF01, RNF02, RNF03, RNF04, RNF28, RNF38 |
+| `BK-MF7-04` | Refinamento das paginas principais e estados de UX | Davi | Mateus | P1 | TODO | M | `BK-MF7-03` | RNF01, RNF02, RNF03, RNF05, RNF38, RNF40 |
+| `BK-MF7-05` | Gate visual, responsividade e navegacao segura | Nuno | Matheus, Mateus, Davi, Kaue | P0 | TODO | S | `BK-MF7-04` | RNF21, RNF22, RNF38, RNF40 |
 
 ---
 
-## MF8 - Buffer e fecho
+## MF8 - Consolidacao, evidencia, defesa, buffer e fecho
 
-| BK          | Titulo                          | Owner   | Apoio                       | Pri | Estado | Esforco | Dependencias | RF/RNF      |
-| ----------- | ------------------------------- | ------- | --------------------------- | --- | ------ | ------- | ------------ | ----------- |
-| `BK-MF8-01` | Lista de riscos residuais       | Kaue    | Davi                        | P0  | TODO   | S       | `BK-MF7-05`  | transversal |
-| `BK-MF8-02` | Correcao de bugs bloqueantes    | Matheus | Mateus, Davi, Kaue          | P0  | TODO   | M       | `BK-MF8-01`  | transversal |
-| `BK-MF8-03` | Scope freeze final              | Nuno    | Matheus, Mateus, Davi, Kaue | P0  | TODO   | S       | `BK-MF8-02`  | transversal |
-| `BK-MF8-04` | Empacotamento final de entrega  | Kaue    | Mateus                      | P1  | TODO   | S       | `BK-MF8-03`  | transversal |
-| `BK-MF8-05` | Retro final e licoes aprendidas | Nuno    | Matheus, Mateus, Davi, Kaue | P1  | TODO   | S       | `BK-MF8-04`  | transversal |
+| BK          | Titulo | Owner | Apoio | Pri | Estado | Esforco | Dependencias | RF/RNF |
+| ----------- | ------ | ----- | ----- | --- | ------ | ------- | ------------ | ------ |
+| `BK-MF8-01` | Matriz de cobertura RF -> evidencia | Kaue | Matheus, Mateus, Davi | P0 | TODO | M | `BK-MF7-05` | RF_ATIVOS_MVP |
+| `BK-MF8-02` | Matriz de cobertura RNF -> validacao | Davi | Kaue | P0 | TODO | M | `BK-MF8-01` | RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40 |
+| `BK-MF8-03` | Roteiro de demo final | Mateus | Kaue | P1 | TODO | S | `BK-MF8-02` | transversal |
+| `BK-MF8-04` | Ensaio tecnico da defesa | Matheus | Davi | P1 | TODO | S | `BK-MF8-03` | transversal |
+| `BK-MF8-05` | Avaliacao final e feedback orientador | Nuno | Matheus, Mateus, Davi, Kaue | P0 | TODO | S | `BK-MF8-04` | transversal |
+| `BK-MF8-06` | Lista de riscos residuais | Kaue | Davi | P0 | TODO | S | `BK-MF8-05` | transversal |
+| `BK-MF8-07` | Correcao de bugs bloqueantes | Matheus | Mateus, Davi, Kaue | P0 | TODO | M | `BK-MF8-06` | transversal |
+| `BK-MF8-08` | Scope freeze final | Nuno | Matheus, Mateus, Davi, Kaue | P0 | TODO | S | `BK-MF8-07` | transversal |
+| `BK-MF8-09` | Empacotamento final de entrega | Kaue | Mateus | P1 | TODO | S | `BK-MF8-08` | transversal |
+| `BK-MF8-10` | Retro final e licoes aprendidas | Nuno | Matheus, Mateus, Davi, Kaue | P1 | TODO | S | `BK-MF8-09` | transversal |
 
 ## Criterios de aceite globais por BK (step-by-step)
 
@@ -298,3 +308,5 @@ Estado do guia indica a fase de criacao documental.
 - `2026-04-14`: reforcado contrato canonico de campos BK e validacao cruzada backlog<->matriz<->guias<->sprints.
 - `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral dos BK fora de escopo e ajuste de dependencias para `BK-MF5-06`.
 - `2026-05-25`: adicionada nota anti-drift para explicitar que `MF0` e documental/governance e que implementacao tecnica comeca em `MF1`.
+
+- `2026-06-22`: reestruturadas MF7/MF8; baseline atualizado para `60/60` BK.

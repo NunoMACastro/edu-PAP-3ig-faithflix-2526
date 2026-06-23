@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-05-25`
+- `last_updated`: `2026-06-22`
 
 ## Objetivo
 
@@ -17,12 +17,12 @@ Traduzir os requisitos ativos (`RF` e `RNF`) num plano executavel para 4 alunos,
 
 - Equipa tecnica: `Matheus`, `Mateus`, `Davi`, `Kaue`.
 - Orientacao: `Nuno` (governance, avaliacao, gates e defesa).
-- Limites estruturais: `12 sprints`, `55 BK`.
+- Limites estruturais: `12 sprints`, `60 BK`.
 - Distribuicao desigual de BK mantida por criterio pedagogico e tecnico.
 
 ## Baseline de escopo MVP (2026-04-17)
 
-- BK ativos no MVP corrente: `55/55`.
+- BK ativos no MVP corrente: `60/60`.
 - RF fora de escopo removidos integralmente de `docs/RF.md`, backlog e matriz.
 - Regra documental: apenas itens ativos permanecem nos artefactos canonicos.
 
@@ -46,8 +46,8 @@ Traduzir os requisitos ativos (`RF` e `RNF`) num plano executavel para 4 alunos,
 | `MF4` | Monetizacao solidaria | `RF35..RF48`, `RF52..RF54` |
 | `MF5` | Operacao e privacidade | `RF55..RF60` |
 | `MF6` | Hardening | `RNF` criticos de qualidade/performance/seguranca |
-| `MF7` | Evidencias PAP | matriz RF/RNF + demo + ensaio |
-| `MF8` | Buffer e fecho | estabilizacao, freeze e retro final |
+| `MF7` | Refinamento de UI e navegacao segura | inventario UI/mockup, sessao/role, layout, paginas e gate visual |
+| `MF8` | Consolidacao, evidencia, defesa, buffer e fecho | matrizes RF/RNF, demo, ensaio, avaliacao, riscos, bugs, freeze, entrega e retro |
 
 ### Nota anti-drift sobre `MF0`
 
@@ -82,7 +82,7 @@ A fundacao tecnica com ficheiros, comandos, estrutura de projeto e decisoes impl
 
 ### Gate S12
 
-- Fecho integral `91/91` (RF+RNF ativos) e `55/55` BK.
+- Fecho integral `91/91` (RF+RNF ativos) e `60/60` BK.
 - Scorecard oficial consolidado sprint-a-sprint.
 - Score final consolidado no scorecard oficial.
 - Parecer final `GO/NO-GO` com assinatura do orientador.
@@ -101,3 +101,5 @@ A fundacao tecnica com ficheiros, comandos, estrutura de projeto e decisoes impl
 - `2026-04-14`: incorporada hierarquia canonica adaptada, scorecard oficial por sprint e guiao docente semanal.
 - `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral de itens fora de escopo.
 - `2026-05-25`: adicionada nota anti-drift para explicitar que `MF0` e governance/kickoff e que a fundacao tecnica comeca em `MF1`.
+
+- `2026-06-22`: MF7 passou a UI/navegacao segura e MF8 passou a consolidacao, evidencia, defesa, buffer e fecho.

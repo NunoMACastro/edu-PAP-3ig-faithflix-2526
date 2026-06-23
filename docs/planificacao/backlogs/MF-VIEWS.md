@@ -272,7 +272,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 ---
 
-## MF7 - Consolidacao PAP
+## MF7 - Refinamento de UI e navegacao segura
 
 ### Sequencia
 
@@ -284,27 +284,27 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 ### Guias disponiveis
 
-- `BK-MF7-01`: `../guias-bk/MF7/BK-MF7-01-matriz-de-cobertura-rf-evidencia.md`
-- `BK-MF7-02`: `../guias-bk/MF7/BK-MF7-02-matriz-de-cobertura-rnf-validacao.md`
-- `BK-MF7-03`: `../guias-bk/MF7/BK-MF7-03-roteiro-de-demo-final.md`
-- `BK-MF7-04`: `../guias-bk/MF7/BK-MF7-04-ensaio-tecnico-da-defesa.md`
-- `BK-MF7-05`: `../guias-bk/MF7/BK-MF7-05-avaliacao-final-e-feedback-orientador.md`
+- `BK-MF7-01`: `../guias-bk/MF7/BK-MF7-01-inventario-ui-vs-mockup-plano-refinamento.md`
+- `BK-MF7-02`: `../guias-bk/MF7/BK-MF7-02-navegacao-segura-por-sessao-e-perfil.md`
+- `BK-MF7-03`: `../guias-bk/MF7/BK-MF7-03-layout-tokens-header-alinhados-mockup.md`
+- `BK-MF7-04`: `../guias-bk/MF7/BK-MF7-04-refinamento-paginas-principais-estados-ux.md`
+- `BK-MF7-05`: `../guias-bk/MF7/BK-MF7-05-gate-visual-responsividade-navegacao-segura.md`
 
 ### Step-by-step
 
-1. Fechar matriz RF.
-2. Fechar matriz RNF.
-3. Fechar roteiro demo.
-4. Ensaiar defesa.
-5. Receber avaliacao final.
+1. Inventario UI vs mockup e plano de refinamento.
+2. Navegacao segura por sessao e perfil.
+3. Layout, tokens e header alinhados ao mockup.
+4. Refinamento das paginas principais e estados de UX.
+5. Gate visual, responsividade e navegacao segura.
 
 ### Pronto da macro
 
-- Evidencias completas para defesa.
+- UI defensavel, responsiva e com navegacao segura por perfil.
 
 ---
 
-## MF8 - Buffer e fecho
+## MF8 - Consolidacao, evidencia, defesa, buffer e fecho
 
 ### Sequencia
 
@@ -313,31 +313,48 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 3. `BK-MF8-03`
 4. `BK-MF8-04`
 5. `BK-MF8-05`
+6. `BK-MF8-06`
+7. `BK-MF8-07`
+8. `BK-MF8-08`
+9. `BK-MF8-09`
+10. `BK-MF8-10`
 
 ### Guias disponiveis
 
-- `BK-MF8-01`: `../guias-bk/MF8/BK-MF8-01-lista-de-riscos-residuais.md`
-- `BK-MF8-02`: `../guias-bk/MF8/BK-MF8-02-correcao-de-bugs-bloqueantes.md`
-- `BK-MF8-03`: `../guias-bk/MF8/BK-MF8-03-scope-freeze-final.md`
-- `BK-MF8-04`: `../guias-bk/MF8/BK-MF8-04-empacotamento-final-de-entrega.md`
-- `BK-MF8-05`: `../guias-bk/MF8/BK-MF8-05-retro-final-e-licoes-aprendidas.md`
+- `BK-MF8-01`: `../guias-bk/MF8/BK-MF8-01-matriz-de-cobertura-rf-evidencia.md`
+- `BK-MF8-02`: `../guias-bk/MF8/BK-MF8-02-matriz-de-cobertura-rnf-validacao.md`
+- `BK-MF8-03`: `../guias-bk/MF8/BK-MF8-03-roteiro-de-demo-final.md`
+- `BK-MF8-04`: `../guias-bk/MF8/BK-MF8-04-ensaio-tecnico-da-defesa.md`
+- `BK-MF8-05`: `../guias-bk/MF8/BK-MF8-05-avaliacao-final-e-feedback-orientador.md`
+- `BK-MF8-06`: `../guias-bk/MF8/BK-MF8-06-lista-de-riscos-residuais.md`
+- `BK-MF8-07`: `../guias-bk/MF8/BK-MF8-07-correcao-de-bugs-bloqueantes.md`
+- `BK-MF8-08`: `../guias-bk/MF8/BK-MF8-08-scope-freeze-final.md`
+- `BK-MF8-09`: `../guias-bk/MF8/BK-MF8-09-empacotamento-final-de-entrega.md`
+- `BK-MF8-10`: `../guias-bk/MF8/BK-MF8-10-retro-final-e-licoes-aprendidas.md`
 
 ### Step-by-step
 
-1. Levantar riscos.
-2. Corrigir bloqueantes.
-3. Scope freeze final.
-4. Empacotar entrega.
-5. Registar retro final.
+1. Matriz de cobertura RF -> evidencia.
+2. Matriz de cobertura RNF -> validacao.
+3. Roteiro de demo final.
+4. Ensaio tecnico da defesa.
+5. Avaliacao final e feedback orientador.
+6. Lista de riscos residuais.
+7. Correcao de bugs bloqueantes.
+8. Scope freeze final.
+9. Empacotamento final de entrega.
+10. Retro final e licoes aprendidas.
 
 ### Pronto da macro
 
-- Entrega final estabilizada.
+- Entrega final estabilizada, evidence organizada e retro fechada.
 
 ## Changelog
 
 - `2026-04-11`: versao revista com equipa correta e ownership atualizado.
 - `2026-04-12`: blocos "Guias disponiveis" sincronizados para cobertura total (MF0..MF8), sem entradas pendentes.
 - `2026-04-13`: ordem de sequencia normalizada para derivar de `PLANO-SPRINTS` (fonte canonica).
-- `2026-04-17`: sequencias MF3/MF4/MF5 alinhadas ao rebaseline de escopo MVP com limpeza de itens fora de escopo.
+- `2026-06-22`: sequencias MF3/MF4/MF5 alinhadas ao rebaseline de escopo MVP com limpeza de itens fora de escopo.
 - `2026-05-25`: reforcada nota anti-drift para impedir leitura de `MF0` como fase de implementacao funcional.
+
+- `2026-06-22`: atualizadas MF7/MF8 para nova cadeia.

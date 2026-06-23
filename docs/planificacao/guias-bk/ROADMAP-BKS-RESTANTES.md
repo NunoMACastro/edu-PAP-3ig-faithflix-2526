@@ -11,11 +11,11 @@
 
 ## Objetivo
 
-Consolidar a manutencao dos guias BK apos cobertura total (`55/55`), garantindo alinhamento continuo com backlog, matriz RF/RNF, plano de sprints e evidencias de gate.
+Consolidar a manutencao dos guias BK apos cobertura total (`60/60`), garantindo alinhamento continuo com backlog, matriz RF/RNF, plano de sprints e evidencias de gate.
 
 ## Estado atual (snapshot)
 
-- Guias BK criados: `55/55`.
+- Guias BK criados: `60/60`.
 - BKs pendentes de criacao: `0`.
 - Fonte de verdade operacional: `docs/planificacao/backlogs/BACKLOG-MVP.md`.
 - Ordem canonica de execucao: `docs/planificacao/sprints/PLANO-SPRINTS.md`.
@@ -56,10 +56,12 @@ Consolidar a manutencao dos guias BK apos cobertura total (`55/55`), garantindo 
 1. Script de validacao em `PASS`.
 2. Checklist de gates com baseline + execucao real preenchidos.
 3. Sem divergencias entre `BACKLOG-MVP`, `MATRIZ-CANONICA-BK`, `MF-VIEWS` e guias BK.
-4. BK terminal (`BK-MF8-05`) mantem `Proximo BK recomendado = -`.
+4. BK terminal (`BK-MF8-10`) mantem `Proximo BK recomendado = -`.
 
 ## Changelog
 
 - `2026-04-12`: roadmap inicial dos BKs em falta (fase de criacao).
 - `2026-04-13`: roadmap atualizado para fase pos-cobertura total (`60/60`) com foco em manutencao, evidencias e fecho de gates.
-- `2026-04-17`: roadmap atualizado para baseline final do MVP (`55/55`) apos rebaseline de escopo.
+- `2026-04-17`: roadmap atualizado para baseline final do MVP (`60/60`) apos rebaseline de escopo.
+
+- `2026-06-22`: roadmap atualizado para nova cadeia MF7/MF8.

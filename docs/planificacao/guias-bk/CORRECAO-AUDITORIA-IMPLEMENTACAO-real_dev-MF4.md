@@ -1,12 +1,12 @@
-# Correcao de auditoria - real_dev - MF4
+# Correcao de auditoria - referencia_privada_docente - MF4
 
 ## Header
 
 - Data: 2026-06-15
 - Projeto: FaithFlix
 - Modo: corrigir_auditoria
-- Implementacao corrigida: `real_dev`
-- Relatorio de auditoria origem: `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md`
+- Implementacao corrigida: `referencia_privada_docente`
+- Relatorio de auditoria origem: `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md`
 - MF alvo: `MF4`
 - BKs abrangidos: `BK-MF4-01`, `BK-MF4-02`, `BK-MF4-03`, `BK-MF4-04`, `BK-MF4-05`, `BK-MF4-06`, `BK-MF4-08`
 - Severidades tratadas: `P0`, `P1`, `P2`, `P3`
@@ -17,14 +17,14 @@
 
 A auditoria ativa da MF4 nao tem findings `P0` nem `P1` ativos. O antigo `MF4-AUD-P1-001` continua `JA_CORRIGIDO`: a subscricao paga nao pode ser ativada por `POST /api/subscriptions/me`; a ativacao paga passa pelo checkout simulado aprovado.
 
-O finding `MF4-AUD-P2-001` foi fechado como `CORRIGIDO_VALIDADO`. A causa efetiva era o backend nao carregar o `.env` de `real_dev/backend` antes de construir `env.mongoUri`, caindo no fallback local `mongodb://127.0.0.1:27017`. Foi adicionado carregamento centralizado do `.env`, sem expor segredos e sem sobrepor variaveis ja definidas pelo processo. Depois disso, o E2E MF4 passou de ponta a ponta.
+O finding `MF4-AUD-P2-001` foi fechado como `CORRIGIDO_VALIDADO`. A causa efetiva era o backend nao carregar o `.env` de `referencia_privada_docente/backend` antes de construir `env.mongoUri`, caindo no fallback local `mongodb://127.0.0.1:27017`. Foi adicionado carregamento centralizado do `.env`, sem expor segredos e sem sobrepor variaveis ja definidas pelo processo. Depois disso, o E2E MF4 passou de ponta a ponta.
 
 ## Findings tratados
 
 | Finding | Severidade | Estado na auditoria | Estado final | Evidencia |
 | --- | --- | --- | --- | --- |
 | `MF4-AUD-P1-001` | `P1` | `JA_CORRIGIDO` | `JA_CORRIGIDO` | A suite backend MF4 passou fora do sandbox e confirma que `POST /api/subscriptions/me` devolve `404`. |
-| `MF4-AUD-P2-001` | `P2` | `BLOQUEADO_AMBIENTE` | `CORRIGIDO_VALIDADO` | `real_dev/backend/src/config/env.js` carrega `real_dev/backend/.env`; verificacao sanitizada confirmou `mongodb+srv`; `npm run e2e:mf4` passou fora do sandbox. |
+| `MF4-AUD-P2-001` | `P2` | `BLOQUEADO_AMBIENTE` | `CORRIGIDO_VALIDADO` | `referencia_privada_docente/backend/src/config/env.js` carrega `referencia_privada_docente/backend/.env`; verificacao sanitizada confirmou `mongodb+srv`; `npm run e2e:mf4` passou fora do sandbox. |
 
 ## Plano aplicado
 
@@ -42,20 +42,20 @@ O finding `MF4-AUD-P2-001` foi fechado como `CORRIGIDO_VALIDADO`. A causa efetiv
 
 - Causa original: possibilidade historica de ativar subscricao paga sem checkout aprovado.
 - Estado atual: `JA_CORRIGIDO`.
-- Evidencia: `real_dev/backend/src/modules/subscriptions/subscriptions.routes.js` nao monta `POST /me`; `real_dev/backend/src/modules/payments/payments.service.js` ativa subscricao apenas apos tentativa simulada `approved`; `npm --prefix real_dev/backend test` passou 38/38 fora do sandbox.
+- Evidencia: `referencia_privada_docente/backend/src/modules/subscriptions/subscriptions.routes.js` nao monta `POST /me`; `referencia_privada_docente/backend/src/modules/payments/payments.service.js` ativa subscricao apenas apos tentativa simulada `approved`; `npm --prefix pasta_privada_do_professor/backend test` passou 38/38 fora do sandbox.
 - Acao desta execucao: nenhuma alteracao necessaria.
 
 ### `MF4-AUD-P2-001`
 
-- Causa atual: backend nao carregava `real_dev/backend/.env`, pelo que `MONGODB_URI` nao entrava em `process.env` e `env.mongoUri` usava o fallback local `mongodb://127.0.0.1:27017`.
+- Causa atual: backend nao carregava `referencia_privada_docente/backend/.env`, pelo que `MONGODB_URI` nao entrava em `process.env` e `env.mongoUri` usava o fallback local `mongodb://127.0.0.1:27017`.
 - Estado atual: `CORRIGIDO_VALIDADO`.
 - Evidencia de implementacao existente:
   - `package.json` contem `e2e:mf4`.
-  - `real_dev/backend/package.json` contem `seed:e2e:mf4`.
-  - `real_dev/backend/scripts/seed-mf4-e2e.js` existe e passa `node --check`.
+  - `referencia_privada_docente/backend/package.json` contem `seed:e2e:mf4`.
+  - `referencia_privada_docente/backend/scripts/seed-mf4-e2e.js` existe e passa `node --check`.
   - `tests/e2e/mf4-flow.spec.js` existe, passa `node --check` e e descoberto pelo Playwright.
 - Evidencia de correcao:
-  - `node --check real_dev/backend/src/config/env.js` passou.
+  - `node --check referencia_privada_docente/backend/src/config/env.js` passou.
   - Import sanitizado de `env.js` confirmou `mongoKind: "mongodb+srv"` e `mongoDbName: "faithflix"`, sem expor a URI completa.
   - `MONGODB_URI=mongodb://process-value ...` confirmou que variaveis de processo continuam a ter prioridade sobre `.env`.
   - `npm run e2e:mf4` passou fora do sandbox.
@@ -63,29 +63,29 @@ O finding `MF4-AUD-P2-001` foi fechado como `CORRIGIDO_VALIDADO`. A causa efetiv
 
 ## Ficheiros alterados
 
-- `real_dev/backend/src/config/env.js`
+- `referencia_privada_docente/backend/src/config/env.js`
 - `playwright.config.js`
 - `tests/e2e/mf4-flow.spec.js`
-- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md`
-- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md`
+- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md`
+- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md`
 
 ## Ficheiros auditados principais
 
-- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md`
-- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md`
+- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md`
+- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md`
 - `package.json`
-- `real_dev/backend/package.json`
-- `real_dev/frontend/package.json`
-- `real_dev/backend/src/config/database.js`
-- `real_dev/backend/src/config/env.js`
-- `real_dev/backend/scripts/seed-mf4-e2e.js`
+- `referencia_privada_docente/backend/package.json`
+- `referencia_privada_docente/frontend/package.json`
+- `referencia_privada_docente/backend/src/config/database.js`
+- `referencia_privada_docente/backend/src/config/env.js`
+- `referencia_privada_docente/backend/scripts/seed-mf4-e2e.js`
 - `tests/e2e/mf4-flow.spec.js`
-- `real_dev/backend/src/modules/subscriptions/*`
-- `real_dev/backend/src/modules/payments/*`
-- `real_dev/backend/src/modules/charities/*`
-- `real_dev/backend/src/modules/notifications/*`
-- `real_dev/frontend/src/services/api/*`
-- `real_dev/frontend/src/pages/*`
+- `referencia_privada_docente/backend/src/modules/subscriptions/*`
+- `referencia_privada_docente/backend/src/modules/payments/*`
+- `referencia_privada_docente/backend/src/modules/charities/*`
+- `referencia_privada_docente/backend/src/modules/notifications/*`
+- `referencia_privada_docente/frontend/src/services/api/*`
+- `referencia_privada_docente/frontend/src/pages/*`
 
 ## Validacoes executadas
 
@@ -100,16 +100,16 @@ O finding `MF4-AUD-P2-001` foi fechado como `CORRIGIDO_VALIDADO`. A causa efetiv
 | `npm run e2e:mf4` no sandbox | `BLOQUEADO_AMBIENTE` | Seed falhou com `connect EPERM 127.0.0.1:27017`. |
 | `npm run e2e:mf4` no sandbox apos carregar `.env` | `BLOQUEADO_AMBIENTE` | Seed ja tentou usar o Atlas do `.env`, mas DNS/network do sandbox falhou com `querySrv ECONNREFUSED`. |
 | `npm run e2e:mf4` fora do sandbox | `PASS` | Seed MF4 concluida e 1/1 teste Playwright passou. |
-| `node --check real_dev/backend/src/config/env.js` | `PASS` | Config backend sem erro de sintaxe. |
-| Import sanitizado de `real_dev/backend/src/config/env.js` | `PASS` | `mongoKind` efetivo: `mongodb+srv`; `mongoDbName`: `faithflix`. |
-| Pesquisa estatica de seguranca/drift em `real_dev` | `PASS_COM_NOTA` | Falsos positivos: `temporary` em docstrings de trial, README a proibir storage de tokens, `secret` na lista de redacao do logger. |
+| `node --check referencia_privada_docente/backend/src/config/env.js` | `PASS` | Config backend sem erro de sintaxe. |
+| Import sanitizado de `referencia_privada_docente/backend/src/config/env.js` | `PASS` | `mongoKind` efetivo: `mongodb+srv`; `mongoDbName`: `faithflix`. |
+| Pesquisa estatica de seguranca/drift em `referencia_privada_docente` | `PASS_COM_NOTA` | Falsos positivos: `temporary` em docstrings de trial, README a proibir storage de tokens, `secret` na lista de redacao do logger. |
 | Pesquisa de drift OPSA/Orelle/StudyFlow/etc. | `PASS` | Sem ocorrencias. |
-| `node --check real_dev/backend/scripts/seed-mf4-e2e.js` | `PASS` | Seed E2E MF4 sem erro de sintaxe. |
+| `node --check referencia_privada_docente/backend/scripts/seed-mf4-e2e.js` | `PASS` | Seed E2E MF4 sem erro de sintaxe. |
 | `node --check tests/e2e/mf4-flow.spec.js` | `PASS` | Spec Playwright MF4 sem erro de sintaxe. |
-| `npm --prefix real_dev/frontend run build` | `PASS` | Vite build passou; 92 modulos transformados. |
+| `npm --prefix pasta_privada_do_professor/frontend run build` | `PASS` | Vite build passou; 92 modulos transformados. |
 | `git diff --check` | `PASS` | Sem erros de whitespace. |
-| `npm --prefix real_dev/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | 20 testes passaram; 18 falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
-| `npm --prefix real_dev/backend test` fora do sandbox | `PASS` | 38/38 testes passaram. |
+| `npm --prefix pasta_privada_do_professor/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | 20 testes passaram; 18 falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
+| `npm --prefix pasta_privada_do_professor/backend test` fora do sandbox | `PASS` | 38/38 testes passaram. |
 | `npm run smoke` no sandbox | `BLOQUEADO_AMBIENTE` | Smoke backend falhou 8/8 por `listen EPERM: operation not permitted 127.0.0.1`. |
 | `npm run smoke` fora do sandbox | `PASS` | Smoke backend passou 8/8 e smoke frontend fez build com 92 modulos transformados. |
 

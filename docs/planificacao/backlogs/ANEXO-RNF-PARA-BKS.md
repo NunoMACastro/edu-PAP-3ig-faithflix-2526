@@ -6,7 +6,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-14`
+- `last_updated`: `2026-06-22`
 
 ## Objetivo
 Mapear RNF -> BK com base na matriz canónica, sem alterar conteúdo funcional.
@@ -34,26 +34,27 @@ Mapear RNF -> BK com base na matriz canónica, sem alterar conteúdo funcional.
 | RNF18 | `BK-MF6-03` | 1 |
 | RNF19 | `BK-MF6-03` | 1 |
 | RNF20 | `BK-MF6-03` | 1 |
-| RNF21 | `BK-MF7-02` | 1 |
-| RNF22 | `BK-MF7-02` | 1 |
-| RNF23 | `BK-MF7-02` | 1 |
-| RNF24 | `BK-MF7-02` | 1 |
-| RNF25 | `BK-MF7-02` | 1 |
-| RNF26 | `BK-MF7-02` | 1 |
+| RNF21 | `BK-MF8-02` | 1 |
+| RNF22 | `BK-MF8-02` | 1 |
+| RNF23 | `BK-MF8-02` | 1 |
+| RNF24 | `BK-MF8-02` | 1 |
+| RNF25 | `BK-MF8-02` | 1 |
+| RNF26 | `BK-MF8-02` | 1 |
 | RNF27 | `BK-MF1-01` | 1 |
 | RNF28 | `BK-MF1-02` | 1 |
 | RNF29 | `BK-MF1-06` | 1 |
 | RNF30 | `BK-MF1-03` | 1 |
 | RNF31 | `BK-MF1-05` | 1 |
-| RNF32 | `BK-MF7-02` | 1 |
-| RNF33 | `BK-MF7-02` | 1 |
+| RNF32 | `BK-MF8-02` | 1 |
+| RNF33 | `BK-MF8-02` | 1 |
 | RNF34 | `BK-MF3-06` | 1 |
-| RNF35 | `BK-MF7-02` | 1 |
-| RNF36 | `BK-MF7-02` | 1 |
+| RNF35 | `BK-MF8-02` | 1 |
+| RNF36 | `BK-MF8-02` | 1 |
 | RNF37 | `BK-MF6-03` | 1 |
-| RNF38 | `BK-MF7-02` | 1 |
-| RNF39 | `BK-MF7-02` | 1 |
-| RNF40 | `BK-MF7-02` | 1 |
+| RNF38 | `BK-MF8-02` | 1 |
+| RNF39 | `BK-MF8-02` | 1 |
+| RNF40 | `BK-MF8-02` | 1 |
 
 ## Changelog
+- `2026-06-22`: alinhado com a reestruturacao MF7/MF8 e com a `MATRIZ-CANONICA-BK.md`.
 - `2026-04-14`: anexo gerado a partir de `MATRIZ-CANONICA-BK.md`.

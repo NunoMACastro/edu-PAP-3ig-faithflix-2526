@@ -13,7 +13,7 @@
 - `dependencias`: `BK-MF2-02`
 - `rf_rnf`: `RF58`
 - `fase_documental`: `Fase 2`
-- `sprint`: `S09`
+- `sprint`: `S08`
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF5-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-04-gestao-de-utilizadores-admin.md`

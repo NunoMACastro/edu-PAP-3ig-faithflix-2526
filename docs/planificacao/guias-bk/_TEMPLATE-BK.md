@@ -51,7 +51,7 @@ Explica porque este BK existe no produto FaithFlix, que RF/RNF cumpre, que probl
 - RF/RNF aplicaveis.
 - BKs anteriores obrigatorios.
 - Documentos canonicos a consultar.
-- Ficheiros reais em `real_dev/backend` e `real_dev/frontend`, se existirem.
+- Ficheiros de aluno em `backend` e `frontend`, se existirem.
 
 #### Glossario
 
@@ -76,10 +76,10 @@ Explica a teoria minima para o aluno perceber o raciocinio: ownership por utiliz
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `real_dev/backend/...`
-- EDITAR: `real_dev/backend/...`
-- CRIAR: `real_dev/frontend/...`
-- EDITAR: `real_dev/frontend/...`
+- CRIAR: `backend/...`
+- EDITAR: `backend/...`
+- CRIAR: `frontend/...`
+- EDITAR: `frontend/...`
 - REVER: `docs/planificacao/guias-bk/MF*/BK-...md`
 
 #### Tutorial tecnico linear

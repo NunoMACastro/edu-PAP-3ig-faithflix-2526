@@ -1,13 +1,13 @@
-# Auditoria de implementacao - real_dev - MF6
+# Auditoria de implementacao - referencia_privada_docente - MF6
 
 ## Header
 
 - Data local: `2026-06-22` (`Europe/Lisbon`)
 - Projeto: `FaithFlix`
 - Modo executado: `auditar_implementacao`
-- Implementacao auditada: `real_dev`
-- Backend auditado: `real_dev/backend`
-- Frontend auditado: `real_dev/frontend`
+- Implementacao auditada: `referencia_privada_docente`
+- Backend auditado: `referencia_privada_docente/backend`
+- Frontend auditado: `referencia_privada_docente/frontend`
 - MF alvo: `MF6 - Hardening`
 - BKs auditados: `BK-MF6-01`, `BK-MF6-02`, `BK-MF6-03`, `BK-MF6-04`, `BK-MF6-05`, `BK-MF6-06`
 - Estado geral da MF: `PASS_COM_RISCOS`
@@ -48,17 +48,17 @@ Foram consultados:
 - `docs/planificacao/guias-bk/AUDITORIA-HIDRATACAO-MF6.md`;
 - `docs/planificacao/guias-bk/IMPLEMENTACAO-REAL_DEV-MF6.md`;
 - evidences `docs/evidence/MF6/*.md`;
-- codigo real em `real_dev/backend` e `real_dev/frontend`.
+- codigo real em `referencia_privada_docente/backend` e `referencia_privada_docente/frontend`.
 
-Pasta auditada: `real_dev`, porque contem `backend/package.json`, `frontend/package.json`, codigo `src`, scripts, testes e evidences reais. Pastas `backend/`, `frontend/`, `apps/`, `server/` e `client/` da raiz foram tratadas apenas como referencia auxiliar. `mockup/` nao foi usado como contrato tecnico.
+Pasta auditada: `referencia_privada_docente`, porque contem `backend/package.json`, `frontend/package.json`, codigo `src`, scripts, testes e evidences reais. Pastas `backend/`, `frontend/`, `apps/`, `server/` e `client/` da raiz foram tratadas apenas como referencia auxiliar. `mockup/` nao foi usado como contrato tecnico.
 
 ## Estado por BK
 
 | BK | Estado | Justificacao |
 | --- | --- | --- |
-| `BK-MF6-01` | `CONFORME` | Existe suite `node:test` em `real_dev/backend/tests/regression/mf6-backend-regression.test.js`; cobre auth, subscricoes, playback, catalogo paginado, pool solidaria e endpoints admin herdados da MF5. Validacao atual: `6/6`. |
-| `BK-MF6-02` | `CONFORME` | Existe `real_dev/frontend/scripts/check-frontend-regression.mjs`; valida rotas principais, ficheiros de paginas, estados loading/error/empty, `credentials: "include"` e contratos de acessibilidade consumidos por MF6-05. |
-| `BK-MF6-03` | `CONFORME` | Existe `real_dev/backend/scripts/check-security-baseline.mjs`; combina scanner estatico com controlos estruturais de hashing, rotas admin, privacidade, integracoes, recomendacoes e cookie de sessao no frontend. |
+| `BK-MF6-01` | `CONFORME` | Existe suite `node:test` em `referencia_privada_docente/backend/tests/regression/mf6-backend-regression.test.js`; cobre auth, subscricoes, playback, catalogo paginado, pool solidaria e endpoints admin herdados da MF5. Validacao atual: `6/6`. |
+| `BK-MF6-02` | `CONFORME` | Existe `referencia_privada_docente/frontend/scripts/check-frontend-regression.mjs`; valida rotas principais, ficheiros de paginas, estados loading/error/empty, `credentials: "include"` e contratos de acessibilidade consumidos por MF6-05. |
+| `BK-MF6-03` | `CONFORME` | Existe `referencia_privada_docente/backend/scripts/check-security-baseline.mjs`; combina scanner estatico com controlos estruturais de hashing, rotas admin, privacidade, integracoes, recomendacoes e cookie de sessao no frontend. |
 | `BK-MF6-04` | `CONFORME` | Catalogo publico usa `page`, `limit`, `total` e `items`; `limit > 24` falha; medidor de performance exige cookie antes de medir recomendacoes autenticadas e a baseline real anterior esta registada. |
 | `BK-MF6-05` | `CONFORME` | Frontend tem `SkipLink`, `main#conteudo-principal`, foco visivel, navegacao PT-PT, player com `controls`, labels e grupo acessivel; build e regressao frontend passam. |
 | `BK-MF6-06` | `CONFORME_COM_RISCOS` | Gate S12 existe em `docs/evidence/MF6/GATE-S12-MF6.md`, consolida proof/neg dos BKs MF6 e decide `GO_COM_RESSALVAS`; a unica ressalva e validacao humana formal antes da defesa/MF7. |
@@ -67,8 +67,8 @@ Pasta auditada: `real_dev`, porque contem `backend/package.json`, `frontend/pack
 
 | BK | RF/RNF | Ficheiros principais | Validacao observada |
 | --- | --- | --- | --- |
-| `BK-MF6-01` | `RNF29` | `tests/regression/mf6-backend-regression.test.js`, `tests/smoke/app.smoke.test.js` | `node --test tests/regression/mf6-backend-regression.test.js` passou com `6/6`; `npm --prefix real_dev/backend test` passou fora da sandbox com `49/49`; smoke passou fora da sandbox com `8/8`. |
-| `BK-MF6-02` | `RNF29` | `scripts/check-frontend-regression.mjs`, `src/routes/AppRoutes.jsx`, `src/services/api/apiClient.js` | `node scripts/check-frontend-regression.mjs` passou; `npm --prefix real_dev/frontend run build` passou com 101 modulos transformados. |
+| `BK-MF6-01` | `RNF29` | `tests/regression/mf6-backend-regression.test.js`, `tests/smoke/app.smoke.test.js` | `node --test tests/regression/mf6-backend-regression.test.js` passou com `6/6`; `npm --prefix pasta_privada_do_professor/backend test` passou fora da sandbox com `49/49`; smoke passou fora da sandbox com `8/8`. |
+| `BK-MF6-02` | `RNF29` | `scripts/check-frontend-regression.mjs`, `src/routes/AppRoutes.jsx`, `src/services/api/apiClient.js` | `node scripts/check-frontend-regression.mjs` passou; `npm --prefix pasta_privada_do_professor/frontend run build` passou com 101 modulos transformados. |
 | `BK-MF6-03` | `RNF14`, `RNF16`, `RNF17`, `RNF18`, `RNF19`, `RNF20`, `RNF37` | `scripts/check-security-baseline.mjs`, `auth.password.js`, `user.routes.js`, `privacy.service.js`, `integrations.validation.js`, `recommendations.routes.js`, `apiClient.js` | `node scripts/check-security-baseline.mjs` devolveu `Hardening MF6: PASS`; pesquisa estatica obrigatoria so devolveu falsos positivos defensivos. |
 | `BK-MF6-04` | `RNF09`, `RNF10`, `RNF11`, `RNF12` | `catalog.validation.js`, `catalog.service.js`, `measure-performance-baseline.mjs`, `BK-MF6-04-performance.md` | Regressao valida catalogo paginado e rejeicao de `limit=100`; smoke confirma HTTP 400 para catalogo/pesquisa invalidos; medidor sem cookie falha controladamente; evidence anterior regista baseline real dentro dos limites. |
 | `BK-MF6-05` | `RNF01`, `RNF02`, `RNF03`, `RNF04`, `RNF06` | `SkipLink.jsx`, `AppLayout.jsx`, `AppHeader.jsx`, `PlaybackPage.jsx`, `global.css`, `BK-MF6-05-acessibilidade-ux.md` | Regressao frontend e build passam; evidence regista validacao Playwright externa em 390px/768px/1280px, skip link, foco, formulario obrigatorio e labels do player. |
@@ -125,45 +125,45 @@ Sem findings `P3` acionaveis. As notas abaixo sao observacoes nao bloqueantes, s
 - `PASS`: `apiClient` usa `credentials: "include"` e nao foi encontrado uso de `localStorage`/`sessionStorage` para sessao/token.
 - `PASS`: scanner MF6 confirma hashing, rotas admin com role, exportacao RGPD com filtragem sensivel, integracoes sem `publicConfig` secret-like e recomendacoes autenticadas.
 - `PASS_COM_NOTA`: pesquisa estatica encontrou apenas falsos positivos defensivos em `check-security-baseline.mjs`, `integrations.validation.js`, `privacy.service.js`, `logger.js` e teste negativo `stripe_real`.
-- `PASS`: pesquisa de drift de outros dominios (`StudyFlow`, `OPSA`, `Orelle`, `companyId`, fiscalidade, biometria, turma, professor, sala, disciplina) nao devolveu ocorrencias em `real_dev`.
+- `PASS`: pesquisa de drift de outros dominios (`StudyFlow`, `OPSA`, `Orelle`, `companyId`, fiscalidade, biometria, turma, professor, sala, disciplina) nao devolveu ocorrencias em `referencia_privada_docente`.
 
 ## Comandos executados
 
 | Comando | Diretoria | Resultado | Observacao |
 | --- | --- | --- | --- |
-| `git status --short --untracked-files=all` | raiz | `PASS_COM_NOTA` | Existem artefactos MF6 untracked; isso e esperado para `real_dev`/relatorios tecnicos e nao foi tratado como problema. |
-| `node --test tests/regression/mf6-backend-regression.test.js` | `real_dev/backend` | `PASS` | `6` testes, `6` pass, `0` fail, `duration_ms 231.371708`. |
-| `node scripts/check-security-baseline.mjs` | `real_dev/backend` | `PASS` | Output: `Hardening MF6: PASS`. |
-| `node scripts/check-frontend-regression.mjs` | `real_dev/frontend` | `PASS` | Output: `Regressao frontend MF6: PASS`. |
-| `npm --prefix real_dev/frontend run build` | raiz | `PASS` | Vite build passou; `101` modulos transformados; build em `557ms`. |
-| `npm --prefix real_dev/backend test` | raiz/sandbox | `BLOQUEADO_AMBIENTE` | `33/49` passaram e `16` falharam apenas por `listen EPERM` ao abrir `127.0.0.1`. |
-| `npm --prefix real_dev/backend test` | raiz/fora da sandbox | `PASS` | `49` testes, `49` pass, `0` fail, `duration_ms 397.549375`. |
-| `npm --prefix real_dev/backend run smoke` | raiz/sandbox | `BLOQUEADO_AMBIENTE` | `8/8` falharam apenas por `listen EPERM` ao abrir `127.0.0.1`. |
-| `npm --prefix real_dev/backend run smoke` | raiz/fora da sandbox | `PASS` | `8` testes, `8` pass, `0` fail, `duration_ms 235.069583`. |
+| `git status --short --untracked-files=all` | raiz | `PASS_COM_NOTA` | Existem artefactos MF6 untracked; isso e esperado para `referencia_privada_docente`/relatorios tecnicos e nao foi tratado como problema. |
+| `node --test tests/regression/mf6-backend-regression.test.js` | `referencia_privada_docente/backend` | `PASS` | `6` testes, `6` pass, `0` fail, `duration_ms 231.371708`. |
+| `node scripts/check-security-baseline.mjs` | `referencia_privada_docente/backend` | `PASS` | Output: `Hardening MF6: PASS`. |
+| `node scripts/check-frontend-regression.mjs` | `referencia_privada_docente/frontend` | `PASS` | Output: `Regressao frontend MF6: PASS`. |
+| `npm --prefix pasta_privada_do_professor/frontend run build` | raiz | `PASS` | Vite build passou; `101` modulos transformados; build em `557ms`. |
+| `npm --prefix pasta_privada_do_professor/backend test` | raiz/sandbox | `BLOQUEADO_AMBIENTE` | `33/49` passaram e `16` falharam apenas por `listen EPERM` ao abrir `127.0.0.1`. |
+| `npm --prefix pasta_privada_do_professor/backend test` | raiz/fora da sandbox | `PASS` | `49` testes, `49` pass, `0` fail, `duration_ms 397.549375`. |
+| `npm --prefix pasta_privada_do_professor/backend run smoke` | raiz/sandbox | `BLOQUEADO_AMBIENTE` | `8/8` falharam apenas por `listen EPERM` ao abrir `127.0.0.1`. |
+| `npm --prefix pasta_privada_do_professor/backend run smoke` | raiz/fora da sandbox | `PASS` | `8` testes, `8` pass, `0` fail, `duration_ms 235.069583`. |
 | `bash scripts/validate-planificacao.sh` | raiz | `PASS` | `checked_bks: 55`, `checked_guides: 55`, `errors: []`. |
 | `git diff --check` | raiz | `PASS` | Sem output de erro. |
-| `node scripts/measure-performance-baseline.mjs` | `real_dev/backend` | `PASS_NEGATIVO` | Falhou cedo, como esperado, por falta de `FAITHFLIX_SESSION_COOKIE`; nao imprime cookie nem mede recomendacoes sem sessao. |
+| `node scripts/measure-performance-baseline.mjs` | `referencia_privada_docente/backend` | `PASS_NEGATIVO` | Falhou cedo, como esperado, por falta de `FAITHFLIX_SESSION_COOKIE`; nao imprime cookie nem mede recomendacoes sem sessao. |
 | Pesquisa estatica obrigatoria de seguranca | raiz | `PASS_COM_NOTA` | Apenas falsos positivos defensivos: scanner, listas de segredo/redacao e teste negativo `stripe_real`. |
-| Pesquisa estatica de drift de dominio | raiz | `PASS` | Sem ocorrencias de outros projetos/dominios em `real_dev`. |
+| Pesquisa estatica de drift de dominio | raiz | `PASS` | Sem ocorrencias de outros projetos/dominios em `referencia_privada_docente`. |
 
 ## Ficheiros auditados principais
 
-- `real_dev/backend/tests/regression/mf6-backend-regression.test.js`
-- `real_dev/backend/tests/smoke/app.smoke.test.js`
-- `real_dev/backend/scripts/check-security-baseline.mjs`
-- `real_dev/backend/scripts/measure-performance-baseline.mjs`
-- `real_dev/backend/src/modules/catalog/catalog.validation.js`
-- `real_dev/backend/src/modules/catalog/catalog.service.js`
-- `real_dev/backend/src/modules/users/user.routes.js`
-- `real_dev/backend/src/modules/privacy/privacy.service.js`
-- `real_dev/backend/src/modules/integrations/integrations.validation.js`
-- `real_dev/backend/src/modules/recommendations/recommendations.routes.js`
-- `real_dev/frontend/scripts/check-frontend-regression.mjs`
-- `real_dev/frontend/src/services/api/apiClient.js`
-- `real_dev/frontend/src/components/a11y/SkipLink.jsx`
-- `real_dev/frontend/src/layouts/AppLayout.jsx`
-- `real_dev/frontend/src/components/layout/AppHeader.jsx`
-- `real_dev/frontend/src/pages/PlaybackPage.jsx`
+- `referencia_privada_docente/backend/tests/regression/mf6-backend-regression.test.js`
+- `referencia_privada_docente/backend/tests/smoke/app.smoke.test.js`
+- `referencia_privada_docente/backend/scripts/check-security-baseline.mjs`
+- `referencia_privada_docente/backend/scripts/measure-performance-baseline.mjs`
+- `referencia_privada_docente/backend/src/modules/catalog/catalog.validation.js`
+- `referencia_privada_docente/backend/src/modules/catalog/catalog.service.js`
+- `referencia_privada_docente/backend/src/modules/users/user.routes.js`
+- `referencia_privada_docente/backend/src/modules/privacy/privacy.service.js`
+- `referencia_privada_docente/backend/src/modules/integrations/integrations.validation.js`
+- `referencia_privada_docente/backend/src/modules/recommendations/recommendations.routes.js`
+- `referencia_privada_docente/frontend/scripts/check-frontend-regression.mjs`
+- `referencia_privada_docente/frontend/src/services/api/apiClient.js`
+- `referencia_privada_docente/frontend/src/components/a11y/SkipLink.jsx`
+- `referencia_privada_docente/frontend/src/layouts/AppLayout.jsx`
+- `referencia_privada_docente/frontend/src/components/layout/AppHeader.jsx`
+- `referencia_privada_docente/frontend/src/pages/PlaybackPage.jsx`
 - `docs/evidence/MF6/BK-MF6-01-regressao-backend.md`
 - `docs/evidence/MF6/BK-MF6-02-regressao-frontend.md`
 - `docs/evidence/MF6/BK-MF6-03-hardening-seguranca.md`
@@ -173,7 +173,7 @@ Sem findings `P3` acionaveis. As notas abaixo sao observacoes nao bloqueantes, s
 
 ## Ficheiros alterados nesta execucao
 
-- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-real_dev-MF6.md`
+- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF6.md`
 
 Nao foram alterados codigo, BKs canonicos, backlog, matriz, prompts, commits ou PRs.
 

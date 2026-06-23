@@ -1,11 +1,11 @@
-# Auditoria de implementacao - real_dev - MF2
+# Auditoria de implementacao - referencia_privada_docente - MF2
 
 ## Resultado geral
 
 - Estado: FAIL
 - MF auditada: MF2
 - BKs auditados: BK-MF2-01, BK-MF2-02, BK-MF2-03, BK-MF2-04, BK-MF2-05, BK-MF2-06, BK-MF2-07, BK-MF2-08
-- Implementacao auditada: `real_dev`
+- Implementacao auditada: `referencia_privada_docente`
 - Coerencia entre MFs: adjacentes
 - Fronteiras auditadas: `MF1 -> MF2`, `MF2 -> MF3`
 - Resumo: a implementacao real cobre a maior parte do core streaming MVP: autenticacao por cookie HttpOnly, perfil, roles base, catalogo, detalhe, playback, progresso, preferencias media, favoritos, watchlist, historico, seed E2E e teste Playwright. A auditoria nao deve fechar a MF2 como pronta porque a recuperacao de password nao fecha um fluxo auditavel de ponta a ponta sem email real nem canal dev-only controlado, e porque o E2E principal nao foi executado com sucesso neste ambiente.
@@ -18,7 +18,7 @@
 - BKs excluidos: nenhum BK da MF2 foi excluido.
 - MFs implementadas detetadas: `MF1` IMPLEMENTADA; `MF2` IMPLEMENTADA com falhas; `MF3` PARCIAL/placeholder; `MF4` PARCIAL/placeholder; `MF5` PARCIAL por presenca de gestao admin de utilizadores.
 - MFs usadas para coerencia: `MF1`, `MF2`, `MF3`.
-- Limitacoes: nao foi encontrado glossario tecnico PAP; nao havia relatorios existentes `AUDITORIA-HIDRATACAO-MF*.md`, `IMPLEMENTACAO-REAL_DEV-MF*.md` ou `AUDITORIA-IMPLEMENTACAO-*.md`; comandos que abrem servidor falharam no sandbox com `listen EPERM`; o E2E completo nao foi executado para nao correr seed persistente; o build/frontend smoke nao foi executado porque escreve em `real_dev/frontend/dist`.
+- Limitacoes: nao foi encontrado glossario tecnico PAP; nao havia relatorios existentes `AUDITORIA-HIDRATACAO-MF*.md`, `IMPLEMENTACAO-REAL_DEV-MF*.md` ou `AUDITORIA-IMPLEMENTACAO-*.md`; comandos que abrem servidor falharam no sandbox com `listen EPERM`; o E2E completo nao foi executado para nao correr seed persistente; o build/frontend smoke nao foi executado porque escreve em `referencia_privada_docente/frontend/dist`.
 
 ## Matriz por BK
 
@@ -50,7 +50,7 @@
 - Cumpre: parcialmente.
 - Falhas: o fluxo de recuperacao nao e auditavel end-to-end por um utilizador ou avaliador sem acesso direto a base de dados, porque nao ha envio de email real nem canal dev-only documentado para obter o token bruto.
 - Negativos: ha testes para password fraca e reset generico.
-- Evidencia: `real_dev/backend/src/modules/auth/auth.service.js:97`; `real_dev/backend/tests/unit/mf2-validation.test.js:68`; `real_dev/frontend/src/components/auth/AuthForms.jsx:63`.
+- Evidencia: `referencia_privada_docente/backend/src/modules/auth/auth.service.js:97`; `referencia_privada_docente/backend/tests/unit/mf2-validation.test.js:68`; `referencia_privada_docente/frontend/src/components/auth/AuthForms.jsx:63`.
 - Riscos: RF05 fica demonstravel apenas por inspecao interna, nao por fluxo funcional.
 - Handoff: BK-MF2-02 recebe `req.user` e roles base; esse handoff esta presente.
 
@@ -62,7 +62,7 @@
 - Cumpre: sim, com risco menor.
 - Falhas: a navegacao mostra links admin a qualquer visitante; o backend protege, mas a UX e a superficie visivel ficam pouco alinhadas.
 - Negativos: teste unitario rejeita role invalida.
-- Evidencia: `real_dev/backend/src/modules/users/user.routes.js:21`; `real_dev/frontend/src/components/layout/AppHeader.jsx:11`.
+- Evidencia: `referencia_privada_docente/backend/src/modules/users/user.routes.js:21`; `referencia_privada_docente/frontend/src/components/layout/AppHeader.jsx:11`.
 - Riscos: confusao pedagogica/UX e pedidos 401/403 previsiveis para utilizadores sem role.
 - Handoff: catalogo administrativo pode depender de roles admin/moderator.
 
@@ -74,7 +74,7 @@
 - Cumpre: sim, com validacao dinamica incompleta.
 - Falhas: sem build/E2E executados nesta auditoria.
 - Negativos: teste unitario rejeita estado invalido e valida media.
-- Evidencia: `real_dev/backend/src/app.js:40`; `real_dev/frontend/src/services/api/catalogApi.js:3`; `real_dev/backend/tests/unit/mf2-validation.test.js:74`.
+- Evidencia: `referencia_privada_docente/backend/src/app.js:40`; `referencia_privada_docente/frontend/src/services/api/catalogApi.js:3`; `referencia_privada_docente/backend/tests/unit/mf2-validation.test.js:74`.
 - Riscos: baixo, desde que comandos passem fora do sandbox.
 - Handoff: detalhe e pesquisa futura usam `contents` publicado por slug/id.
 
@@ -86,7 +86,7 @@
 - Cumpre: sim, mas sem validacao executada.
 - Falhas: E2E nao executado.
 - Negativos: nao confirmados por comando nesta auditoria.
-- Evidencia: `real_dev/frontend/src/services/api/catalogApi.js:7`; `tests/e2e/mf2-flow.spec.js:23`.
+- Evidencia: `referencia_privada_docente/frontend/src/services/api/catalogApi.js:7`; `tests/e2e/mf2-flow.spec.js:23`.
 - Riscos: baixo.
 - Handoff: playback recebe `contentId`.
 
@@ -98,7 +98,7 @@
 - Cumpre: sim, com risco por validacao incompleta.
 - Falhas: RNF08 nao foi medido.
 - Negativos: teste unitario valida progresso negativo.
-- Evidencia: `real_dev/frontend/src/services/api/playbackApi.js:3`; `tests/e2e/mf2-flow.spec.js:33`; `real_dev/backend/tests/unit/mf2-validation.test.js:107`.
+- Evidencia: `referencia_privada_docente/frontend/src/services/api/playbackApi.js:3`; `tests/e2e/mf2-flow.spec.js:33`; `referencia_privada_docente/backend/tests/unit/mf2-validation.test.js:107`.
 - Riscos: performance real do player nao confirmada nesta auditoria.
 - Handoff: historico e favoritos/watchlist podem reutilizar `contentId` e `userId`.
 
@@ -110,7 +110,7 @@
 - Cumpre: sim, com risco de validacao browser.
 - Falhas: nao foi confirmado em browser real.
 - Negativos: teste unitario valida parental e media.
-- Evidencia: `real_dev/backend/scripts/seed-mf2-e2e.js:83`; `real_dev/backend/tests/unit/mf2-validation.test.js:118`.
+- Evidencia: `referencia_privada_docente/backend/scripts/seed-mf2-e2e.js:83`; `referencia_privada_docente/backend/tests/unit/mf2-validation.test.js:118`.
 - Riscos: baixo/medio por falta de E2E executado.
 - Handoff: recomendacao futura pode usar preferencias e historico.
 
@@ -122,7 +122,7 @@
 - Cumpre: sim, com validacao dinamica incompleta.
 - Falhas: E2E nao executado.
 - Negativos: teste unitario rejeita tipo de lista invalido.
-- Evidencia: `real_dev/backend/src/app.js:42`; `real_dev/frontend/src/services/api/libraryApi.js:3`; `real_dev/backend/tests/unit/mf2-validation.test.js:126`.
+- Evidencia: `referencia_privada_docente/backend/src/app.js:42`; `referencia_privada_docente/frontend/src/services/api/libraryApi.js:3`; `referencia_privada_docente/backend/tests/unit/mf2-validation.test.js:126`.
 - Riscos: baixo/medio por falta de prova E2E.
 - Handoff: `BK-MF3-01` depende destes contratos para ratings por utilizador/conteudo.
 
@@ -134,7 +134,7 @@
 - Cumpre: parcialmente.
 - Falhas: a execucao nao foi confirmada. `npx playwright test --list` tentou aceder a `https://registry.npmjs.org/playwright` e falhou com `ENOTFOUND`; o E2E completo nao foi executado para nao modificar dados via seed.
 - Negativos: seed tem protecao contra apagar conteudo por slug sem fixture.
-- Evidencia: `tests/e2e/mf2-flow.spec.js:1`; `playwright.config.js:26`; `real_dev/backend/scripts/seed-mf2-e2e.js:38`; `real_dev/frontend/public/media/piloto.mp4`.
+- Evidencia: `tests/e2e/mf2-flow.spec.js:1`; `playwright.config.js:26`; `referencia_privada_docente/backend/scripts/seed-mf2-e2e.js:38`; `referencia_privada_docente/frontend/public/media/piloto.mp4`.
 - Riscos: a MF2 nao tem prova operacional do fluxo principal no ambiente auditado.
 - Handoff: MF3 nao deve assumir MF2 fechada sem E2E verde.
 
@@ -149,7 +149,7 @@ Sem findings P0.
 ### P1 - BK-MF2-01 - Recuperacao de password nao fecha fluxo auditavel
 
 - Area: Backend/Frontend/Testes
-- Ficheiro: `real_dev/backend/src/modules/auth/auth.service.js:97`; `real_dev/backend/tests/unit/mf2-validation.test.js:68`; `real_dev/frontend/src/components/auth/AuthForms.jsx:63`
+- Ficheiro: `referencia_privada_docente/backend/src/modules/auth/auth.service.js:97`; `referencia_privada_docente/backend/tests/unit/mf2-validation.test.js:68`; `referencia_privada_docente/frontend/src/components/auth/AuthForms.jsx:63`
 - Evidencia observada: o backend cria token de reset e guarda hash, e o teste confirma que a resposta publica contem apenas `message`; nao foi encontrada entrega de email real, canal dev-only controlado, endpoint administrativo seguro ou evidence que permita ao utilizador obter o token bruto para completar `reset-password`.
 - Esperado pelo BK/documento: `BK-MF2-01` cobre `RF05` e exige recuperacao de password; email real esta fora de scope, mas o fluxo deve ser demonstravel sem expor o token na resposta publica.
 - Impacto: o fluxo RF05 fica incompleto para validacao PAP e para o utilizador final do MVP; a funcionalidade so e testavel por acesso interno a base de dados.
@@ -169,7 +169,7 @@ Sem findings P0.
 ### P2 - MF2 - Navegacao expoe areas futuras/placeholder
 
 - Area: Scope/Frontend
-- Ficheiro: `real_dev/frontend/src/components/layout/AppHeader.jsx:7`
+- Ficheiro: `referencia_privada_docente/frontend/src/components/layout/AppHeader.jsx:7`
 - Evidencia observada: a navegacao inclui `Pesquisa`, `Associacoes` e `Planos`, que pertencem a MFs posteriores; tambem inclui links admin visiveis antes de a sessao/role ser considerada.
 - Esperado pelo BK/documento: MF2 deve focar identidade, catalogo, detalhe, playback, media controls e biblioteca pessoal; funcionalidades futuras nao devem substituir contratos de BK nem criar promessa funcional.
 - Impacto: risco de drift pedagogico e UX, sobretudo se utilizadores interpretarem placeholders como funcionalidades fechadas.
@@ -178,7 +178,7 @@ Sem findings P0.
 ### P2 - MF1 -> MF2 - Contrato de sessao anonima diverge entre BK-MF1-06 e implementacao atual
 
 - Area: Coerencia entre MFs
-- Ficheiro: `docs/planificacao/guias-bk/MF1/BK-MF1-06-smoke-tests-fe-be.md:186`; `real_dev/backend/tests/smoke/app.smoke.test.js:64`
+- Ficheiro: `docs/planificacao/guias-bk/MF1/BK-MF1-06-smoke-tests-fe-be.md:186`; `referencia_privada_docente/backend/tests/smoke/app.smoke.test.js:64`
 - Evidencia observada: o guia MF1 esperava 401 para `/api/session/me` sem cookie, mas a suite atual espera 200 com `user: null`.
 - Esperado pelo BK/documento: contratos entre MFs devem ser preservados ou o drift deve ser documentado.
 - Impacto: nao bloqueia a MF2 se o contrato atual for deliberado, mas cria ambiguidade para alunos e auditores.
@@ -229,12 +229,12 @@ Sem findings P0.
 - Resultado: PASS
 - Observacoes: `checked_bks: 55`, `checked_guides: 55`, `errors: []`.
 
-- Comando: `npm --prefix real_dev/backend run test`
+- Comando: `npm --prefix pasta_privada_do_professor/backend run test`
 - Diretoria: raiz
 - Resultado: FAIL por ambiente
 - Observacoes: 7 testes passaram; 6 smoke falharam com `listen EPERM: operation not permitted 127.0.0.1`, antes de validar comportamento funcional.
 
-- Comando: `npm --prefix real_dev/backend run smoke`
+- Comando: `npm --prefix pasta_privada_do_professor/backend run smoke`
 - Diretoria: raiz
 - Resultado: FAIL por ambiente
 - Observacoes: 6/6 smoke falharam com `listen EPERM` ao abrir servidor local no sandbox.
@@ -244,8 +244,8 @@ Sem findings P0.
 - Resultado: FAIL por ambiente/dependencias
 - Observacoes: tentou aceder a `https://registry.npmjs.org/playwright` e falhou com `ENOTFOUND`; nao foi repetido com rede porque a auditoria proibe instalar dependencias.
 
-- Comando nao executado: `npm --prefix real_dev/frontend run smoke`
-- Motivo: `smoke` executa `vite build` e pode atualizar `real_dev/frontend/dist`, o que criaria artefactos de build durante uma auditoria sem alteracao de codigo.
+- Comando nao executado: `npm --prefix pasta_privada_do_professor/frontend run smoke`
+- Motivo: `smoke` executa `vite build` e pode atualizar `referencia_privada_docente/frontend/dist`, o que criaria artefactos de build durante uma auditoria sem alteracao de codigo.
 
 - Comando nao executado: `npm run smoke`
 - Motivo: agrega frontend smoke/build e herdaria o risco de escrita em `dist`.

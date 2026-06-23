@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-06-22`
 
 ## Objetivo
 
@@ -15,7 +15,7 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 
 ## Baseline de escopo MVP (aplicada em 2026-04-17)
 
-- Planeamento alinhado ao backlog final de `55 BK`.
+- Planeamento alinhado ao backlog final de `60 BK`.
 - Itens fora de escopo nao aparecem no calendario ativo de sprints.
 
 ## Capacidade recomendada
@@ -48,11 +48,11 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 | `Sprint 5`  | Descoberta base                   | `BK-MF3-01..04`                           | `8`        |
 | `Sprint 6`  | IA baseline e explicabilidade     | `BK-MF3-05..06`                           | `4`        |
 | `Sprint 7`  | Subscricoes e pagamentos          | `BK-MF4-01`, `BK-MF4-02`, `BK-MF4-08`     | `7`        |
-| `Sprint 8`  | Pool de associacoes               | `BK-MF4-03..06`                           | `9`        |
-| `Sprint 9`  | RGPD e admin base                 | `BK-MF5-01..05`                           | `10`       |
-| `Sprint 10` | Integracoes + regressao           | `BK-MF5-06`, `BK-MF6-01..02`              | `6`        |
-| `Sprint 11` | Hardening + matrizes de cobertura | `BK-MF6-03..06`, `BK-MF7-01..02`          | `11`       |
-| `Sprint 12` | Defesa + buffer + fecho           | `BK-MF7-03..05`, `BK-MF8-01..05`          | `9`        |
+| `Sprint 8`  | Pool de associacoes + admin base  | `BK-MF4-03..06`, `BK-MF5-04`              | `11`       |
+| `Sprint 9`  | RGPD e admin operacional          | `BK-MF5-01..03`, `BK-MF5-05..06`          | `10`       |
+| `Sprint 10` | Regressao + hardening antecipado  | `BK-MF6-01..05`                           | `10`       |
+| `Sprint 11` | Gate tecnico + UI segura          | `BK-MF6-06`, `BK-MF7-01..05`, `BK-MF8-01` | `11`       |
+| `Sprint 12` | Defesa + buffer + fecho           | `BK-MF8-02..10`                           | `11`       |
 
 > Regra operacional: nenhuma sprint pode ultrapassar `11` pontos.
 
@@ -66,7 +66,11 @@ Mesmo quando varios BK aparecem na mesma sprint, a ordem abaixo deve ser respeit
 | `Sprint 3` | `BK-MF2-02` -> `BK-MF2-03` -> `BK-MF2-04` | Catalogo usa roles de `BK-MF2-02`; detalhe usa contrato de catalogo. |
 | `Sprint 4` | `BK-MF2-05` -> `BK-MF2-06` e `BK-MF2-07` -> `BK-MF2-08` | E2E fecha apenas depois de player, media controls, favoritos, watchlist e historico. |
 | `Sprint 7` | `BK-MF4-01` -> `BK-MF4-02` -> `BK-MF4-08` | Notificacoes transacionais dependem de subscricoes, checkout/trial e progresso de playback ja existentes. |
-| `Sprint 8` | `BK-MF4-03` -> `BK-MF4-04` -> `BK-MF4-05` -> `BK-MF4-06` | Distribuicao mensal exige associacoes aprovadas e contratos de subscricao/pagamento da Sprint 7. |
+| `Sprint 8` | `BK-MF4-03` -> `BK-MF4-04` -> `BK-MF4-05` -> `BK-MF4-06`; `BK-MF5-04` pode iniciar admin base em paralelo apos validar roles de MF2 | Distribuicao mensal exige associacoes aprovadas; admin base entra cedo para abrir MF5 sem rebentar a carga final. |
+| `Sprint 9` | `BK-MF5-01` -> `BK-MF5-02`; `BK-MF5-03` em paralelo; `BK-MF5-05` e `BK-MF5-06` depois de `BK-MF5-04` | RGPD e paineis admin dependem de sessao/roles e admin base. |
+| `Sprint 10` | `BK-MF6-01` e `BK-MF6-02` -> `BK-MF6-03`, `BK-MF6-04`, `BK-MF6-05` | Hardening pode avancar na mesma sprint depois das suites de regressao. |
+| `Sprint 11` | `BK-MF6-06` -> `BK-MF7-01` -> `BK-MF7-02` -> `BK-MF7-03` -> `BK-MF7-04` -> `BK-MF7-05` -> `BK-MF8-01` | UI segura so abre depois do gate tecnico; matriz RF ja pode iniciar apos gate MF7. |
+| `Sprint 12` | `BK-MF8-02` -> `BK-MF8-03` -> `BK-MF8-04` -> `BK-MF8-05` -> `BK-MF8-06` -> `BK-MF8-07` -> `BK-MF8-08` -> `BK-MF8-09` -> `BK-MF8-10` | A defesa fecha antes de riscos, bugs, freeze, pacote e retro terminal. |
 
 PRs de BK dependentes so devem ser integrados depois do PR da dependencia estar merged ou, em alternativa, depois de existir branch de integracao validada pelo owner tecnico.
 
@@ -190,3 +194,5 @@ Remediacao minima:
 - `2026-04-14`: alinhado com scorecard oficial por sprint e guiao docente semanal com checkpoints/remediacao.
 - `2026-04-17`: aplicado rebaseline de escopo MVP com remocao integral de itens fora de escopo.
 - `2026-04-17`: recalibrada carga planeada das sprints `S06` e `S10` para coincidir com a soma de pontos dos BKs alocados.
+
+- `2026-06-22`: redistribuidas S08..S12 para 60 BK mantendo limite de 11 pontos.

@@ -1,13 +1,13 @@
-# Validacao de implementacao - real_dev - MF5
+# Validacao de implementacao - referencia_privada_docente - MF5
 
 ## Resultado geral
 
 - Projeto: FaithFlix
 - Macro fase: MF5 - Operacao e privacidade
 - Modo executado: `validar_apenas`
-- Raiz validada: `real_dev`
-- Backend validado: `real_dev/backend`
-- Frontend validado: `real_dev/frontend`
+- Raiz validada: `referencia_privada_docente`
+- Backend validado: `referencia_privada_docente/backend`
+- Frontend validado: `referencia_privada_docente/frontend`
 - Data local: 2026-06-18
 - Estado final: `PASS`
 - Commits/push: nao executados
@@ -31,8 +31,8 @@ Fontes principais consultadas:
 - `README.md`, `docs/RF.md`, `docs/RNF.md`.
 - Planificacao, backlog, matriz canonica, contrato de campos, MF views e plano de sprints.
 - Guias BK da `MF5` e fronteiras `MF4`/`MF6`.
-- Relatorios tecnicos `IMPLEMENTACAO-REAL_DEV-MF5.md`, `AUDITORIA-IMPLEMENTACAO-real_dev-MF5.md` e `CORRECAO-AUDITORIA-IMPLEMENTACAO-real_dev-MF5.md`.
-- Codigo real em `real_dev/backend` e `real_dev/frontend`.
+- Relatorios tecnicos `IMPLEMENTACAO-REAL_DEV-MF5.md`, `AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF5.md` e `CORRECAO-AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF5.md`.
+- Codigo real em `referencia_privada_docente/backend` e `referencia_privada_docente/frontend`.
 
 ## Estado por BK
 
@@ -67,8 +67,8 @@ Os findings historicos do relatorio de auditoria permanecem no estado `JA_CORRIG
 Comando de seguranca e drift:
 
 ```bash
-rg -n "TODO implementar|FIXME|temporario|temporário|temporary|demo only|implementar depois|pseudo-codigo|payload: unknown|as any|localStorage|sessionStorage|dangerouslySetInnerHTML|eval\(|new Function|password.*console|token.*console|cookie.*console|console\.log\(.*password|console\.log\(.*token|secret|api[_-]?key|stripe|paypal|mb way|webhook|CDN|DRM|streaming adaptativo|embeddings|vector database|RAG|IA generativa|deleteMany\(\{\}\)" real_dev/backend/src real_dev/backend/tests real_dev/backend/scripts real_dev/frontend/src real_dev/frontend/index.html real_dev/frontend/package.json real_dev/backend/package.json
-rg -n "StudyFlow|OPSA|Orelle|companyId|multiempresa|fiscalidade|SNC|SAF-T|IVA|IBAN|cosmetica|cosmética|biometria|turma|professor|sala|disciplina" real_dev/backend/src real_dev/backend/tests real_dev/backend/scripts real_dev/frontend/src
+rg -n "TODO implementar|FIXME|temporario|temporário|temporary|demo only|implementar depois|pseudo-codigo|payload: unknown|as any|localStorage|sessionStorage|dangerouslySetInnerHTML|eval\(|new Function|password.*console|token.*console|cookie.*console|console\.log\(.*password|console\.log\(.*token|secret|api[_-]?key|stripe|paypal|mb way|webhook|CDN|DRM|streaming adaptativo|embeddings|vector database|RAG|IA generativa|deleteMany\(\{\}\)" referencia_privada_docente/backend/src referencia_privada_docente/backend/tests referencia_privada_docente/backend/scripts referencia_privada_docente/frontend/src referencia_privada_docente/frontend/index.html referencia_privada_docente/frontend/package.json referencia_privada_docente/backend/package.json
+rg -n "StudyFlow|OPSA|Orelle|companyId|multiempresa|fiscalidade|SNC|SAF-T|IVA|IBAN|cosmetica|cosmética|biometria|turma|professor|sala|disciplina" referencia_privada_docente/backend/src referencia_privada_docente/backend/tests referencia_privada_docente/backend/scripts referencia_privada_docente/frontend/src
 ```
 
 Resultado:
@@ -80,19 +80,19 @@ Resultado:
 
 | Comando | Resultado | Observacao |
 | --- | --- | --- |
-| `git status --short --untracked-files=all` | `PASS_COM_NOTA` | Relatorios tecnicos MF5 aparecem como `??`; isto nao e falha conforme a regra da prompt sobre `real_dev` e relatorios locais. |
-| `npm --prefix real_dev/backend test` na sandbox | `BLOQUEADO_AMBIENTE` | 27 testes passaram e 16 testes HTTP falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
-| `npm --prefix real_dev/backend test` fora da sandbox | `PASS` | `43/43` testes passaram. |
-| `npm --prefix real_dev/frontend run build` | `PASS` | Vite build passou; 100 modulos transformados. |
+| `git status --short --untracked-files=all` | `PASS_COM_NOTA` | Relatorios tecnicos MF5 aparecem como `??`; isto nao e falha conforme a regra da prompt sobre `referencia_privada_docente` e relatorios locais. |
+| `npm --prefix pasta_privada_do_professor/backend test` na sandbox | `BLOQUEADO_AMBIENTE` | 27 testes passaram e 16 testes HTTP falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
+| `npm --prefix pasta_privada_do_professor/backend test` fora da sandbox | `PASS` | `43/43` testes passaram. |
+| `npm --prefix pasta_privada_do_professor/frontend run build` | `PASS` | Vite build passou; 100 modulos transformados. |
 | `npm run smoke` fora da sandbox | `PASS` | Backend smoke `8/8` e frontend build passaram. |
 | `bash scripts/validate-planificacao.sh` | `PASS` | `checked_bks: 55`, `checked_guides: 55`, `errors: []`. |
 | `git diff --check` | `PASS` | Sem erros de whitespace. |
 
 ## Ficheiros alterados nesta execucao
 
-- `docs/planificacao/guias-bk/VALIDACAO-IMPLEMENTACAO-real_dev-MF5.md`
+- `docs/planificacao/guias-bk/VALIDACAO-IMPLEMENTACAO-referencia_privada_docente-MF5.md`
 
-Nao foram alterados ficheiros em `real_dev/backend`, `real_dev/frontend`, BKs canonicos, backlog, matriz, prompts, commits ou PRs.
+Nao foram alterados ficheiros em `referencia_privada_docente/backend`, `referencia_privada_docente/frontend`, BKs canonicos, backlog, matriz, prompts, commits ou PRs.
 
 ## Blockers e TODOs
 

@@ -6,7 +6,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-06-22`
 
 ## Objetivo
 Fixar o contrato canónico mínimo por BK e evitar drift entre backlog, matriz e guias.
@@ -66,16 +66,21 @@ Nota de escopo:
 | BK-MF6-04 | Davi | P1 | BK-MF6-02 | RNF09, RNF10, RNF11, RNF12 |
 | BK-MF6-05 | Mateus | P1 | BK-MF6-02 | RNF01, RNF02, RNF03, RNF04, RNF06 |
 | BK-MF6-06 | Nuno | P0 | BK-MF6-03,BK-MF6-05 | transversal |
-| BK-MF7-01 | Kaue | P0 | BK-MF6-06 | RF_ATIVOS_MVP |
-| BK-MF7-02 | Davi | P0 | BK-MF6-06 | RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40 |
-| BK-MF7-03 | Mateus | P1 | BK-MF7-01 | transversal |
-| BK-MF7-04 | Matheus | P1 | BK-MF7-03 | transversal |
-| BK-MF7-05 | Nuno | P0 | BK-MF7-02,BK-MF7-04 | transversal |
-| BK-MF8-01 | Kaue | P0 | BK-MF7-05 | transversal |
-| BK-MF8-02 | Matheus | P0 | BK-MF8-01 | transversal |
-| BK-MF8-03 | Nuno | P0 | BK-MF8-02 | transversal |
-| BK-MF8-04 | Kaue | P1 | BK-MF8-03 | transversal |
-| BK-MF8-05 | Nuno | P1 | BK-MF8-04 | transversal |
+| BK-MF7-01 | Mateus | P0 | BK-MF6-06 | transversal |
+| BK-MF7-02 | Matheus | P0 | BK-MF7-01 | RF02, RF04, RNF13, RNF15, RNF16, RNF19 |
+| BK-MF7-03 | Mateus | P1 | BK-MF7-02 | RNF01, RNF02, RNF03, RNF04, RNF28, RNF38 |
+| BK-MF7-04 | Davi | P1 | BK-MF7-03 | RNF01, RNF02, RNF03, RNF05, RNF38, RNF40 |
+| BK-MF7-05 | Nuno | P0 | BK-MF7-04 | RNF21, RNF22, RNF38, RNF40 |
+| BK-MF8-01 | Kaue | P0 | BK-MF7-05 | RF_ATIVOS_MVP |
+| BK-MF8-02 | Davi | P0 | BK-MF8-01 | RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40 |
+| BK-MF8-03 | Mateus | P1 | BK-MF8-02 | transversal |
+| BK-MF8-04 | Matheus | P1 | BK-MF8-03 | transversal |
+| BK-MF8-05 | Nuno | P0 | BK-MF8-04 | transversal |
+| BK-MF8-06 | Kaue | P0 | BK-MF8-05 | transversal |
+| BK-MF8-07 | Matheus | P0 | BK-MF8-06 | transversal |
+| BK-MF8-08 | Nuno | P0 | BK-MF8-07 | transversal |
+| BK-MF8-09 | Kaue | P1 | BK-MF8-08 | transversal |
+| BK-MF8-10 | Nuno | P1 | BK-MF8-09 | transversal |
 
 ## Changelog
 - `2026-04-14`: contrato canónico criado a partir do `BACKLOG-MVP.md`.

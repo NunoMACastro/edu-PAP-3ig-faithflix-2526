@@ -4,16 +4,16 @@
 - Apoio: Kaue
 - Data: 2026-06-22
 - Requisitos: RNF01, RNF02, RNF03, RNF04, RNF06
-- Referência de entrega: execução local em `real_dev/frontend`, sem commit por `PERMITIR_COMMITS: nao`
+- Referência de entrega: execução local em `referencia_privada_docente/frontend`, sem commit por `PERMITIR_COMMITS: nao`
 
 ## Comandos executados
 
 | Comando | Resultado real | Evidence anexada |
 | --- | --- | --- |
-| `npm run build` em `real_dev/frontend` | PASS | Vite transformou 101 módulos e concluiu build em 537ms. |
-| `node scripts/check-frontend-regression.mjs` em `real_dev/frontend` | PASS | `Regressao frontend MF6: PASS`, incluindo contratos de `SkipLink`, `main`, navegação e player. |
+| `npm run build` em `referencia_privada_docente/frontend` | PASS | Vite transformou 101 módulos e concluiu build em 537ms. |
+| `node scripts/check-frontend-regression.mjs` em `referencia_privada_docente/frontend` | PASS | `Regressao frontend MF6: PASS`, incluindo contratos de `SkipLink`, `main`, navegação e player. |
 | `node /private/tmp/faithflix-verify-mf6-a11y.mjs` na raiz do projeto | PASS | Playwright externo validou foco, skip link, responsividade, formulário obrigatório, semântica de `main` e labels do player. |
-| `rg -n "<main\|</main>" real_dev/frontend/src/pages real_dev/frontend/src/components real_dev/frontend/src/layouts` | PASS | Apenas `real_dev/frontend/src/layouts/AppLayout.jsx` contém o `main#conteudo-principal`. |
+| `rg -n "<main\|</main>" referencia_privada_docente/frontend/src/pages referencia_privada_docente/frontend/src/components referencia_privada_docente/frontend/src/layouts` | PASS | Apenas `referencia_privada_docente/frontend/src/layouts/AppLayout.jsx` contém o `main#conteudo-principal`. |
 
 ## Proof
 

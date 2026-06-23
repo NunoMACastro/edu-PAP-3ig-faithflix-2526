@@ -1,13 +1,13 @@
-# Auditoria de implementacao - real_dev - MF4
+# Auditoria de implementacao - referencia_privada_docente - MF4
 
 ## Header
 
 - Data: 2026-06-16
 - Projeto: FaithFlix
 - Modo: auditar_implementacao
-- Implementacao auditada: `real_dev`
-- Backend auditado: `real_dev/backend`
-- Frontend auditado: `real_dev/frontend`
+- Implementacao auditada: `referencia_privada_docente`
+- Backend auditado: `referencia_privada_docente/backend`
+- Frontend auditado: `referencia_privada_docente/frontend`
 - MF alvo: `MF4`
 - BKs auditados: `BK-MF4-01`, `BK-MF4-02`, `BK-MF4-03`, `BK-MF4-04`, `BK-MF4-05`, `BK-MF4-06`, `BK-MF4-08`
 - Estado geral da MF: `PASS_COM_RISCOS`
@@ -16,7 +16,7 @@
 
 ## Resultado executivo
 
-A MF4 esta substancialmente conforme em `real_dev`: planos, subscricoes, checkout simulado, trial unico, candidaturas, aprovacao/rejeicao, entrada na pool, distribuicao mensal, relatorios, historico privado, CSV, notificacoes internas e preferencias existem com backend/frontend alinhados.
+A MF4 esta substancialmente conforme em `referencia_privada_docente`: planos, subscricoes, checkout simulado, trial unico, candidaturas, aprovacao/rejeicao, entrada na pool, distribuicao mensal, relatorios, historico privado, CSV, notificacoes internas e preferencias existem com backend/frontend alinhados.
 
 O finding historico `MF4-AUD-P1-001` sobre ativacao direta de subscricao paga continua `JA_CORRIGIDO`: `POST /api/subscriptions/me` nao esta montado, e a ativacao paga passa por `POST /api/payments/simulated-checkout` com resultado `approved`.
 
@@ -27,7 +27,7 @@ O comando canonico `npm run e2e:mf4` nao deve ser contado como `PASS` nesta reau
 Observacoes sem bloqueio funcional:
 
 - `DRIFT_DOCUMENTAL_CONTROLADO`: `BK-MF4-01` ainda lista `POST /api/subscriptions/me` nos criterios de aceite, mas `BK-MF4-02` substitui a ativacao direta por checkout simulado. A implementacao atual privilegia a regra mais segura: subscricao paga so nasce por `POST /api/payments/simulated-checkout` aprovado, e o teste HTTP confirma `404` na rota direta.
-- `RISCO_OPERACIONAL_CONTROLADO`: existe uma URI MongoDB com credenciais num `.env` local dentro de `real_dev/backend`. O ficheiro esta ignorado por Git e nao e codigo versionado; o valor nao foi reproduzido neste relatorio.
+- `RISCO_OPERACIONAL_CONTROLADO`: existe uma URI MongoDB com credenciais num `.env` local dentro de `referencia_privada_docente/backend`. O ficheiro esta ignorado por Git e nao e codigo versionado; o valor nao foi reproduzido neste relatorio.
 
 ## Escopo auditado
 
@@ -55,15 +55,15 @@ Observacoes sem bloqueio funcional:
 - `docs/planificacao/guias-bk/MF5/BK-MF5-01-exportacao-dados-utilizador.md` para handoff `MF4 -> MF5`
 - `docs/planificacao/guias-bk/AUDITORIA-HIDRATACAO-MF4.md`
 - `docs/planificacao/guias-bk/IMPLEMENTACAO-REAL_DEV-MF4.md`
-- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md`
-- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md` existente antes desta atualizacao
+- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md`
+- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md` existente antes desta atualizacao
 
 ### Pasta auditada e pastas ignoradas
 
-- `real_dev/` foi escolhida porque contem backend e frontend reais com `package.json`, `src`, testes e scripts.
+- `referencia_privada_docente/` foi escolhida porque contem backend e frontend reais com `package.json`, `src`, testes e scripts.
 - `backend/` e `frontend/` na raiz foram tratados apenas como referencia historica.
 - `mockup/` foi tratado apenas como referencia visual/fluxo, nao como contrato tecnico.
-- `real_dev/` estar fora do git nao foi tratado como falha, conforme regra da prompt.
+- `referencia_privada_docente/` estar fora do git nao foi tratado como falha, conforme regra da prompt.
 
 ## Estado por BK
 
@@ -100,7 +100,7 @@ Observacoes sem bloqueio funcional:
 - Colecoes: `subscription_plans`, `subscriptions`, `payment_attempts`, `trials`, `notifications`, `notification_preferences`, `charity_applications`, `charities`, `pool_distributions`, `charity_memberships`.
 - Endpoints: `/api/subscriptions/*`, `/api/payments/*`, `/api/notifications/*`, `/api/charities/*`.
 - Frontend: `/planos`, `/notificacoes`, `/associacoes`, `/associacoes/candidatura`, `/associacoes/:charityId/historico`, `/admin/associacoes/*`.
-- E2E MF4: `e2e:mf4` em `package.json`, `seed:e2e:mf4` em `real_dev/backend/package.json`, seed em `real_dev/backend/scripts/seed-mf4-e2e.js` e spec em `tests/e2e/mf4-flow.spec.js`.
+- E2E MF4: `e2e:mf4` em `package.json`, `seed:e2e:mf4` em `referencia_privada_docente/backend/package.json`, seed em `referencia_privada_docente/backend/scripts/seed-mf4-e2e.js` e spec em `tests/e2e/mf4-flow.spec.js`.
 - Handoff `MF5`: dados de subscricao, notificacoes, preferencias, historico privado e CSV podem ser reutilizados por exportacao/privacidade.
 
 ## Findings
@@ -118,8 +118,8 @@ Sem findings P1 ativos.
 - Estado atual: `JA_CORRIGIDO`
 - BK/RF/RNF: `BK-MF4-02`, `RF37`; impacto indireto em `BK-MF4-05`, `RF44`
 - Expected: subscricao paga deve ser ativada apenas quando o checkout simulado tem resultado `approved`, com tentativa auditavel em `payment_attempts`.
-- Observed atual: `real_dev/backend/src/modules/subscriptions/subscriptions.routes.js` expoe apenas `GET /plans`, `GET /me` e `POST /me/cancel-renewal`; nao ha `POST /api/subscriptions/me` para ativacao direta. A ativacao paga ocorre em `payments.service.js`, que regista `payment_attempts` e so chama `activateSubscription` depois de `status: "approved"`.
-- Evidencia de teste: `real_dev/backend/tests/integration/mf4-http.test.js` confirma que `POST /api/subscriptions/me` devolve `404` e que checkout aprovado/recusado gera evidencia auditavel.
+- Observed atual: `referencia_privada_docente/backend/src/modules/subscriptions/subscriptions.routes.js` expoe apenas `GET /plans`, `GET /me` e `POST /me/cancel-renewal`; nao ha `POST /api/subscriptions/me` para ativacao direta. A ativacao paga ocorre em `payments.service.js`, que regista `payment_attempts` e so chama `activateSubscription` depois de `status: "approved"`.
+- Evidencia de teste: `referencia_privada_docente/backend/tests/integration/mf4-http.test.js` confirma que `POST /api/subscriptions/me` devolve `404` e que checkout aprovado/recusado gera evidencia auditavel.
 - Impacto atual: sem impacto ativo confirmado.
 - Bloqueia MF: nao.
 
@@ -158,7 +158,7 @@ Sem findings P3 de implementacao confirmados. A contaminacao da porta `5173` fic
 - Ownership: notificacoes, subscricoes, trial, playback e historico privado usam `req.user.id` ou membership backend.
 - Dados financeiros: nao foram encontrados cartoes reais, CVV, IBAN, Stripe, PayPal, MB Way real, webhooks reais ou tokens financeiros em codigo de produto.
 - Logs: logger faz redacao por chaves sensiveis como `password`, `token`, `secret`, `cookie` e `authorization`.
-- Drift de dominio: nao foram encontradas referencias a OPSA, StudyFlow, Orelle, fiscalidade, turma, sala ou disciplina em `real_dev`.
+- Drift de dominio: nao foram encontradas referencias a OPSA, StudyFlow, Orelle, fiscalidade, turma, sala ou disciplina em `referencia_privada_docente`.
 - Ambiente local: foi detetada uma URI MongoDB com credenciais apenas em `.env` local ignorado por Git; nao foi reproduzida no relatorio nem tratada como codigo versionado.
 
 ## Comandos executados
@@ -166,15 +166,15 @@ Sem findings P3 de implementacao confirmados. A contaminacao da porta `5173` fic
 | Comando | Resultado | Observacao |
 | --- | --- | --- |
 | `git status --short` | `PASS_COM_NOTA` | Ha ficheiros modificados/untracked ja presentes no workspace de MF4; isto nao foi tratado como falha da implementacao. |
-| Pesquisa estatica de seguranca em `real_dev` | `PASS_COM_NOTA` | Falsos positivos: `temporary` em docstrings de trial, README a proibir storage de tokens, `secret` na lista de redacao do logger. |
-| Pesquisa de drift OPSA/Orelle/StudyFlow/etc. | `PASS` | Sem ocorrencias em `real_dev`. |
-| `node --check real_dev/backend/scripts/seed-mf4-e2e.js` | `PASS` | Seed E2E MF4 sem erro de sintaxe. |
+| Pesquisa estatica de seguranca em `referencia_privada_docente` | `PASS_COM_NOTA` | Falsos positivos: `temporary` em docstrings de trial, README a proibir storage de tokens, `secret` na lista de redacao do logger. |
+| Pesquisa de drift OPSA/Orelle/StudyFlow/etc. | `PASS` | Sem ocorrencias em `referencia_privada_docente`. |
+| `node --check referencia_privada_docente/backend/scripts/seed-mf4-e2e.js` | `PASS` | Seed E2E MF4 sem erro de sintaxe. |
 | `node --check tests/e2e/mf4-flow.spec.js` | `PASS` | Spec Playwright MF4 sem erro de sintaxe. |
 | `git diff --check` | `PASS` | Sem erros de whitespace nos ficheiros rastreados. |
 | `bash scripts/validate-planificacao.sh` | `PASS` | `checked_bks: 55`, `checked_guides: 55`, `errors: []`. |
-| `npm --prefix real_dev/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | 20 testes passaram e 18 falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
-| `npm --prefix real_dev/backend test` fora do sandbox | `PASS` | 38/38 testes passaram. |
-| `npm --prefix real_dev/frontend run build` | `PASS` | Vite build passou; 92 modulos transformados. |
+| `npm --prefix pasta_privada_do_professor/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | 20 testes passaram e 18 falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
+| `npm --prefix pasta_privada_do_professor/backend test` fora do sandbox | `PASS` | 38/38 testes passaram. |
+| `npm --prefix pasta_privada_do_professor/frontend run build` | `PASS` | Vite build passou; 92 modulos transformados. |
 | `npm run smoke` no sandbox | `BLOQUEADO_AMBIENTE` | Smoke backend falhou 8/8 por `listen EPERM: operation not permitted 127.0.0.1`. |
 | `npm run smoke` fora do sandbox | `PASS` | Smoke backend passou 8/8 e smoke frontend executou `vite build` com 92 modulos transformados. |
 | `./node_modules/.bin/playwright test tests/e2e/mf4-flow.spec.js --list` | `PASS` | Playwright descobriu 1 teste MF4. |
@@ -185,39 +185,39 @@ Sem findings P3 de implementacao confirmados. A contaminacao da porta `5173` fic
 
 ## Ficheiros auditados principais
 
-- `real_dev/backend/src/app.js`
-- `real_dev/backend/src/server.js`
-- `real_dev/backend/src/config/cors.js`
-- `real_dev/backend/src/modules/subscriptions/*`
-- `real_dev/backend/src/modules/payments/*`
-- `real_dev/backend/src/modules/charities/*`
-- `real_dev/backend/src/modules/notifications/*`
-- `real_dev/backend/src/modules/playback/playback.routes.js`
-- `real_dev/backend/src/modules/playback/playback.service.js`
-- `real_dev/backend/tests/unit/mf4-validation.test.js`
-- `real_dev/backend/tests/integration/mf4-http.test.js`
-- `real_dev/backend/scripts/seed-mf4-e2e.js`
-- `real_dev/frontend/src/services/api/subscriptionsApi.js`
-- `real_dev/frontend/src/services/api/paymentsApi.js`
-- `real_dev/frontend/src/services/api/charitiesApi.js`
-- `real_dev/frontend/src/services/api/notificationsApi.js`
-- `real_dev/frontend/src/pages/SubscriptionPage.jsx`
-- `real_dev/frontend/src/pages/NotificationsPage.jsx`
-- `real_dev/frontend/src/pages/CharityApplicationPage.jsx`
-- `real_dev/frontend/src/pages/PublicCharitiesPage.jsx`
-- `real_dev/frontend/src/pages/AdminCharityApplicationsPage.jsx`
-- `real_dev/frontend/src/pages/AdminPoolDistributionPage.jsx`
-- `real_dev/frontend/src/pages/AdminPoolDashboardPage.jsx`
-- `real_dev/frontend/src/pages/CharityHistoryPage.jsx`
-- `real_dev/frontend/src/pages/AdminCharityMembersPage.jsx`
-- `real_dev/frontend/src/routes/AppRoutes.jsx`
+- `referencia_privada_docente/backend/src/app.js`
+- `referencia_privada_docente/backend/src/server.js`
+- `referencia_privada_docente/backend/src/config/cors.js`
+- `referencia_privada_docente/backend/src/modules/subscriptions/*`
+- `referencia_privada_docente/backend/src/modules/payments/*`
+- `referencia_privada_docente/backend/src/modules/charities/*`
+- `referencia_privada_docente/backend/src/modules/notifications/*`
+- `referencia_privada_docente/backend/src/modules/playback/playback.routes.js`
+- `referencia_privada_docente/backend/src/modules/playback/playback.service.js`
+- `referencia_privada_docente/backend/tests/unit/mf4-validation.test.js`
+- `referencia_privada_docente/backend/tests/integration/mf4-http.test.js`
+- `referencia_privada_docente/backend/scripts/seed-mf4-e2e.js`
+- `referencia_privada_docente/frontend/src/services/api/subscriptionsApi.js`
+- `referencia_privada_docente/frontend/src/services/api/paymentsApi.js`
+- `referencia_privada_docente/frontend/src/services/api/charitiesApi.js`
+- `referencia_privada_docente/frontend/src/services/api/notificationsApi.js`
+- `referencia_privada_docente/frontend/src/pages/SubscriptionPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/NotificationsPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/CharityApplicationPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/PublicCharitiesPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/AdminCharityApplicationsPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/AdminPoolDistributionPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/AdminPoolDashboardPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/CharityHistoryPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/AdminCharityMembersPage.jsx`
+- `referencia_privada_docente/frontend/src/routes/AppRoutes.jsx`
 - `tests/e2e/mf4-flow.spec.js`
 - `package.json`
 - `playwright.config.js`
 
 ## Ficheiros alterados nesta execucao
 
-- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md`
+- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md`
 
 Nota: foi usada uma config Playwright temporaria em `/private/tmp/faithflix-mf4-playwright.config.js` para validar o fluxo em portas limpas. Nao e ficheiro do repositorio.
 

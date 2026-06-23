@@ -9,7 +9,7 @@
 - `data`: `2026-06-16`
 - `timezone`: `Europe/Lisbon`
 - `area`: `docs/planificacao/guias-bk`
-- `implementation_root`: `real_dev`
+- `implementation_root`: `referencia_privada_docente`
 - `strict_scope`: `true`
 - `check_mf_coherence`: `true`
 - `run_commands`: `true`
@@ -72,12 +72,12 @@ Nota de workspace: antes desta auditoria já existiam alterações não commitad
 - `docs/planificacao/guias-bk/AUDITORIA-HIDRATACAO-MF3.md`
 - `docs/planificacao/guias-bk/AUDITORIA-HIDRATACAO-MF4.md`
 - `docs/planificacao/guias-bk/AUDITORIA-HIDRATACAO-MF5.md`
-- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md`
-- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-real_dev-MF4.md`
+- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md`
+- `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF4.md`
 - `docs/planificacao/guias-bk/IMPLEMENTACAO-REAL_DEV-MF4.md`
 - `GLOSSARIO-TERMOS-TECNICOS-PAP.md`
-- `real_dev/backend`
-- `real_dev/frontend`
+- `referencia_privada_docente/backend`
+- `referencia_privada_docente/frontend`
 - `mockup/README.md`
 - `mockup/src/app/pages/MinhaContaPage.tsx`
 - `mockup/src/app/FAITHFLIX_INTERFACE_SPECS.md`
@@ -153,7 +153,7 @@ Não existem findings abertos nesta execução.
 | Check | Resultado |
 | --- | --- |
 | Endpoints duplicados para a mesma acção | PASS: endpoints têm responsabilidades separadas. |
-| Nomes de colecções críticos | PASS: `content_comments`, `media_preferences`, `pool_distributions.totalPoolCents` e `trials` existem em `real_dev/backend`. |
+| Nomes de colecções críticos | PASS: `content_comments`, `media_preferences`, `pool_distributions.totalPoolCents` e `trials` existem em `referencia_privada_docente/backend`. |
 | Frontend chama endpoints declarados no guia | PASS: cada cliente API novo aponta para endpoint declarado no respectivo BK. |
 | Ownership em fluxos privados | PASS documental: exportação, eliminação e consentimentos usam `req.user.id`. |
 | Roles admin | PASS documental: gestão de utilizadores, métricas e integrações exigem `requireRole(["admin"])`. |
@@ -164,7 +164,7 @@ Não existem findings abertos nesta execução.
 
 ## Coerência MF anterior -> MF alvo -> MF seguinte
 
-- `MF4 -> MF5`: a MF5 consome subscrições, tentativas de pagamento simuladas, trials, notificações, biblioteca, ratings, comentários, preferências de media e dados de conta criados nas fases anteriores. A auditoria confirmou os nomes críticos contra `real_dev/backend`.
+- `MF4 -> MF5`: a MF5 consome subscrições, tentativas de pagamento simuladas, trials, notificações, biblioteca, ratings, comentários, preferências de media e dados de conta criados nas fases anteriores. A auditoria confirmou os nomes críticos contra `referencia_privada_docente/backend`.
 - `MF5 interna`: exportação prepara eliminação; eliminação e consentimentos fecham self-service de privacidade; gestão admin prepara métricas e integrações.
 - `MF5 -> MF6`: regressão backend/frontend deve cobrir `GET /api/privacy/export`, `DELETE /api/privacy/account`, consentimentos, `GET/PATCH /api/users`, métricas admin e integrações admin.
 
@@ -172,7 +172,7 @@ Não existem findings abertos nesta execução.
 
 - `_TEMPLATE-BK.md` ainda reflecte contrato pedagógico antigo, enquanto os BKs MF5 seguem a estrutura exigida pela prompt activa.
 - `docs/RNF.md` e `mockup/src/app/FAITHFLIX_INTERFACE_SPECS.md` contêm referências evolutivas a tecnologias/serviços fora do contrato final, como Next.js/Axios, Firebase/Supabase, PostgreSQL, Stripe, CDN e qualidade adaptativa. Nesta auditoria foram tratados como drift ou referência visual, não como contrato técnico.
-- O mockup usa `/minha-conta` e uma área de configurações/eliminação visualmente útil, mas o contrato real dos BKs usa `real_dev`, sessão por cookie e endpoints Express/MongoDB.
+- O mockup usa `/minha-conta` e uma área de configurações/eliminação visualmente útil, mas o contrato real dos BKs usa `referencia_privada_docente`, sessão por cookie e endpoints Express/MongoDB.
 
 ## Riscos restantes
 
@@ -186,7 +186,7 @@ Não existem findings abertos nesta execução.
 | --- | --- |
 | Pesquisa obrigatória de termos proibidos nos BKs MF5 | PASS: sem ocorrências. |
 | Pesquisa de drift de outras PAPs nos BKs MF5 | PASS_COM_NOTA: apenas falsos positivos de `IVA` dentro de `DERIVADO`; não há domínio fiscal ou outra PAP. |
-| Pesquisa estática proporcional em `real_dev/backend` e `real_dev/frontend` | PASS_COM_NOTA: ocorrências de `password`, `token` e `cookie` pertencem a auth/sessão/testes ou documentação; `localStorage`/`sessionStorage` aparecem no README como comportamento fora de scope. |
+| Pesquisa estática proporcional em `referencia_privada_docente/backend` e `referencia_privada_docente/frontend` | PASS_COM_NOTA: ocorrências de `password`, `token` e `cookie` pertencem a auth/sessão/testes ou documentação; `localStorage`/`sessionStorage` aparecem no README como comportamento fora de scope. |
 | Estrutura obrigatória das secções | PASS: os 6 BKs têm as secções de `#### Objetivo` a `#### Changelog`. |
 | Passos técnicos | PASS: os 6 BKs têm 5 passos e cada passo contém pontos 1 a 7. |
 | Auditoria automática de blocos de código | PASS: todos os blocos com 8+ e 20+ linhas não vazias cumprem a regra mínima de comentários didácticos. |

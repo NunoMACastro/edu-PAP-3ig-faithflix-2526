@@ -1,4 +1,4 @@
-# Implementacao - real_dev - MF6
+# Implementacao - referencia_privada_docente - MF6
 
 ## Resultado geral
 
@@ -7,9 +7,9 @@
 - Macro fase alvo: `MF6 - Hardening`
 - BKs abrangidos: `BK-MF6-01`, `BK-MF6-02`, `BK-MF6-03`, `BK-MF6-04`, `BK-MF6-05`, `BK-MF6-06`
 - BK implementado nesta execucao: `BK-MF6-06 - Validacao tecnica final por gate`
-- Raiz de implementacao: `real_dev`
-- Backend validado: `real_dev/backend`
-- Frontend validado para coerencia adjacente: `real_dev/frontend`
+- Raiz de implementacao: `referencia_privada_docente`
+- Backend validado: `referencia_privada_docente/backend`
+- Frontend validado para coerencia adjacente: `referencia_privada_docente/frontend`
 - Data local: `2026-06-22` (`Europe/Lisbon`)
 - Estado geral da MF6 ate ao BK atual: `IMPLEMENTADO`
 - Estado do `BK-MF6-06`: `IMPLEMENTADO`
@@ -24,10 +24,10 @@ O `BK-MF6-06` ficou implementado como evidence pack final em `docs/evidence/MF6/
 
 | BK | Estado final | Entrega |
 | --- | --- | --- |
-| `BK-MF6-01` | `IMPLEMENTADO` | Suite `node:test` em `real_dev/backend/tests/regression/mf6-backend-regression.test.js`, cobrindo autenticacao, checkout simulado, cancelamento de renovacao, playback, rotacao da pool solidaria e montagem/protecao de endpoints admin herdados da MF5. |
-| `BK-MF6-02` | `IMPLEMENTADO` | Script estatico em `real_dev/frontend/scripts/check-frontend-regression.mjs`, cobrindo rotas principais, paginas essenciais, `apiClient` com `credentials: "include"` e estados minimos de carregamento/erro/vazio; build Vite e negativos registados em evidence. |
-| `BK-MF6-03` | `IMPLEMENTADO` | Scanner `real_dev/backend/scripts/check-security-baseline.mjs`, revisao manual de auth/users/privacy/integrations/recommendations/logger/apiClient, evidence de backups/recuperacao e tres negativos controlados. |
-| `BK-MF6-04` | `IMPLEMENTADO` | Catalogo publico paginado com `page`, `limit`, `total` e `items`; medidor `real_dev/backend/scripts/measure-performance-baseline.mjs`; negativo HTTP `GET /api/catalog?limit=100 -> 400`; baseline real em `docs/evidence/MF6/BK-MF6-04-performance.md`. |
+| `BK-MF6-01` | `IMPLEMENTADO` | Suite `node:test` em `referencia_privada_docente/backend/tests/regression/mf6-backend-regression.test.js`, cobrindo autenticacao, checkout simulado, cancelamento de renovacao, playback, rotacao da pool solidaria e montagem/protecao de endpoints admin herdados da MF5. |
+| `BK-MF6-02` | `IMPLEMENTADO` | Script estatico em `referencia_privada_docente/frontend/scripts/check-frontend-regression.mjs`, cobrindo rotas principais, paginas essenciais, `apiClient` com `credentials: "include"` e estados minimos de carregamento/erro/vazio; build Vite e negativos registados em evidence. |
+| `BK-MF6-03` | `IMPLEMENTADO` | Scanner `referencia_privada_docente/backend/scripts/check-security-baseline.mjs`, revisao manual de auth/users/privacy/integrations/recommendations/logger/apiClient, evidence de backups/recuperacao e tres negativos controlados. |
+| `BK-MF6-04` | `IMPLEMENTADO` | Catalogo publico paginado com `page`, `limit`, `total` e `items`; medidor `referencia_privada_docente/backend/scripts/measure-performance-baseline.mjs`; negativo HTTP `GET /api/catalog?limit=100 -> 400`; baseline real em `docs/evidence/MF6/BK-MF6-04-performance.md`. |
 | `BK-MF6-05` | `IMPLEMENTADO` | `SkipLink`, `main#conteudo-principal`, CSS de foco, navegacao PT-PT, player com labels acessiveis, wrappers semanticos sem `main` aninhado e evidence `docs/evidence/MF6/BK-MF6-05-acessibilidade-ux.md`. |
 | `BK-MF6-06` | `IMPLEMENTADO` | Gate S12 em `docs/evidence/MF6/GATE-S12-MF6.md`, com matriz de validacao, comandos reais, negativos consolidados, riscos residuais, coerencia MF5/MF6/MF7 e handoff para MF7. |
 
@@ -45,17 +45,17 @@ Fora de escopo conforme prompt e BK:
 
 | BK | RF/RNF | Ficheiros principais | Validacao |
 | --- | --- | --- | --- |
-| `BK-MF6-01` | `RNF29` | `real_dev/backend/tests/regression/mf6-backend-regression.test.js` | `node --test tests/regression/mf6-backend-regression.test.js` passou com 6/6 depois de incluir o caso de catalogo paginado. |
-| `BK-MF6-02` | `RNF29`, `RNF05` auxiliar | `real_dev/frontend/scripts/check-frontend-regression.mjs`, `real_dev/frontend/src/routes/AppRoutes.jsx`, `real_dev/frontend/src/services/api/apiClient.js` | `node scripts/check-frontend-regression.mjs` passou e o build Vite passou. |
-| `BK-MF6-03` | `RNF14`, `RNF16`, `RNF17`, `RNF18`, `RNF19`, `RNF20`, `RNF37` | `real_dev/backend/scripts/check-security-baseline.mjs`, auth/users/privacy/integrations/recommendations/logger/apiClient | `node scripts/check-security-baseline.mjs` passou; suite backend fora da sandbox passou 49/49. |
-| `BK-MF6-04` | `RNF09` | `real_dev/backend/src/modules/catalog/catalog.validation.js`, `catalog.controller.js`, `catalog.service.js` | `GET /api/catalog?limit=100 -> 400` no smoke; `listPublishedCatalog({ page: "1", limit: "1" })` devolve 1 item e `total=2`; `limit=100` rejeitado. |
-| `BK-MF6-04` | `RNF09` | `real_dev/backend/src/modules/search/search.validation.js`, `search.service.js` | Pesquisa mantem paginacao e `GET /api/search?q=f -> 400` no smoke. |
-| `BK-MF6-04` | `RNF11`, `RNF37` | `real_dev/backend/src/modules/recommendations/recommendations.routes.js`, `recommendations.service.js` | `GET /api/recommendations/me -> 401` sem sessao no smoke; script exige `FAITHFLIX_SESSION_COOKIE` antes de medir recomendacoes autenticadas. |
-| `BK-MF6-04` | `RNF10`, `RNF12` | `real_dev/backend/scripts/measure-performance-baseline.mjs` | Script criado com `fetch` nativo, P95 de 20 pedidos concorrentes a `/health`, sem estado global novo nem dependencias. Baseline real passou com P95 de 7ms. |
-| `BK-MF6-04` | `RNF09`, `RNF11` | `real_dev/frontend/src/pages/CatalogPage.jsx`, `SearchPage.jsx`, `ForYouPage.jsx` | Revistos para compatibilidade: catalogo continua a consumir `response.items`; search e recomendacoes ja tinham loading/error/empty; `npm --prefix real_dev/frontend run build` passou. |
-| `BK-MF6-05` | `RNF01`, `RNF04` | `real_dev/frontend/src/components/a11y/SkipLink.jsx`, `real_dev/frontend/src/layouts/AppLayout.jsx`, `real_dev/frontend/src/styles/global.css` | Playwright confirmou primeiro foco no skip link e salto para `#conteudo-principal`; pesquisa estatica confirmou apenas um `main` no layout. |
-| `BK-MF6-05` | `RNF01`, `RNF02`, `RNF03` | `real_dev/frontend/src/components/layout/AppHeader.jsx`, paginas com wrappers semanticos, `global.css` | Header mantem rotas e textos PT-PT; Playwright validou renderizacao sem overflow a `390px`, `768px` e `1280px`; foco global preservado por `:focus-visible`. |
-| `BK-MF6-05` | `RNF04`, `RNF06` | `real_dev/frontend/src/pages/PlaybackPage.jsx`, `real_dev/frontend/src/components/ui/BaseButton.jsx`, `real_dev/frontend/src/components/auth/AuthForms.jsx` | Player preserva `controls`, `data-testid`, `role="group"`, labels `Áudio`/`Automática` e `aria-label`; `BaseButton` continua `<button disabled>`; textos criticos de autenticacao foram normalizados. |
+| `BK-MF6-01` | `RNF29` | `referencia_privada_docente/backend/tests/regression/mf6-backend-regression.test.js` | `node --test tests/regression/mf6-backend-regression.test.js` passou com 6/6 depois de incluir o caso de catalogo paginado. |
+| `BK-MF6-02` | `RNF29`, `RNF05` auxiliar | `referencia_privada_docente/frontend/scripts/check-frontend-regression.mjs`, `referencia_privada_docente/frontend/src/routes/AppRoutes.jsx`, `referencia_privada_docente/frontend/src/services/api/apiClient.js` | `node scripts/check-frontend-regression.mjs` passou e o build Vite passou. |
+| `BK-MF6-03` | `RNF14`, `RNF16`, `RNF17`, `RNF18`, `RNF19`, `RNF20`, `RNF37` | `referencia_privada_docente/backend/scripts/check-security-baseline.mjs`, auth/users/privacy/integrations/recommendations/logger/apiClient | `node scripts/check-security-baseline.mjs` passou; suite backend fora da sandbox passou 49/49. |
+| `BK-MF6-04` | `RNF09` | `referencia_privada_docente/backend/src/modules/catalog/catalog.validation.js`, `catalog.controller.js`, `catalog.service.js` | `GET /api/catalog?limit=100 -> 400` no smoke; `listPublishedCatalog({ page: "1", limit: "1" })` devolve 1 item e `total=2`; `limit=100` rejeitado. |
+| `BK-MF6-04` | `RNF09` | `referencia_privada_docente/backend/src/modules/search/search.validation.js`, `search.service.js` | Pesquisa mantem paginacao e `GET /api/search?q=f -> 400` no smoke. |
+| `BK-MF6-04` | `RNF11`, `RNF37` | `referencia_privada_docente/backend/src/modules/recommendations/recommendations.routes.js`, `recommendations.service.js` | `GET /api/recommendations/me -> 401` sem sessao no smoke; script exige `FAITHFLIX_SESSION_COOKIE` antes de medir recomendacoes autenticadas. |
+| `BK-MF6-04` | `RNF10`, `RNF12` | `referencia_privada_docente/backend/scripts/measure-performance-baseline.mjs` | Script criado com `fetch` nativo, P95 de 20 pedidos concorrentes a `/health`, sem estado global novo nem dependencias. Baseline real passou com P95 de 7ms. |
+| `BK-MF6-04` | `RNF09`, `RNF11` | `referencia_privada_docente/frontend/src/pages/CatalogPage.jsx`, `SearchPage.jsx`, `ForYouPage.jsx` | Revistos para compatibilidade: catalogo continua a consumir `response.items`; search e recomendacoes ja tinham loading/error/empty; `npm --prefix pasta_privada_do_professor/frontend run build` passou. |
+| `BK-MF6-05` | `RNF01`, `RNF04` | `referencia_privada_docente/frontend/src/components/a11y/SkipLink.jsx`, `referencia_privada_docente/frontend/src/layouts/AppLayout.jsx`, `referencia_privada_docente/frontend/src/styles/global.css` | Playwright confirmou primeiro foco no skip link e salto para `#conteudo-principal`; pesquisa estatica confirmou apenas um `main` no layout. |
+| `BK-MF6-05` | `RNF01`, `RNF02`, `RNF03` | `referencia_privada_docente/frontend/src/components/layout/AppHeader.jsx`, paginas com wrappers semanticos, `global.css` | Header mantem rotas e textos PT-PT; Playwright validou renderizacao sem overflow a `390px`, `768px` e `1280px`; foco global preservado por `:focus-visible`. |
+| `BK-MF6-05` | `RNF04`, `RNF06` | `referencia_privada_docente/frontend/src/pages/PlaybackPage.jsx`, `referencia_privada_docente/frontend/src/components/ui/BaseButton.jsx`, `referencia_privada_docente/frontend/src/components/auth/AuthForms.jsx` | Player preserva `controls`, `data-testid`, `role="group"`, labels `Áudio`/`Automática` e `aria-label`; `BaseButton` continua `<button disabled>`; textos criticos de autenticacao foram normalizados. |
 | `BK-MF6-06` | `transversal` | `docs/evidence/MF6/GATE-S12-MF6.md`, evidences `BK-MF6-01..05`, `scripts/validate-planificacao.sh` | Gate consolidado sem placeholders, com `git diff --check`, `validate-planificacao`, regressao backend, suite backend completa, smoke, hardening, performance, regressao frontend, build frontend e negativos consolidados. |
 
 ## Contratos consumidos
@@ -95,30 +95,30 @@ Fora de escopo conforme prompt e BK:
 
 Implementacao:
 
-- `real_dev/backend/src/modules/catalog/catalog.validation.js`
-- `real_dev/backend/src/modules/catalog/catalog.controller.js`
-- `real_dev/backend/src/modules/catalog/catalog.service.js`
-- `real_dev/backend/scripts/measure-performance-baseline.mjs`
-- `real_dev/backend/tests/unit/mf2-validation.test.js`
-- `real_dev/backend/tests/regression/mf6-backend-regression.test.js`
-- `real_dev/backend/tests/smoke/app.smoke.test.js`
-- `real_dev/frontend/src/components/a11y/SkipLink.jsx`
-- `real_dev/frontend/src/layouts/AppLayout.jsx`
-- `real_dev/frontend/src/styles/global.css`
-- `real_dev/frontend/src/components/layout/AppHeader.jsx`
-- `real_dev/frontend/src/pages/PlaybackPage.jsx`
-- `real_dev/frontend/src/pages/LoginPage.jsx`
-- `real_dev/frontend/src/components/auth/AuthForms.jsx`
-- `real_dev/frontend/src/components/ui/BaseButton.jsx`
-- `real_dev/frontend/scripts/check-frontend-regression.mjs`
-- `real_dev/frontend/src/pages/CharityApplicationPage.jsx`
-- `real_dev/frontend/src/pages/NotificationsPage.jsx`
-- `real_dev/frontend/src/pages/AdminCharityApplicationsPage.jsx`
-- `real_dev/frontend/src/pages/AdminPoolDashboardPage.jsx`
-- `real_dev/frontend/src/pages/SubscriptionPage.jsx`
-- `real_dev/frontend/src/pages/AdminPoolDistributionPage.jsx`
-- `real_dev/frontend/src/pages/CharityHistoryPage.jsx`
-- `real_dev/frontend/src/pages/AdminCharityMembersPage.jsx`
+- `referencia_privada_docente/backend/src/modules/catalog/catalog.validation.js`
+- `referencia_privada_docente/backend/src/modules/catalog/catalog.controller.js`
+- `referencia_privada_docente/backend/src/modules/catalog/catalog.service.js`
+- `referencia_privada_docente/backend/scripts/measure-performance-baseline.mjs`
+- `referencia_privada_docente/backend/tests/unit/mf2-validation.test.js`
+- `referencia_privada_docente/backend/tests/regression/mf6-backend-regression.test.js`
+- `referencia_privada_docente/backend/tests/smoke/app.smoke.test.js`
+- `referencia_privada_docente/frontend/src/components/a11y/SkipLink.jsx`
+- `referencia_privada_docente/frontend/src/layouts/AppLayout.jsx`
+- `referencia_privada_docente/frontend/src/styles/global.css`
+- `referencia_privada_docente/frontend/src/components/layout/AppHeader.jsx`
+- `referencia_privada_docente/frontend/src/pages/PlaybackPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/LoginPage.jsx`
+- `referencia_privada_docente/frontend/src/components/auth/AuthForms.jsx`
+- `referencia_privada_docente/frontend/src/components/ui/BaseButton.jsx`
+- `referencia_privada_docente/frontend/scripts/check-frontend-regression.mjs`
+- `referencia_privada_docente/frontend/src/pages/CharityApplicationPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/NotificationsPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/AdminCharityApplicationsPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/AdminPoolDashboardPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/SubscriptionPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/AdminPoolDistributionPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/CharityHistoryPage.jsx`
+- `referencia_privada_docente/frontend/src/pages/AdminCharityMembersPage.jsx`
 
 Relatorios/evidence tecnicos:
 
@@ -140,39 +140,39 @@ Relatorios/evidence tecnicos:
 | `node --test tests/unit/mf2-validation.test.js` | `PASS` | 7 testes, 7 pass, 0 fail. |
 | `node --test tests/regression/mf6-backend-regression.test.js` | `PASS` | 6 testes, 6 pass, 0 fail. |
 | `node scripts/measure-performance-baseline.mjs` | `PASS_NEGATIVO` | Falhou sem cookie com mensagem controlada: `Define FAITHFLIX_SESSION_COOKIE=faithflix_session=...`. |
-| `npm --prefix real_dev/backend run seed:e2e` na sandbox | `BLOQUEADO_AMBIENTE_HISTORICO` | DNS do MongoDB Atlas bloqueado na sandbox com `querySrv ECONNREFUSED`; repetido fora da sandbox com sucesso. |
-| `npm --prefix real_dev/backend run seed:e2e` fora da sandbox | `PASS` | Seed MF2 E2E concluido para `e2e@faithflix.test`. |
-| `npm --prefix real_dev/backend start` fora da sandbox | `PASS` | API arrancou em `127.0.0.1:3000`. |
+| `npm --prefix pasta_privada_do_professor/backend run seed:e2e` na sandbox | `BLOQUEADO_AMBIENTE_HISTORICO` | DNS do MongoDB Atlas bloqueado na sandbox com `querySrv ECONNREFUSED`; repetido fora da sandbox com sucesso. |
+| `npm --prefix pasta_privada_do_professor/backend run seed:e2e` fora da sandbox | `PASS` | Seed MF2 E2E concluido para `e2e@faithflix.test`. |
+| `npm --prefix pasta_privada_do_professor/backend start` fora da sandbox | `PASS` | API arrancou em `127.0.0.1:3000`. |
 | `POST /api/auth/login` fora da sandbox | `PASS` | HTTP 200 e cookie real guardado localmente sem registar o valor. |
 | `FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE=*** node scripts/measure-performance-baseline.mjs` fora da sandbox | `PASS` | `/health` 2ms, catalogo 38ms, pesquisa 159ms, recomendacoes 235ms e P95 concorrente 7ms. |
-| `npm --prefix real_dev/backend test` na sandbox | `BLOQUEADO_AMBIENTE` | 33 pass, 16 fail por `listen EPERM: operation not permitted 127.0.0.1`. |
-| `npm --prefix real_dev/backend test` fora da sandbox | `PASS` | 49 testes, 49 pass, 0 fail. |
-| `npm --prefix real_dev/backend run smoke` na sandbox | `BLOQUEADO_AMBIENTE` | 8 fail por `listen EPERM: operation not permitted 127.0.0.1`. |
-| `npm --prefix real_dev/backend run smoke` fora da sandbox | `PASS` | 8 testes, 8 pass, 0 fail, incluindo catalogo `limit=100 -> 400`. |
-| `npm --prefix real_dev/frontend run build` | `PASS` | Vite build passou; 100 modulos transformados; build em 456 ms. |
+| `npm --prefix pasta_privada_do_professor/backend test` na sandbox | `BLOQUEADO_AMBIENTE` | 33 pass, 16 fail por `listen EPERM: operation not permitted 127.0.0.1`. |
+| `npm --prefix pasta_privada_do_professor/backend test` fora da sandbox | `PASS` | 49 testes, 49 pass, 0 fail. |
+| `npm --prefix pasta_privada_do_professor/backend run smoke` na sandbox | `BLOQUEADO_AMBIENTE` | 8 fail por `listen EPERM: operation not permitted 127.0.0.1`. |
+| `npm --prefix pasta_privada_do_professor/backend run smoke` fora da sandbox | `PASS` | 8 testes, 8 pass, 0 fail, incluindo catalogo `limit=100 -> 400`. |
+| `npm --prefix pasta_privada_do_professor/frontend run build` | `PASS` | Vite build passou; 100 modulos transformados; build em 456 ms. |
 | `node scripts/check-security-baseline.mjs` | `PASS` | `Hardening MF6: PASS`. |
 | `node scripts/check-frontend-regression.mjs` | `PASS` | `Regressao frontend MF6: PASS`. |
-| `npm run build` em `real_dev/frontend` apos `BK-MF6-05` | `PASS` | Vite transformou 101 modulos e concluiu build em 537 ms. |
-| `node scripts/check-frontend-regression.mjs` em `real_dev/frontend` apos `BK-MF6-05` | `PASS` | Inclui contratos de `SkipLink`, `main`, navegacao PT-PT e player acessivel. |
-| `node --test tests/regression/mf6-backend-regression.test.js` em `real_dev/backend` para `BK-MF6-06` | `PASS` | 6 testes, 6 pass, 0 fail, `duration_ms 394.0315`. |
-| `npm test` em `real_dev/backend` para `BK-MF6-06` | `PASS` | Fora da sandbox: 49 testes, 49 pass, 0 fail, `duration_ms 451.821125`; dentro da sandbox falhou apenas por `listen EPERM`. |
-| `npm run smoke` em `real_dev/backend` para `BK-MF6-06` | `PASS` | Fora da sandbox: 8 testes, 8 pass, 0 fail, `duration_ms 237.024375`; dentro da sandbox falhou apenas por `listen EPERM`. |
-| `node scripts/check-security-baseline.mjs` em `real_dev/backend` para `BK-MF6-06` | `PASS` | `Hardening MF6: PASS`. |
-| `node scripts/measure-performance-baseline.mjs` em `real_dev/backend` sem cookie | `PASS_NEGATIVO` | Falhou controladamente com `Define FAITHFLIX_SESSION_COOKIE=faithflix_session=...`. |
-| `node scripts/check-frontend-regression.mjs` em `real_dev/frontend` para `BK-MF6-06` | `PASS` | `Regressao frontend MF6: PASS`. |
-| `npm run build` em `real_dev/frontend` para `BK-MF6-06` | `PASS` | Vite transformou 101 modulos e concluiu build em 544 ms. |
-| Pesquisa estatica obrigatoria de seguranca em `real_dev` para `BK-MF6-06` | `PASS_COM_NOTA` | Apenas falsos positivos defensivos: scanner, redacao/filtragem de chaves sensiveis, teste negativo `stripe_real` e validacao de integracoes. |
-| Pesquisa estatica de drift de dominio em `real_dev` para `BK-MF6-06` | `PASS` | Sem ocorrencias de `StudyFlow`, `OPSA`, `Orelle`, `companyId`, fiscalidade, biometria, turma, professor, sala ou disciplina. |
+| `npm run build` em `referencia_privada_docente/frontend` apos `BK-MF6-05` | `PASS` | Vite transformou 101 modulos e concluiu build em 537 ms. |
+| `node scripts/check-frontend-regression.mjs` em `referencia_privada_docente/frontend` apos `BK-MF6-05` | `PASS` | Inclui contratos de `SkipLink`, `main`, navegacao PT-PT e player acessivel. |
+| `node --test tests/regression/mf6-backend-regression.test.js` em `referencia_privada_docente/backend` para `BK-MF6-06` | `PASS` | 6 testes, 6 pass, 0 fail, `duration_ms 394.0315`. |
+| `npm test` em `referencia_privada_docente/backend` para `BK-MF6-06` | `PASS` | Fora da sandbox: 49 testes, 49 pass, 0 fail, `duration_ms 451.821125`; dentro da sandbox falhou apenas por `listen EPERM`. |
+| `npm run smoke` em `referencia_privada_docente/backend` para `BK-MF6-06` | `PASS` | Fora da sandbox: 8 testes, 8 pass, 0 fail, `duration_ms 237.024375`; dentro da sandbox falhou apenas por `listen EPERM`. |
+| `node scripts/check-security-baseline.mjs` em `referencia_privada_docente/backend` para `BK-MF6-06` | `PASS` | `Hardening MF6: PASS`. |
+| `node scripts/measure-performance-baseline.mjs` em `referencia_privada_docente/backend` sem cookie | `PASS_NEGATIVO` | Falhou controladamente com `Define FAITHFLIX_SESSION_COOKIE=faithflix_session=...`. |
+| `node scripts/check-frontend-regression.mjs` em `referencia_privada_docente/frontend` para `BK-MF6-06` | `PASS` | `Regressao frontend MF6: PASS`. |
+| `npm run build` em `referencia_privada_docente/frontend` para `BK-MF6-06` | `PASS` | Vite transformou 101 modulos e concluiu build em 544 ms. |
+| Pesquisa estatica obrigatoria de seguranca em `referencia_privada_docente` para `BK-MF6-06` | `PASS_COM_NOTA` | Apenas falsos positivos defensivos: scanner, redacao/filtragem de chaves sensiveis, teste negativo `stripe_real` e validacao de integracoes. |
+| Pesquisa estatica de drift de dominio em `referencia_privada_docente` para `BK-MF6-06` | `PASS` | Sem ocorrencias de `StudyFlow`, `OPSA`, `Orelle`, `companyId`, fiscalidade, biometria, turma, professor, sala ou disciplina. |
 | Pesquisa de marcadores de preenchimento pendentes em evidence/relatorios MF6 antes do gate | `PASS` | Sem ocorrencias. |
 | `npm run dev -- --host 127.0.0.1 --port 4175` na sandbox | `BLOQUEADO_AMBIENTE` | Falhou com `listen EPERM: operation not permitted 127.0.0.1:4175`. |
 | `npm run dev -- --host 127.0.0.1 --port 4175` fora da sandbox | `PASS` | Vite arrancou em `http://127.0.0.1:4175/`. |
 | `node /private/tmp/faithflix-verify-mf6-a11y.mjs` fora da sandbox | `PASS` | Playwright validou skip link, foco, `main`, navegacao, larguras 390/768/1280, formulario obrigatorio e labels do player. |
-| `rg -n "<main\\|</main>" real_dev/frontend/src/pages real_dev/frontend/src/components real_dev/frontend/src/layouts` | `PASS` | Apenas `AppLayout.jsx` contem `main#conteudo-principal`. |
-| Pesquisa estatica de seguranca em `real_dev` | `PASS_COM_NOTA` | Apenas falsos positivos defensivos: README anti-storage, teste `stripe_real`, listas de redacao/filtragem de `secret`, scanner e regra de integracoes contra segredos. |
-| Pesquisa de drift OPSA/Orelle/StudyFlow/etc. em `real_dev` | `PASS` | Sem ocorrencias. |
+| `rg -n "<main\\|</main>" referencia_privada_docente/frontend/src/pages referencia_privada_docente/frontend/src/components referencia_privada_docente/frontend/src/layouts` | `PASS` | Apenas `AppLayout.jsx` contem `main#conteudo-principal`. |
+| Pesquisa estatica de seguranca em `referencia_privada_docente` | `PASS_COM_NOTA` | Apenas falsos positivos defensivos: README anti-storage, teste `stripe_real`, listas de redacao/filtragem de `secret`, scanner e regra de integracoes contra segredos. |
+| Pesquisa de drift OPSA/Orelle/StudyFlow/etc. em `referencia_privada_docente` | `PASS` | Sem ocorrencias. |
 | `bash scripts/validate-planificacao.sh` | `PASS` | `checked_bks: 55`, `checked_guides: 55`, `errors: []`. |
 | `git diff --check` | `PASS` | Sem erros de whitespace em tracked diffs. |
-| `rg -n "[ \t]+$" real_dev/frontend/src docs/evidence/MF6/BK-MF6-05-acessibilidade-ux.md docs/planificacao/guias-bk/IMPLEMENTACAO-REAL_DEV-MF6.md` | `PASS` | Sem trailing whitespace nos ficheiros novos/alterados, incluindo artefactos untracked. |
+| `rg -n "[ \t]+$" referencia_privada_docente/frontend/src docs/evidence/MF6/BK-MF6-05-acessibilidade-ux.md docs/planificacao/guias-bk/IMPLEMENTACAO-REAL_DEV-MF6.md` | `PASS` | Sem trailing whitespace nos ficheiros novos/alterados, incluindo artefactos untracked. |
 
 ## Blockers e TODOs
 

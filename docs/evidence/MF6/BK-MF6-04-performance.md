@@ -4,26 +4,26 @@
 - Apoio: Mateus
 - Data: 2026-06-22 Europe/Lisbon
 - Requisitos: RNF09, RNF10, RNF11, RNF12
-- Ambiente: macOS local, Node.js v24.11.1, backend FaithFlix em `real_dev/backend`, frontend FaithFlix em `real_dev/frontend`
+- Ambiente: macOS local, Node.js v24.11.1, backend FaithFlix em `referencia_privada_docente/backend`, frontend FaithFlix em `referencia_privada_docente/frontend`
 - Estado da evidence: `PASS`
 
 ## Comandos executados
 
 | Comando | Resultado |
 | --- | --- |
-| `node --check scripts/measure-performance-baseline.mjs` em `real_dev/backend` | PASS |
-| `node scripts/measure-performance-baseline.mjs` em `real_dev/backend` sem cookie | PASS_NEGATIVO: falhou com mensagem controlada para definir `FAITHFLIX_SESSION_COOKIE` |
-| `npm --prefix real_dev/backend run seed:e2e` dentro da sandbox | BLOQUEADO_AMBIENTE_HISTORICO: DNS do MongoDB Atlas bloqueado com `querySrv ECONNREFUSED` |
-| `npm --prefix real_dev/backend run seed:e2e` fora da sandbox | PASS: seed MF2 E2E concluido para `e2e@faithflix.test` |
-| `npm --prefix real_dev/backend start` fora da sandbox | PASS: API arrancou em `127.0.0.1:3000` |
+| `node --check scripts/measure-performance-baseline.mjs` em `referencia_privada_docente/backend` | PASS |
+| `node scripts/measure-performance-baseline.mjs` em `referencia_privada_docente/backend` sem cookie | PASS_NEGATIVO: falhou com mensagem controlada para definir `FAITHFLIX_SESSION_COOKIE` |
+| `npm --prefix pasta_privada_do_professor/backend run seed:e2e` dentro da sandbox | BLOQUEADO_AMBIENTE_HISTORICO: DNS do MongoDB Atlas bloqueado com `querySrv ECONNREFUSED` |
+| `npm --prefix pasta_privada_do_professor/backend run seed:e2e` fora da sandbox | PASS: seed MF2 E2E concluido para `e2e@faithflix.test` |
+| `npm --prefix pasta_privada_do_professor/backend start` fora da sandbox | PASS: API arrancou em `127.0.0.1:3000` |
 | `POST /api/auth/login` com o utilizador E2E fora da sandbox | PASS: HTTP 200 e cookie guardado localmente sem registar o valor |
-| `FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE=*** node scripts/measure-performance-baseline.mjs` em `real_dev/backend` fora da sandbox | PASS: baseline real dentro dos limites |
-| `node --test tests/regression/mf6-backend-regression.test.js` em `real_dev/backend` | PASS: 6/6 |
-| `npm --prefix real_dev/backend run smoke` fora da sandbox | PASS: 8/8, incluindo `GET /api/catalog?limit=100 -> 400` |
-| `npm --prefix real_dev/backend test` fora da sandbox | PASS: 49/49 |
-| `node scripts/check-security-baseline.mjs` em `real_dev/backend` | PASS: `Hardening MF6: PASS` |
-| `node scripts/check-frontend-regression.mjs` em `real_dev/frontend` | PASS: `Regressao frontend MF6: PASS` |
-| `npm --prefix real_dev/frontend run build` | PASS: Vite build, 100 modulos transformados, 561 ms |
+| `FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE=*** node scripts/measure-performance-baseline.mjs` em `referencia_privada_docente/backend` fora da sandbox | PASS: baseline real dentro dos limites |
+| `node --test tests/regression/mf6-backend-regression.test.js` em `referencia_privada_docente/backend` | PASS: 6/6 |
+| `npm --prefix pasta_privada_do_professor/backend run smoke` fora da sandbox | PASS: 8/8, incluindo `GET /api/catalog?limit=100 -> 400` |
+| `npm --prefix pasta_privada_do_professor/backend test` fora da sandbox | PASS: 49/49 |
+| `node scripts/check-security-baseline.mjs` em `referencia_privada_docente/backend` | PASS: `Hardening MF6: PASS` |
+| `node scripts/check-frontend-regression.mjs` em `referencia_privada_docente/frontend` | PASS: `Regressao frontend MF6: PASS` |
+| `npm --prefix pasta_privada_do_professor/frontend run build` | PASS: Vite build, 100 modulos transformados, 561 ms |
 
 ## Baseline local
 

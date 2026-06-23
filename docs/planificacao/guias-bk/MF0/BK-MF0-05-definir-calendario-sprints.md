@@ -25,7 +25,7 @@ Este BK ensina que um calendário de sprints não é só uma tabela de datas: é
 
 ## Bloco operacional (obrigatorio)
 
-O trabalho operacional é validar `docs/planificacao/sprints/PLANO-SPRINTS.md`, garantindo que os 55 BK estão distribuídos por 12 sprints, com carga máxima controlada e gates claros.
+O trabalho operacional é validar `docs/planificacao/sprints/PLANO-SPRINTS.md`, garantindo que os 60 BK estão distribuídos por 12 sprints, com carga máxima controlada e gates claros.
 
 #### Nota anti-drift MF0
 
@@ -92,7 +92,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 
 #### O que vamos fazer neste BK (DERIVADO):
 
-- Confirmar que as 12 sprints cobrem os 55 BK.
+- Confirmar que as 12 sprints cobrem os 60 BK.
 - Confirmar que Sprint 1 contém `BK-MF0-01..06`, `BK-MF1-01` e `BK-MF1-02`.
 - Confirmar que cargas planeadas respeitam o limite `<= 11`.
 - Confirmar que os gates têm critérios de validação, não apenas datas.
@@ -151,10 +151,10 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
    - Descricao detalhada do objetivo: verificar que o calendário é derivado do backlog atómico.
    - Justificacao: não se planeia sprint com itens fora do backlog.
    - Como fazer (0.1): rever a dependência `BK-MF0-03`.
-   - Como fazer (0.2): confirmar que o plano de sprints menciona 55 BK.
+   - Como fazer (0.2): confirmar que o plano de sprints menciona 60 BK.
    - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
    - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `Planeamento alinhado ao backlog final de 55 BK`
+   - Snippet de referencia: `Planeamento alinhado ao backlog final de 60 BK`
    - O que verificar: calendário não contém BK fora do backlog.
 
 1. **Objetivo (~10 min): Validar capacidade recomendada**
