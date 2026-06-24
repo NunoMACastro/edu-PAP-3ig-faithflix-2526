@@ -6,6 +6,7 @@
  */
 
 import { Route, Routes } from "react-router-dom";
+import { AdminRoute } from "../components/auth/AdminRoute.jsx";
 import { AppLayout } from "../layouts/AppLayout.jsx";
 import { AccountPage } from "../pages/AccountPage.jsx";
 import { AdminCatalogPage } from "../pages/AdminCatalogPage.jsx";
@@ -31,6 +32,7 @@ import { SearchPage } from "../pages/SearchPage.jsx";
 import { SubscriptionPage } from "../pages/SubscriptionPage.jsx";
 import { NotFoundPage } from "../pages/pages.jsx";
 
+
 /**
  * Declara a árvore de rotas renderizada dentro do layout partilhado.
  *
@@ -54,14 +56,14 @@ export function AppRoutes() {
         <Route path="/biblioteca" element={<MyLibraryPage />} />
         <Route path="/notificacoes" element={<NotificationsPage />} />
         <Route path="/pesquisa" element={<SearchPage />} />
-        <Route path="/admin/catalogo" element={<AdminCatalogPage />} />
-        <Route path="/admin/utilizadores" element={<AdminUsersPage />} />
-        <Route path="/admin/metricas" element={<AdminMetricsPage />} />
-        <Route path="/admin/integracoes" element={<AdminIntegrationsPage />} />
-        <Route path="/admin/charity-applications" element={<AdminCharityApplicationsPage />} />
-        <Route path="/admin/pool/distribution" element={<AdminPoolDistributionPage />} />
-        <Route path="/admin/pool/dashboard" element={<AdminPoolDashboardPage />} />
-        <Route path="/admin/charity-members" element={<AdminCharityMembersPage />} />
+        <Route path="/admin/catalogo" element={withAdminRoute(<AdminCatalogPage />)} />
+        <Route path="/admin/utilizadores" element={withAdminRoute(<AdminUsersPage />)} />
+        <Route path="/admin/metricas" element={withAdminRoute(<AdminMetricsPage />)} />
+        <Route path="/admin/integracoes" element={withAdminRoute(<AdminIntegrationsPage />)} />
+        <Route path="/admin/charity-applications" element={withAdminRoute(<AdminCharityApplicationsPage />)} />
+        <Route path="/admin/pool/distribution" element={withAdminRoute(<AdminPoolDistributionPage />)} />
+        <Route path="/admin/pool/dashboard" element={withAdminRoute(<AdminPoolDashboardPage />)} />
+        <Route path="/admin/charity-members" element={withAdminRoute(<AdminCharityMembersPage />)} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AppLayout>

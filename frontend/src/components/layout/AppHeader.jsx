@@ -4,20 +4,21 @@
 
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/faithflix-logo.png";
+import { useSession } from "../../context/SessionContext.jsx";
 
 const navItems = [
-    { to: "/", label: "Início" },
-    { to: "/catalogo", label: "Catálogo" },
-    { to: "/biblioteca", label: "Biblioteca" },
-    { to: "/pesquisa", label: "Pesquisa" },
-    { to: "/para-si", label: "Para si" },
-    { to: "/associacoes", label: "Associações" },
-    { to: "/planos", label: "Planos" },
-    { to: "/conta", label: "Conta" },
-    { to: "/admin/catalogo", label: "Admin catálogo" },
-    { to: "/admin/utilizadores", label: "Admin utilizadores" },
-    { to: "/admin/metricas", label: "Métricas" },
-    { to: "/admin/integracoes", label: "Integrações" },
+  { to: "/", label: "Início", visibility: "public" },
+  { to: "/catalogo", label: "Catálogo", visibility: "public" },
+  { to: "/pesquisa", label: "Pesquisa", visibility: "public" },
+  { to: "/para-si", label: "Para si", visibility: "authenticated" },
+  { to: "/biblioteca", label: "Biblioteca", visibility: "authenticated" },
+  { to: "/associacoes", label: "Associações", visibility: "public" },
+  { to: "/planos", label: "Planos", visibility: "public" },
+  { to: "/conta", label: "Conta", visibility: "authenticated" },
+  { to: "/admin/catalogo", label: "Admin catálogo", visibility: "admin" },
+  { to: "/admin/utilizadores", label: "Admin utilizadores", visibility: "admin" },
+  { to: "/admin/metricas", label: "Métricas", visibility: "admin" },
+  { to: "/admin/integracoes", label: "Integrações", visibility: "admin" },
 ];
 
 /**
@@ -28,6 +29,20 @@ const navItems = [
  */
 function getNavLinkClassName({ isActive }) {
     return isActive ? "nav-link nav-link-active" : "nav-link";
+}
+
+/**
+ * Decide se um item pode aparecer para o perfil atual.
+ *
+ * @param {{ visibility: string }} item Item de navegação.
+ * @param {{ status: string, isAdmin: boolean }} session Estado de sessão.
+ * @returns {boolean} Verdadeiro quando o link deve ser visível.
+ */
+function canShowNavItem(item, session) {
+  if (item.visibility === "public") return true;
+  if (item.visibility === "authenticated") return session.status === "authenticated";
+  if (item.visibility === "admin") return session.isAdmin;
+  return false;
 }
 
 /**
@@ -55,23 +70,23 @@ function renderNavItem(item) {
  * @returns {JSX.Element} Cabeçalho visível em todas as páginas.
  */
 export function AppHeader() {
-    return (
-        <header className="app-header">
-            <NavLink
-                className="brand-link"
-                to="/"
-                aria-label="FaithFlix - início"
-            >
-                <span className="brand-mark" aria-hidden="true">
-                    <img className="brand-logo" src={logo} alt="" />
-                </span>
-                <span className="brand-name">FaithFlix</span>
-            </NavLink>
+    const session = useSession();
+    const visibleItems = navItems.filter((item) => canShowNavItem(item, session));
 
-            {/* A label da região ajuda leitores de ecrã a identificar a navegação principal. */}
-            <nav className="main-nav" aria-label="Navegação principal">
-                {navItems.map(renderNavItem)}
-            </nav>
-        </header>
-    );
+   return (
+    <header className="app-header">
+      <NavLink className="brand-link" to="/" aria-label="FaithFlix - início">
+        <span className="brand-mark" aria-hidden="true">F</span>
+        <span className="brand-name">FaithFlix</span>
+      </NavLink>
+
+      <nav className="main-nav" aria-label="Navegação principal">
+        {visibleItems.map((item) => (
+          <NavLink key={item.to} className={getNavLinkClassName} to={item.to}>
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+    </header>
+  );
 }
