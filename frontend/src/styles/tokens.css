@@ -1,30 +1,37 @@
 :root {
-    color-scheme: dark;
-    --color-bg: #141414;
-    --color-bg-deep: #0f0f0f;
-    --color-surface: #1f1f1f;
-    --color-surface-raised: #2a2a2a;
-    --color-text: #f9f7f3;
-    --color-text-soft: #e5e5e5;
-    --color-muted: #a0a0a0;
-    --color-brand: #8da385;
-    --color-brand-strong: #a3b89d;
-    --color-brand-hover: #7a8f74;
-    --color-accent: #f0cd95;
-    --color-accent-strong: #d9b87b;
-    --color-danger: #d16449;
-    --color-border: rgba(255, 255, 255, 0.1);
-    --color-focus: #f0cd95;
-    --shadow-soft: 0 18px 42px rgba(0, 0, 0, 0.35);
-    --shadow-raised: 0 22px 60px rgba(0, 0, 0, 0.45);
-    --radius-md: 8px;
-    --space-page: clamp(1rem, 4vw, 3rem);
-    font-family:
-        Inter,
-        ui-sans-serif,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
+  color-scheme: light;
+  --color-bg: #f9f7f3;
+  /* Estes tokens mantêm nomes já consumidos por footer, cards, hover e media. */
+  --color-bg-deep: #4b4b4b;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f4efe6;
+  --color-surface-raised: #ffffff;
+  --color-text: #3f3f3f;
+  --color-text-soft: #4b4b4b;
+  --color-muted: #676767;
+  --color-brand: #8da385;
+  --color-brand-strong: #667a60;
+  --color-brand-hover: #7a8f74;
+  --color-accent: #f0cd95;
+  --color-danger: #d16449;
+  --color-border: rgba(75, 75, 75, 0.16);
+  /* A cor de foco fica separada da marca para manter contraste claro no uso por teclado. */
+  --color-focus: #4f6fbd;
+  --shadow-soft: 0 14px 32px rgba(63, 63, 63, 0.1);
+  --shadow-card: 0 8px 24px rgba(63, 63, 63, 0.08);
+  --shadow-raised: 0 18px 42px rgba(63, 63, 63, 0.14);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --space-page: clamp(1rem, 4vw, 3rem);
+  /* A largura máxima evita linhas demasiado longas e grelhas dispersas em ecrãs grandes. */
+  --content-width: 1160px;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
