@@ -1,5 +1,5 @@
 /**
- * @file Ficheiro `real_dev/frontend/src/pages/DiscoveryHomePage.jsx` da implementação real_dev.
+ * @file Página inicial de descoberta FaithFlix.
  */
 
 import { useEffect, useState } from "react";
@@ -9,56 +9,73 @@ import { ApiStatusBadge } from "../components/system/ApiStatusBadge.jsx";
 import { discoveryApi } from "../services/api/discoveryApi.js";
 
 /**
- * Página inicial orientada à descoberta da MF3.
+ * Mostra a entrada principal da plataforma e os carrosséis de descoberta.
  *
- * @returns {JSX.Element} Página inicial de descoberta.
+ * @returns {JSX.Element} Página inicial da aplicação.
  */
 export function DiscoveryHomePage() {
-    const [carousels, setCarousels] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+  const [carousels, setCarousels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    useEffect(() => {
-        discoveryApi
-            .home()
-            .then((response) => setCarousels(response.carousels))
-            .catch((requestError) => setError(requestError.message))
-            .finally(() => setLoading(false));
-    }, []);
+  useEffect(() => {
+    let ignore = false;
 
-    return (
-        <section className="page-section">
-            <section className="hero-section">
-                <div className="hero-copy">
-                    <p className="section-kicker">
-                        Streaming cristao com descoberta curada
-                    </p>
-                    <h1>FaithFlix</h1>
-                    <p>
-                        Pesquisa, ratings, comentarios, relacionados e
-                        recomendacao baseline trabalham sobre conteudos
-                        publicados.
-                    </p>
-                    <div className="button-row">
-                        <Link className="button-link" to="/pesquisa">
-                            Pesquisar
-                        </Link>
-                        <Link className="button-link" to="/para-si">
-                            Para si
-                        </Link>
-                    </div>
-                </div>
-                <ApiStatusBadge />
-            </section>
-            {loading ? <p>A carregar descoberta...</p> : null}
-            {error ? <p role="alert">{error}</p> : null}
-            {carousels.map((carousel) => (
-                <DiscoveryCarousel
-                    key={carousel.id}
-                    title={carousel.title}
-                    items={carousel.items}
-                />
-            ))}
-        </section>
-    );
+    async function loadDiscovery() {
+      try {
+        const response = await discoveryApi.home();
+
+        if (!ignore) {
+          setCarousels(response.carousels);
+        }
+      } catch (requestError) {
+        if (!ignore) {
+          setError(requestError.message);
+        }
+      } finally {
+        // A flag evita atualizar estado se o componente sair do ecrã durante o pedido.
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadDiscovery();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  return (
+    <section className="page-section">
+      <section className="hero-section" aria-labelledby="home-title">
+        <div className="hero-copy">
+          <p className="section-kicker">Streaming cristão curado</p>
+          <h1 id="home-title">FaithFlix</h1>
+          <p>
+            Conteúdos, pesquisa, recomendações simples e impacto solidário numa
+            experiência preparada para desktop, tablet e telemóvel.
+          </p>
+          <div className="button-row">
+            <Link className="button-link" to="/catalogo">Explorar catálogo</Link>
+            <Link className="button-link" to="/planos">Ver planos</Link>
+          </div>
+        </div>
+        {/* O badge confirma saúde da API sem interromper o fluxo visual do hero. */}
+        <ApiStatusBadge />
+      </section>
+
+      {loading ? <p role="status">A carregar descoberta...</p> : null}
+      {error ? <p role="alert">{error}</p> : null}
+
+      {carousels.map((carousel) => (
+        <DiscoveryCarousel
+          key={carousel.id}
+          title={carousel.title}
+          items={carousel.items}
+        />
+      ))}
+    </section>
+  );
 }
