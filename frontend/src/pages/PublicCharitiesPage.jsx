@@ -1,11 +1,11 @@
 /**
  * @file Página pública de associações apoiadas.
- *
- * Mostra apenas dados públicos das associações elegíveis para a pool solidária.
  */
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { ContentCard } from "../components/ui/ContentCard.jsx";
+import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
@@ -20,11 +20,36 @@ export function PublicCharitiesPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    charitiesApi
-      .listPublicCharities()
-      .then((response) => setCharities(response.charities))
-      .catch((requestError) => setError(toUserMessage(requestError)))
-      .finally(() => setLoading(false));
+    let active = true;
+
+    /**
+     * Carrega apenas associações públicas elegíveis.
+     *
+     * @returns {Promise<void>} Termina depois de atualizar a lista.
+     */
+    async function loadCharities() {
+      try {
+        const response = await charitiesApi.listPublicCharities();
+
+        if (active) {
+          setCharities(response.charities);
+        }
+      } catch (requestError) {
+        if (active) {
+          setError(toUserMessage(requestError));
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadCharities();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -36,28 +61,29 @@ export function PublicCharitiesPage() {
           Candidatar associação
         </Link>
       </div>
-      {loading ? <p>A carregar associações...</p> : null}
-      {error ? <p role="alert">{error}</p> : null}
-      {!loading && charities.length === 0 ? (
-        <p>Ainda não existem associações públicas.</p>
+
+      {loading ? <p role="status">A carregar associações...</p> : null}
+      {error ? <EmptyState title="Não foi possível carregar associações" description={error} tone="error" /> : null}
+      {!loading && !error && charities.length === 0 ? (
+        <EmptyState
+          title="Ainda não existem associações públicas"
+          description="Quando existirem associações aprovadas e públicas, aparecem nesta lista."
+        />
       ) : null}
-      <div className="card-grid">
+
+      <section className="content-grid" aria-label="Associações públicas">
         {charities.map((charity) => (
-          <article className="content-card" key={charity.id}>
-            <h2>{charity.name}</h2>
-            <p>{charity.mission}</p>
-            {charity.websiteUrl ? (
-              <a href={charity.websiteUrl}>{charity.websiteUrl}</a>
-            ) : null}
-            <Link
-              className="button-link"
-              to={`/associacoes/${charity.id}/historico`}
-            >
-              Histórico privado
-            </Link>
-          </article>
+          <ContentCard
+            key={charity.id}
+            eyebrow="Associação"
+            title={charity.name}
+            description={charity.mission}
+            meta={charity.websiteUrl}
+            to={`/associacoes/${charity.id}/historico`}
+            actionLabel="Ver histórico"
+          />
         ))}
-      </div>
+      </section>
     </section>
   );
 }

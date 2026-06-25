@@ -1,28 +1,28 @@
 /**
- * @file Ficheiro `real_dev/frontend/src/components/ui/EmptyState.jsx` da implementação real_dev.
+ * @file Estado vazio reutilizável para listas, erros, sucessos e permissões.
  */
 
 import { useId } from "react";
 
 /**
- * Estado vazio reutilizável para páginas cujas funcionalidades chegam em BKs posteriores.
+ * Mostra uma mensagem clara quando a página não tem dados úteis para listar.
  *
- * @param {{ title: string, description: string, children?: React.ReactNode }} props - Propriedades do estado vazio.
- * @param {string} props.title - Título do estado vazio.
- * @param {string} props.description - Explicação apresentada ao utilizador.
- * @param {React.ReactNode} [props.children] - Área opcional de ação.
- * @returns {JSX.Element} Secção acessível de estado vazio.
+ * @param {{ title: string, description: string, children?: React.ReactNode, tone?: "neutral" | "error" | "success" }} props Propriedades do estado.
+ * @param {string} props.title Título curto do estado.
+ * @param {string} props.description Explicação orientada para o utilizador.
+ * @param {React.ReactNode} [props.children] Ações opcionais, como links ou botões.
+ * @param {"neutral" | "error" | "success"} [props.tone="neutral"] Tom visual do estado.
+ * @returns {JSX.Element} Secção acessível de estado.
  */
-export function EmptyState({ title, description, children }) {
-    const headingId = useId();
+export function EmptyState({ title, description, children, tone = "neutral" }) {
+  const headingId = useId();
 
-    return (
-        <section className="empty-state" aria-labelledby={headingId}>
-            <h2 id={headingId}>{title}</h2>
-            <p>{description}</p>
-            {children ? (
-                <div className="empty-state-actions">{children}</div>
-            ) : null}
-        </section>
-    );
+  return (
+    // O ID liga o título à secção para leitores de ecrã identificarem o estado.
+    <section className={`empty-state empty-state-${tone}`} aria-labelledby={headingId}>
+      <h2 id={headingId}>{title}</h2>
+      <p>{description}</p>
+      {children ? <div className="empty-state-actions">{children}</div> : null}
+    </section>
+  );
 }
