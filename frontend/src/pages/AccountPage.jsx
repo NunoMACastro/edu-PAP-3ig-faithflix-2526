@@ -1,5 +1,5 @@
 /**
- * @file Ficheiro `real_dev/frontend/src/pages/AccountPage.jsx` da implementação real_dev.
+ * @file Página de conta autenticada com perfil, controlo parental e privacidade.
  */
 
 import { useEffect, useState } from "react";
@@ -8,138 +8,156 @@ import { PrivacyDangerZone } from "../components/privacy/PrivacyDangerZone.jsx";
 import { PrivacyExportPanel } from "../components/privacy/PrivacyExportPanel.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { userApi } from "../services/api/userApi.js";
+import { toUserMessage } from "../services/api/apiErrors.js";
 
 /**
- * Authenticated account page with profile and parental settings.
+ * Mostra e atualiza dados da conta autenticada.
  *
  * @returns {JSX.Element} Página de conta.
  */
 export function AccountPage() {
-    const [name, setName] = useState("");
-    const [parentalMaxAgeRating, setParentalMaxAgeRating] = useState(18);
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [status, setStatus] = useState("");
-    const [error, setError] = useState("");
+  const [name, setName] = useState("");
+  const [parentalMaxAgeRating, setParentalMaxAgeRating] = useState(18);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
 
-    useEffect(() => {
-        userApi
-            .getMe()
-            .then((response) => {
-                setUser(response.user);
-                setName(response.user.name);
-                setParentalMaxAgeRating(response.user.parentalMaxAgeRating);
-            })
-            .catch((requestError) => setError(requestError.message))
-            .finally(() => setLoading(false));
-    }, []);
+  useEffect(() => {
+    let active = true;
 
     /**
-     * Documenta `handleProfileSubmit`, mantendo explícita a responsabilidade desta função no módulo.
+     * Carrega a conta do utilizador autenticado.
      *
-     * @param {unknown} event Valor recebido por `handleProfileSubmit`.
-     * @returns {Promise<unknown>} Resultado devolvido por `handleProfileSubmit`.
+     * @returns {Promise<void>} Termina depois de preencher formulário e resumo.
      */
-    async function handleProfileSubmit(event) {
-        event.preventDefault();
-        setStatus("");
-        setError("");
+    async function loadAccount() {
+      try {
+        const response = await userApi.getMe();
 
-        try {
-            const response = await userApi.updateMe({ name });
-            setUser(response.user);
-            setStatus("Perfil atualizado.");
-        } catch (requestError) {
-            setError(requestError.message);
+        if (active) {
+          setUser(response.user);
+          setName(response.user.name);
+          setParentalMaxAgeRating(response.user.parentalMaxAgeRating);
         }
-    }
-
-    /**
-     * Documenta `handleParentalSubmit`, mantendo explícita a responsabilidade desta função no módulo.
-     *
-     * @param {unknown} event Valor recebido por `handleParentalSubmit`.
-     * @returns {Promise<unknown>} Resultado devolvido por `handleParentalSubmit`.
-     */
-    async function handleParentalSubmit(event) {
-        event.preventDefault();
-        setStatus("");
-        setError("");
-
-        try {
-            const response = await userApi.updateParental(
-                Number(parentalMaxAgeRating),
-            );
-            setUser(response.user);
-            setStatus("Controlo parental atualizado.");
-        } catch (requestError) {
-            setError(requestError.message);
+      } catch (requestError) {
+        if (active) {
+          setError(toUserMessage(requestError));
         }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
     }
 
-    if (loading) {
-        return (
-            <section className="page-section">
-                <p>A carregar conta...</p>
-            </section>
-        );
-    }
+    loadAccount();
 
-    if (!user) {
-        return (
-            <section className="page-section narrow-section">
-                <p className="section-kicker">Conta</p>
-                <h1>A minha conta</h1>
-                {error ? <p role="alert">{error}</p> : null}
-                <EmptyState
-                    title="Conta indisponivel"
-                    description="Inicia sessao novamente para veres e atualizares os teus dados."
-                />
-            </section>
-        );
-    }
+    return () => {
+      active = false;
+    };
+  }, []);
 
+  /**
+   * Guarda nome público do utilizador autenticado.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} event Evento do formulário.
+   * @returns {Promise<void>} Termina quando a API responde.
+   */
+  async function handleProfileSubmit(event) {
+    event.preventDefault();
+    setStatus("");
+    setError("");
+
+    try {
+      // A rota usa a sessão atual; a UI não envia userId nem tenta alterar outra conta.
+      const response = await userApi.updateMe({ name });
+      setUser(response.user);
+      setStatus("Perfil atualizado.");
+    } catch (requestError) {
+      setError(toUserMessage(requestError));
+    }
+  }
+
+  /**
+   * Guarda limite parental da conta autenticada.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} event Evento do formulário.
+   * @returns {Promise<void>} Termina quando a API responde.
+   */
+  async function handleParentalSubmit(event) {
+    event.preventDefault();
+    setStatus("");
+    setError("");
+
+    try {
+      const response = await userApi.updateParental(Number(parentalMaxAgeRating));
+      setUser(response.user);
+      setStatus("Controlo parental atualizado.");
+    } catch (requestError) {
+      setError(toUserMessage(requestError));
+    }
+  }
+
+  if (loading) {
     return (
-        <section className="page-section narrow-section">
-            <p className="section-kicker">Conta</p>
-            <h1>A minha conta</h1>
-            {error ? <p role="alert">{error}</p> : null}
-            {status ? <p role="status">{status}</p> : null}
-            <form className="form-panel" onSubmit={handleProfileSubmit}>
-                <label>
-                    Nome
-                    <input
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                    />
-                </label>
-                <button type="submit">Guardar perfil</button>
-            </form>
-            <form className="form-panel" onSubmit={handleParentalSubmit}>
-                <label>
-                    Limite parental
-                    <input
-                        min="0"
-                        max="18"
-                        type="number"
-                        value={parentalMaxAgeRating}
-                        onChange={(event) =>
-                            setParentalMaxAgeRating(event.target.value)
-                        }
-                    />
-                </label>
-                <button type="submit">Guardar limite</button>
-            </form>
-            {user ? (
-                <dl className="meta-list">
-                    <dt>Email</dt>
-                    <dd>{user.email}</dd>
-                    <dt>Role</dt>
-                    <dd>{user.role}</dd>
-                </dl>
-            ) : null}
-            <PrivacyExportPanel />
-            <PrivacyConsentsPanel />
-            <PrivacyDangerZone />
-        </section>
+      <section className="page-section narrow-section">
+        <p role="status">A carregar conta...</p>
+      </section>
     );
+  }
+
+  if (!user) {
+    return (
+      <section className="page-section narrow-section">
+        <p className="section-kicker">Conta</p>
+        <h1>A minha conta</h1>
+        {error ? <EmptyState title="Conta indisponível" description={error} tone="error" /> : null}
+      </section>
+    );
+  }
+
+  return (
+    <section className="page-section narrow-section">
+      <p className="section-kicker">Conta</p>
+      <h1>A minha conta</h1>
+      {error ? <EmptyState title="Não foi possível atualizar a conta" description={error} tone="error" /> : null}
+      {status ? <EmptyState title="Alteração guardada" description={status} tone="success" /> : null}
+
+      <form className="form-panel" onSubmit={handleProfileSubmit}>
+        <h2>Perfil</h2>
+        <label>
+          Nome
+          <input value={name} onChange={(event) => setName(event.target.value)} />
+        </label>
+        <button type="submit">Guardar perfil</button>
+      </form>
+
+      <form className="form-panel" onSubmit={handleParentalSubmit}>
+        <h2>Controlo parental</h2>
+        <label>
+          Limite parental
+          <input
+            min="0"
+            max="18"
+            type="number"
+            value={parentalMaxAgeRating}
+            onChange={(event) => setParentalMaxAgeRating(event.target.value)}
+          />
+        </label>
+        <button type="submit">Guardar limite</button>
+      </form>
+
+      <dl className="meta-list">
+        <dt>Email</dt>
+        <dd>{user.email}</dd>
+        <dt>Papel</dt>
+        <dd>{user.role}</dd>
+      </dl>
+
+      <PrivacyExportPanel />
+      <PrivacyConsentsPanel />
+      <PrivacyDangerZone />
+    </section>
+  );
 }
