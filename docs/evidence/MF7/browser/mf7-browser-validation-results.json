@@ -1,0 +1,93 @@
+{
+  "generatedAt": "2026-06-25T19:28:33.396Z",
+  "results": [
+    {
+      "id": "mf7-mobile-390-anonymous-home",
+      "profile": "anonymous",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "http://127.0.0.1:4176/",
+      "description": "Visitante em mobile: hero visível e sem links admin.",
+      "screenshot": "mf7-mobile-390-anonymous-home.png",
+      "check": {
+        "h1": "FaithFlix",
+        "navText": "Início\nCatálogo\nPesquisa\nAssociações\nPlanos",
+        "heroColor": "rgb(255, 250, 242)",
+        "ok": true
+      }
+    },
+    {
+      "id": "mf7-tablet-768-user-admin-denied",
+      "profile": "user",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "url": "http://127.0.0.1:4176/admin/metricas",
+      "description": "User comum em tablet: rota admin bloqueada visualmente.",
+      "screenshot": "mf7-tablet-768-user-admin-denied.png",
+      "check": {
+        "bodyExcerpt": "Saltar para o conteúdo principal\nFaithFlix\nInício\nCatálogo\nPesquisa\nAssociações\nPlanos\nPara si\nBiblioteca\nConta\n\nNão tem permissão para aceder a esta área.\n\nFaithFlix PAP 2025/2026\nConteúdo, comunidade e impacto solidário.",
+        "ok": true
+      }
+    },
+    {
+      "id": "mf7-desktop-1366-moderator-catalog",
+      "profile": "moderator",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "url": "http://127.0.0.1:4176/admin/catalogo",
+      "description": "Moderator em desktop: acede ao catálogo admin, sem link de utilizadores.",
+      "screenshot": "mf7-desktop-1366-moderator-catalog.png",
+      "check": {
+        "h1": "Gestão de catálogo",
+        "navText": "Início\nCatálogo\nPesquisa\nAssociações\nPlanos\nPara si\nBiblioteca\nConta\nAdmin catálogo",
+        "ok": true
+      }
+    },
+    {
+      "id": "mf7-desktop-1440-admin-home",
+      "profile": "admin",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "http://127.0.0.1:4176/",
+      "description": "Admin em desktop largo: hero e links admin esperados.",
+      "screenshot": "mf7-desktop-1440-admin-home.png",
+      "check": {
+        "h1": "FaithFlix",
+        "navText": "Início\nCatálogo\nPesquisa\nAssociações\nPlanos\nPara si\nBiblioteca\nConta\nAdmin catálogo\nAdmin utilizadores\nMétricas\nIntegrações",
+        "ok": true
+      }
+    },
+    {
+      "id": "mf7-keyboard-skip-link",
+      "profile": "anonymous",
+      "viewport": {
+        "width": 1280,
+        "height": 820
+      },
+      "url": "http://127.0.0.1:4176/",
+      "description": "Teclado: Tab foca o skip link e Enter move foco para o main.",
+      "screenshot": "mf7-keyboard-skip-link.png",
+      "check": {
+        "focusedBeforeEnter": {
+          "className": "skip-link",
+          "text": "Saltar para o conteúdo principal",
+          "top": 12,
+          "transform": "matrix(1, 0, 0, 1, 0, 0)"
+        },
+        "focusedAfterEnter": {
+          "id": "conteudo-principal",
+          "hash": "#conteudo-principal"
+        },
+        "ok": true
+      }
+    }
+  ]
+}
