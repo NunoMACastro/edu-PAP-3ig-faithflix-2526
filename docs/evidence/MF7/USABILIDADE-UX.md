@@ -4,44 +4,14 @@
 
 - BK: BK-MF7-04
 - Owner: Davi
-<<<<<<< HEAD
-- Fonte: RNF01, RNF02, RNF03, RNF05, RNF38, RNF40
-- Decisão: EM_REVISAO
-=======
 - Data: 2026-06-25
 - Fonte: RNF01, RNF02, RNF03, RNF05, RNF38, RNF40
 - Decisão: PASS_COM_RISCOS
->>>>>>> dc94538 (Update: MF8)
 
 ## Matriz por página
 
 | Página | Loading | Erro | Vazio | Lista/sucesso | Mobile 390px | Tablet 768px | Desktop | Estado |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-<<<<<<< HEAD
-| Catálogo | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher |
-| Pesquisa | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher |
-| Para si | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher |
-| Biblioteca | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher |
-| Planos | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher |
-| Associações | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher |
-| Conta | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher | A preencher |
-
-## Negativos
-
-- Erro da API não expõe detalhe técnico sensível:
-- Lista vazia não aparece sem explicação:
-- Mobile não cria scroll horizontal:
-- Mensagens estão em português de Portugal:
-- Datas e valores usam formato europeu:
-- Pagamento continua identificado como simulado:
-
-## Handoff para BK-MF7-05
-
-- Páginas prontas para gate:
-- Páginas com ressalvas:
-- Riscos bloqueantes:
-- Evidência reutilizável no gate:
-=======
 | Catálogo | `role="status"` | `EmptyState tone="error"` | `Ainda não existem conteúdos publicados` | `ContentCard` com imagem, tipo, título e detalhe | CSS usa grid fluida | CSS usa grid fluida | Largura `--content-width` | PASS_COM_RISCOS |
 | Pesquisa | `role="status"` | `EmptyState tone="error"` | Sugere retirar filtros ou procurar outro termo | `ContentCard` com metadados de taxonomia | CSS usa grid fluida | CSS usa grid fluida | Largura controlada | PASS_COM_RISCOS |
 | Para si | `role="status"` | `EmptyState tone="error"` | Cold start explicado sem IA opaca | Carrosséis com explicação baseline | CSS herdado dos carrosséis | CSS herdado dos carrosséis | Largura controlada | PASS_COM_RISCOS |
@@ -94,4 +64,3 @@ Validação de teclado: o fluxo `Tab` -> skip link -> `Enter` -> `main#conteudo-
 - Resultado: `CORRIGIDO`
 - Evidência: `frontend/src/components/search/SearchFilters.jsx` corrigido para PT-PT nos filtros de pesquisa.
 - Validação: build no package frontend, pesquisa textual do finding e `git diff --check`.
->>>>>>> dc94538 (Update: MF8)

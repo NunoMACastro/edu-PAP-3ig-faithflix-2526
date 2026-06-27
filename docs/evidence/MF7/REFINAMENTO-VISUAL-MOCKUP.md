@@ -4,36 +4,14 @@
 
 - BK: BK-MF7-03
 - Owner: Mateus
-<<<<<<< HEAD
-- Fonte: RNF01, RNF02, RNF03, RNF04, RNF28, RNF38
-- Decisão: EM_REVISAO
-=======
 - Data: 2026-06-25
 - Fonte: RNF01, RNF02, RNF03, RNF04, RNF28, RNF38
 - Decisão: PASS_COM_RISCOS
->>>>>>> dc94538 (Update: MF8)
 
 ## Verificações
 
 | Área | Resultado esperado | Resultado observado | Estado |
 | --- | --- | --- | --- |
-<<<<<<< HEAD
-| Tokens | Paleta base usa variáveis CSS | A preencher | A preencher |
-| Header desktop | Links legíveis e filtrados por perfil | A preencher | A preencher |
-| Header mobile | Sem sobreposição nem scroll horizontal | A preencher | A preencher |
-| Hero | Marca, descrição e CTAs claros | A preencher | A preencher |
-| Foco teclado | Outline visível em links e botões | A preencher | A preencher |
-| Hover/active | Feedback visual sem deslocar layout | A preencher | A preencher |
-| Disabled | Botões bloqueados ficam reconhecíveis | A preencher | A preencher |
-| PT-PT | Texto visível com acentuação correta | A preencher | A preencher |
-
-## Handoff para BK-MF7-04
-
-- Tokens prontos:
-- Classes reutilizáveis:
-- Páginas com maior risco visual:
-- Estados de UI a uniformizar:
-=======
 | Tokens | Paleta base usa variáveis CSS | `tokens.css` define paleta clara, superfícies, texto, texto inverso para fundos escuros, foco, sombras, raios e largura máxima reutilizável. | PASS |
 | Header desktop | Links legíveis e filtrados por perfil | `AppHeader` filtra por sessão/roles e `global.css` usa header sticky com fundo sólido e wrap. | PASS |
 | Header mobile | Sem sobreposição nem scroll horizontal | CSS troca para coluna em viewport estreita e a navegação usa `flex-wrap` sem `overflow-x`. | PASS_COM_RISCOS |
@@ -78,4 +56,3 @@ Decisao operacional: `PASS_COM_RISCOS`, nao por falta de screenshots ou prova de
 
 - Existem screenshots browser representativos para mobile, tablet, desktop e teclado; a ressalva restante e revisao humana completa de UX antes da defesa final.
 - A auditoria de `BK-MF7-03` detetou contraste insuficiente no hero/footer; a correcao passou a usar tokens de texto inverso e removeu o hover destrutivo hardcoded.
->>>>>>> dc94538 (Update: MF8)

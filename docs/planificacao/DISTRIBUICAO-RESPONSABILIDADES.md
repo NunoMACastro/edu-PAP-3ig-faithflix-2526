@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-13`
+- `last_updated`: `2026-06-27`
 
 ## Objetivo
 
@@ -55,6 +55,7 @@ Distribuir responsabilidades de forma equilibrada entre os 4 alunos e separar cl
 | Admin panel e operacao             | Kaue            | Mateus          | Nuno         |
 | RGPD e privacidade                 | Matheus         | Kaue            | Nuno         |
 | Testes e hardening                 | Kaue            | todos           | Nuno         |
+| Readiness operacional e auditoria final | Matheus     | Davi, Kaue      | Nuno         |
 
 ## Matriz por artefacto
 
@@ -67,6 +68,8 @@ Distribuir responsabilidades de forma equilibrada entre os 4 alunos e separar cl
 | Observabilidade e metricas tecnicas     | Davi    | Kaue    |
 | Evidencias de sprint e cobertura RF/RNF | Kaue    | todos   |
 | Quality gate final                      | Nuno    | todos   |
+| Readiness operacional MF8                | Matheus | Davi    |
+| Auditoria administrativa final MF8       | Matheus | Kaue    |
 
 ## Cerimonias
 
@@ -131,10 +134,11 @@ Distribuir responsabilidades de forma equilibrada entre os 4 alunos e separar cl
 ### Preparacao PAP
 
 - orientar consolidacao de evidencias;
-- orientar roteiro de demonstracao;
+- orientar scope freeze, riscos finais e matriz final;
 - orientar treino de defesa tecnica.
 
 ## Changelog
 
 - `2026-04-11`: versao revista para equipa de 4 alunos e papel de orientacao do Nuno.
 - `2026-04-13`: adicionados handoff semanal de BK P0 e pairing semanal obrigatorio (60-90 min).
+- `2026-06-27`: adicionadas responsabilidades MF8 de readiness operacional e auditoria administrativa final ao Matheus.

@@ -25,7 +25,7 @@ Este BK ensina que um calendário de sprints não é só uma tabela de datas: é
 
 ## Bloco operacional (obrigatorio)
 
-O trabalho operacional é validar `docs/planificacao/sprints/PLANO-SPRINTS.md`, garantindo que os 60 BK estão distribuídos por 12 sprints, com carga máxima controlada e gates claros.
+O trabalho operacional é validar `docs/planificacao/sprints/PLANO-SPRINTS.md`, garantindo que os 60 BK estão distribuídos por 12 sprints, com carga controlada, excecao S12 documentada e gates claros.
 
 #### Nota anti-drift MF0
 

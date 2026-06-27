@@ -1,74 +1,43 @@
-# Reestruturacao MF7/MF8 - FaithFlix
+# Reestruturacao MF7/MF8 - baseline final
 
-## Resumo da mudanca
+## Header
 
-- MF7 passa a ser Refinamento de UI e navegacao segura.
-- MF8 passa a concentrar consolidacao, evidencia, defesa, buffer e fecho.
-- A cadeia final passa de 55 para 60 BKs.
-- A fase antiga de evidencias/defesa foi movida semanticamente para o inicio da nova MF8.
-- A fase antiga de buffer/fecho continua na MF8, depois de evidencia e defesa.
+- `doc_id`: `REESTRUTURACAO-MF7-MF8`
+- `area`: `planificacao`
+- `owner`: `Nuno (orientacao)`
+- `status`: `ativo`
+- `last_updated`: `2026-06-27`
 
-## Tabela old -> new
+## Decisao atual
 
-| Origem | Destino | Titulo |
-| --- | --- | --- |
-| novo | BK-MF7-01 | Inventario UI vs mockup e plano de refinamento |
-| novo | BK-MF7-02 | Navegacao segura por sessao e perfil |
-| novo | BK-MF7-03 | Layout, tokens e header alinhados ao mockup |
-| novo | BK-MF7-04 | Refinamento das paginas principais e estados de UX |
-| novo | BK-MF7-05 | Gate visual, responsividade e navegacao segura |
-| antigo BK-MF7-01 | BK-MF8-01 | Matriz de cobertura RF -> evidencia |
-| antigo BK-MF7-02 | BK-MF8-02 | Matriz de cobertura RNF -> validacao |
-| antigo BK-MF7-03 | BK-MF8-03 | Roteiro de demo final |
-| antigo BK-MF7-04 | BK-MF8-04 | Ensaio tecnico da defesa |
-| antigo BK-MF7-05 | BK-MF8-05 | Avaliacao final e feedback orientador |
-| antigo BK-MF8-01 | BK-MF8-06 | Lista de riscos residuais |
-| antigo BK-MF8-02 | BK-MF8-07 | Correcao de bugs bloqueantes |
-| antigo BK-MF8-03 | BK-MF8-08 | Scope freeze final |
-| antigo BK-MF8-04 | BK-MF8-09 | Empacotamento final de entrega |
-| antigo BK-MF8-05 | BK-MF8-10 | Retro final e licoes aprendidas |
+A baseline final fica em `60 BK / 60 guias`. A MF7 mantem o fecho visual e de navegacao segura; a MF8 fica condensada para 10 BKs praticos, sem os antigos BKs documentais de defesa/pacote como itens formais.
 
-## Ficheiros alterados
+## MF8 final
 
-- docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md
-- docs/planificacao/backlogs/BACKLOG-MVP.md
-- docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md
-- docs/planificacao/backlogs/CONTRATO-CAMPOS-BK.md
-- docs/planificacao/backlogs/MF-VIEWS.md
-- docs/planificacao/backlogs/ANEXO-BK-SPRINT-OWNER.md
-- docs/planificacao/sprints/PLANO-SPRINTS.md
-- docs/planificacao/sprints/SCORECARD-SPRINTS.md
-- docs/planificacao/guias-bk/MF7/*.md
-- docs/planificacao/guias-bk/MF8/*.md
-- docs/evidence/MF7/README.md
-- docs/evidence/MF8/README.md
+| BK | Titulo | Owner | Dependencia |
+| --- | --- | --- | --- |
+| `BK-MF8-01` | Alinhamento visual parte I | Matheus | `BK-MF7-05` |
+| `BK-MF8-02` | Alinhamento visual parte II | Matheus | `BK-MF8-01` |
+| `BK-MF8-03` | Criacao de testes finais da aplicacao | Matheus | `BK-MF8-02` |
+| `BK-MF8-04` | Painel de readiness | Matheus | `BK-MF8-03` |
+| `BK-MF8-05` | Auditoria administrativa final | Matheus | `BK-MF8-04` |
+| `BK-MF8-06` | Matriz final | Kaue | `BK-MF8-05` |
+| `BK-MF8-07` | Lista de riscos totais | Kaue | `BK-MF8-06` |
+| `BK-MF8-08` | Execucao de testes e report de erros | Davi | `BK-MF8-07` |
+| `BK-MF8-09` | Correcao de erros do report anterior | Kaue | `BK-MF8-08` |
+| `BK-MF8-10` | Scope Freeze | Kaue | `BK-MF8-09` |
 
-## Decisoes canonicas
-- MF7 é refinamento de UI e navegação segura.
-- MF8 concentra evidências finais e defesa.
-- discrepâncias de links admin e perfil bloqueiam antes de discrepâncias estéticas.
-- Mantem-se 12 sprints.
-- Mantem-se limite de 11 pontos por sprint.
-- BK-MF5-04 foi antecipado para S08 para abrir capacidade nas sprints finais.
-- BK-MF6-03..05 foram antecipados para S10.
-- S11 fecha gate tecnico, MF7 e BK-MF8-01.
-- S12 concentra BK-MF8-02..10.
-- Cadeia obrigatoria: BK-MF7-05 -> BK-MF8-01 -> BK-MF8-02 -> BK-MF8-03 -> BK-MF8-04 -> BK-MF8-05 -> BK-MF8-06 -> BK-MF8-07 -> BK-MF8-08 -> BK-MF8-09 -> BK-MF8-10.
+## Racional
 
-## Riscos
+1. O frontend real e aproximado do mockup em duas partes.
+2. Os testes finais sao criados e organizados antes de serem executados.
+3. Readiness e auditoria administrativa fecham a prova operacional.
+4. A matriz final vem depois do trabalho tecnico.
+5. A lista de riscos passa a cobrir todos os riscos, nao apenas residuais.
+6. O report de erros e corrigido ou classificado antes do scope freeze.
 
-- S11 e S12 ficam no limite de 11 pontos e exigem checkpoint docente rigoroso.
-- BK-MF7-02 e critico; se a navegacao segura falhar, a UI nao deve passar a MF8.
-- BK-MF8-07 nao pode virar fase de novas features; deve limitar-se a bugs bloqueantes aprovados.
+## Implicacoes
 
-## Validacoes executadas
-
-- `git diff --check`: PASS, sem whitespace errors.
-- `bash scripts/validate-planificacao.sh`: PASS, 60 BKs e 60 guias verificados, 0 erros.
-- Pesquisa estatica de caminhos privados em `docs/planificacao docs/evidence`: PASS, sem ocorrencias.
-- Pesquisa estatica de descricoes antigas de MF7 como fase principal de evidencias: PASS, sem ocorrencias nos termos obrigatorios.
-- Pesquisa estatica da nova cadeia: PASS, encontrou `BK-MF7-05`, `BK-MF8-09`, `BK-MF8-10`, `NAVEGACAO-SEGURA` e `GATE-UI` nos documentos de planificacao.
-
-## Pendencias
-
-- Sem pendencias canonicas conhecidas antes das validacoes finais.
+- Documentos canonicos devem apontar apenas para `BK-MF8-01` a `BK-MF8-10`.
+- Guias MF8 removidos da estrutura formal podem ser reaproveitados como notas internas, mas nao contam para backlog, matriz, sprints ou scorecards.
+- Student-facing docs nao devem expor caminhos privados de implementacao.

@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-22`
+- `last_updated`: `2026-06-27`
 
 ## Objetivo
 
@@ -57,7 +57,7 @@ Campos obrigatorios por sprint:
 | S09 | - | - | - | - | - | 10 | - | - | Verde | - |
 | S10 | - | - | - | - | - | 10 | - | - | Verde | - |
 | S11 | - | - | - | - | - | 11 | - | - | Verde | - |
-| S12 | - | - | - | - | - | 11 | - | - | Verde | - |
+| S12 | - | - | - | - | - | 15 | - | - | Amarelo | Checkpoint docente reforcado para a cadeia pratica final da MF8 |
 
 ## Regras de semaforo
 
@@ -77,3 +77,4 @@ Campos obrigatorios por sprint:
 - `2026-04-17`: cargas planeadas sincronizadas com `PLANO-SPRINTS.md` e com a soma real de pontos dos BK por sprint.
 
 - `2026-06-22`: cargas S08..S12 sincronizadas com reestruturacao MF7/MF8.
+- `2026-06-27`: S12 mantida a 15 pontos e sincronizada com a MF8 final de 10 BKs.

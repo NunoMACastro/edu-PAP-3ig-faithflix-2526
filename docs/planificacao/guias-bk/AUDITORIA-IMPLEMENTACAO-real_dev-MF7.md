@@ -71,7 +71,7 @@ Fora de scope:
 - `docs/planificacao/guias-bk/MF7/BK-MF7-03-layout-tokens-header-alinhados-mockup.md`
 - `docs/planificacao/guias-bk/MF7/BK-MF7-04-refinamento-paginas-principais-estados-ux.md`
 - `docs/planificacao/guias-bk/MF7/BK-MF7-05-gate-visual-responsividade-navegacao-segura.md`
-- `docs/planificacao/guias-bk/MF8/BK-MF8-01-matriz-de-cobertura-rf-evidencia.md`
+- `docs/planificacao/guias-bk/MF8/BK-MF8-01-alinhamento-visual-parte-i.md`
 - `docs/evidence/MF6/GATE-S12-MF6.md`
 - `docs/evidence/MF7/INVENTARIO-UI-MOCKUP.md`
 - `docs/evidence/MF7/NAVEGACAO-SEGURA-POR-PERFIL.md`

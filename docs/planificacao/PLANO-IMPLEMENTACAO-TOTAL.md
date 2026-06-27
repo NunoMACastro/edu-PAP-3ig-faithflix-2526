@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-22`
+- `last_updated`: `2026-06-27`
 
 ## Objetivo
 
@@ -47,7 +47,7 @@ Traduzir os requisitos ativos (`RF` e `RNF`) num plano executavel para 4 alunos,
 | `MF5` | Operacao e privacidade | `RF55..RF60` |
 | `MF6` | Hardening | `RNF` criticos de qualidade/performance/seguranca |
 | `MF7` | Refinamento de UI e navegacao segura | inventario UI/mockup, sessao/role, layout, paginas e gate visual |
-| `MF8` | Consolidacao, evidencia, defesa, buffer e fecho | matrizes RF/RNF, demo, ensaio, avaliacao, riscos, bugs, freeze, entrega e retro |
+| `MF8` | Consolidacao, evidencia, readiness, auditoria, defesa, buffer e fecho | alinhamento visual mockup/frontend, testes finais, readiness, auditoria admin, matriz final, riscos totais, report de erros, correcao e scope freeze |
 
 ### Nota anti-drift sobre `MF0`
 
@@ -103,3 +103,4 @@ A fundacao tecnica com ficheiros, comandos, estrutura de projeto e decisoes impl
 - `2026-05-25`: adicionada nota anti-drift para explicitar que `MF0` e governance/kickoff e que a fundacao tecnica comeca em `MF1`.
 
 - `2026-06-22`: MF7 passou a UI/navegacao segura e MF8 passou a consolidacao, evidencia, defesa, buffer e fecho.
+- `2026-06-27`: MF8 condensada para 10 BKs finais, com matriz final apenas depois dos BKs tecnicos.

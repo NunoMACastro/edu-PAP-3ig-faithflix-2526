@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-06-27`
 
 ## Objetivo
 
@@ -61,7 +61,8 @@ Consolidar a manutencao dos guias BK apos cobertura total (`60/60`), garantindo 
 ## Changelog
 
 - `2026-04-12`: roadmap inicial dos BKs em falta (fase de criacao).
-- `2026-04-13`: roadmap atualizado para fase pos-cobertura total (`60/60`) com foco em manutencao, evidencias e fecho de gates.
+- `2026-04-13`: roadmap atualizado para fase pos-cobertura total, com foco em manutencao, evidencias e fecho de gates.
 - `2026-04-17`: roadmap atualizado para baseline final do MVP (`60/60`) apos rebaseline de escopo.
 
 - `2026-06-22`: roadmap atualizado para nova cadeia MF7/MF8.
+- `2026-06-27`: roadmap atualizado para `60/60` guias apos condensacao final da MF8 em 10 BKs.

@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-22`
+- `last_updated`: `2026-06-27`
 
 ## Objetivo
 
@@ -135,14 +135,9 @@ Estes BKs sao obrigatorios para governance, refinamento final, defesa e fecho.
 | `BK-MF6-06` | `MF6` | Nuno | `P0` | Gate tecnico final antes da MF7 |
 | `BK-MF7-01` | `MF7` | Mateus | `P0` | Inventario UI/mockup e plano de refinamento |
 | `BK-MF7-05` | `MF7` | Nuno | `P0` | Gate visual, responsividade e navegacao segura |
-| `BK-MF8-03` | `MF8` | Mateus | `P1` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
-| `BK-MF8-04` | `MF8` | Matheus | `P1` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
-| `BK-MF8-05` | `MF8` | Nuno | `P0` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
-| `BK-MF8-06` | `MF8` | Kaue | `P0` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
-| `BK-MF8-07` | `MF8` | Matheus | `P0` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
-| `BK-MF8-08` | `MF8` | Nuno | `P0` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
-| `BK-MF8-09` | `MF8` | Kaue | `P1` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
-| `BK-MF8-10` | `MF8` | Nuno | `P1` | Consolidacao/defesa/buffer/fecho com evidence `pr/proof/neg` |
+| `BK-MF8-07` | `MF8` | Kaue | `P0` | Lista completa de riscos tecnicos, produto, UX, seguranca, dados, demonstracao e manutencao |
+| `BK-MF8-09` | `MF8` | Kaue | `P0` | Correcao ou classificacao dos erros do report anterior |
+| `BK-MF8-10` | `MF8` | Kaue | `P0` | Scope freeze e checklist final de entrega |
 
 ## BKs com requisito direto cobertos como mapeamento secundario
 
@@ -155,16 +150,21 @@ Estes BKs partilham requisitos com outros BKs de base tecnica e, por isso, entra
 | `BK-MF7-02` | `MF7` | `RF02, RF04, RNF13, RNF15, RNF16, RNF19` | Matheus | Validar navegacao segura por sessao/role, mantendo backend como autoridade |
 | `BK-MF7-03` | `MF7` | `RNF01, RNF02, RNF03, RNF04, RNF28, RNF38` | Mateus | Validar layout, tokens, header e hero alinhados ao mockup |
 | `BK-MF7-04` | `MF7` | `RNF01, RNF02, RNF03, RNF05, RNF38, RNF40` | Davi | Validar paginas principais, estados vazios e PT-PT |
-| `BK-MF8-01` | `MF8` | `RF_ATIVOS_MVP` | Kaue | Validar no gate S12 com matriz RF->evidencia + `pr/proof/neg` |
-| `BK-MF8-02` | `MF8` | `RNF21, RNF22, RNF23, RNF24, RNF25, RNF26, RNF32, RNF33, RNF35, RNF36, RNF38, RNF39, RNF40` | Davi | Validar no gate S12 com matriz RNF->validacao + `pr/proof/neg` |
+| `BK-MF8-01` | `MF8` | `RNF01, RNF02, RNF03, RNF04, RNF28, RNF38` | Matheus | Validar alinhamento visual parte I: tokens, cores, tipografia, espacos, header/nav e hero/home |
+| `BK-MF8-02` | `MF8` | `RNF01, RNF02, RNF03, RNF05, RNF21, RNF22, RNF38, RNF40` | Matheus | Validar alinhamento visual parte II: catalogo, cards, planos, estados, responsividade e acessibilidade visual |
+| `BK-MF8-03` | `MF8` | `RNF29` | Matheus | Validar criacao/organizacao dos testes finais antes da execucao consolidada |
+| `BK-MF8-04` | `MF8` | `RNF30, RNF31, RNF32, RNF33` | Matheus | Validar painel/mecanismo de readiness com decisao GO/GO_COM_RESSALVAS/NO_GO |
+| `BK-MF8-05` | `MF8` | `RNF19, RNF30` | Matheus | Validar auditoria administrativa final, permissoes, rotas protegidas e exposicao indevida |
+| `BK-MF8-06` | `MF8` | `RF_ATIVOS_MVP` | Kaue | Validar matriz final RF/RNF depois dos BKs tecnicos, readiness e auditoria |
+| `BK-MF8-08` | `MF8` | `RNF29, RNF21, RNF22` | Davi | Validar execucao dos testes automaticos, manuais e visuais com report de erros |
 
 ## Validacoes estruturais
 
 - Requisitos mapeados: `91/91`.
-- BKs com requisito direto (primario + secundario): `45`.
-- BKs transversais registados em secao propria: `20`.
+- BKs com requisito direto (primario + secundario): `48`.
+- BKs transversais registados em secao propria: `12`.
 - BKs totais visiveis no artefacto (requisito de cobertura): `60/60`.
-- IDs BK reestruturados em MF7/MF8 conforme baseline de 60 BK, sem alterar requisitos ativos.
+- IDs BK reestruturados em MF8 conforme baseline de 60 BK, sem alterar requisitos ativos.
 
 ## Changelog
 
@@ -174,3 +174,4 @@ Estes BKs partilham requisitos com outros BKs de base tecnica e, por isso, entra
 - `2026-05-31`: revista apos correcao de dependencias em `BACKLOG-MVP.md`; cobertura requisito -> BK mantida sem alteracoes.
 
 - `2026-06-22`: atualizada matriz para nova MF7/MF8.
+- `2026-06-27`: MF8 atualizada para 10 BKs finais, com matriz final depois de alinhamento, testes, readiness e auditoria.

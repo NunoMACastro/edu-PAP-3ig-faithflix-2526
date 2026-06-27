@@ -7,11 +7,11 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-22`
+- `last_updated`: `2026-06-27`
 
 ## Objetivo
 
-Definir cadencia semanal para transformar backlog em entregas incrementais com 4 alunos, mantendo `12 sprints` e reduzindo picos de carga para `<=11` pontos.
+Definir cadencia semanal para transformar backlog em entregas incrementais com 4 alunos, mantendo `12 sprints` e registando explicitamente a excecao de carga da sprint final.
 
 ## Baseline de escopo MVP (aplicada em 2026-04-17)
 
@@ -52,9 +52,9 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 | `Sprint 9`  | RGPD e admin operacional          | `BK-MF5-01..03`, `BK-MF5-05..06`          | `10`       |
 | `Sprint 10` | Regressao + hardening antecipado  | `BK-MF6-01..05`                           | `10`       |
 | `Sprint 11` | Gate tecnico + UI segura          | `BK-MF6-06`, `BK-MF7-01..05`, `BK-MF8-01` | `11`       |
-| `Sprint 12` | Defesa + buffer + fecho           | `BK-MF8-02..10`                           | `11`       |
+| `Sprint 12` | Alinhamento final, testes, readiness e freeze | `BK-MF8-02..10`                           | `15`       |
 
-> Regra operacional: nenhuma sprint pode ultrapassar `11` pontos.
+> Regra operacional: nenhuma sprint regular deve ultrapassar `11` pontos. A `Sprint 12` fica como excecao aprovada de fecho, com `15` pontos, porque concentra o alinhamento visual final, testes, readiness, auditoria, matriz, riscos, report, correcao e freeze.
 
 ## Ordem interna obrigatoria nas sprints com dependencias criticas
 
@@ -70,7 +70,7 @@ Mesmo quando varios BK aparecem na mesma sprint, a ordem abaixo deve ser respeit
 | `Sprint 9` | `BK-MF5-01` -> `BK-MF5-02`; `BK-MF5-03` em paralelo; `BK-MF5-05` e `BK-MF5-06` depois de `BK-MF5-04` | RGPD e paineis admin dependem de sessao/roles e admin base. |
 | `Sprint 10` | `BK-MF6-01` e `BK-MF6-02` -> `BK-MF6-03`, `BK-MF6-04`, `BK-MF6-05` | Hardening pode avancar na mesma sprint depois das suites de regressao. |
 | `Sprint 11` | `BK-MF6-06` -> `BK-MF7-01` -> `BK-MF7-02` -> `BK-MF7-03` -> `BK-MF7-04` -> `BK-MF7-05` -> `BK-MF8-01` | UI segura so abre depois do gate tecnico; matriz RF ja pode iniciar apos gate MF7. |
-| `Sprint 12` | `BK-MF8-02` -> `BK-MF8-03` -> `BK-MF8-04` -> `BK-MF8-05` -> `BK-MF8-06` -> `BK-MF8-07` -> `BK-MF8-08` -> `BK-MF8-09` -> `BK-MF8-10` | A defesa fecha antes de riscos, bugs, freeze, pacote e retro terminal. |
+| `Sprint 12` | `BK-MF8-02` -> `BK-MF8-03` -> `BK-MF8-04` -> `BK-MF8-05` -> `BK-MF8-06` -> `BK-MF8-07` -> `BK-MF8-08` -> `BK-MF8-09` -> `BK-MF8-10` | Alinhamento visual parte II fecha antes de testes, readiness, auditoria, matriz, riscos, report de erros, correcao e scope freeze. |
 
 PRs de BK dependentes so devem ser integrados depois do PR da dependencia estar merged ou, em alternativa, depois de existir branch de integracao validada pelo owner tecnico.
 
@@ -139,7 +139,7 @@ Remediacao minima:
 2. Surgindo blocker critico, cortar `P2` no mesmo sprint.
 3. Se cair capacidade, priorizar estabilidade sobre volume.
 4. Scope cuts finais sao decididos por Nuno em gate.
-5. Sempre que uma sprint exceder `11` pontos, redistribuir BK para sprint seguinte no mesmo macro-bloco.
+5. Sempre que uma sprint exceder a carga aprovada, redistribuir BK para sprint seguinte no mesmo macro-bloco; a excecao `S12=15` exige checkpoint docente reforcado.
 
 ## Gates obrigatorios de conformidade (S4/S8/S12)
 
@@ -196,3 +196,4 @@ Remediacao minima:
 - `2026-04-17`: recalibrada carga planeada das sprints `S06` e `S10` para coincidir com a soma de pontos dos BKs alocados.
 
 - `2026-06-22`: redistribuidas S08..S12 para 60 BK mantendo limite de 11 pontos.
+- `2026-06-27`: S12 atualizada para `BK-MF8-02..10`, com excecao de 15 pontos para incluir alinhamento final, testes, readiness, auditoria, matriz, riscos, report, correcao e freeze.

@@ -257,7 +257,7 @@ Registar a decisão final e preparar `BK-MF8-01`.
 
 2. Ficheiros envolvidos:
     - EDITAR: `docs/evidence/MF7/GATE-UI-NAVEGACAO-SEGURA.md`
-    - REVER: `docs/planificacao/guias-bk/MF8/BK-MF8-01-matriz-de-cobertura-rf-evidencia.md`
+    - REVER: `docs/planificacao/guias-bk/MF8/BK-MF8-01-alinhamento-visual-parte-i.md`
     - LOCALIZAÇÃO: decisão final e handoff.
 
 3. Instruções do que fazer.
@@ -267,7 +267,7 @@ Preenche:
 - decisão final;
 - riscos aceites;
 - riscos bloqueantes;
-- evidence que deve alimentar a matriz RF;
+- evidence que deve alimentar o alinhamento visual parte I da MF8;
 - assinatura do owner do gate.
 
 4. Código completo, correto e integrado com a app final.
@@ -276,7 +276,7 @@ Sem código neste passo. Este passo fecha a decisão documental.
 
 5. Explicação do código.
 
-O handoff garante que a MF8 começa com provas organizadas, sem repetir validação visual da MF7.
+O handoff garante que a MF8 começa com provas visuais organizadas, sem repetir validação visual da MF7.
 
 6. Validação do passo.
 

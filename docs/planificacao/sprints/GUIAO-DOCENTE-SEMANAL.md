@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-04-17`
+- `last_updated`: `2026-06-27`
 
 ## Objetivo
 
@@ -61,7 +61,7 @@ Dar ao orientador um guiao semanal simples e executavel para controlo de sprint,
 ## Checklist de remediacao rapida
 
 - [ ] Blockers com owner e prazo definidos.
-- [ ] BKs replaneados sem ultrapassar 11 pontos na sprint.
+- [ ] BKs replaneados sem ultrapassar a carga aprovada da sprint; em S12, validar explicitamente a excecao de 15 pontos da MF8 final.
 - [ ] Guias atualizados com handoff claro para proximo BK.
 - [ ] Scorecard e checklist de gate alinhados.
 
@@ -75,3 +75,4 @@ Dar ao orientador um guiao semanal simples e executavel para controlo de sprint,
 
 - `2026-04-14`: criado guiao docente semanal com checkpoints e remediacao objetiva.
 - `2026-04-17`: alinhado ao rebaseline de escopo MVP sem referencias residuais a itens fora de escopo.
+- `2026-06-27`: salvaguarda S12 atualizada para a MF8 final de 10 BKs e 15 pontos.

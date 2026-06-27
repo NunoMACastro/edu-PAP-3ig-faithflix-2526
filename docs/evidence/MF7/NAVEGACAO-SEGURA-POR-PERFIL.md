@@ -4,10 +4,6 @@
 
 - BK: BK-MF7-02
 - Owner: Matheus
-<<<<<<< HEAD
-- Fonte: RF02, RF04, RNF13, RNF15, RNF16, RNF19
-- Decisão: EM_REVISAO
-=======
 - Data: 2026-06-25
 - Fonte: RF02, RF04, RNF13, RNF15, RNF16, RNF19
 - Decisão: PASS_COM_RISCOS
@@ -24,29 +20,11 @@
 | Header admin | Links administrativos só aparecem quando `hasRole(...)` permite a role; catálogo preserva `admin` e `moderator`, restantes links usam `admin`. | PASS |
 | Rotas admin | Todas as rotas `/admin/*` passam por `AdminRoute`. | PASS |
 | Backend como autoridade | `backend/src/modules/auth/auth.middleware.js` mantém `requireRole`; o frontend não substitui 401/403 do backend. | PASS |
->>>>>>> dc94538 (Update: MF8)
 
 ## Verificações
 
 | Perfil | Ação | Resultado esperado | Resultado observado | Estado |
 | --- | --- | --- | --- | --- |
-<<<<<<< HEAD
-| Visitante | Abrir header | Não vê links admin | A preencher | A preencher |
-| Visitante | Abrir /admin/metricas | Redireciona para /login | A preencher | A preencher |
-| Utilizador comum | Abrir header | Não vê links admin | A preencher | A preencher |
-| Utilizador comum | Abrir /admin/metricas | Mostra aviso de permissão | A preencher | A preencher |
-| Admin | Abrir header | Vê links admin | A preencher | A preencher |
-| Admin | Abrir /admin/metricas | Vê página de métricas | A preencher | A preencher |
-| Backend | Chamar rota admin sem sessão | 401 | A preencher | A preencher |
-| Backend | Chamar rota admin como user | 403 | A preencher | A preencher |
-
-## Handoff para BK-MF7-03
-
-- Header filtrado por sessão:
-- Links públicos confirmados:
-- Links admin confirmados:
-- Riscos visuais que passam para tokens/layout:
-=======
 | Visitante | Abrir header | Não vê links admin | Header filtra por `visibility`/`roles`; visitante não cumpre `authenticated`. | PASS |
 | Visitante | Abrir `/admin/metricas` | Redireciona para `/login` | `AdminRoute` devolve `<Navigate to="/login" replace />` quando `status === "anonymous"`. | PASS |
 | Utilizador comum | Abrir header | Não vê links admin | `hasRole(["admin"])` falha para `user`; links admin não entram em `visibleItems`. | PASS |
@@ -75,4 +53,3 @@
 ## Ressalvas
 
 - Não foram executados screenshots autenticados reais com contas `user`, `admin` e `moderator`; o gate usa prova estática + build/regressão e recomenda confirmação visual manual antes da defesa.
->>>>>>> dc94538 (Update: MF8)

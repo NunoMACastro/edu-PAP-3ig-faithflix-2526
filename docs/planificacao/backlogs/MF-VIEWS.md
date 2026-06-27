@@ -304,7 +304,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 ---
 
-## MF8 - Consolidacao, evidencia, defesa, buffer e fecho
+## MF8 - Fecho pratico, testes, readiness, matriz, riscos e scope freeze
 
 ### Sequencia
 
@@ -321,33 +321,33 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 ### Guias disponiveis
 
-- `BK-MF8-01`: `../guias-bk/MF8/BK-MF8-01-matriz-de-cobertura-rf-evidencia.md`
-- `BK-MF8-02`: `../guias-bk/MF8/BK-MF8-02-matriz-de-cobertura-rnf-validacao.md`
-- `BK-MF8-03`: `../guias-bk/MF8/BK-MF8-03-roteiro-de-demo-final.md`
-- `BK-MF8-04`: `../guias-bk/MF8/BK-MF8-04-ensaio-tecnico-da-defesa.md`
-- `BK-MF8-05`: `../guias-bk/MF8/BK-MF8-05-avaliacao-final-e-feedback-orientador.md`
-- `BK-MF8-06`: `../guias-bk/MF8/BK-MF8-06-lista-de-riscos-residuais.md`
-- `BK-MF8-07`: `../guias-bk/MF8/BK-MF8-07-correcao-de-bugs-bloqueantes.md`
-- `BK-MF8-08`: `../guias-bk/MF8/BK-MF8-08-scope-freeze-final.md`
-- `BK-MF8-09`: `../guias-bk/MF8/BK-MF8-09-empacotamento-final-de-entrega.md`
-- `BK-MF8-10`: `../guias-bk/MF8/BK-MF8-10-retro-final-e-licoes-aprendidas.md`
+- `BK-MF8-01`: `../guias-bk/MF8/BK-MF8-01-alinhamento-visual-parte-i.md`
+- `BK-MF8-02`: `../guias-bk/MF8/BK-MF8-02-alinhamento-visual-parte-ii.md`
+- `BK-MF8-03`: `../guias-bk/MF8/BK-MF8-03-criacao-testes-finais-aplicacao.md`
+- `BK-MF8-04`: `../guias-bk/MF8/BK-MF8-04-painel-readiness-operacional.md`
+- `BK-MF8-05`: `../guias-bk/MF8/BK-MF8-05-auditoria-administrativa-final.md`
+- `BK-MF8-06`: `../guias-bk/MF8/BK-MF8-06-matriz-final.md`
+- `BK-MF8-07`: `../guias-bk/MF8/BK-MF8-07-lista-riscos-totais.md`
+- `BK-MF8-08`: `../guias-bk/MF8/BK-MF8-08-execucao-testes-report-erros.md`
+- `BK-MF8-09`: `../guias-bk/MF8/BK-MF8-09-correcao-erros-report.md`
+- `BK-MF8-10`: `../guias-bk/MF8/BK-MF8-10-scope-freeze.md`
 
 ### Step-by-step
 
-1. Matriz de cobertura RF -> evidencia.
-2. Matriz de cobertura RNF -> validacao.
-3. Roteiro de demo final.
-4. Ensaio tecnico da defesa.
-5. Avaliacao final e feedback orientador.
-6. Lista de riscos residuais.
-7. Correcao de bugs bloqueantes.
-8. Scope freeze final.
-9. Empacotamento final de entrega.
-10. Retro final e licoes aprendidas.
+1. Alinhamento visual parte I.
+2. Alinhamento visual parte II.
+3. Criacao de testes finais da aplicacao.
+4. Painel de readiness.
+5. Auditoria administrativa final.
+6. Matriz final.
+7. Lista de riscos totais.
+8. Execucao de testes e report de erros.
+9. Correcao de erros do report anterior.
+10. Scope Freeze.
 
 ### Pronto da macro
 
-- Entrega final estabilizada, evidence organizada e retro fechada.
+- Frontend real alinhado ao mockup, testes finais preparados e executados, readiness e auditoria administrativa fechados, matriz final colocada depois do trabalho tecnico, riscos totais registados, erros tratados e scope congelado.
 
 ## Changelog
 
@@ -358,3 +358,4 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 - `2026-05-25`: reforcada nota anti-drift para impedir leitura de `MF0` como fase de implementacao funcional.
 
 - `2026-06-22`: atualizadas MF7/MF8 para nova cadeia.
+- `2026-06-27`: MF8 condensada para 10 BKs finais, com alinhamento visual, testes, readiness, auditoria, matriz final, riscos totais, report, correcao e freeze.

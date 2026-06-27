@@ -63,7 +63,7 @@ BKs e artefactos de coerencia consultados:
 - Todos os guias em `docs/planificacao/guias-bk/MF7/`
 - Inventario de headers dos guias `MF0..MF8`
 - `docs/planificacao/guias-bk/MF6/BK-MF6-06-validacao-tecnica-final-por-gate.md`
-- `docs/planificacao/guias-bk/MF8/BK-MF8-01-matriz-de-cobertura-rf-evidencia.md`
+- `docs/planificacao/guias-bk/MF8/BK-MF8-01-alinhamento-visual-parte-i.md`
 - `docs/evidence/MF6/GATE-S12-MF6.md`
 - `docs/evidence/MF7/README.md`
 - `mockup/src/app/FAITHFLIX_INTERFACE_SPECS.md`
@@ -146,7 +146,7 @@ Nao foram confirmados findings ativos dentro dos BKs MF7.
 | --- | --- | --- | --- |
 | A prompt recebida ainda descreve MF7 como evidencias PAP e MF8 como buffer/fecho. | Prompt da execucao vs `REESTRUTURACAO-MF7-MF8.md`, `BACKLOG-MVP.md`, `MATRIZ-CANONICA-BK.md`, `MF-VIEWS.md` e `PLANO-SPRINTS.md`. | Nao bloqueia os BKs MF7; o canon atual do repo reatribuiu MF7 para UI/navegacao segura e MF8 para consolidacao, evidencia, defesa, buffer e fecho. | Seguir canon atual do repositorio e registar drift. |
 | Handoff antigo da MF6 ainda aponta para a antiga semantica MF7. | `docs/planificacao/guias-bk/MF6/BK-MF6-06-validacao-tecnica-final-por-gate.md` ainda refere `BK-MF7-01 - matriz RF` e `BK-MF7-02 - matriz RNF`; `docs/evidence/MF6/GATE-S12-MF6.md` tambem aponta para esse consumo antigo. | Pode confundir a passagem MF6 -> MF7 se o aluno/docente ler MF6 isoladamente. Nao invalida os BKs MF7 atuais porque estes e o canon atualizado apontam corretamente para UI/navegacao segura. | BLOQUEADO_POR_SCOPE nesta execucao; recomendar correcao cirurgica dos handoffs MF6 em tarefa propria. |
-| `BK-MF8-01` existe e depende de `BK-MF7-05`, mas ainda usa estrutura mais generica que os BKs MF7. | Leitura de `docs/planificacao/guias-bk/MF8/BK-MF8-01-matriz-de-cobertura-rf-evidencia.md`. | Nao bloqueia MF7; pode tornar a proxima auditoria MF8 mais provavel de encontrar lacunas pedagogicas. | Registar como risco da MF seguinte; nao corrigir em auditoria MF7. |
+| `BK-MF8-01` existe, depende de `BK-MF7-05` e aponta para o alinhamento visual parte I. | Leitura de `docs/planificacao/guias-bk/MF8/BK-MF8-01-alinhamento-visual-parte-i.md`. | A passagem MF7 -> MF8 deixou de apontar para ficheiro antigo. | `CORRIGIDO` em correcao documental posterior. |
 | Worktree com muitas alteracoes pre-existentes. | `git status --short --untracked-files=all` mostra alteracoes e ficheiros untracked em MF6/MF7/MF8, evidencias, relatorios e planificacao antes desta edicao. | Risco operacional de atribuir mudancas antigas a esta auditoria. | Preservar alteracoes existentes; limitar esta execucao ao relatorio MF7. |
 
 ## Decisoes tecnicas confirmadas

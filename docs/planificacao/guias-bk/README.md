@@ -1,6 +1,6 @@
 # Guias BK - README
 
-`last_updated`: `2026-04-17`
+`last_updated`: `2026-06-27`
 
 ## O que esta pasta contem
 

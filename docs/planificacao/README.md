@@ -1,6 +1,6 @@
 # Planificacao - FaithFlix
 
-`last_updated`: `2026-06-22`
+`last_updated`: `2026-06-27`
 
 ## Objetivo
 
