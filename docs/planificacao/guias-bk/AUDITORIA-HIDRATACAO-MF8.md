@@ -9,32 +9,51 @@
 - `implementation_root`: `real_dev`
 - `student_backend_root`: `backend`
 - `student_frontend_root`: `frontend`
-- `bk_output_path_policy`: `student_roots_only`
+- `bk_output_path_policy`: student_roots_only
 - `output_mode`: relatorio_e_resumo
 - `strict_scope`: true
 - `run_commands`: true
 - `check_mf_coherence`: true
-- `last_updated`: 2026-06-27
+- `last_updated`: 2026-06-28
+- `latest_revalidation`: 2026-06-28T19:22:55+0100
 
 ## Sumario executivo
 
-Esta execucao revalidou a MF8 em modo `auditar_apenas`, mantendo `STRICT_SCOPE: true`. Nao foram alterados BKs, codigo da aplicacao, mockups, evidence, backlogs, matrizes, sprints ou documentos canonicos. A unica escrita desta execucao ficou limitada a este relatorio:
+Esta execucao aplicou `MODO=auditar_apenas` a `MF_ALVO=MF8` com `BK_IDS=[]`. Por contrato da prompt, `BK_IDS=[]` significa auditoria da macrofase completa, nao apenas dos BKs recordados de execucoes anteriores.
+
+Foram analisados os 10 guias atuais da MF8:
+
+1. `BK-MF8-01` - Alinhamento visual parte I.
+2. `BK-MF8-02` - Alinhamento visual parte II.
+3. `BK-MF8-03` - Criacao de testes finais da aplicacao.
+4. `BK-MF8-04` - Painel de readiness operacional.
+5. `BK-MF8-05` - Auditoria administrativa final.
+6. `BK-MF8-06` - Matriz final.
+7. `BK-MF8-07` - Lista de riscos totais.
+8. `BK-MF8-08` - Execucao de testes e report de erros.
+9. `BK-MF8-09` - Correcao de erros do report anterior.
+10. `BK-MF8-10` - Scope Freeze.
+
+Nao foram editados BKs, codigo da aplicacao, mockups, evidence, backlogs, matrizes, sprints ou documentos canonicos. A unica escrita desta execucao ficou limitada a este relatorio:
 
 - `docs/planificacao/guias-bk/AUDITORIA-HIDRATACAO-MF8.md`
 
-Estado antes desta auditoria, segundo o relatorio existente: `10 OK / 0 PARCIAL / 0 CRITICO`.
+Resultado antes desta auditoria, considerando o estado observado no arranque: `10 OK / 0 PARCIAL / 0 CRITICO`.
 
 Resultado depois desta auditoria: `10 OK / 0 PARCIAL / 0 CRITICO`.
 
-A MF8 ativa esta condensada em 10 BKs praticos/operacionais: alinhamento visual, testes finais, readiness, auditoria administrativa, matriz final, riscos totais, execucao de testes, correcao/classificacao de erros e scope freeze. Os 10 BKs seguem o contrato estrutural de guias, usam 7 passos tecnicos, publicam apenas caminhos publicos (`backend/`, `frontend/`, `docs/`, `scripts/`, `tests/`, `mockup/`) e nao expõem caminhos privados nos ficheiros destinados aos alunos.
+O relatorio local anterior ainda refletia uma execucao estreita sobre `BK-MF8-09` e `BK-MF8-10`. Esse drift do proprio relatorio foi corrigido aqui para refletir a prompt ativa: MF8 completa, 10 BKs, `auditar_apenas`, `relatorio_e_resumo`.
 
-O finding anterior `MF8-BK03-COMENTARIOS-CODIGO` continua corrigido: `BK-MF8-03` inclui dois blocos `js` completos para testes finais, com JSDoc, explicacao externa e comentarios didaticos internos suficientes dentro dos proprios blocos de codigo.
+## Contagem da auditoria
 
-A revalidacao confirmou o finding anterior `MF8-BK03-LINGUAGEM-GENERICA-QUANDO-APLICAVEL` como corrigido: a linha de evidence do campo `neg` exige expected result obrigatorio e resultado observado preenchido depois da execucao, sem a condicao vaga proibida pela prompt.
-
-A correcao documental posterior fechou os drifts que estavam fora do alvo editavel da auditoria inicial: `PLANO-IMPLEMENTACAO-TOTAL.md`, `ROADMAP-BKS-RESTANTES.md` e `BK-MF0-01` apontam agora para `60/60`; o changelog de `PLANO-SPRINTS.md` aponta para `BK-MF8-02..10`; e o handoff interno de `BK-MF7-05` aponta para o ficheiro atual `BK-MF8-01-alinhamento-visual-parte-i.md`.
+| Momento | OK | PARCIAL | CRITICO | Nota |
+| --- | ---: | ---: | ---: | --- |
+| Antes desta auditoria | 10 | 0 | 0 | Estado observado no arranque: todos os BKs MF8 atuais ja tinham estrutura completa e cadeia coerente. |
+| Depois desta auditoria | 10 | 0 | 0 | Relatorio atualizado para cobrir `BK_IDS=[]`; nenhum BK foi alterado nesta execucao. |
 
 ## Documentos e artefactos consultados
+
+Documentos canonicos e de planeamento:
 
 - `README.md`
 - `docs/RF.md`
@@ -53,303 +72,163 @@ A correcao documental posterior fechou os drifts que estavam fora do alvo editav
 - `docs/planificacao/guias-bk/README.md`
 - `docs/planificacao/guias-bk/_TEMPLATE-BK.md`
 - `docs/planificacao/guias-bk/REESTRUTURACAO-MF7-MF8.md`
-- `docs/planificacao/guias-bk/AVALIACAO-REAL_DEV-MF8-CANDIDATOS.md`
+- `docs/evidence/MF8/README.md`
 - `GLOSSARIO-TERMOS-TECNICOS-PAP.md`
-- Todos os guias `docs/planificacao/guias-bk/MF0/*.md` a `docs/planificacao/guias-bk/MF8/*.md`
-- Relatorios de auditoria/hidratacao/implementacao/correcao existentes em `docs/planificacao/guias-bk/`
-- `docs/evidence/MF7/*` e `docs/evidence/MF8/README.md`
-- `mockup/README.md`
-- Raizes internas de validacao: `real_dev/backend` e `real_dev/frontend`
 
-## Contagem da auditoria
+BKs, relatorios e evidence:
 
-| Momento | OK | PARCIAL | CRITICO | Nota |
-| --- | ---: | ---: | ---: | --- |
-| Antes desta auditoria | 10 | 0 | 0 | O relatorio anterior ja classificava os 10 BKs MF8 como `OK`. |
-| Depois desta auditoria | 10 | 0 | 0 | A revalidacao manteve os 10 BKs MF8 como `OK`, sem edicoes nos guias. |
+- MF8 completa: 10 guias, de `BK-MF8-01` a `BK-MF8-10`.
+- Cadeia anterior relevante: `BK-MF7-05 -> BK-MF8-01`.
+- Cadeia final da MF8: `BK-MF8-01 -> BK-MF8-02 -> BK-MF8-03 -> BK-MF8-04 -> BK-MF8-05 -> BK-MF8-06 -> BK-MF8-07 -> BK-MF8-08 -> BK-MF8-09 -> BK-MF8-10 -> FIM`.
+- Guias anteriores `MF0..MF7`, por inventario estrutural e coerencia de dependencias.
+- Relatorios `AUDITORIA-HIDRATACAO-*.md` e relatorios de implementacao real_dev relevantes para historico.
 
-## BKs analisados
+Raizes de validacao confirmadas:
 
-| BK | Ficheiro atual | Estado antes | Estado depois | Edicao nesta execucao |
-| --- | --- | --- | --- | --- |
-| `BK-MF8-01` | `BK-MF8-01-alinhamento-visual-parte-i.md` | OK | OK | Nenhuma. |
-| `BK-MF8-02` | `BK-MF8-02-alinhamento-visual-parte-ii.md` | OK | OK | Nenhuma. |
-| `BK-MF8-03` | `BK-MF8-03-criacao-testes-finais-aplicacao.md` | OK | OK | Nenhuma; findings anteriores revalidados como corrigidos. |
-| `BK-MF8-04` | `BK-MF8-04-painel-readiness-operacional.md` | OK | OK | Nenhuma. |
-| `BK-MF8-05` | `BK-MF8-05-auditoria-administrativa-final.md` | OK | OK | Nenhuma. |
-| `BK-MF8-06` | `BK-MF8-06-matriz-final.md` | OK | OK | Nenhuma. |
-| `BK-MF8-07` | `BK-MF8-07-lista-riscos-totais.md` | OK | OK | Nenhuma. |
-| `BK-MF8-08` | `BK-MF8-08-execucao-testes-report-erros.md` | OK | OK | Nenhuma. |
-| `BK-MF8-09` | `BK-MF8-09-correcao-erros-report.md` | OK | OK | Nenhuma. |
-| `BK-MF8-10` | `BK-MF8-10-scope-freeze.md` | OK | OK | Nenhuma. |
-
-Ficheiros BK editados nesta execucao:
-
-- Nenhum.
-
-Ficheiro de relatorio editado nesta execucao:
-
-- `docs/planificacao/guias-bk/AUDITORIA-HIDRATACAO-MF8.md`
+- `real_dev/backend`
+- `real_dev/frontend`
 
 ## Resultado por BK
 
-### `BK-MF8-01` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-01-alinhamento-visual-parte-i.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/ALINHAMENTO-VISUAL-PARTE-I.md`.
-- Consome `BK-MF7-05`, mockup, evidence MF7, `frontend/`, `docs/` e `RNF01`, `RNF02`, `RNF03`, `RNF04`, `RNF28`, `RNF38`.
-- O guia separa diferenca visual aceite de falha visual e exige proof antes/depois.
-- Nao cria novas funcionalidades, endpoints, schemas, DTOs, services ou dependencias.
-- Nao contem linguagem interna nem caminhos privados.
-
-Decisao: `OK`.
-
-### `BK-MF8-02` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-02-alinhamento-visual-parte-ii.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/ALINHAMENTO-VISUAL-PARTE-II.md`.
-- Consome `BK-MF8-01`, ecras de catalogo/cards/planos/estados, responsividade, acessibilidade visual e `RNF01`, `RNF02`, `RNF03`, `RNF05`, `RNF21`, `RNF22`, `RNF38`, `RNF40`.
-- Mantem pagamentos como simulados e nao inventa gateway real.
-- Prepara `BK-MF8-03` ao exigir uma UI estavel antes da matriz de testes.
-- Nao contem linguagem interna nem caminhos privados.
-
-Decisao: `OK`.
-
-### `BK-MF8-03` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-03-criacao-testes-finais-aplicacao.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/TESTES-FINAIS-CRIADOS.md`.
-- Consome `BK-MF8-02`, `backend/package.json`, `frontend/package.json`, pastas de teste, scripts e `RNF29`.
-- Exige inventario de comandos existentes e proibe inventar scripts inexistentes.
-- Prepara `BK-MF8-08` com matriz de execucao, negativos e expected results.
-- Nao contem caminhos privados.
-- O passo 4 inclui dois blocos `js` completos (`backend/tests/smoke/mf8-critical-smoke.test.js` e `backend/tests/unit/mf8-final-validation.test.js`) com JSDoc, explicacao externa e comentarios didaticos internos.
-- O bloco smoke passou a explicar porque o servidor arranca uma vez, porque deve ser fechado, porque o health-check e o primeiro sinal operacional e porque o cookie falso valida a seguranca da sessao.
-- O bloco unitario passou a explicar porque se testa primeiro o caso valido, porque a paginacao acompanha a query string e porque o negativo bloqueia pesquisas sem utilidade.
-- A linha de evidence do campo `neg` passou a exigir expected result obrigatorio e resultado observado preenchido depois da execucao, sem condicoes vagas.
-
-Decisao: `OK`.
-
-### `BK-MF8-04` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-04-painel-readiness-operacional.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/PAINEL-READINESS-OPERACIONAL.md`.
-- Consome `BK-MF8-03`, evidence MF6/MF7/MF8, scripts existentes e `RNF30`, `RNF31`, `RNF32`, `RNF33`.
-- Define decisao operacional `GO`, `GO_COM_RESSALVAS` ou `NO_GO` com sinais objetivos.
-- Nao transforma readiness em opiniao verbal e nao expõe segredos na evidence.
-- Nao contem linguagem interna nem caminhos privados.
-
-Decisao: `OK`.
-
-### `BK-MF8-05` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-05-auditoria-administrativa-final.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/AUDITORIA-ADMINISTRATIVA-FINAL.md`.
-- Consome `BK-MF8-04`, superficie administrativa, rotas protegidas, permissoes, logs, configuracao e `RNF19`, `RNF30`.
-- Reforca que admin nao elimina autorizacao e que associacoes nao devem ver dados de outras entidades.
-- Exige proof positivo, negativo e matriz de campos sensiveis.
-- Nao contem linguagem interna nem caminhos privados.
-
-Decisao: `OK`.
-
-### `BK-MF8-06` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-06-matriz-final.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/MATRIZ-FINAL.md`.
-- Consome `BK-MF8-05`, RF/RNF ativos, evidence, readiness, auditoria administrativa e documentos de planificacao.
-- Consolida cobertura final sem declarar sucesso sem proof.
-- Prepara `BK-MF8-07` ao separar gaps, riscos e estados finais.
-- Nao contem linguagem interna nem caminhos privados.
-
-Decisao: `OK`.
-
-### `BK-MF8-07` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-07-lista-riscos-totais.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/LISTA-RISCOS-TOTAIS.md`.
-- Consome `BK-MF8-06`, matriz final, feedback, testes, readiness e auditoria.
-- Cobre riscos tecnicos, produto, UX, seguranca, dados, demonstracao e manutencao.
-- Separa risco aceite de blocker e prepara `BK-MF8-08`.
-- Nao contem linguagem interna nem caminhos privados.
-
-Decisao: `OK`.
-
-### `BK-MF8-08` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-08-execucao-testes-report-erros.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/EXECUCAO-TESTES-REPORT-ERROS.md`.
-- Consome `BK-MF8-07`, matriz de testes, comandos de backend/frontend, testes manuais e visuais, `RNF29`, `RNF21`, `RNF22`.
-- Inclui tabela de comandos e resultados esperados para testes backend, smoke, build frontend, hardening, regressao, planificacao, whitespace e teste visual manual.
-- Exige report acionavel com expected/observed/severidade/owner.
-- Nao contem linguagem interna nem caminhos privados.
-
-Decisao: `OK`.
-
-### `BK-MF8-09` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-09-correcao-erros-report.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/CORRECAO-ERROS-REPORT.md`.
-- Consome `BK-MF8-08`, report de erros, comandos afetados e matriz de riscos.
-- Como os erros reais so sao conhecidos depois de `BK-MF8-08`, o guia nao inventa codigo antecipado; exige caminho publico, causa raiz, estado final, prova de revalidacao ou classificacao honesta.
-- Bloqueia `scope creep` ao exigir que cada alteracao tenha erro associado.
-- Nao contem linguagem interna nem caminhos privados.
-
-Decisao: `OK`.
-
-### `BK-MF8-10` - OK
-
-Evidencia observada:
-
-- Guia atual: `docs/planificacao/guias-bk/MF8/BK-MF8-10-scope-freeze.md`.
-- 16 secoes `####` na ordem obrigatoria e 7 passos `### Passo 1..7`.
-- Resultado observavel: `docs/evidence/MF8/SCOPE-FREEZE.md`.
-- Consome `BK-MF8-09`, riscos aceites, lista de exclusoes, estado final da app e checks de ficheiros sensiveis.
-- Congela funcionalidades, separa trabalho pos-PAP e impede usar futuro como prova do requisito atual.
-- Fecha a cadeia MF8 com handoff terminal.
-- Nao contem linguagem interna nem caminhos privados.
-
-Decisao: `OK`.
+| BK | Estado | Evidencia principal |
+| --- | --- | --- |
+| `BK-MF8-01` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `ALINHAMENTO-VISUAL-PARTE-I.md`, scope visual limitado a mockup/frontend/evidence e handoff para `BK-MF8-02`. |
+| `BK-MF8-02` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `ALINHAMENTO-VISUAL-PARTE-II.md`, cobre catalogo/cards/planos/estados/responsividade e handoff para testes finais. |
+| `BK-MF8-03` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `TESTES-FINAIS-CRIADOS.md` e dois blocos de codigo completos com comentarios didaticos. Imports e rotas foram confirmados contra a implementacao privada. |
+| `BK-MF8-04` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `PAINEL-READINESS-OPERACIONAL.md`, decisao `GO`/`GO_COM_RESSALVAS`/`NO_GO` e handoff para auditoria administrativa. |
+| `BK-MF8-05` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `AUDITORIA-ADMINISTRATIVA-FINAL.md`, foco em permissoes/admin/auditoria e handoff para matriz final. |
+| `BK-MF8-06` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `MATRIZ-FINAL.md`, consolida RF/RNF/BKs/evidence/gaps e prepara lista total de riscos. |
+| `BK-MF8-07` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `LISTA-RISCOS-TOTAIS.md`, separa riscos tecnicos/produto/seguranca/dados/demonstracao e prepara execucao de testes. |
+| `BK-MF8-08` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `EXECUCAO-TESTES-REPORT-ERROS.md`, consome testes de `BK-MF8-03` e entrega erros acionaveis para `BK-MF8-09`. |
+| `BK-MF8-09` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `CORRECAO-ERROS-REPORT.md`, trata causa raiz, revalidacao, classificacao e ressalvas antes do freeze. |
+| `BK-MF8-10` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `SCOPE-FREEZE.md`, fecha scope, exclusoes, riscos aceites, estado final e handoff terminal `FIM`. |
 
 ## Findings
 
-| Finding | Severidade | Evidencia | Estado atual |
-| --- | --- | --- | --- |
-| `MF8-BK03-COMENTARIOS-CODIGO` | P2 | `BK-MF8-03`, passo 4: dois blocos `js` completos incluem comentarios didaticos internos sobre setup/teardown, health-check, sessao falsa, validacao positiva, paginacao e negativo de pesquisa. | `CORRIGIDO`: correcao anterior revalidada nesta execucao `auditar_apenas`. |
-| `MF8-BK03-LINGUAGEM-GENERICA-QUANDO-APLICAVEL` | P3 | `docs/planificacao/guias-bk/MF8/BK-MF8-03-criacao-testes-finais-aplicacao.md` ja exige expected result obrigatorio e resultado observado no campo `neg`. | `CORRIGIDO`: correcao anterior revalidada nesta execucao `auditar_apenas`. |
-| `MF8-PLAN-COUNT-DRIFT-60-62` | P3 | `PLANO-IMPLEMENTACAO-TOTAL.md`, `ROADMAP-BKS-RESTANTES.md` e `BK-MF0-01` foram alinhados para `60/60`. | `CORRIGIDO`: drift documental externo fechado. |
-| `MF8-SPRINT-CHANGELOG-DRIFT` | P3 | O changelog de `docs/planificacao/sprints/PLANO-SPRINTS.md` foi alinhado para `BK-MF8-02..10`. | `CORRIGIDO`: drift documental externo fechado. |
-| `MF7-HANDOFF-OLD-MF8-PATH` | P3 | `BK-MF7-05` passou a rever `docs/planificacao/guias-bk/MF8/BK-MF8-01-alinhamento-visual-parte-i.md`. | `CORRIGIDO`: handoff MF7 -> MF8 aponta para o ficheiro atual. |
-| `MF8-FOREIGN-DOMAIN-FALSE-POSITIVE` | Informativo | A pesquisa literal por `IVA` devolveu matches dentro de palavras como `DERIVADO` e `AUDITORIA-ADMINISTRATIVA-FINAL`; a pesquisa com boundary nao devolveu matches. | `FINDING_DESCARTADO`. |
+| Finding | Severidade | BK/RF/RNF | Expected | Observed | Estado |
+| --- | --- | --- | --- | --- | --- |
+| `MF8-FULL-AUDIT-OK` | Info | `BK-MF8-01..10` | `BK_IDS=[]` deve auditar a MF8 completa. | 10/10 BKs foram analisados; todos cumprem a estrutura ativa, cadeia de dependencias e regras de publicacao. | `NAO_APLICAVEL`: sem correcao necessaria. |
+| `MF8-BK03-CODE-CONTRACT-OK` | Info | `BK-MF8-03`; `RNF29` | Codigo publicado no guia deve apontar para contratos reais ou criados no proprio BK. | `assertSearchQuery`, `parsePagination`, `startTestServer`, `/health` e `/api/session/me` existem na implementacao privada; caminhos publicados no BK permanecem em `backend/`. | `NAO_APLICAVEL`: sem correcao necessaria. |
+| `MF8-REPORT-SCOPE-DRIFT` | P3 | Relatorio de auditoria | O relatorio deve refletir a prompt ativa: `BK_IDS=[]`, MF8 completa, `auditar_apenas`. | Relatorio anterior estava estreito em `BK-MF8-09` e `BK-MF8-10`. | `CORRIGIDO`: este relatorio foi atualizado. |
+| `MF8-README-LEGACY-CONTRACT` | P3 | Documento auxiliar fora dos BKs alvo | Documentacao auxiliar deveria estar alinhada com o contrato ativo de 16 secoes e 7 passos. | `docs/planificacao/guias-bk/README.md` ainda menciona bloco pedagogico/operacional e snippet tecnico obrigatorio, termos do contrato legacy. | `BLOQUEADO_POR_SCOPE`: registado como drift documental; nao impede a MF8. |
+| `MF8-EARLIER-MF-LEGACY-CONTRACT` | P3 | `MF0..MF7` fora do alvo | A prompt ativa pede estrutura linear forte para os BKs alvo. | Os guias `MF0..MF7` preservam estruturas legacy anteriores; `MF8` e o template ativo estao no contrato atual. | `BLOQUEADO_POR_SCOPE`: nao corrigido nesta execucao. |
+| `MF8-RNF-STACK-TENSION` | P3 | `docs/RNF.md` | Stack ativa dos BKs deve refletir React/Vite/fetch, Express e MongoDB sem prometer providers externos. | `RNF.md` ainda contem referencias opcionais/aspiracionais a Next.js/Axios, Stripe/CDN/embeddings. Os BKs MF8 nao promovem essas opcoes como entrega atual. | `BLOQUEADO_POR_SCOPE`: registado como contexto. |
+| `MF8-FOREIGN-DOMAIN-FALSE-POSITIVE` | Info | Pesquisa estatica MF8 | Drift de outras PAPs deve ser confirmado por contexto, nao por substring. | A pesquisa literal encontrou `IVA` apenas dentro de palavras FaithFlix/planeamento como `DERIVADO` e `AUDITORIA-ADMINISTRATIVA-FINAL`. | `FINDING_DESCARTADO`. |
 
-Sem findings `PARCIAL` ou `CRITICO` dentro dos BKs alvo.
+Sem findings `PARCIAL` ou `CRITICO` restantes dentro dos BKs MF8.
 
 ## Decisoes tecnicas confirmadas
 
-- Stack confirmada nos documentos e no `real_dev`: backend Node.js/Express/MongoDB com ES Modules; frontend React/Vite com React Router e cliente API baseado em `fetch`.
-- `real_dev/backend` e `real_dev/frontend` existem e estao ignorados por `.gitignore`, como esperado para raiz privada de validacao.
-- Caminhos nos BKs MF8 usam apenas raizes publicas e artefactos de aluno: `backend/`, `frontend/`, `docs/`, `scripts/`, `tests/`, `mockup/` e `docs/evidence/`.
-- A implementacao real ate MF7 contem modulos relevantes para a auditoria final: autenticacao/sessao, catalogo, playback, library, ratings, comentarios, discovery, search, recommendations, subscriptions, payments, charities, privacy, admin metrics, integrations, health e UI administrativa.
-- Os BKs MF8 nao introduzem novas dependencias.
-- Os BKs MF8 nao inventam gateways reais, CDN, DRM, RAG, embeddings, vector database ou IA generativa.
-- Os passos sem codigo sao aceitaveis no contexto destes BKs porque o trabalho formal e evidence, validacao, classificacao ou correcao condicionada a erro real posterior. `BK-MF8-03`, passo 4, inclui codigo de teste e cumpre a regra de comentarios didaticos internos; a linha de evidence revalidada exige resultado negativo concreto em vez de condicao vaga. Quando houver correcao concreta em `BK-MF8-09`, o guia exige registo do ficheiro alterado e revalidacao, sem inventar codigo antecipado.
+- Baseline ativa confirmada: `60 BK / 60 guias`, com MF8 condensada para 10 guias finais.
+- Stack validavel confirmada: backend Node.js/Express/MongoDB com ES Modules; frontend React/Vite/React Router.
+- `real_dev/backend/package.json` contem scripts `test` e `smoke`; `real_dev/frontend/package.json` contem scripts `build` e `smoke`.
+- Os BKs publicados nao expõem `real_dev/`, variaveis internas da prompt ou comandos privados.
+- Os caminhos dos guias MF8 usam raizes de aluno: `backend/`, `frontend/`, `tests/`, `scripts/`, `docs/` e `docs/evidence/`.
+- `BK-MF8-03` e o unico BK MF8 com codigo; os blocos incluem JSDoc e comentarios didaticos suficientes para testes.
+- Os restantes BKs sao documentais/evidence ou de validacao final; a frase `Sem código neste passo.` aparece corretamente nos passos sem codigo.
+- Nenhum BK MF8 introduz dependencia nova.
+- Nenhum BK MF8 cria gateway real de pagamento, CDN, DRM, RAG, embeddings, vector database ou IA generativa.
 
 ## Decisoes de dominio confirmadas
 
-- `BK-MF8-01` e `BK-MF8-02` fecham alinhamento visual contra mockup/MF7 sem alterar regras de negocio.
+- `BK-MF8-01` e `BK-MF8-02` fecham alinhamento visual sem transformar mockup em contrato tecnico de backend.
 - `BK-MF8-03` organiza testes finais antes da execucao consolidada.
-- `BK-MF8-04` cria decisao operacional de readiness baseada em sinais objetivos.
-- `BK-MF8-05` audita superficie administrativa, permissoes, logs e exposicao indevida.
-- `BK-MF8-06` consolida RF/RNF depois dos BKs tecnicos.
-- `BK-MF8-07` agrega riscos totais e separa risco aceite de blocker.
-- `BK-MF8-08` executa testes e transforma falhas em report acionavel.
-- `BK-MF8-09` corrige, classifica ou bloqueia erros do report anterior com prova.
-- `BK-MF8-10` congela scope e separa trabalho pos-PAP da entrega atual.
+- `BK-MF8-04` transforma sinais tecnicos em decisao operacional de readiness.
+- `BK-MF8-05` valida superficies administrativas, permissoes e exposicao indevida.
+- `BK-MF8-06` consolida RF/RNF, BKs, evidence, gaps e estado final.
+- `BK-MF8-07` agrega riscos totais, nao apenas riscos residuais.
+- `BK-MF8-08` executa testes e produz report acionavel.
+- `BK-MF8-09` corrige, classifica ou bloqueia erros do report anterior.
+- `BK-MF8-10` congela o scope final e separa entrega atual de trabalho pos-PAP.
+- Pagamentos continuam simulados no MVP; estes BKs nao introduzem Stripe, PayPal, MB Way ou webhooks reais.
+- Recomendacao continua baseline/regra simples; estes BKs nao prometem IA generativa, RAG ou embeddings como entrega.
 
 ## Decisoes marcadas como DERIVADO
 
-- Diferencas visuais podem ser aceites quando nao prejudicam usabilidade, acessibilidade ou coerencia, desde que tenham proof e impacto.
-- Cards e estados UI consistentes reduzem esforco cognitivo e devem ser validados antes da execucao final.
-- A matriz de testes e um contrato operacional entre preparacao e execucao.
-- Readiness pode devolver `GO_COM_RESSALVAS` quando os riscos sao controlados e documentados.
-- Matriz de rotas administrativas ajuda a provar limites entre visitante, utilizador comum, associacao e admin.
-- Gap final nao e automaticamente falha critica; precisa de impacto, owner e decisao.
-- Risco aceite nao e risco ignorado; precisa de owner, motivo e plano de comunicacao.
-- Nem toda falha de teste e bug de codigo; pode ser ambiente, comando ausente ou divida documental.
-- Correcao sem revalidacao fica no maximo como `CORRIGIDO_SEM_VALIDACAO_TOTAL`.
-- Trabalho pos-PAP nao valida requisito atual.
+- Evidence visual antes/depois evita decisoes esteticas sem prova.
+- Responsividade, estados vazios e mensagens PT-PT reduzem risco de defesa fraca mesmo quando nao criam endpoints novos.
+- Testes finais devem ter IDs e risco coberto para serem uteis na matriz final.
+- Readiness deve distinguir `GO`, `GO_COM_RESSALVAS` e `NO_GO` para evitar falso sucesso.
+- Gaps na matriz final precisam de impacto, owner e decisao, nao apenas uma marca generica.
+- Risco aceite precisa de motivo e plano de comunicacao.
+- Correcao de erro sem revalidacao continua incompleta.
+- Trabalho pos-PAP nao conta como entrega atual.
 
 ## Mapa de integracao da MF
 
-| BK | Ficheiros criados/editados pelo aluno | Consumos de BKs anteriores | Entrega para | Endpoints/DTOs/schemas/services/componentes | Regras de seguranca/autorizacao | Testes/evidence |
+| BK | Ficheiros criados/editados pelo aluno | Consumos de BKs anteriores | Entrega para | Elementos tecnicos | Seguranca/autorizacao | Testes/evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| `BK-MF8-01` | `docs/evidence/MF8/ALINHAMENTO-VISUAL-PARTE-I.md` | `BK-MF7-05`, mockup, evidence MF7, `frontend/` | `BK-MF8-02` | Nao cria codigo de produto. | Nao altera permissoes; valida links visiveis e foco. | Proof visual, negativos e decisao. |
-| `BK-MF8-02` | `docs/evidence/MF8/ALINHAMENTO-VISUAL-PARTE-II.md` | `BK-MF8-01`, paginas, cards, planos, estados UI | `BK-MF8-03` | Nao cria codigo de produto. | Nao altera regras de subscricao/autorizacao. | Viewports, estados, acessibilidade visual. |
-| `BK-MF8-03` | `docs/evidence/MF8/TESTES-FINAIS-CRIADOS.md` | `BK-MF8-02`, package scripts e pastas de teste | `BK-MF8-04`, `BK-MF8-08` | Nao cria codigo de produto. | Testes devem cobrir autenticacao/autorizacao nos cenarios que envolvem sessao, perfil ou permissao. | Matriz de testes e negativos. |
-| `BK-MF8-04` | `docs/evidence/MF8/PAINEL-READINESS-OPERACIONAL.md` | `BK-MF8-03`, evidence tecnica, scripts | `BK-MF8-05` | Nao cria codigo de produto. | Segredos e valores sensiveis nao entram na evidence. | Sinais de readiness e decisao GO/ressalvas/NO_GO. |
-| `BK-MF8-05` | `docs/evidence/MF8/AUDITORIA-ADMINISTRATIVA-FINAL.md` | `BK-MF8-04`, areas admin, logs, configuracao | `BK-MF8-06` | Nao cria codigo de produto. | Admin, associacao e utilizador comum mantem limites de permissao. | Matriz admin, proof positivo/negativo e dados sensiveis. |
-| `BK-MF8-06` | `docs/evidence/MF8/MATRIZ-FINAL.md` | `BK-MF8-05`, RF/RNF, evidence, readiness, auditoria | `BK-MF8-07` | Nao cria codigo de produto. | Nao declara RF/RNF validado sem proof. | Matriz final, gaps, owners e decisao. |
-| `BK-MF8-07` | `docs/evidence/MF8/LISTA-RISCOS-TOTAIS.md` | `BK-MF8-06`, matriz final, falhas e ressalvas | `BK-MF8-08` | Nao cria codigo de produto. | Riscos de seguranca/dados nao podem ser escondidos como ressalva vaga. | Lista total de riscos e prioridades. |
-| `BK-MF8-08` | `docs/evidence/MF8/EXECUCAO-TESTES-REPORT-ERROS.md` | `BK-MF8-07`, matriz de testes, scripts, frontend/backend | `BK-MF8-09` | Nao cria codigo de produto. | Outputs nao devem expor cookies, passwords, tokens ou dados pessoais. | Comandos, outputs, testes manuais/visuais e report de erros. |
-| `BK-MF8-09` | `docs/evidence/MF8/CORRECAO-ERROS-REPORT.md`; ficheiros de app apenas se houver erro real aprovado | `BK-MF8-08`, erros reportados, riscos | `BK-MF8-10` | Pode documentar alteracoes futuras, mas nao inventa codigo antecipado. | Cada correcao exige causa raiz, menor alteracao e revalidacao. | Estado por erro, testes afetados e riscos restantes. |
-| `BK-MF8-10` | `docs/evidence/MF8/SCOPE-FREEZE.md` | `BK-MF8-09`, riscos aceites, evidence final | `FIM` | Nao cria codigo de produto. | Verifica exclusoes sensiveis e separa pos-PAP da entrega atual. | Checklist final, freeze e decisao terminal. |
+| `BK-MF8-01` | `docs/evidence/MF8/ALINHAMENTO-VISUAL-PARTE-I.md` | `BK-MF7-05`, evidence MF7, mockup e frontend | `BK-MF8-02` | Nao cria endpoints/DTOs/schemas; revê `frontend/` quando necessario. | Mantem foco, contraste, navegacao e PT-PT sem quebrar sessao. | Proof visual, negativos de decisao sem screenshot e handoff. |
+| `BK-MF8-02` | `docs/evidence/MF8/ALINHAMENTO-VISUAL-PARTE-II.md` | `BK-MF8-01` | `BK-MF8-03` | Nao cria endpoints/DTOs/schemas; revê cards, catalogo, planos e estados. | Preserva acessibilidade visual, estados de erro e responsividade. | Evidence visual final e ressalvas para testes. |
+| `BK-MF8-03` | `docs/evidence/MF8/TESTES-FINAIS-CRIADOS.md`; testes em `backend/tests/...` quando executado pelo aluno | `BK-MF8-02`, scripts reais, contratos MF1..MF7 | `BK-MF8-04` e `BK-MF8-08` | Cria/organiza testes finais; usa `startTestServer`, `/health`, `/api/session/me`, validadores de pesquisa. | Inclui negativo de sessao falsa e validacao de input. | Inventario `TST-*`, smoke backend, testes unitarios e matriz de cobertura. |
+| `BK-MF8-04` | `docs/evidence/MF8/PAINEL-READINESS-OPERACIONAL.md` | `BK-MF8-03`, scripts de teste/build/smoke | `BK-MF8-05` | Nao cria produto novo; consolida sinais operacionais. | Nao expõe segredos em outputs; separa bloqueio real de ressalva. | Decisao `GO`/`GO_COM_RESSALVAS`/`NO_GO`. |
+| `BK-MF8-05` | `docs/evidence/MF8/AUDITORIA-ADMINISTRATIVA-FINAL.md` | `BK-MF8-04`, rotas/admin/evidence anteriores | `BK-MF8-06` | Revê superficies administrativas, rotas e logs; nao inventa endpoints. | Verifica roles, permissoes, exposicao indevida e logs sem dados sensiveis. | Provas positivas e negativas por superficie admin. |
+| `BK-MF8-06` | `docs/evidence/MF8/MATRIZ-FINAL.md` | `BK-MF8-05`, RF/RNF, backlog, evidence | `BK-MF8-07` | Consolida matriz final; nao altera contratos. | Gaps de seguranca/privacidade ficam explicitamente classificados. | Rastreabilidade RF/RNF/BK/proof/neg. |
+| `BK-MF8-07` | `docs/evidence/MF8/LISTA-RISCOS-TOTAIS.md` | `BK-MF8-06`, matriz final, readiness e auditoria | `BK-MF8-08` | Lista riscos tecnicos, produto, UX, seguranca, dados e manutencao. | Riscos de dados/sessao/permissao exigem owner, mitigacao e decisao. | Priorizacao por impacto/probabilidade e riscos aceites. |
+| `BK-MF8-08` | `docs/evidence/MF8/EXECUCAO-TESTES-REPORT-ERROS.md` | `BK-MF8-07`, testes de `BK-MF8-03`, scripts reais | `BK-MF8-09` | Executa comandos e regista erros acionaveis sem output excessivo. | Outputs seguros sem tokens, cookies, passwords ou dados pessoais. | Report por `TST-*`, expected/observed, severidade e owner. |
+| `BK-MF8-09` | `docs/evidence/MF8/CORRECAO-ERROS-REPORT.md`; eventualmente ficheiros publicos `backend/`, `frontend/`, `tests/`, `scripts/` quando o erro exigir | `BK-MF8-08` | `BK-MF8-10` | Corrige apenas erro reproduzido; nao predefine endpoints novos. | Prioriza auth, autorizacao, dados e privacidade; nao apaga erro sem prova. | Revalidacao por erro, estado corrigido/ressalva/bloqueado. |
+| `BK-MF8-10` | `docs/evidence/MF8/SCOPE-FREEZE.md` | `BK-MF8-09`, matriz final, riscos e evidence final | `FIM` | Congela estado e scope; nao cria produto novo. | Verifica segredos, dados sensiveis, outputs privados e exclusoes. | Checklist final, decisao de entrega e trabalho pos-PAP separado. |
 
 Confirmacoes de integracao:
 
-- `BACKLOG-MVP.md`, `CONTRATO-CAMPOS-BK.md`, `MATRIZ-CANONICA-BK.md`, `MF-VIEWS.md` e `docs/evidence/MF8/README.md` confirmam a cadeia formal `BK-MF8-01 -> ... -> BK-MF8-10`.
-- `PLANO-SPRINTS.md` confirma `BK-MF8-01` em S11 e `BK-MF8-02..10` em S12, com changelog alinhado ao mesmo intervalo.
-- Nao existem dois endpoints, schemas, DTOs ou services criados para a mesma acao dentro dos BKs MF8, porque estes BKs nao criam codigo novo de produto sem erro real posterior.
+- `BACKLOG-MVP.md`, `CONTRATO-CAMPOS-BK.md`, `MATRIZ-CANONICA-BK.md`, `MF-VIEWS.md`, `PLANO-SPRINTS.md`, `REESTRUTURACAO-MF7-MF8.md` e `docs/evidence/MF8/README.md` confirmam a cadeia formal de 10 BKs.
+- Nao existem dois endpoints, schemas, DTOs ou services criados pelos BKs MF8 para a mesma responsabilidade, porque a MF8 e maioritariamente de evidence/fecho e so `BK-MF8-03` publica codigo de testes.
+- Os imports e rotas do codigo de `BK-MF8-03` foram cruzados com a implementacao privada antes de o BK ser classificado como `OK`.
 
 ## Coerencia MF7 -> MF8 -> fecho
 
 - MF7 fecha UI, responsividade e navegacao segura em `BK-MF7-05`.
-- MF8 atual recebe esse gate e inicia com `BK-MF8-01 - Alinhamento visual parte I`.
-- A cadeia central da MF8 esta coerente: `BK-MF8-01 -> BK-MF8-02 -> BK-MF8-03 -> BK-MF8-04 -> BK-MF8-05 -> BK-MF8-06 -> BK-MF8-07 -> BK-MF8-08 -> BK-MF8-09 -> BK-MF8-10 -> FIM`.
-- O handoff de `BK-MF7-05` aponta agora para o ficheiro atual `BK-MF8-01-alinhamento-visual-parte-i.md`.
+- MF8 recebe esse gate em `BK-MF8-01 - Alinhamento visual parte I`.
+- `BK-MF8-01` e `BK-MF8-02` fecham alinhamento visual antes de criar/organizar testes finais.
+- `BK-MF8-03` prepara testes finais reutilizaveis.
+- `BK-MF8-04` usa sinais desses testes para readiness.
+- `BK-MF8-05` valida o plano administrativo antes da matriz final.
+- `BK-MF8-06` consolida requisitos, evidence e gaps para alimentar `BK-MF8-07`.
+- `BK-MF8-07` prioriza riscos totais para orientar `BK-MF8-08`.
+- `BK-MF8-08` executa testes e reporta erros para `BK-MF8-09`.
+- `BK-MF8-09` corrige, classifica ou bloqueia erros antes de `BK-MF8-10`.
+- `BK-MF8-10` congela o scope e fecha a cadeia.
 - Nao existe MF seguinte depois da MF8; o fecho esperado e `FIM`/scope freeze.
 
-## Drift documental corrigido
+## Drift documental encontrado
 
-| Drift | Evidencia pos-correcao | Impacto resolvido | Decisao |
+| Drift | Evidencia | Impacto | Decisao |
 | --- | --- | --- | --- |
-| Contagem global alternava entre a baseline atual e uma contagem antiga. | `PLANO-IMPLEMENTACAO-TOTAL.md`, `ROADMAP-BKS-RESTANTES.md` e `BK-MF0-01` foram alinhados para `60/60`. | Alunos/docente deixam de receber baseline contraditoria. | `CORRIGIDO`. |
-| Changelog de sprints mencionava um intervalo antigo de BKs MF8. | `PLANO-SPRINTS.md` menciona `BK-MF8-02..10`, coerente com a MF8 final de 10 BKs. | Remove ruido documental sobre BKs inexistentes. | `CORRIGIDO`. |
-| Handoff interno de `BK-MF7-05` apontava para ficheiro MF8 antigo. | `BK-MF7-05` aponta para `BK-MF8-01-alinhamento-visual-parte-i.md`. | A passagem MF7 -> MF8 deixa de apontar para ficheiro removido. | `CORRIGIDO`. |
+| Relatorio local refletia recorte anterior. | Metadados e sumario anteriores apontavam para `BK_IDS=[BK-MF8-09, BK-MF8-10]`. | Ficaria desalinhado com a prompt ativa `BK_IDS=[]`. | Corrigido neste relatorio. |
+| Contrato legacy no README dos guias. | `docs/planificacao/guias-bk/README.md` menciona bloco pedagogico/operacional e snippet tecnico obrigatorio. | Pode confundir leitura futura, mas nao bloqueia MF8 porque o template ativo e a prompt atual exigem a estrutura linear de 16 secoes/7 passos. | `BLOQUEADO_POR_SCOPE`: reportado sem editar documento canonico. |
+| Guias MF0..MF7 preservam estrutura antiga. | Inventario estrutural mostra que `MF0..MF7` ainda usam contratos anteriores; `MF8` tem 10/10 no contrato ativo. | Sem impacto direto no recorte MF8; e drift historico fora do alvo. | `BLOQUEADO_POR_SCOPE`. |
+| Tensionamento de stack no `RNF.md`. | `RNF.md` apresenta Next.js/Axios, gateway real, CDN e embeddings como opcoes/aspiracoes; BKs e implementacao validavel estabilizam React/Vite/fetch, Express, MongoDB e pagamentos simulados. | Sem impacto nos BKs MF8, que nao introduzem stack nova nem provider externo. | Registado como contexto; sem correcao no recorte. |
 
 ## Riscos restantes
 
+- Sem findings `PARCIAL` ou `CRITICO` dentro da MF8.
+- Sem blockers tecnicos dentro dos 10 BKs MF8.
 - Evidence MF8 ainda tera de ser preenchida pelos alunos ao executar os BKs.
-- `BK-MF8-09` so pode apresentar codigo concreto quando houver erro real vindo de `BK-MF8-08`; antes disso, o guia deve continuar a exigir causa raiz, caminho publico, correcao minima e revalidacao, sem inventar patches.
-- Sem drift documental ativo conhecido entre `60/60`, `BK-MF8-02..10` e o handoff `BK-MF7-05 -> BK-MF8-01`.
-- Sem `TODO (BLOCKER)` confirmado dentro dos BKs MF8.
+- O drift legacy em `docs/planificacao/guias-bk/README.md` e nos guias `MF0..MF7` fica fora de scope nesta execucao.
+- O repositorio ja tinha alteracoes locais fora desta execucao; foram preservadas e nao foram tratadas como findings do recorte.
 
 ## Validacoes executadas
 
 | Verificacao | Resultado |
 | --- | --- |
+| Inventario de documentos obrigatorios | PASS: documentos obrigatorios e canonicos existem. |
 | Inventario de guias MF8 | PASS: 10 guias atuais. |
-| Inventario global MF0..MF8 | PASS: 60 guias BK. |
+| Inventario global de guias BK | PASS: 60 guias em `MF0..MF8`. |
+| Header dos BKs MF8 | PASS: 10/10 com campos obrigatorios, `macro=MF8`, `guia_path` correto e cadeia `proximo_bk` coerente. |
 | Estrutura obrigatoria dos BKs MF8 | PASS: 10/10 com 16 secoes `####` na ordem esperada. |
-| Passos tecnicos MF8 | PASS: 10/10 com 7 passos `### Passo 1..7`. |
-| Passos sem codigo | PASS: 69/70 passos declaram explicitamente `Sem codigo neste passo.` ou `Sem código neste passo.`; o passo restante e `BK-MF8-03` passo 4, com codigo real de testes. |
-| Blocos de codigo nos BKs MF8 | PASS: existem 2 blocos `js`, ambos em `BK-MF8-03` passo 4; têm JSDoc, explicacao externa e comentarios didaticos internos suficientes. |
-| Pesquisa de termos internos/proibidos | PASS: sem matches. |
-| Pesquisa adicional de linguagem generica proibida | PASS: sem matches para a expressao corrigida nos BKs MF8. |
-| Pesquisa de caminhos privados nos BKs MF8 | PASS: sem matches para `real_dev`, variaveis internas da prompt ou comandos em raiz privada. |
-| Pesquisa literal de drift de outras PAPs | PASS com falso positivo: matches de `IVA` dentro de `DERIVADO`/`AUDITORIA-ADMINISTRATIVA-FINAL`; pesquisa com boundary devolveu zero matches. |
-| Pesquisa residual dos drifts corrigidos | PASS: sem referencias antigas de contagem, intervalo de sprints ou ficheiro MF8 removido nos ficheiros corrigidos. |
+| Passos tecnicos dos BKs MF8 | PASS: 70/70 passos com pontos 1 a 7, ficheiros envolvidos, `LOCALIZAÇÃO`, validacao e cenario negativo. |
+| Blocos de codigo nos BKs MF8 | PASS: apenas `BK-MF8-03` tem codigo; os blocos têm JSDoc/comentarios didaticos e imports/rotas confirmados contra a implementacao privada. |
+| Pesquisa de termos internos/proibidos nos BKs MF8 | PASS: sem matches proibidos. |
+| Pesquisa de caminhos privados nos BKs MF8 | PASS: sem matches para `real_dev`, variaveis internas da prompt ou caminhos privados. |
+| Pesquisa de drift de outras PAPs nos BKs MF8 | PASS com falsos positivos: `IVA` aparece apenas como substring de palavras FaithFlix/planeamento como `DERIVADO` e `AUDITORIA-ADMINISTRATIVA-FINAL`; sem drift real confirmado. |
+| Pesquisa de acentuacao nos BKs MF8 | PASS: todos os passos sem codigo usam `Sem código neste passo.` e nao `Sem codigo neste passo.` |
+| Contratos privados usados por `BK-MF8-03` | PASS: `assertSearchQuery`, `parsePagination`, `startTestServer`, `/health` e `/api/session/me` existem. |
 | Confirmacao de `real_dev/` ignorado | PASS: `.gitignore:2:real_dev/`. |
-| `git diff --check` | PASS. |
-| `bash scripts/validate-planificacao.sh` | PASS: `checked_bks=60`, `checked_guides=60`, `errors=[]`. |
+| `git diff --check` | PASS: sem output, exit code 0. |
+| `bash scripts/validate-planificacao.sh` | PASS: `status=PASS`, `checked_bks=60`, `checked_guides=60`, `errors=[]`. |
 
 ## Bloqueios ou TODOs restantes
 
-- Sem blockers dentro dos 10 BKs MF8.
-- Sem findings `PARCIAL` ou `CRITICO` dentro dos BKs alvo.
-- Sem bloqueios por scope pendentes relativos aos drifts corrigidos.
+- `BK-MF8-01..10`: sem blocker dentro do recorte.
+- Sem `TODO (BLOCKER)` restante dentro dos BKs MF8.
+- Drift legacy em `docs/planificacao/guias-bk/README.md` e em guias `MF0..MF7`: fora do recorte editavel desta execucao.

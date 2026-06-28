@@ -110,7 +110,7 @@ Regista origem, descrição curta e requisito ou BK associado.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -142,7 +142,7 @@ Usa categorias fechadas para facilitar leitura e priorização.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -174,7 +174,7 @@ Usa escala simples: baixo, médio, alto, crítico. Explica o motivo.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -206,7 +206,7 @@ Owner deve ser pessoa ou papel já usado no planeamento.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -238,7 +238,7 @@ Regista critério de decisão e evidence.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -270,7 +270,7 @@ Inclui falhas de ambiente, login, dados seed, navegação e tempo.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -302,7 +302,7 @@ Liga riscos a comandos, páginas ou ações manuais.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 

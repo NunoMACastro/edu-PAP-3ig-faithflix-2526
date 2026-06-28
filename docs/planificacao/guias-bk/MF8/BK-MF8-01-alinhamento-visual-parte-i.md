@@ -110,7 +110,7 @@ Revê `mockup/`, `frontend/src/` e a evidence MF7. Regista cada diferença como 
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -142,7 +142,7 @@ Confirma nomes já existentes em `frontend/src/styles/`. Não cries nomes novos 
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -174,7 +174,7 @@ Revê `frontend/src/components/layout/` e rotas visíveis. Regista diferenças p
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -206,7 +206,7 @@ Revê a página inicial e componentes usados no hero. A decisão deve separar es
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -238,7 +238,7 @@ Preenche a secção antes/depois da evidence com data, viewport, rota e observa�
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -270,7 +270,7 @@ Liga cada critério a RNF do header e a uma prova. Usa `PASS`, `PASS_COM_RESSALV
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -302,7 +302,7 @@ Escreve handoff com decisões, riscos e páginas que continuam na parte II.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 

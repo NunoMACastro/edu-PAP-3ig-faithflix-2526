@@ -110,7 +110,7 @@ Usa `BK-MF8-03`, evidence MF6/MF7/MF8 e scripts existentes como fontes.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -142,7 +142,7 @@ Regista regras para mudar cada estado e impacto na decisão final.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -174,7 +174,7 @@ Usa regra clara: sem bloqueios críticos para `GO`; riscos controlados para `GO_
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -206,7 +206,7 @@ Não reexecutes tudo neste passo; aponta para comandos e evidence de `BK-MF8-03`
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -238,7 +238,7 @@ Lista nomes de variáveis necessárias e onde são documentadas.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -270,7 +270,7 @@ Cada risco deve ter severidade, owner, mitigação e estado.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -302,7 +302,7 @@ Escreve decisão, provas principais, ressalvas e ações antes de `BK-MF8-05`.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -351,4 +351,5 @@ Resultado esperado: a validação documental fica em `PASS`; se existir falha t�
 
 #### Changelog
 
+- `2026-06-27`: frase dos passos sem código uniformizada com acentuação portuguesa correta.
 - `2026-06-27`: guia corrigido para a MF8 final de 10 BKs, com estrutura obrigatória, conceitos específicos, passos sem código declarados e critérios de evidence mais concretos.

@@ -110,7 +110,7 @@ Revê `frontend/src/pages/` e componentes de cards. Regista exemplos de estado n
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -142,7 +142,7 @@ Compara textos e hierarquia com documentação de MF4, sem inventar pagamentos r
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -174,7 +174,7 @@ Revê páginas com pedidos ao backend. Regista a mensagem visível para vazio, e
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -206,7 +206,7 @@ Usa screenshots por viewport e regista problemas por rota.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -238,7 +238,7 @@ Revê elementos interativos e estados de foco. Liga cada observação a RNF do h
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -270,7 +270,7 @@ Classifica diferenças como corrigida, aceite com ressalva ou bloqueante.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -302,7 +302,7 @@ Escreve handoff com rotas, estados, comandos e riscos visuais restantes.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 

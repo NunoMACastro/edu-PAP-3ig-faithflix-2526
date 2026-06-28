@@ -110,7 +110,7 @@ Cria tabela de triagem com id, tipo, severidade, owner e estado inicial.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -142,7 +142,7 @@ Define prioridade de correção e motivo.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -174,7 +174,7 @@ Regista ficheiros afetados ou motivo da não correção. Não descrevas alteraç
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -206,7 +206,7 @@ Usa apenas caminhos `backend/`, `frontend/`, `docs/`, `scripts/` ou `tests/`.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -238,7 +238,7 @@ Regista comando, output resumido e estado.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -270,7 +270,7 @@ Atualiza `LISTA-RISCOS-TOTAIS.md` se o risco continuar ativo.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -302,7 +302,7 @@ A decisão final deve dizer se `BK-MF8-10` pode congelar o scope.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 

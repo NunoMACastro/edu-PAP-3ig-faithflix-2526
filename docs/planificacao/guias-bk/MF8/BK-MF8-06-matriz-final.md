@@ -110,7 +110,7 @@ Lista fonte, caminho, data e uso na matriz.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -142,7 +142,7 @@ Usa RF/RNF ativos sem renumerar nem criar novos requisitos.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -174,7 +174,7 @@ Preenche campos de implementação, teste, proof e negativo.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -182,7 +182,7 @@ Como não há código neste passo, a explicação incide sobre a decisão técni
 
 6. Validação do passo.
 
-A validação passa quando estado `VALIDADO` tem proof e negativo proporcionais.
+A validação passa quando cada estado positivo, como `PASS` ou `PASS_COM_RESSALVAS`, tem proof e negativo proporcionais.
 
 7. Cenário negativo/erro esperado.
 
@@ -206,7 +206,7 @@ Regista impacto, motivo, owner e destino: risco, correção ou aceitação.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -238,7 +238,7 @@ Verifica dependências de MF7 para MF8 e da cadeia `BK-MF8-01` a `BK-MF8-10`.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -266,11 +266,11 @@ Atribuir estado final coerente a cada requisito.
 
 3. Instruções do que fazer.
 
-Usa estados como `VALIDADO`, `VALIDADO_COM_RESSALVAS`, `NAO_VALIDADO` ou `FORA_DO_SCOPE`.
+Usa apenas os estados finais definidos nos critérios de aceite: `PASS`, `PASS_COM_RESSALVAS`, `FAIL` ou `NAO_APLICAVEL`. Assim, a matriz final e a evidence usam o mesmo vocabulário.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -302,7 +302,7 @@ Cria lista de riscos candidatos com origem na matriz final.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem codigo neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 5. Explicação do código.
 
@@ -351,4 +351,5 @@ Resultado esperado: a validação documental fica em `PASS`; se existir falha t�
 
 #### Changelog
 
+- `2026-06-27`: corrigida a acentuação dos passos sem código e normalizado o vocabulário de estados finais para `PASS`, `PASS_COM_RESSALVAS`, `FAIL` e `NAO_APLICAVEL`.
 - `2026-06-27`: guia corrigido para a MF8 final de 10 BKs, com estrutura obrigatória, conceitos específicos, passos sem código declarados e critérios de evidence mais concretos.
