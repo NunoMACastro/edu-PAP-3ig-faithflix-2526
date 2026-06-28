@@ -1,0 +1,23 @@
+{
+    "name": "faithflix-backend",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "node --watch src/server.js",
+        "start": "node src/server.js",
+        "test": "node --test",
+        "smoke": "node --test tests/smoke/*.test.js",
+        "promote:admin": "node scripts/promote-admin.js",
+        "seed:e2e": "node scripts/seed-mf2-e2e.js",
+        "seed:e2e:mf4": "node scripts/seed-mf4-e2e.js",
+        "dev:reset-token": "node scripts/show-dev-reset-token.js"
+    },
+    "dependencies": {
+        "express": "^4.19.2",
+        "mongodb": "^6.16.0"
+    },
+    "engines": {
+        "node": ">=20"
+    }
+}

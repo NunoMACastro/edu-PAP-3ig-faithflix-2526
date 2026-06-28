@@ -1,0 +1,110 @@
+/**
+ * @file Ficheiro `real_dev/frontend/src/pages/ContentDetailPage.jsx` da implementação real_dev.
+ */
+
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { CommentsPanel } from "../components/comments/CommentsPanel.jsx";
+import { RelatedContent } from "../components/discovery/RelatedContent.jsx";
+import { LibraryActions } from "../components/library/LibraryActions.jsx";
+import { RatingBox } from "../components/ratings/RatingBox.jsx";
+import { catalogApi } from "../services/api/catalogApi.js";
+
+/**
+ * Documenta `formatDuration`, mantendo explícita a responsabilidade desta função no módulo.
+ *
+ * @param {unknown} seconds Valor recebido por `formatDuration`.
+ * @returns {unknown} Resultado devolvido por `formatDuration`.
+ */
+function formatDuration(seconds) {
+    const minutes = Math.round(Number(seconds) / 60);
+    return `${minutes} min`;
+}
+
+/**
+ * Página pública de detalhe de conteúdo.
+ *
+ * @returns {JSX.Element} Página de detalhe de conteúdo.
+ */
+export function ContentDetailPage() {
+    const { idOrSlug } = useParams();
+    const [content, setContent] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        let active = true;
+
+        setLoading(true);
+        setError("");
+
+        catalogApi
+            .getDetail(idOrSlug)
+            .then((response) => {
+                if (active) {
+                    setContent(response.content);
+                }
+            })
+            .catch((requestError) => {
+                if (active) {
+                    setError(requestError.message);
+                }
+            })
+            .finally(() => {
+                if (active) {
+                    setLoading(false);
+                }
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [idOrSlug]);
+
+    if (loading) {
+        return (
+            <section className="page-section">
+                <p role="status">A carregar conteúdo...</p>
+            </section>
+        );
+    }
+
+    if (error || !content) {
+        return (
+            <section className="page-section">
+                <h1>Conteúdo indisponível</h1>
+                <p>{error || "Conteúdo não encontrado."}</p>
+            </section>
+        );
+    }
+
+    return (
+        <section className="page-section" data-testid="content-detail">
+            {content.assets?.backdropUrl || content.assets?.posterUrl ? (
+                <img
+                    className="detail-media"
+                    src={content.assets.backdropUrl || content.assets.posterUrl}
+                    alt=""
+                />
+            ) : null}
+            <p className="section-kicker">{content.type}</p>
+            <h1>{content.title}</h1>
+            <p>{content.synopsis}</p>
+            <dl className="meta-list">
+                <dt>Duração</dt>
+                <dd>{formatDuration(content.durationSeconds)}</dd>
+                <dt>Classificação</dt>
+                <dd>{content.ageRating}+</dd>
+            </dl>
+            <div className="button-row">
+                <Link className="button-link" to={`/ver/${content.id}`}>
+                    Reproduzir
+                </Link>
+            </div>
+            <LibraryActions contentId={content.id} />
+            <RatingBox contentId={content.id} />
+            <CommentsPanel contentId={content.id} />
+            <RelatedContent contentId={content.id} />
+        </section>
+    );
+}
