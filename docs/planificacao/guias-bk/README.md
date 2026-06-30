@@ -1,6 +1,6 @@
 # Guias BK - README
 
-`last_updated`: `2026-06-27`
+`last_updated`: `2026-06-30`
 
 ## O que esta pasta contem
 
@@ -8,7 +8,7 @@ Guias de execucao por backlog item (`BK-*`) para apoiar implementacao, validacao
 
 ## Estrutura
 
-- `MF0/` ate `MF8/`: guias BK por macrofase.
+- `MF0/` ate `MF9/`: guias BK por macrofase.
 - `_TEMPLATE-BK.md`: template canonico para criar/editar qualquer guia.
 
 ## Contrato canonico obrigatorio

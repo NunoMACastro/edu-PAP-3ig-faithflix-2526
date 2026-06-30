@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-06-30`
 
 ## Objetivo
 
@@ -17,12 +17,12 @@ Traduzir os requisitos ativos (`RF` e `RNF`) num plano executavel para 4 alunos,
 
 - Equipa tecnica: `Matheus`, `Mateus`, `Davi`, `Kaue`.
 - Orientacao: `Nuno` (governance, avaliacao, gates e defesa).
-- Limites estruturais: `12 sprints`, `60 BK`.
+- Limites estruturais: `13 sprints`, `66 BK`.
 - Distribuicao desigual de BK mantida por criterio pedagogico e tecnico.
 
 ## Baseline de escopo MVP (2026-04-17)
 
-- BK ativos no MVP corrente: `60/60`.
+- BK ativos no MVP corrente: `66/66`.
 - RF fora de escopo removidos integralmente de `docs/RF.md`, backlog e matriz.
 - Regra documental: apenas itens ativos permanecem nos artefactos canonicos.
 
@@ -48,6 +48,7 @@ Traduzir os requisitos ativos (`RF` e `RNF`) num plano executavel para 4 alunos,
 | `MF6` | Hardening | `RNF` criticos de qualidade/performance/seguranca |
 | `MF7` | Refinamento de UI e navegacao segura | inventario UI/mockup, sessao/role, layout, paginas e gate visual |
 | `MF8` | Consolidacao, evidencia, readiness, auditoria, defesa, buffer e fecho | alinhamento visual mockup/frontend, testes finais, readiness, auditoria admin, matriz final, riscos totais, report de erros, correcao e scope freeze |
+| `MF9` | Plano Pro/Familia, partilha real e qualidade de streaming | `RF61..RF63`, entitlements, memberships familiares, qualidade por plano, RGPD operacional e gate S13 |
 
 ### Nota anti-drift sobre `MF0`
 
@@ -82,15 +83,22 @@ A fundacao tecnica com ficheiros, comandos, estrutura de projeto e decisoes impl
 
 ### Gate S12
 
-- Fecho integral `91/91` (RF+RNF ativos) e `60/60` BK.
+- Fecho integral da baseline MF8: `91/91` (RF+RNF ativos) e `60/60` BK.
 - Scorecard oficial consolidado sprint-a-sprint.
 - Score final consolidado no scorecard oficial.
 - Parecer final `GO/NO-GO` com assinatura do orientador.
 
+### Gate S13
+
+- Fecho incremental `94/94` (RF+RNF ativos) e `66/66` BK.
+- Validacao end-to-end de planos Pro/Familia, partilha familiar real e qualidade por plano.
+- Regressao backend/frontend e evidence MF9 anexada.
+- Parecer final atualizado `GO/NO-GO` com assinatura do orientador.
+
 ## Criterios de saida do plano
 
 - Validacao automatica a `PASS`: `scripts/validate-planificacao.sh`.
-- Gate `S4/S8/S12` com baseline + execucao real + acao corretiva.
+- Gate `S4/S8/S12/S13` com baseline + execucao real + acao corretiva.
 - Score total `>=97/100` no contrato oficial.
 
 ## Changelog
@@ -104,3 +112,4 @@ A fundacao tecnica com ficheiros, comandos, estrutura de projeto e decisoes impl
 
 - `2026-06-22`: MF7 passou a UI/navegacao segura e MF8 passou a consolidacao, evidencia, defesa, buffer e fecho.
 - `2026-06-27`: MF8 condensada para 10 BKs finais, com matriz final apenas depois dos BKs tecnicos.
+- `2026-06-30`: adicionada MF9 em S13 para planos Pro/Familia, partilha familiar real, qualidade por plano e regressao final.

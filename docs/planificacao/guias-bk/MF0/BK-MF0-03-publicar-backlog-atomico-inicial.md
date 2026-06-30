@@ -37,7 +37,7 @@ O trabalho operacional é validar `docs/planificacao/backlogs/BACKLOG-MVP.md` co
 
 Neste BK vamos publicar o backlog atómico inicial do FaithFlix. "Atómico" significa que cada BK deve ser suficientemente pequeno para ser executado, validado e defendido, mas suficientemente completo para entregar valor ou preparar uma entrega seguinte. Na MF0, o valor é organizacional: a equipa passa a saber exatamente que BKs existem, quem é owner, que dependências há e que evidência mínima será exigida.
 
-O backlog oficial tem 60 BK ativos, distribuídos por `MF0..MF8`. Este BK não altera o escopo funcional; confirma que o backlog representa o MVP descrito no README/RF/RNF e que cada linha tem os campos obrigatórios: `bk_id`, `titulo`, `owner`, `apoio`, `prioridade`, `estado`, `esforco`, `dependencias` e `rf_rnf`.
+O backlog oficial tem 66 BK ativos, distribuídos por `MF0..MF9`. Este BK não altera o escopo funcional; confirma que o backlog representa o MVP descrito no README/RF/RNF e que cada linha tem os campos obrigatórios: `bk_id`, `titulo`, `owner`, `apoio`, `prioridade`, `estado`, `esforco`, `dependencias` e `rf_rnf`.
 
 A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de criar ecrãs, rotas ou modelos, a equipa precisa de uma lista de trabalho estável.
 
@@ -51,7 +51,7 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
 
 ##### O que entra (scope)
 
-- Validar os 60 BK ativos do MVP.
+- Validar os 66 BK ativos do MVP.
 - Confirmar campos obrigatórios e valores permitidos.
 - Confirmar sequência e dependências da `MF0` e transição para `MF1`.
 - Confirmar ligação entre backlog, matriz canónica, MF views e plano de sprints.
@@ -67,7 +67,7 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
 
 ##### Como saber que isto ficou bem
 
-- O backlog mantém `60 BK` e todos têm campos obrigatórios.
+- O backlog mantém `66 BK` e todos têm campos obrigatórios.
 - A `MF0` tem 6 BK em sequência coerente.
 - `BK-MF1-01` e `BK-MF1-02` dependem de `BK-MF0-06`, garantindo handoff de governance para fundação técnica.
 - A matriz canónica reconhece os BK transversais da MF0.
@@ -92,8 +92,8 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
 
 #### O que vamos fazer neste BK (DERIVADO):
 
-- Confirmar que o backlog tem 60 BK ativos e não contém itens fora de escopo.
-- Confirmar que cada BK usa o formato `BK-MF[0-8]-NN`.
+- Confirmar que o backlog tem 66 BK ativos e não contém itens fora de escopo.
+- Confirmar que cada BK usa o formato `BK-MF[0-9]+-NN`.
 - Confirmar que prioridade, estado, esforço e dependências seguem os valores permitidos.
 - Confirmar que a sequência MF0 do backlog coincide com `MF-VIEWS.md`.
 - Criar handoff para `BK-MF0-04` com as regras que entram na Definition of Done.
@@ -101,7 +101,7 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
 #### Estado, ficheiros e impacto (DERIVADO):
 
 - Estado esperado antes do BK: plano total existe e a equipa tem distribuição de responsabilidades; backlog ainda precisa de validação atómica.
-- Estado esperado depois do BK: backlog de 60 BK validado como fonte operacional e pronto para alimentar DoD/evidence.
+- Estado esperado depois do BK: backlog de 66 BK validado como fonte operacional e pronto para alimentar DoD/evidence.
 - Ficheiros a criar: nenhum.
 - Ficheiros a editar: apenas este guia se forem registados ajustes/evidence do BK.
 - Ficheiros a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`, `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`, `docs/planificacao/backlogs/MF-VIEWS.md`, `docs/planificacao/sprints/PLANO-SPRINTS.md`.
@@ -113,7 +113,7 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
 
 #### Pre-leitura minima (10-15 min) (DERIVADO):
 
-- `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`: limites estruturais `12 sprints`, `60 BK`.
+- `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`: limites estruturais `13 sprints`, `66 BK`.
 - `docs/planificacao/backlogs/BACKLOG-MVP.md`: documento alvo.
 - `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`: rastreabilidade e cobertura.
 - `docs/planificacao/backlogs/MF-VIEWS.md`: sequência por macro fase.
@@ -151,10 +151,10 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
    - Descricao detalhada do objetivo: validar que o backlog ativo é o documento certo e está alinhado ao plano total.
    - Justificacao: o backlog é a base operacional dos BK seguintes.
    - Como fazer (0.1): rever header e baseline do `BACKLOG-MVP.md`.
-   - Como fazer (0.2): confirmar referência a `60 BK`.
+   - Como fazer (0.2): confirmar referência a `66 BK`.
    - Ficheiro a rever: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
    - Ficheiro alvo: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-   - Snippet de referencia: `Universo final de backlog ativo: 60 BK`
+   - Snippet de referencia: `Universo final de backlog ativo: 66 BK`
    - O que verificar: não há contagem divergente entre plano e backlog.
 
 1. **Objetivo (~15 min): Validar contrato de campos**
@@ -194,13 +194,13 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
    - Como fazer (4.2): confirmar que todos os `BK-MF0-01..06` aparecem.
    - Ficheiro a rever: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
    - Ficheiro alvo: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-   - Snippet de referencia: `Checklist de gate S4/S8/S12 + evidence pr/proof/neg`
+   - Snippet de referencia: `Checklist de gate S4/S8/S12/S13 + evidence pr/proof/neg`
    - O que verificar: os seis BK da MF0 têm cobertura transversal.
 
 5. **Objetivo (~15 min): Validar ligação ao plano de sprints**
    - Descricao detalhada do objetivo: confirmar que a Sprint 1 inclui `BK-MF0-01..06`, `BK-MF1-01` e `BK-MF1-02`.
    - Justificacao: a carga e ordem semanal devem ser realistas.
-   - Como fazer (5.1): rever calendário de 12 sprints.
+   - Como fazer (5.1): rever calendário de 13 sprints.
    - Como fazer (5.2): confirmar carga alvo de Sprint 1.
    - Ficheiro a rever: `docs/planificacao/sprints/PLANO-SPRINTS.md`
    - Ficheiro alvo: `docs/planificacao/backlogs/BACKLOG-MVP.md`
@@ -241,7 +241,7 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
 
 **Smoke**
 - [ ] Backlog tem header ativo.
-- [ ] Backlog declara `60 BK`.
+- [ ] Backlog declara `66 BK`.
 - [ ] Secção MF0 contém 6 BK.
 - [ ] Ligações para guias da MF0 existem.
 
@@ -273,7 +273,7 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
 - Lista de regras de campos preparada para DoD.
 
 **Verificacoes:**
-- 60 BK ativos.
+- 66 BK ativos.
 - 6 BK na MF0.
 - Todos os BK da MF0 aparecem na matriz como transversais.
 
@@ -313,8 +313,8 @@ A fase foi detalhada sem mockup e sem código da app. Isto é esperado: antes de
 
 ```text
 CHECK BK-MF0-03
-1. backlog.total_bk == 55
-2. all(bk.id.match("BK-MF[0-8]-[0-9][0-9]"))
+1. backlog.total_bk == 66
+2. all(bk.id.match("BK-MF[0-9]+-[0-9][0-9]"))
 3. all(bk.owner != "")
 4. all(bk.prioridade in ["P0", "P1", "P2"])
 5. all(bk.dependencias == "-" or dependencias_existem(bk))

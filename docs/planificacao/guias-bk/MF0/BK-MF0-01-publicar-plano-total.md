@@ -56,9 +56,9 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
 ##### O que entra (scope)
 
 - Rever e publicar o plano total da PAP em `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`.
-- Confirmar que as macro fases `MF0..MF8` estão descritas e alinhadas com backlog e sprints.
+- Confirmar que as macro fases `MF0..MF9` estão descritas e alinhadas com backlog e sprints.
 - Confirmar que os contratos canónicos obrigatórios apontam para ficheiros existentes.
-- Confirmar que a regra de gates `S4/S8/S12` está clara.
+- Confirmar que a regra de gates `S4/S8/S12/S13` está clara.
 - Registar evidence mínima para defesa: referência de PR/commit, prova de validação e negativos documentais.
 
 ##### O que nao entra (scope-out)
@@ -97,7 +97,7 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
 #### O que vamos fazer neste BK (DERIVADO):
 
 - Confirmar que `PLANO-IMPLEMENTACAO-TOTAL.md` traduz RF/RNF num plano executável para 4 alunos.
-- Validar que os 60 BK ativos e as 12 sprints são referidos sem contradição.
+- Validar que os 66 BK ativos e as 13 sprints são referidos sem contradição.
 - Confirmar que `MF0` aparece como kickoff/governance e que `MF1` aparece como fundação técnica.
 - Registar que não existe código de app neste momento, logo este BK não mexe em caminhos de `src`, `server` ou `client`.
 - Preparar um handoff curto para `BK-MF0-02` com a lista de macro fases e artefactos canónicos.
@@ -127,7 +127,7 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
 - `docs/RF.md`: escopo funcional ativo por domínio.
 - `docs/RNF.md`: RNF críticos e stack tecnológica sugerida.
 - `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`: objetivo, macro fases e critérios de saída.
-- `docs/planificacao/backlogs/BACKLOG-MVP.md`: universo de 60 BK e contrato de campos.
+- `docs/planificacao/backlogs/BACKLOG-MVP.md`: universo de 66 BK e contrato de campos.
 - `docs/planificacao/sprints/PLANO-SPRINTS.md`: Sprint 1 e gates.
 - Mockup: não existe; a fase foi detalhada sem mockup.
 - Código: não existe app detetável no repositório; não há ficheiros de implementação a rever neste BK.
@@ -139,7 +139,7 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
 - Governance: conjunto de regras para decidir, validar e evitar trabalho desalinhado.
 - Fonte oficial: ficheiro que tem autoridade sobre uma decisão.
 - Drift: divergência entre documentos que deveriam dizer a mesma coisa.
-- Gate: ponto formal de validação, como `S4`, `S8` ou `S12`.
+- Gate: ponto formal de validação, como `S4`, `S8`, `S12` ou `S13`.
 - Evidence: provas objetivas usadas no PR ou defesa da PAP.
 - Scope-out: lista do que fica fora para evitar aumento descontrolado do trabalho.
 
@@ -149,9 +149,9 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
 
 **Rastreabilidade.** Rastreabilidade significa conseguir responder: "este requisito está coberto por que BK e por que evidência?". Mesmo num BK transversal sem RF direto, a matriz indica que ele entra nos gates por checklist e evidence `pr/proof/neg`.
 
-**Drift documental.** Drift acontece quando, por exemplo, o plano diz 60 BK, mas o backlog mostra outro número. Em PAP isto é perigoso porque os alunos podem trabalhar sobre versões diferentes da verdade.
+**Drift documental.** Drift acontece quando, por exemplo, o plano diz 66 BK, mas o backlog mostra outro número. Em PAP isto é perigoso porque os alunos podem trabalhar sobre versões diferentes da verdade.
 
-**Gates.** Um gate é uma paragem de controlo. No FaithFlix há gates em `S4`, `S8` e `S12`. O objetivo é corrigir cedo, não descobrir no fim que faltam evidências.
+**Gates.** Um gate é uma paragem de controlo. No FaithFlix há gates em `S4`, `S8`, `S12` e `S13`. O objetivo é corrigir cedo, não descobrir no fim que faltam evidências.
 
 **Stack derivada.** A stack ainda não é implementada neste BK, mas o plano e RNF apontam para Node.js LTS, Express modular, frontend React/Next.js e MongoDB Atlas. Isto fica como contrato de preparação para `MF1`, sem instalar dependências agora.
 
@@ -179,17 +179,17 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
    - O que verificar: o plano menciona monetização solidária e não remove o diferencial do projeto.
 
 2. **Objetivo (~15 min): Validar universo de backlog**
-   - Descricao detalhada do objetivo: confirmar que o plano total fala em `60/60` BK ativos e que isso bate certo com o backlog.
+   - Descricao detalhada do objetivo: confirmar que o plano total fala em `66/66` BK ativos e que isso bate certo com o backlog.
    - Justificacao: se o número de BK divergir, as sprints e a matriz ficam pouco confiáveis.
    - Como fazer (2.1): rever a secção `Baseline de escopo MVP` no plano.
    - Como fazer (2.2): comparar com `BACKLOG-MVP.md`, secção `Baseline de escopo MVP`.
    - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
    - Ficheiro alvo: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
-   - Snippet de referencia: `BK ativos no MVP corrente: 60/60`
-   - O que verificar: ambos os documentos indicam 60 BK ativos.
+   - Snippet de referencia: `BK ativos no MVP corrente: 66/66`
+   - O que verificar: ambos os documentos indicam 66 BK ativos.
 
 3. **Objetivo (~15 min): Confirmar macro fases**
-   - Descricao detalhada do objetivo: rever se `MF0..MF8` têm nomes e cobertura coerentes.
+   - Descricao detalhada do objetivo: rever se `MF0..MF9` têm nomes e cobertura coerentes.
    - Justificacao: as fases seguintes só são cumulativas se a sequência macro for estável.
    - Como fazer (3.1): comparar a tabela `Macro fases` com a sequência de `MF-VIEWS.md`.
    - Como fazer (3.2): confirmar que `MF0` está descrita como kickoff/governance.
@@ -209,9 +209,9 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
    - O que verificar: os seis contratos canónicos obrigatórios existem no repositório.
 
 5. **Objetivo (~15 min): Confirmar gates e critérios de saída**
-   - Descricao detalhada do objetivo: validar que `S4`, `S8` e `S12` aparecem com critérios verificáveis.
+   - Descricao detalhada do objetivo: validar que `S4`, `S8`, `S12` e `S13` aparecem com critérios verificáveis.
    - Justificacao: gates fracos levam a BKs marcados como completos sem evidência.
-   - Como fazer (5.1): rever as secções `Gate S4`, `Gate S8` e `Gate S12`.
+   - Como fazer (5.1): rever as secções `Gate S4`, `Gate S8`, `Gate S12` e `Gate S13`.
    - Como fazer (5.2): confirmar que o plano exige `PASS` no script e validação humana.
    - Ficheiro a rever: `docs/planificacao/sprints/PLANO-SPRINTS.md`
    - Ficheiro alvo: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
@@ -235,7 +235,7 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
    - Como fazer (7.2): procurar macro fase existente no plano mas ausente em `MF-VIEWS.md`.
    - Ficheiro a rever: `docs/planificacao/backlogs/MF-VIEWS.md`
    - Ficheiro alvo: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
-   - Snippet de referencia: `MF0..MF8`
+   - Snippet de referencia: `MF0..MF9`
    - O que verificar: pelo menos 3 negativos P0 ficam registados na evidence.
 
 8. **Objetivo (~10 min): Fechar evidence e handoff**
@@ -252,11 +252,11 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
 
 **Smoke**
 - [ ] `PLANO-IMPLEMENTACAO-TOTAL.md` existe e tem header ativo.
-- [ ] A tabela de macro fases inclui `MF0..MF8`.
+- [ ] A tabela de macro fases inclui `MF0..MF9`.
 - [ ] O plano aponta para backlog, matriz, template, scorecard, guião docente e script.
 
 **Negativos**
-- [ ] Passo: 2; input/acao: comparar contagem de BK no plano e backlog; resultado esperado: ambos indicam `60/60`; risco que cobre: planeamento com universo errado.
+- [ ] Passo: 2; input/acao: comparar contagem de BK no plano e backlog; resultado esperado: ambos indicam `66/66`; risco que cobre: planeamento com universo errado.
 - [ ] Passo: 3; input/acao: procurar `MF0` tratada como produto funcional; resultado esperado: `MF0` aparece como kickoff/governance; risco que cobre: alunos começarem implementação fora de ordem.
 - [ ] Passo: 4; input/acao: verificar caminhos de contratos canónicos; resultado esperado: todos existem; risco que cobre: fonte de verdade quebrada.
 - [ ] Passo: 0; input/acao: procurar instrucoes para criar `apps/api`, `apps/web`, `backend/`, `frontend/` ou comandos de scaffold em `MF0`; resultado esperado: nenhuma instrucao de criacao tecnica; risco que cobre: implementacao antecipada antes de `MF1`.
@@ -283,9 +283,9 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
 - Handoff para `BK-MF0-02` preparado com macro fases e contratos canónicos.
 
 **Verificacoes:**
-- Plano e backlog indicam `60/60` BK ativos.
+- Plano e backlog indicam `66/66` BK ativos.
 - `MF0` aparece como kickoff/governance.
-- Gates `S4/S8/S12` existem e têm critérios.
+- Gates `S4/S8/S12/S13` existem e têm critérios.
 - Nao ha criacao de scaffold tecnico no fecho deste BK.
 
 **Qualidade:**
@@ -324,8 +324,8 @@ Este BK não entrega uma funcionalidade visível do FaithFlix, mas protege todas
 ```text
 CHECK BK-MF0-01
 1. plano_total.existe == true
-2. plano_total.macro_fases == MF0..MF8
-3. backlog.total_bk == 55
+2. plano_total.macro_fases == MF0..MF9
+3. backlog.total_bk == 66
 4. matriz.cobre_bk_transversais(MF0) == true
 5. gate_saida.inclui(script_validacao, validacao_orientador) == true
 ```

@@ -15,30 +15,30 @@
 - `fase_documental`: `Fase 3`
 - `sprint`: `S12`
 - `core_or_reforco`: `Reforco`
-- `proximo_bk`: `FIM`
+- `proximo_bk`: `BK-MF9-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF8/BK-MF8-10-scope-freeze.md`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-06-30`
 
 #### Objetivo
 
-Neste BK vais congelar o scope final da PAP FaithFlix. O foco é declarar o que está dentro, o que ficou fora, que riscos foram aceites e que estado final pode ser defendido.
+Neste BK vais congelar o scope final da baseline MF8 FaithFlix antes da extensao MF9. O foco é declarar o que está dentro, o que ficou fora, que riscos foram aceites e que estado MF8 pode ser defendido.
 
-O resultado observável é `docs/evidence/MF8/SCOPE-FREEZE.md`, com checklist final, decisão de entrega e trabalho pós-PAP claramente separado.
+O resultado observável é `docs/evidence/MF8/SCOPE-FREEZE.md`, com checklist final, decisão de entrega MF8 e handoff claro para `BK-MF9-01`.
 
 #### Importância
 
-Scope freeze protege a equipa contra mudanças de última hora. Também torna a defesa mais honesta: o aluno sabe o que entrega, o que não entrega e como justificar as decisões finais.
+Scope freeze protege a equipa contra mudanças de última hora. Também torna a defesa mais honesta: o aluno sabe o que a MF8 entrega, o que não entrega e como justificar o avanço para a MF9.
 
 #### Scope-in
 
 - Congelar funcionalidades entregues.
 - Listar exclusões e riscos aceites.
 - Confirmar estado final da app e evidence.
-- Indicar trabalho pós-PAP sem misturar com entrega.
+- Indicar trabalho pós-MF8 ou pós-PAP sem misturar com a entrega MF8.
 
 #### Scope-out
 
-- Criar funcionalidades novas.
+- Criar funcionalidades novas da MF9.
 - Reabrir bugs já classificados sem decisão.
 - Alterar RF/RNF ou owners.
 - Prometer evolução futura como se estivesse entregue.
@@ -46,7 +46,7 @@ Scope freeze protege a equipa contra mudanças de última hora. Também torna a 
 #### Estado antes e depois
 
 - Antes: `BK-MF8-09` fecha correção/classificação dos erros.
-- Depois: a PAP tem decisão final e cadeia MF8 terminada.
+- Depois: a baseline MF8 tem decisão final, cadeia MF8 terminada e handoff para `BK-MF9-01`.
 
 #### Pre-requisitos
 
@@ -60,7 +60,7 @@ Scope freeze protege a equipa contra mudanças de última hora. Também torna a 
 
 - `Scope freeze`: congelamento formal do âmbito entregue.
 - `Exclusão`: funcionalidade ou melhoria fora da entrega final.
-- `Trabalho pós-PAP`: melhoria futura que não conta como entrega atual.
+- `Trabalho pós-MF8`: melhoria ou extensão futura que não conta como entrega MF8.
 - `Decisão final`: estado de entrega com ou sem ressalvas.
 
 #### Conceitos teóricos essenciais
@@ -68,7 +68,7 @@ Scope freeze protege a equipa contra mudanças de última hora. Também torna a 
 - `CANONICO`: o scope final vem do backlog, matriz, evidence e correções; evita prometer trabalho não entregue.
 - `DERIVADO`: exclusões bem escritas protegem a equipa, porque explicam limite sem parecer esquecimento.
 - `CANONICO`: riscos aceites precisam de origem e mitigação; seguem para defesa como decisão consciente.
-- `DERIVADO`: trabalho pós-PAP é futuro e não deve ser usado para validar requisito atual.
+- `DERIVADO`: trabalho pós-MF8 ou pós-PAP é futuro e não deve ser usado para validar requisito atual da MF8.
 - `CANONICO`: checklist final confirma que segredos, dados sensíveis e outputs privados não entram na entrega.
 
 #### Arquitetura do BK
@@ -345,10 +345,11 @@ Resultado esperado: a validação documental fica em `PASS`; se existir falha t�
 #### Handoff
 
 - Entrega principal: `docs/evidence/MF8/SCOPE-FREEZE.md`.
-- Próximo BK: `FIM`.
+- Próximo BK: `BK-MF9-01`.
 - O handoff deve indicar decisões fechadas, ressalvas, riscos, blockers e owner da próxima ação.
 - Se houver `FAIL`, o próximo BK só pode avançar com decisão explícita do orientador ou com correção registada.
 
 #### Changelog
 
 - `2026-06-27`: guia corrigido para a MF8 final de 10 BKs, com estrutura obrigatória, conceitos específicos, passos sem código declarados e critérios de evidence mais concretos.
+- `2026-06-30`: handoff atualizado para `BK-MF9-01` após criação da MF9 canónica.

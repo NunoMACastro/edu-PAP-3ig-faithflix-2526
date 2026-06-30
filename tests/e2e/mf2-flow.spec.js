@@ -8,12 +8,12 @@ test("MF2 fluxo principal: login, detalhe, listas, player e biblioteca", async (
     await page.getByTestId("email-input").fill("e2e@faithflix.test");
     await page.getByTestId("password-input").fill("password-segura-123");
     await page.getByTestId("login-submit").click();
-    await expect(page.getByText("Sessao iniciada.")).toBeVisible();
+    await expect(page.getByRole("status")).toHaveText("Sess\u00e3o iniciada.");
 
     const catalogStart = performance.now();
     await page.goto("/catalogo");
     await expect(
-        page.getByRole("heading", { name: /catalogo/i }),
+        page.getByRole("heading", { name: "Cat\u00e1logo FaithFlix" }),
     ).toBeVisible();
     await expect(page.getByText("Piloto FaithFlix")).toBeVisible();
     const catalogLoadMs = performance.now() - catalogStart;
@@ -66,5 +66,10 @@ test("MF2 fluxo principal: login, detalhe, listas, player e biblioteca", async (
 
     await page.goto("/biblioteca");
     await expect(page.getByTestId("my-library")).toBeVisible();
-    await expect(page.getByText("Piloto FaithFlix")).toBeVisible();
+    await expect(
+        page
+            .getByTestId("my-library")
+            .getByRole("heading", { name: "Piloto FaithFlix" })
+            .first(),
+    ).toBeVisible();
 });

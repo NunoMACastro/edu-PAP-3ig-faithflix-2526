@@ -37,6 +37,7 @@ build/
 .vitest/
 .jest/
 test-results/
+playwright-report/
 
 # IDEs e editores
 .vscode/

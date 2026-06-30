@@ -14,10 +14,11 @@
 10. [Notificações](#10-notificações)
 11. [Privacidade e RGPD](#11-privacidade-e-rgpd)
 12. [Administração e Operação](#12-administração-e-operação)
-13. [Critérios de Aceitação](#critérios-de-aceitação)
-14. [Sugestão de MVP organizado por fases e RF](#sugestão-de-mvp-organizado-por-fases-e-rf)
-15. [Licença](#licença)
-16. [Changelog](#changelog)
+13. [Planos Pro/Família e Qualidade](#13-planos-profamília-e-qualidade)
+14. [Critérios de Aceitação](#critérios-de-aceitação)
+15. [Sugestão de MVP organizado por fases e RF](#sugestão-de-mvp-organizado-por-fases-e-rf)
+16. [Licença](#licença)
+17. [Changelog](#changelog)
 
 -   [Voltar ao início](../README.md)
 
@@ -162,6 +163,16 @@
 
 ---
 
+### 13. Planos Pro/Família e Qualidade
+
+| Código | Requisito                          | Atores              | Prioridade | Dependências |
+| ------ | ---------------------------------- | ------------------- | ---------- | ------------ |
+| RF61   | Planos Pro/Família e entitlements  | Utilizador/Sistema  | Must       | RF35, RF38   |
+| RF62   | Partilha familiar real             | Utilizador/Sistema  | Must       | RF02, RF61   |
+| RF63   | Qualidade de streaming por plano   | Utilizador/Sistema  | Must       | RF11, RF15, RF61 |
+
+---
+
 ## Critérios de Aceitação
 
 > Critérios de aceitação são descrições detalhadas que definem quando um requisito funcional está completo e funciona conforme esperado.
@@ -172,6 +183,14 @@
 -   Se o pagamento falhar, o sistema bloqueia o acesso e envia notificação.
 -   Trial só pode ser usado uma vez por utilizador.
 -   Página de gestão deve mostrar: método, ciclo, data de renovação, estado atual.
+
+### Planos Pro/Família e Qualidade (RF61–RF63)
+
+-   Os planos Pro e Família devem expor entitlements públicos sem quebrar os códigos `faithflix-monthly` e `faithflix-yearly`.
+-   A partilha familiar deve usar contas reais existentes, exigir owner com plano Família ativo e impedir múltiplas famílias ativas por membro.
+-   Membros familiares devem obter acesso premium apenas enquanto o owner mantiver plano Família ativo.
+-   A qualidade máxima deve ser imposta no backend: Pro/trial até `1080p`; Família até `2160p/4K`.
+-   URLs de qualidades bloqueadas não podem ser expostos ao frontend.
 
 ### Streaming (RF11–RF15)
 
@@ -204,6 +223,7 @@
 -   **Fase 2 - Descoberta MVP:** RF19–RF28 (classificações, pesquisa e recomendações IA baseline).
 -   **Fase 3 - Monetização Solidária:** RF35–RF48, RF52–RF54 (subscrições, pool de associações e notificações essenciais).
 -   **Fase 4 - Operação e Privacidade:** RF55–RF60 (RGPD, administração e operação base).
+-   **Fase 5 - Planos avançados e família:** RF61–RF63 (entitlements, partilha familiar real e qualidade por plano).
 
 ---
 
@@ -219,3 +239,4 @@ Projeto académico orientado para fins educativos no âmbito da PAP.
 -   **2026-04-13** - Nome do projeto uniformizado para **FaithFlix** e atualização editorial de consistência documental.
 -   **2026-04-17** - Removidos RF fora de escopo da versão PAP para manter requisitos e planificação sem referências residuais.
 -   **2026-04-17** - Clarificada a política de numeracao RF apos rebaseline para evitar ambiguidade pedagógica.
+-   **2026-06-30** - Adicionados RF61–RF63 para MF9: planos Pro/Família, partilha familiar real e qualidade de streaming por plano.

@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-05-25`
+- `last_updated`: `2026-06-30`
 
 ## Objetivo
 
@@ -349,6 +349,41 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 - Frontend real alinhado ao mockup, testes finais preparados e executados, readiness e auditoria administrativa fechados, matriz final colocada depois do trabalho tecnico, riscos totais registados, erros tratados e scope congelado.
 
+---
+
+## MF9 - Plano Pro/Familia, partilha real e qualidade de streaming
+
+### Sequencia
+
+1. `BK-MF9-01`
+2. `BK-MF9-02`
+3. `BK-MF9-03`
+4. `BK-MF9-04`
+5. `BK-MF9-05`
+6. `BK-MF9-06`
+
+### Guias disponiveis
+
+- `BK-MF9-01`: `../guias-bk/MF9/BK-MF9-01-planos-pro-familia-entitlements.md`
+- `BK-MF9-02`: `../guias-bk/MF9/BK-MF9-02-qualidade-streaming-por-plano.md`
+- `BK-MF9-03`: `../guias-bk/MF9/BK-MF9-03-modelo-api-partilha-familiar.md`
+- `BK-MF9-04`: `../guias-bk/MF9/BK-MF9-04-ui-gestao-familiar-convites.md`
+- `BK-MF9-05`: `../guias-bk/MF9/BK-MF9-05-privacidade-operacao-metricas-familia.md`
+- `BK-MF9-06`: `../guias-bk/MF9/BK-MF9-06-gate-mf9-regressao-evidencia-final.md`
+
+### Step-by-step
+
+1. Atualizar planos Pro/Familia e entitlements.
+2. Aplicar qualidade de streaming por plano.
+3. Criar modelo e API de partilha familiar real.
+4. Criar UI de gestao familiar e convites.
+5. Integrar privacidade, operacao e metricas com familia.
+6. Executar gate MF9, regressao e evidencia final.
+
+### Pronto da macro
+
+- Planos Pro/Familia funcionam end-to-end, partilha familiar e real entre contas, qualidade e limitada pelo backend, RGPD/metrica refletem familia e gate S13 fica validado.
+
 ## Changelog
 
 - `2026-04-11`: versao revista com equipa correta e ownership atualizado.
@@ -359,3 +394,4 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 - `2026-06-22`: atualizadas MF7/MF8 para nova cadeia.
 - `2026-06-27`: MF8 condensada para 10 BKs finais, com alinhamento visual, testes, readiness, auditoria, matriz final, riscos totais, report, correcao e freeze.
+- `2026-06-30`: adicionada MF9 com 6 BKs para Pro/Familia, partilha familiar real, qualidade por plano e gate S13.

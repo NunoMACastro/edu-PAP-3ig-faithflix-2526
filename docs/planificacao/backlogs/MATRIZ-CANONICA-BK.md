@@ -7,11 +7,11 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-06-30`
 
 ## Objetivo
 
-Garantir rastreabilidade canonica requisito -> BK -> evidencia no backlog atualizado de 60 BKs.
+Garantir rastreabilidade canonica requisito -> BK -> evidencia no backlog atualizado de 66 BKs.
 
 ## Baseline de escopo MVP (2026-04-17)
 
@@ -21,10 +21,10 @@ Garantir rastreabilidade canonica requisito -> BK -> evidencia no backlog atuali
 
 - `bk_id`, `macro`, `owner` e `prioridade` devem refletir o valor oficial do `BACKLOG-MVP.md`.
 - Toda alteracao em backlog que mexa em `owner`, `prioridade`, `dependencias` ou `rf_rnf` obriga revisao da matriz no mesmo sprint.
-- O estado `status_validacao` evolui por gate (`S4`, `S8`, `S12`) e deve estar alinhado com o scorecard e checklist de gate.
+- O estado `status_validacao` evolui por gate (`S4`, `S8`, `S12`, `S13`) e deve estar alinhado com o scorecard e checklist de gate.
 - A matriz e fonte de rastreabilidade, mas nao substitui a ordem temporal canonica definida em `PLANO-SPRINTS.md`.
 
-## Tabela canonica por requisito (91 linhas)
+## Tabela canonica por requisito (94 linhas)
 
 | requisito | bk_id | macro | owner | prioridade | dimensao_tecnica | criterio_mensuravel | evidence_minima | status_validacao |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -79,6 +79,9 @@ Garantir rastreabilidade canonica requisito -> BK -> evidencia no backlog atuali
 | `RF58` | `BK-MF5-04` | `MF5` | Kaue | `P1` | Privacidade, administracao e operacao | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S8) |
 | `RF59` | `BK-MF5-05` | `MF5` | Davi | `P1` | Privacidade, administracao e operacao | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S8) |
 | `RF60` | `BK-MF5-06` | `MF5` | Davi | `P1` | Privacidade, administracao e operacao | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S8) |
+| `RF61` | `BK-MF9-01` | `MF9` | Matheus | `P0` | Planos avancados, familia e qualidade | Planos Pro/Familia expõem entitlements e preservam compatibilidade dos codigos atuais. | pr/proof/neg preenchidos + testes MF9 de planos e checkout. | PENDENTE (Gate S13) |
+| `RF62` | `BK-MF9-03` | `MF9` | Matheus | `P0` | Planos avancados, familia e qualidade | Partilha familiar usa contas reais, owner com plano Familia ativo e bloqueios de membership duplicada. | pr/proof/neg preenchidos + testes MF9 de convites, aceite, remocao e acesso. | PENDENTE (Gate S13) |
+| `RF63` | `BK-MF9-02` | `MF9` | Mateus | `P0` | Planos avancados, familia e qualidade | Playback limita qualidade por entitlement e não expõe URL acima do plano. | pr/proof/neg preenchidos + testes MF9 de filtro e fallback de qualidade. | PENDENTE (Gate S13) |
 | `RNF01` | `BK-MF6-05` | `MF6` | Mateus | `P1` | UX, usabilidade e acessibilidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
 | `RNF02` | `BK-MF6-05` | `MF6` | Mateus | `P1` | UX, usabilidade e acessibilidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
 | `RNF03` | `BK-MF6-05` | `MF6` | Mateus | `P1` | UX, usabilidade e acessibilidade | Fluxo do requisito validado no guia, com smoke completo e >=3 negativos (P0/P1). | pr/proof/neg preenchidos + evidencia objetiva (teste, log ou captura). | PENDENTE (Gate S12) |
@@ -126,12 +129,12 @@ Estes BKs sao obrigatorios para governance, refinamento final, defesa e fecho.
 
 | bk_id | macro | owner | prioridade | cobertura_no_gate |
 | --- | --- | --- | --- | --- |
-| `BK-MF0-01` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF0-02` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF0-03` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF0-04` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF0-05` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
-| `BK-MF0-06` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12 + evidence `pr/proof/neg` |
+| `BK-MF0-01` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12/S13 + evidence `pr/proof/neg` |
+| `BK-MF0-02` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12/S13 + evidence `pr/proof/neg` |
+| `BK-MF0-03` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12/S13 + evidence `pr/proof/neg` |
+| `BK-MF0-04` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12/S13 + evidence `pr/proof/neg` |
+| `BK-MF0-05` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12/S13 + evidence `pr/proof/neg` |
+| `BK-MF0-06` | `MF0` | Nuno | `P0` | Checklist de gate S4/S8/S12/S13 + evidence `pr/proof/neg` |
 | `BK-MF6-06` | `MF6` | Nuno | `P0` | Gate tecnico final antes da MF7 |
 | `BK-MF7-01` | `MF7` | Mateus | `P0` | Inventario UI/mockup e plano de refinamento |
 | `BK-MF7-05` | `MF7` | Nuno | `P0` | Gate visual, responsividade e navegacao segura |
@@ -157,14 +160,21 @@ Estes BKs partilham requisitos com outros BKs de base tecnica e, por isso, entra
 | `BK-MF8-05` | `MF8` | `RNF19, RNF30` | Matheus | Validar auditoria administrativa final, permissoes, rotas protegidas e exposicao indevida |
 | `BK-MF8-06` | `MF8` | `RF_ATIVOS_MVP` | Kaue | Validar matriz final RF/RNF depois dos BKs tecnicos, readiness e auditoria |
 | `BK-MF8-08` | `MF8` | `RNF29, RNF21, RNF22` | Davi | Validar execucao dos testes automaticos, manuais e visuais com report de erros |
+| `BK-MF9-01` | `MF9` | `RF35, RF38, RF61, RNF40` | Matheus | Validar planos Pro/Familia, entitlements publicos e compatibilidade dos planos existentes |
+| `BK-MF9-02` | `MF9` | `RF15, RF63, RNF29` | Mateus | Validar qualidade de streaming por plano com enforcement backend e testes de fallback |
+| `BK-MF9-03` | `MF9` | `RF62, RNF13, RNF15, RNF16, RNF19` | Matheus | Validar modelo/API de partilha familiar real, ownership e convites |
+| `BK-MF9-04` | `MF9` | `RF62, RNF01, RNF05, RNF38, RNF40` | Mateus | Validar UI de gestao familiar, convites pendentes e mensagens PT-PT |
+| `BK-MF9-05` | `MF9` | `RF55, RF56, RF59, RF62, RNF17, RNF19, RNF30` | Davi | Validar RGPD, metricas e operacao com memberships familiares |
+| `BK-MF9-06` | `MF9` | `RF61, RF62, RF63, RNF21, RNF22, RNF29, RNF38, RNF40` | Kaue | Validar gate MF9, regressao completa, build/smoke e evidencia final |
 
 ## Validacoes estruturais
 
-- Requisitos mapeados: `91/91`.
-- BKs com requisito direto (primario + secundario): `48`.
+- Requisitos mapeados: `94/94`.
+- BKs com requisito direto (primario + secundario): `54`.
 - BKs transversais registados em secao propria: `12`.
-- BKs totais visiveis no artefacto (requisito de cobertura): `60/60`.
-- IDs BK reestruturados em MF8 conforme baseline de 60 BK, sem alterar requisitos ativos.
+- BKs totais visiveis no artefacto (requisito de cobertura): `66/66`.
+- IDs BK reestruturados em MF8 preservados como historico; baseline ativa passa a 66 BK com MF9.
+- MF9 adiciona RF61..RF63 e mantem RNF01..RNF40 como contrato nao funcional ativo.
 
 ## Changelog
 
@@ -175,3 +185,4 @@ Estes BKs partilham requisitos com outros BKs de base tecnica e, por isso, entra
 
 - `2026-06-22`: atualizada matriz para nova MF7/MF8.
 - `2026-06-27`: MF8 atualizada para 10 BKs finais, com matriz final depois de alinhamento, testes, readiness e auditoria.
+- `2026-06-30`: MF9 adicionada com RF61..RF63, 6 BKs e gate S13.

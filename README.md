@@ -38,6 +38,7 @@ A proposta de valor está na integração destas dimensões sem fragmentação: 
 - gestão de catálogo e taxonomias de conteúdo;
 - página de detalhe com metadados essenciais;
 - reprodução com continuidade (“continuar a ver”);
+- qualidade de streaming limitada por plano;
 - favoritos, watchlist e histórico pessoal.
 
 ### 4.3 Descoberta e recomendação
@@ -47,6 +48,8 @@ A proposta de valor está na integração destas dimensões sem fragmentação: 
 
 ### 4.4 Monetização e pool solidária (núcleo diferencial)
 Fluxo funcional da pool solidária no MVP:
+- planos Pro/Família com entitlements;
+- partilha familiar real entre contas existentes;
 - candidatura de associação elegível;
 - validação/aprovação para entrada na pool;
 - distribuição mensal por rotação/regras definidas;
@@ -74,13 +77,14 @@ A arquitetura privilegia separação de responsabilidades, rastreabilidade de de
 - gestão básica de conta e privacidade;
 - pesquisa e recomendação baseline;
 - pool solidária completa no fluxo essencial (candidatura, aprovação, rotação, transparência);
+- planos Pro/Família, partilha familiar real e qualidade por plano;
 - administração mínima para operar o produto.
 
 ### Pós-PAP (adiado)
 - funcionalidades de comunidade avançada;
 - gamificação;
 - workflow editorial avançado com denúncias complexas;
-- perfis familiares/dispositivos com regras avançadas;
+- perfis infantis, limites de dispositivos e regras familiares avançadas;
 - automações de recomendação e notificação de maior complexidade.
 
 ## 7. Requisitos Não Funcionais Críticos
@@ -96,7 +100,8 @@ Fonte canónica RNF: [docs/RNF.md](docs/RNF.md).
 1. fundação técnica e identidade da aplicação;
 2. catálogo, detalhe e experiência de visualização;
 3. subscrição e pool solidária em ciclo completo;
-4. endurecimento operacional, qualidade documental e preparação de defesa.
+4. endurecimento operacional, qualidade documental e preparação de defesa;
+5. planos Pro/Família, partilha familiar real e qualidade por plano.
 
 ## 9. Créditos, Licença e Changelog
 ### Créditos
@@ -111,3 +116,4 @@ Projeto académico para fins educativos.
 
 ### Changelog
 - 2026-04-17: README reescrito integralmente com estrutura canónica, escopo MVP/pós-PAP e alinhamento com plano mestre.
+- 2026-06-30: escopo MVP atualizado para incluir MF9 com planos Pro/Família, partilha familiar real e qualidade por plano.

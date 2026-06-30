@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-06-30`
 
 ## Objetivo
 
@@ -58,6 +58,7 @@ Campos obrigatorios por sprint:
 | S10 | - | - | - | - | - | 10 | - | - | Verde | - |
 | S11 | - | - | - | - | - | 11 | - | - | Verde | - |
 | S12 | - | - | - | - | - | 15 | - | - | Amarelo | Checkpoint docente reforcado para a cadeia pratica final da MF8 |
+| S13 | - | - | - | - | - | 13 | - | - | Amarelo | Checkpoint docente reforcado para a MF9 de planos Pro/Familia, partilha real e qualidade |
 
 ## Regras de semaforo
 
@@ -78,3 +79,4 @@ Campos obrigatorios por sprint:
 
 - `2026-06-22`: cargas S08..S12 sincronizadas com reestruturacao MF7/MF8.
 - `2026-06-27`: S12 mantida a 15 pontos e sincronizada com a MF8 final de 10 BKs.
+- `2026-06-30`: S13 adicionada com 13 pontos para a MF9 e gate incremental.

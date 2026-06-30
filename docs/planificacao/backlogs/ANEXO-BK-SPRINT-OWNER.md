@@ -6,7 +6,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-06-30`
 
 ## Objetivo
 Consolidar BK, sprint e ownership para validação cruzada rápida.
@@ -74,6 +74,12 @@ Consolidar BK, sprint e ownership para validação cruzada rápida.
 | BK-MF8-08 | MF8 | S12 | Davi | Matheus, Kaue | P0 | Reforco | RNF29, RNF21, RNF22 | BK-MF8-07 | docs/planificacao/guias-bk/MF8/BK-MF8-08-execucao-testes-report-erros.md |
 | BK-MF8-09 | MF8 | S12 | Kaue | Matheus, Mateus, Davi | P0 | Reforco | transversal | BK-MF8-08 | docs/planificacao/guias-bk/MF8/BK-MF8-09-correcao-erros-report.md |
 | BK-MF8-10 | MF8 | S12 | Kaue | Matheus, Mateus, Davi | P0 | Reforco | transversal | BK-MF8-09 | docs/planificacao/guias-bk/MF8/BK-MF8-10-scope-freeze.md |
+| BK-MF9-01 | MF9 | S13 | Matheus | Davi | P0 | Reforco | RF35, RF38, RF61, RNF40 | BK-MF4-01,BK-MF4-02 | docs/planificacao/guias-bk/MF9/BK-MF9-01-planos-pro-familia-entitlements.md |
+| BK-MF9-02 | MF9 | S13 | Mateus | Matheus | P0 | Reforco | RF15, RF63, RNF29 | BK-MF9-01,BK-MF2-06 | docs/planificacao/guias-bk/MF9/BK-MF9-02-qualidade-streaming-por-plano.md |
+| BK-MF9-03 | MF9 | S13 | Matheus | Kaue | P0 | Reforco | RF62, RNF13, RNF15, RNF16, RNF19 | BK-MF9-01,BK-MF2-01 | docs/planificacao/guias-bk/MF9/BK-MF9-03-modelo-api-partilha-familiar.md |
+| BK-MF9-04 | MF9 | S13 | Mateus | Davi | P0 | Reforco | RF62, RNF01, RNF05, RNF38, RNF40 | BK-MF9-03 | docs/planificacao/guias-bk/MF9/BK-MF9-04-ui-gestao-familiar-convites.md |
+| BK-MF9-05 | MF9 | S13 | Davi | Kaue | P1 | Core | RF55, RF56, RF59, RF62, RNF17, RNF19, RNF30 | BK-MF9-03,BK-MF9-04 | docs/planificacao/guias-bk/MF9/BK-MF9-05-privacidade-operacao-metricas-familia.md |
+| BK-MF9-06 | MF9 | S13 | Kaue | Matheus, Mateus, Davi | P0 | Reforco | RF61, RF62, RF63, RNF21, RNF22, RNF29, RNF38, RNF40 | BK-MF9-01,BK-MF9-02,BK-MF9-03,BK-MF9-04,BK-MF9-05 | docs/planificacao/guias-bk/MF9/BK-MF9-06-gate-mf9-regressao-evidencia-final.md |
 
 ## Changelog
 - `2026-04-14`: anexo consolidado a partir dos guias BK canónicos.
@@ -81,3 +87,4 @@ Consolidar BK, sprint e ownership para validação cruzada rápida.
 
 - `2026-06-22`: redistribuidas sprints finais para 60 BK.
 - `2026-06-27`: MF8 atualizada para 10 BKs finais, com matriz apenas depois de alinhamento visual, testes, readiness e auditoria.
+- `2026-06-30`: adicionada MF9 em S13 com 6 BKs para planos Pro/Familia, partilha familiar e qualidade por plano.

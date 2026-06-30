@@ -1,6 +1,6 @@
 # Planificacao - FaithFlix
 
-`last_updated`: `2026-06-27`
+`last_updated`: `2026-06-30`
 
 ## Objetivo
 
@@ -8,13 +8,13 @@ Centralizar a planificacao executavel do FaithFlix com contrato canonico alinhad
 
 ## Baseline de escopo MVP (2026-04-17)
 
-- Backlog ativo final: `60 BK`.
+- Backlog ativo final: `66 BK`.
 - Regra aplicada: BK/RF fora de escopo foram removidos integralmente dos requisitos e da planificacao.
 - Estado operativo esperado: apenas itens em escopo aparecem nos artefactos canónicos.
 
 ## Mapa rapido
 
-- `PLANO-IMPLEMENTACAO-TOTAL.md`: plano macro (`MF0..MF8`) e regras de execucao.
+- `PLANO-IMPLEMENTACAO-TOTAL.md`: plano macro (`MF0..MF9`) e regras de execucao.
 - `DISTRIBUICAO-RESPONSABILIDADES.md`: ownership, handoff e pairing.
 - `backlogs/BACKLOG-MVP.md`: backlog oficial (`BK-*`) com owner/prioridade/dependencias/rf_rnf.
 - `backlogs/MATRIZ-CANONICA-BK.md`: rastreabilidade requisito -> BK -> evidencia.
@@ -57,4 +57,4 @@ Centralizar a planificacao executavel do FaithFlix com contrato canonico alinhad
 ## Validacao
 
 - Comando oficial: `bash scripts/validate-planificacao.sh`.
-- Fecho de gate (`S4/S8/S12`): script em `PASS` + validacao humana do orientador.
+- Fecho de gate (`S4/S8/S12/S13`): script em `PASS` + validacao humana do orientador.

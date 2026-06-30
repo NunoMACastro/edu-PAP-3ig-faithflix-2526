@@ -79,7 +79,7 @@ BKs, relatorios e evidence:
 
 - MF8 completa: 10 guias, de `BK-MF8-01` a `BK-MF8-10`.
 - Cadeia anterior relevante: `BK-MF7-05 -> BK-MF8-01`.
-- Cadeia final da MF8: `BK-MF8-01 -> BK-MF8-02 -> BK-MF8-03 -> BK-MF8-04 -> BK-MF8-05 -> BK-MF8-06 -> BK-MF8-07 -> BK-MF8-08 -> BK-MF8-09 -> BK-MF8-10 -> FIM`.
+- Cadeia interna da MF8: `BK-MF8-01 -> BK-MF8-02 -> BK-MF8-03 -> BK-MF8-04 -> BK-MF8-05 -> BK-MF8-06 -> BK-MF8-07 -> BK-MF8-08 -> BK-MF8-09 -> BK-MF8-10`; handoff posterior para `BK-MF9-01`.
 - Guias anteriores `MF0..MF7`, por inventario estrutural e coerencia de dependencias.
 - Relatorios `AUDITORIA-HIDRATACAO-*.md` e relatorios de implementacao real_dev relevantes para historico.
 
@@ -101,7 +101,7 @@ Raizes de validacao confirmadas:
 | `BK-MF8-07` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `LISTA-RISCOS-TOTAIS.md`, separa riscos tecnicos/produto/seguranca/dados/demonstracao e prepara execucao de testes. |
 | `BK-MF8-08` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `EXECUCAO-TESTES-REPORT-ERROS.md`, consome testes de `BK-MF8-03` e entrega erros acionaveis para `BK-MF8-09`. |
 | `BK-MF8-09` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `CORRECAO-ERROS-REPORT.md`, trata causa raiz, revalidacao, classificacao e ressalvas antes do freeze. |
-| `BK-MF8-10` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `SCOPE-FREEZE.md`, fecha scope, exclusoes, riscos aceites, estado final e handoff terminal `FIM`. |
+| `BK-MF8-10` | `OK` | Tem 16 secoes obrigatorias, 7 passos, evidence `SCOPE-FREEZE.md`, fecha scope, exclusoes, riscos aceites, estado final e handoff para `BK-MF9-01`. |
 
 ## Findings
 
@@ -167,7 +167,7 @@ Sem findings `PARCIAL` ou `CRITICO` restantes dentro dos BKs MF8.
 | `BK-MF8-07` | `docs/evidence/MF8/LISTA-RISCOS-TOTAIS.md` | `BK-MF8-06`, matriz final, readiness e auditoria | `BK-MF8-08` | Lista riscos tecnicos, produto, UX, seguranca, dados e manutencao. | Riscos de dados/sessao/permissao exigem owner, mitigacao e decisao. | Priorizacao por impacto/probabilidade e riscos aceites. |
 | `BK-MF8-08` | `docs/evidence/MF8/EXECUCAO-TESTES-REPORT-ERROS.md` | `BK-MF8-07`, testes de `BK-MF8-03`, scripts reais | `BK-MF8-09` | Executa comandos e regista erros acionaveis sem output excessivo. | Outputs seguros sem tokens, cookies, passwords ou dados pessoais. | Report por `TST-*`, expected/observed, severidade e owner. |
 | `BK-MF8-09` | `docs/evidence/MF8/CORRECAO-ERROS-REPORT.md`; eventualmente ficheiros publicos `backend/`, `frontend/`, `tests/`, `scripts/` quando o erro exigir | `BK-MF8-08` | `BK-MF8-10` | Corrige apenas erro reproduzido; nao predefine endpoints novos. | Prioriza auth, autorizacao, dados e privacidade; nao apaga erro sem prova. | Revalidacao por erro, estado corrigido/ressalva/bloqueado. |
-| `BK-MF8-10` | `docs/evidence/MF8/SCOPE-FREEZE.md` | `BK-MF8-09`, matriz final, riscos e evidence final | `FIM` | Congela estado e scope; nao cria produto novo. | Verifica segredos, dados sensiveis, outputs privados e exclusoes. | Checklist final, decisao de entrega e trabalho pos-PAP separado. |
+| `BK-MF8-10` | `docs/evidence/MF8/SCOPE-FREEZE.md` | `BK-MF8-09`, matriz final, riscos e evidence final | `BK-MF9-01` | Congela estado e scope; nao cria produto novo. | Verifica segredos, dados sensiveis, outputs privados e exclusoes. | Checklist final, decisao de entrega, trabalho pos-PAP separado e handoff para MF9. |
 
 Confirmacoes de integracao:
 
@@ -187,8 +187,8 @@ Confirmacoes de integracao:
 - `BK-MF8-07` prioriza riscos totais para orientar `BK-MF8-08`.
 - `BK-MF8-08` executa testes e reporta erros para `BK-MF8-09`.
 - `BK-MF8-09` corrige, classifica ou bloqueia erros antes de `BK-MF8-10`.
-- `BK-MF8-10` congela o scope e fecha a cadeia.
-- Nao existe MF seguinte depois da MF8; o fecho esperado e `FIM`/scope freeze.
+- `BK-MF8-10` congela o scope MF8 e entrega handoff controlado para `BK-MF9-01`.
+- MF9 e uma extensao posterior; nao reabre a baseline MF8 congelada.
 
 ## Drift documental encontrado
 
@@ -225,7 +225,7 @@ Confirmacoes de integracao:
 | Contratos privados usados por `BK-MF8-03` | PASS: `assertSearchQuery`, `parsePagination`, `startTestServer`, `/health` e `/api/session/me` existem. |
 | Confirmacao de `real_dev/` ignorado | PASS: `.gitignore:2:real_dev/`. |
 | `git diff --check` | PASS: sem output, exit code 0. |
-| `bash scripts/validate-planificacao.sh` | PASS: `status=PASS`, `checked_bks=60`, `checked_guides=60`, `errors=[]`. |
+| `bash scripts/validate-planificacao.sh` | PASS: revalidacao posterior confirma `status=PASS`, `checked_bks=66`, `checked_guides=66`, `errors=[]`. |
 
 ## Bloqueios ou TODOs restantes
 

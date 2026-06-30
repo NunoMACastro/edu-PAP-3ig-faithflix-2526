@@ -7,7 +7,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-06-30`
 
 ## Objetivo
 
@@ -17,7 +17,7 @@ Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios 
 
 Aplicacao direta do `PLANO-MESTRE-ALTERACOES-PAP.md` ao FaithFlix.
 
-- Universo final de backlog ativo: `60 BK`.
+- Universo final de backlog ativo: `66 BK`.
 - Regra operacional: backlog e planificacao incluem apenas BK em escopo do MVP atual.
 
 ## Contrato de rastreabilidade canonica
@@ -34,7 +34,7 @@ Campos obrigatorios por linha BK: `bk_id`, `titulo`, `owner`, `apoio`, `priorida
 
 Regras obrigatorias:
 
-1. `bk_id` segue formato `BK-MF[0-8]-[0-9][0-9]`.
+1. `bk_id` segue formato `BK-MF[0-9]+-[0-9][0-9]`.
 2. `prioridade` so permite `P0|P1|P2`.
 3. `estado` so permite `TODO|IN_PROGRESS|BLOCKED|DONE`.
 4. `esforco` so permite `S|M|L`.
@@ -55,7 +55,7 @@ Regras obrigatorias:
 - Criterios de aceite por guia devem ser mensuraveis (condicao + metrica/limiar + evidencia).
 - Evidence minima por BK: trio `pr`, `proof`, `neg`.
 - Cada guia deve ter objetivo especifico por BK, snippet tecnico e `Proximo BK recomendado` com ID real.
-- Validacao obrigatoria de conformidade em gates `S4`, `S8` e `S12`.
+- Validacao obrigatoria de conformidade em gates `S4`, `S8`, `S12` e `S13`.
 
 ## Contrato de qualidade e validacao
 
@@ -82,12 +82,13 @@ Regras obrigatorias:
 | `MF6` | `TODO` | `0/6`     |
 | `MF7` | `TODO` | `0/5`     |
 | `MF8` | `TODO` | `0/10`    |
+| `MF9` | `TODO` | `0/6`     |
 
 ---
 
 ## Ligacao para guias BK (cobertura total)
 
-Tabela de referencia para todos os guias pedagogicos publicados (MF0..MF8).
+Tabela de referencia para todos os guias pedagogicos publicados (MF0..MF9).
 Estado do guia indica a fase de criacao documental.
 
 | BK          | Guia | Estado do guia |
@@ -152,6 +153,12 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF8-08` | `../guias-bk/MF8/BK-MF8-08-execucao-testes-report-erros.md` | `CRIADO (Fase 3)` |
 | `BK-MF8-09` | `../guias-bk/MF8/BK-MF8-09-correcao-erros-report.md` | `CRIADO (Fase 3)` |
 | `BK-MF8-10` | `../guias-bk/MF8/BK-MF8-10-scope-freeze.md` | `CRIADO (Fase 3)` |
+| `BK-MF9-01` | `../guias-bk/MF9/BK-MF9-01-planos-pro-familia-entitlements.md` | `CRIADO (Fase 3)` |
+| `BK-MF9-02` | `../guias-bk/MF9/BK-MF9-02-qualidade-streaming-por-plano.md` | `CRIADO (Fase 3)` |
+| `BK-MF9-03` | `../guias-bk/MF9/BK-MF9-03-modelo-api-partilha-familiar.md` | `CRIADO (Fase 3)` |
+| `BK-MF9-04` | `../guias-bk/MF9/BK-MF9-04-ui-gestao-familiar-convites.md` | `CRIADO (Fase 3)` |
+| `BK-MF9-05` | `../guias-bk/MF9/BK-MF9-05-privacidade-operacao-metricas-familia.md` | `CRIADO (Fase 3)` |
+| `BK-MF9-06` | `../guias-bk/MF9/BK-MF9-06-gate-mf9-regressao-evidencia-final.md` | `CRIADO (Fase 3)` |
 
 ---
 
@@ -278,6 +285,17 @@ Estado do guia indica a fase de criacao documental.
 | `BK-MF8-09` | Correcao de erros do report anterior | Kaue | Matheus, Mateus, Davi | P0 | TODO | M | `BK-MF8-08` | transversal |
 | `BK-MF8-10` | Scope Freeze | Kaue | Matheus, Mateus, Davi | P0 | TODO | S | `BK-MF8-09` | transversal |
 
+## MF9 - Plano Pro/Familia, partilha real e qualidade de streaming
+
+| BK          | Titulo | Owner | Apoio | Pri | Estado | Esforco | Dependencias | RF/RNF |
+| ----------- | ------ | ----- | ----- | --- | ------ | ------- | ------------ | ------ |
+| `BK-MF9-01` | Planos Pro/Familia e entitlements | Matheus | Davi | P0 | TODO | L | `BK-MF4-01`,`BK-MF4-02` | RF35, RF38, RF61, RNF40 |
+| `BK-MF9-02` | Qualidade de streaming por plano | Mateus | Matheus | P0 | TODO | M | `BK-MF9-01`,`BK-MF2-06` | RF15, RF63, RNF29 |
+| `BK-MF9-03` | Modelo e API de partilha familiar | Matheus | Kaue | P0 | TODO | L | `BK-MF9-01`,`BK-MF2-01` | RF62, RNF13, RNF15, RNF16, RNF19 |
+| `BK-MF9-04` | UI de gestao familiar e convites | Mateus | Davi | P0 | TODO | M | `BK-MF9-03` | RF62, RNF01, RNF05, RNF38, RNF40 |
+| `BK-MF9-05` | Privacidade, operacao e metricas com familia | Davi | Kaue | P1 | TODO | M | `BK-MF9-03`,`BK-MF9-04` | RF55, RF56, RF59, RF62, RNF17, RNF19, RNF30 |
+| `BK-MF9-06` | Gate MF9, regressao e evidencia final | Kaue | Matheus, Mateus, Davi | P0 | TODO | M | `BK-MF9-01`,`BK-MF9-02`,`BK-MF9-03`,`BK-MF9-04`,`BK-MF9-05` | RF61, RF62, RF63, RNF21, RNF22, RNF29, RNF38, RNF40 |
+
 ## Criterios de aceite globais por BK (step-by-step)
 
 1. Implementacao concluida pelo owner.
@@ -293,7 +311,8 @@ Estado do guia indica a fase de criacao documental.
 - Gate `S4`: auditoria de cobertura de matriz + conformidade de guias da janela S1..S4.
 - Gate `S8`: auditoria de coerencia backlog/matriz/guias para S5..S8.
 - Gate `S12`: auditoria final integral para defesa PAP.
-- Score final e regra de aprovacao: consolidados no processo de gate (`S4/S8/S12`).
+- Gate `S13`: auditoria MF9 para planos Pro/Familia, partilha real, qualidade por plano e regressao.
+- Score final e regra de aprovacao: consolidados no processo de gate (`S4/S8/S12/S13`).
 - Pesos oficiais e formulario de score por sprint: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`.
 - Checkpoints e remediacao docente: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`.
 - Comando de pre-fecho: `bash scripts/validate-planificacao.sh`.
@@ -311,3 +330,4 @@ Estado do guia indica a fase de criacao documental.
 
 - `2026-06-22`: reestruturadas MF7/MF8; baseline atualizado para `60/60` BK.
 - `2026-06-27`: MF8 condensada para 10 BKs finais, com alinhamento visual, testes, readiness, auditoria, matriz, riscos totais, report de erros, correcao e scope freeze; baseline atualizado para `60/60` BK.
+- `2026-06-30`: adicionada MF9 com 6 BKs para planos Pro/Familia, partilha familiar real, qualidade de streaming por plano e gate S13; baseline atualizado para `66/66` BK.

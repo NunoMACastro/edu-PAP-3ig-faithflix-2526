@@ -142,7 +142,7 @@ Se o orientador quiser promover este contrato para artefacto canonico separado, 
 
 - `docs/planificacao/backlogs/BACKLOG-MVP.md`: contrato pedagógico v3 e critérios globais.
 - `docs/planificacao/guias-bk/_TEMPLATE-BK.md`: estrutura mínima atual dos guias.
-- `docs/planificacao/sprints/PLANO-SPRINTS.md`: gates `S4/S8/S12`.
+- `docs/planificacao/sprints/PLANO-SPRINTS.md`: gates `S4/S8/S12/S13`.
 - `docs/planificacao/sprints/SCORECARD-SPRINTS.md`: critérios de avaliação por sprint.
 - `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`: remediação e evidence incompleta.
 - Guias `MF0/BK-MF0-01..03`: outputs anteriores.

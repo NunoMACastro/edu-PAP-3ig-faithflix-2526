@@ -6,7 +6,7 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-06-30`
 
 ## Objetivo
 Fixar o contrato canónico mínimo por BK e evitar drift entre backlog, matriz e guias.
@@ -81,8 +81,15 @@ Nota de escopo:
 | BK-MF8-08 | Davi | P0 | BK-MF8-07 | RNF29, RNF21, RNF22 |
 | BK-MF8-09 | Kaue | P0 | BK-MF8-08 | transversal |
 | BK-MF8-10 | Kaue | P0 | BK-MF8-09 | transversal |
+| BK-MF9-01 | Matheus | P0 | BK-MF4-01,BK-MF4-02 | RF35, RF38, RF61, RNF40 |
+| BK-MF9-02 | Mateus | P0 | BK-MF9-01,BK-MF2-06 | RF15, RF63, RNF29 |
+| BK-MF9-03 | Matheus | P0 | BK-MF9-01,BK-MF2-01 | RF62, RNF13, RNF15, RNF16, RNF19 |
+| BK-MF9-04 | Mateus | P0 | BK-MF9-03 | RF62, RNF01, RNF05, RNF38, RNF40 |
+| BK-MF9-05 | Davi | P1 | BK-MF9-03,BK-MF9-04 | RF55, RF56, RF59, RF62, RNF17, RNF19, RNF30 |
+| BK-MF9-06 | Kaue | P0 | BK-MF9-01,BK-MF9-02,BK-MF9-03,BK-MF9-04,BK-MF9-05 | RF61, RF62, RF63, RNF21, RNF22, RNF29, RNF38, RNF40 |
 
 ## Changelog
 - `2026-04-14`: contrato canónico criado a partir do `BACKLOG-MVP.md`.
 - `2026-04-17`: removidos BK fora de escopo e atualizadas dependencias/rastreabilidade da baseline MVP.
 - `2026-06-27`: snapshot MF8 atualizado para a cadeia final de 10 BKs e baseline global de 60 BK.
+- `2026-06-30`: snapshot MF9 adicionado para S13 e baseline global de 66 BK.

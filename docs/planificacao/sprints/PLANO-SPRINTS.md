@@ -7,15 +7,15 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-06-30`
 
 ## Objetivo
 
-Definir cadencia semanal para transformar backlog em entregas incrementais com 4 alunos, mantendo `12 sprints` e registando explicitamente a excecao de carga da sprint final.
+Definir cadencia semanal para transformar backlog em entregas incrementais com 4 alunos, mantendo `13 sprints` e registando explicitamente as excecoes de carga das sprints finais.
 
 ## Baseline de escopo MVP (aplicada em 2026-04-17)
 
-- Planeamento alinhado ao backlog final de `60 BK`.
+- Planeamento alinhado ao backlog final de `66 BK`.
 - Itens fora de escopo nao aparecem no calendario ativo de sprints.
 
 ## Capacidade recomendada
@@ -37,7 +37,7 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 - Scorecard oficial por sprint: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`
 - Guiao docente semanal: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
 
-## Calendario de 12 sprints
+## Calendario de 13 sprints
 
 | Sprint      | Foco                              | BKs alvo                                  | Carga alvo |
 | ----------- | --------------------------------- | ----------------------------------------- | ---------- |
@@ -53,8 +53,9 @@ Definir cadencia semanal para transformar backlog em entregas incrementais com 4
 | `Sprint 10` | Regressao + hardening antecipado  | `BK-MF6-01..05`                           | `10`       |
 | `Sprint 11` | Gate tecnico + UI segura          | `BK-MF6-06`, `BK-MF7-01..05`, `BK-MF8-01` | `11`       |
 | `Sprint 12` | Alinhamento final, testes, readiness e freeze | `BK-MF8-02..10`                           | `15`       |
+| `Sprint 13` | Pro/Familia, partilha real, qualidade e gate MF9 | `BK-MF9-01..06`                           | `13`       |
 
-> Regra operacional: nenhuma sprint regular deve ultrapassar `11` pontos. A `Sprint 12` fica como excecao aprovada de fecho, com `15` pontos, porque concentra o alinhamento visual final, testes, readiness, auditoria, matriz, riscos, report, correcao e freeze.
+> Regra operacional: nenhuma sprint regular deve ultrapassar `11` pontos. A `Sprint 12` fica como excecao aprovada de fecho MF8, com `15` pontos. A `Sprint 13` fica como excecao aprovada de extensao MF9, com `13` pontos, por concentrar planos Pro/Familia, partilha real, qualidade por plano, RGPD operacional e gate.
 
 ## Ordem interna obrigatoria nas sprints com dependencias criticas
 
@@ -71,6 +72,7 @@ Mesmo quando varios BK aparecem na mesma sprint, a ordem abaixo deve ser respeit
 | `Sprint 10` | `BK-MF6-01` e `BK-MF6-02` -> `BK-MF6-03`, `BK-MF6-04`, `BK-MF6-05` | Hardening pode avancar na mesma sprint depois das suites de regressao. |
 | `Sprint 11` | `BK-MF6-06` -> `BK-MF7-01` -> `BK-MF7-02` -> `BK-MF7-03` -> `BK-MF7-04` -> `BK-MF7-05` -> `BK-MF8-01` | UI segura so abre depois do gate tecnico; matriz RF ja pode iniciar apos gate MF7. |
 | `Sprint 12` | `BK-MF8-02` -> `BK-MF8-03` -> `BK-MF8-04` -> `BK-MF8-05` -> `BK-MF8-06` -> `BK-MF8-07` -> `BK-MF8-08` -> `BK-MF8-09` -> `BK-MF8-10` | Alinhamento visual parte II fecha antes de testes, readiness, auditoria, matriz, riscos, report de erros, correcao e scope freeze. |
+| `Sprint 13` | `BK-MF9-01` -> `BK-MF9-02` -> `BK-MF9-03` -> `BK-MF9-04` -> `BK-MF9-05` -> `BK-MF9-06` | Entitlements desbloqueiam qualidade e familia; API familiar desbloqueia UI; privacidade/metricas fecha antes do gate. |
 
 PRs de BK dependentes so devem ser integrados depois do PR da dependencia estar merged ou, em alternativa, depois de existir branch de integracao validada pelo owner tecnico.
 
@@ -85,7 +87,7 @@ PRs de BK dependentes so devem ser integrados depois do PR da dependencia estar 
 | Governanca/avaliacao            | `10`      |
 | **Total**                       | **`100`** |
 
-Regra de uso: score preenchido no fim de cada sprint e consolidado por janela de gate (`S1..S4`, `S5..S8`, `S9..S12`).
+Regra de uso: score preenchido no fim de cada sprint e consolidado por janela de gate (`S1..S4`, `S5..S8`, `S9..S12`, `S13`).
 
 ## Guiao docente semanal (checkpoints e remediacao)
 
@@ -139,9 +141,9 @@ Remediacao minima:
 2. Surgindo blocker critico, cortar `P2` no mesmo sprint.
 3. Se cair capacidade, priorizar estabilidade sobre volume.
 4. Scope cuts finais sao decididos por Nuno em gate.
-5. Sempre que uma sprint exceder a carga aprovada, redistribuir BK para sprint seguinte no mesmo macro-bloco; a excecao `S12=15` exige checkpoint docente reforcado.
+5. Sempre que uma sprint exceder a carga aprovada, redistribuir BK para sprint seguinte no mesmo macro-bloco; as excecoes `S12=15` e `S13=13` exigem checkpoint docente reforcado.
 
-## Gates obrigatorios de conformidade (S4/S8/S12)
+## Gates obrigatorios de conformidade (S4/S8/S12/S13)
 
 ### Gate Sprint 4 (S4)
 
@@ -163,6 +165,13 @@ Remediacao minima:
 2. 100% dos guias BK conformes ao contrato v3.
 3. Score final consolidado no fecho de gate `S12`.
 4. Emissao de parecer final GO/NO-GO documental.
+
+### Gate Sprint 13 (S13)
+
+1. Validar `RF61..RF63` na matriz e nos guias MF9.
+2. Confirmar planos Pro/Familia, partilha familiar real e qualidade por plano com testes.
+3. Revalidar regressao backend/frontend e planificacao a `66/66` BK.
+4. Emitir parecer GO/NO-GO atualizado para MF9.
 
 ### Registo obrigatorio de gate
 
@@ -197,3 +206,4 @@ Remediacao minima:
 
 - `2026-06-22`: redistribuidas S08..S12 para 60 BK mantendo limite de 11 pontos.
 - `2026-06-27`: S12 atualizada para `BK-MF8-02..10`, com excecao de 15 pontos para incluir alinhamento final, testes, readiness, auditoria, matriz, riscos, report, correcao e freeze.
+- `2026-06-30`: adicionada S13 para `BK-MF9-01..06`, com excecao de 13 pontos para Pro/Familia, partilha real, qualidade e gate MF9.

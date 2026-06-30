@@ -25,7 +25,7 @@ Este BK ensina que um calendário de sprints não é só uma tabela de datas: é
 
 ## Bloco operacional (obrigatorio)
 
-O trabalho operacional é validar `docs/planificacao/sprints/PLANO-SPRINTS.md`, garantindo que os 60 BK estão distribuídos por 12 sprints, com carga controlada, excecao S12 documentada e gates claros.
+O trabalho operacional é validar `docs/planificacao/sprints/PLANO-SPRINTS.md`, garantindo que os 66 BK estão distribuídos por 13 sprints, com carga controlada, excecoes S12/S13 documentadas e gates claros.
 
 #### Nota anti-drift MF0
 
@@ -35,7 +35,7 @@ O trabalho operacional é validar `docs/planificacao/sprints/PLANO-SPRINTS.md`, 
 
 ##### O que vamos fazer neste BK
 
-Neste BK vamos definir e validar o calendário de sprints da PAP FaithFlix. O calendário distribui os BKs ao longo de 12 sprints, respeitando capacidade recomendada dos alunos, prioridade dos BKs e gates `S4`, `S8` e `S12`.
+Neste BK vamos definir e validar o calendário de sprints da PAP FaithFlix. O calendário distribui os BKs ao longo de 13 sprints, respeitando capacidade recomendada dos alunos, prioridade dos BKs e gates `S4`, `S8`, `S12` e `S13`.
 
 O calendário também garante continuidade técnica: a Sprint 1 começa com governance e arranque (`BK-MF0-01..06`) e ainda prepara a fundação técnica com `BK-MF1-01` e `BK-MF1-02`. Isto significa que a equipa não fica parada depois da MF0: termina alinhamento e começa a estrutura base.
 
@@ -51,10 +51,10 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 
 ##### O que entra (scope)
 
-- Validar calendário de 12 sprints.
+- Validar calendário de 13 sprints.
 - Confirmar carga alvo por sprint e limite máximo.
 - Confirmar que Sprint 1 contém MF0 e início de MF1.
-- Confirmar gates `S4/S8/S12`.
+- Confirmar gates `S4/S8/S12/S13`.
 - Confirmar regras de replaneamento e checkpoints semanais.
 
 ##### O que nao entra (scope-out)
@@ -83,7 +83,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - Apoio: `-` (CANONICO, `BACKLOG-MVP.md`)
 - Dependencias (BK IDs): `BK-MF0-03` (CANONICO, `BACKLOG-MVP.md`)
 - Pre-condicoes: backlog atómico publicado; DoD pode ser usado como referência de validação mesmo sem dependência canónica (DERIVADO)
-- Ref. Plano: `PLANO-SPRINTS > Calendario de 12 sprints` e `PLANO-IMPLEMENTACAO-TOTAL > Gates` (CANONICO)
+- Ref. Plano: `PLANO-SPRINTS > Calendario de 13 sprints` e `PLANO-IMPLEMENTACAO-TOTAL > Gates` (CANONICO)
 - Flow ID: `MF0-governance-kickoff-05` (DERIVADO)
 - Fonte de verdade: `docs/planificacao/sprints/PLANO-SPRINTS.md`
 - Fonte de verdade: `docs/planificacao/backlogs/BACKLOG-MVP.md`
@@ -92,7 +92,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 
 #### O que vamos fazer neste BK (DERIVADO):
 
-- Confirmar que as 12 sprints cobrem os 60 BK.
+- Confirmar que as 13 sprints cobrem os 66 BK.
 - Confirmar que Sprint 1 contém `BK-MF0-01..06`, `BK-MF1-01` e `BK-MF1-02`.
 - Confirmar que cargas planeadas respeitam o limite `<= 11`.
 - Confirmar que os gates têm critérios de validação, não apenas datas.
@@ -101,7 +101,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 #### Estado, ficheiros e impacto (DERIVADO):
 
 - Estado esperado antes do BK: backlog atómico existe; calendário precisa de validação de carga, sequência e gates.
-- Estado esperado depois do BK: 12 sprints validadas e agenda de alinhamento pronta.
+- Estado esperado depois do BK: 13 sprints validadas e agenda de alinhamento pronta.
 - Ficheiros a criar: nenhum.
 - Ficheiros a editar: apenas este guia se forem registados ajustes/evidence do BK.
 - Ficheiros a rever: `docs/planificacao/sprints/PLANO-SPRINTS.md`, `docs/planificacao/sprints/SCORECARD-SPRINTS.md`, `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`, `docs/planificacao/backlogs/BACKLOG-MVP.md`, `docs/planificacao/backlogs/MF-VIEWS.md`.
@@ -151,10 +151,10 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
    - Descricao detalhada do objetivo: verificar que o calendário é derivado do backlog atómico.
    - Justificacao: não se planeia sprint com itens fora do backlog.
    - Como fazer (0.1): rever a dependência `BK-MF0-03`.
-   - Como fazer (0.2): confirmar que o plano de sprints menciona 60 BK.
+   - Como fazer (0.2): confirmar que o plano de sprints menciona 66 BK.
    - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
    - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `Planeamento alinhado ao backlog final de 60 BK`
+   - Snippet de referencia: `Planeamento alinhado ao backlog final de 66 BK`
    - O que verificar: calendário não contém BK fora do backlog.
 
 1. **Objetivo (~10 min): Validar capacidade recomendada**
@@ -177,7 +177,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
    - Snippet de referencia: `S = 1; M = 2; L = 3`
    - O que verificar: a mesma regra é usada na planificação.
 
-3. **Objetivo (~20 min): Validar calendário de 12 sprints**
+3. **Objetivo (~20 min): Validar calendário de 13 sprints**
    - Descricao detalhada do objetivo: rever todas as linhas do calendário e confirmar foco, BKs alvo e carga.
    - Justificacao: a equipa precisa saber quando cada macro fase acontece.
    - Como fazer (3.1): percorrer a tabela de `Sprint 1` a `Sprint 12`.
@@ -198,7 +198,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
    - O que verificar: o calendário não deixa hiato entre governance e fundação técnica.
 
 5. **Objetivo (~15 min): Validar gates**
-   - Descricao detalhada do objetivo: confirmar que `S4`, `S8` e `S12` têm critérios e registo obrigatório.
+   - Descricao detalhada do objetivo: confirmar que `S4`, `S8`, `S12` e `S13` têm critérios e registo obrigatório.
    - Justificacao: gates controlam qualidade documental e técnica ao longo do projeto.
    - Como fazer (5.1): rever secções de gates.
    - Como fazer (5.2): comparar com `PLANO-IMPLEMENTACAO-TOTAL.md`.
@@ -241,7 +241,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 
 **Smoke**
 - [ ] `PLANO-SPRINTS.md` existe e está ativo.
-- [ ] Há 12 sprints.
+- [ ] Há 13 sprints.
 - [ ] Todas as sprints têm foco, BKs alvo e carga.
 - [ ] Sprint 1 contém `BK-MF0-01..06`, `BK-MF1-01`, `BK-MF1-02`.
 
@@ -269,12 +269,12 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 #### Criterios de aceite:
 
 **Outputs:**
-- Calendário de 12 sprints validado.
+- Calendário de 13 sprints validado.
 - Agenda de reunião inicial preparada.
 
 **Verificacoes:**
 - Nenhuma sprint acima de 11 pontos.
-- Gates `S4/S8/S12` com critérios.
+- Gates `S4/S8/S12/S13` com critérios.
 - Scorecard alinhado com cargas planeadas.
 
 **Qualidade:**
@@ -312,10 +312,10 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 
 ```text
 CHECK BK-MF0-05
-1. len(sprints) == 12
-2. all(sprint.carga_planeada <= 11)
+1. len(sprints) == 13
+2. all(sprint.carga_planeada <= 11 or sprint.id in ["S12", "S13"])
 3. sprint_1.includes(BK-MF0-01..BK-MF0-06)
-4. gates == ["S4", "S8", "S12"]
+4. gates == ["S4", "S8", "S12", "S13"]
 5. scorecard.cargas == plano_sprints.cargas
 ```
 

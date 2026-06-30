@@ -7,15 +7,15 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-06-30`
 
 ## Objetivo
 
-Consolidar a manutencao dos guias BK apos cobertura total (`60/60`), garantindo alinhamento continuo com backlog, matriz RF/RNF, plano de sprints e evidencias de gate.
+Consolidar a manutencao dos guias BK apos cobertura total (`66/66`), garantindo alinhamento continuo com backlog, matriz RF/RNF, plano de sprints e evidencias de gate.
 
 ## Estado atual (snapshot)
 
-- Guias BK criados: `60/60`.
+- Guias BK criados: `66/66`.
 - BKs pendentes de criacao: `0`.
 - Fonte de verdade operacional: `docs/planificacao/backlogs/BACKLOG-MVP.md`.
 - Ordem canonica de execucao: `docs/planificacao/sprints/PLANO-SPRINTS.md`.
@@ -42,12 +42,12 @@ Consolidar a manutencao dos guias BK apos cobertura total (`60/60`), garantindo 
 ### Onda B - Evidencias e fecho de gates
 
 1. Atualizar evidencias `pr/proof/neg` conforme execucao real por sprint.
-2. Preencher `Execucao real` no checklist de gates (`S4`, `S8`, `S12`).
+2. Preencher `Execucao real` no checklist de gates (`S4`, `S8`, `S12`, `S13`).
 3. Registar acoes corretivas, owner e prazo para qualquer criterio `FAIL`.
 
 ### Onda C - Fecho para defesa PAP
 
-1. Confirmar cobertura integral `RF/RNF` e `BK` no gate `S12`.
+1. Confirmar cobertura integral `RF/RNF` e `BK` no gate `S13`.
 2. Consolidar score final documental no scorecard oficial.
 3. Emitir parecer final `GO/NO-GO` com assinatura do orientador.
 
@@ -56,7 +56,7 @@ Consolidar a manutencao dos guias BK apos cobertura total (`60/60`), garantindo 
 1. Script de validacao em `PASS`.
 2. Checklist de gates com baseline + execucao real preenchidos.
 3. Sem divergencias entre `BACKLOG-MVP`, `MATRIZ-CANONICA-BK`, `MF-VIEWS` e guias BK.
-4. BK terminal (`BK-MF8-10`) mantem `Proximo BK recomendado = -`.
+4. BK terminal (`BK-MF9-06`) mantem `Proximo BK recomendado = -`.
 
 ## Changelog
 
@@ -66,3 +66,4 @@ Consolidar a manutencao dos guias BK apos cobertura total (`60/60`), garantindo 
 
 - `2026-06-22`: roadmap atualizado para nova cadeia MF7/MF8.
 - `2026-06-27`: roadmap atualizado para `60/60` guias apos condensacao final da MF8 em 10 BKs.
+- `2026-06-30`: roadmap atualizado para `66/66` guias com MF9 e gate S13.

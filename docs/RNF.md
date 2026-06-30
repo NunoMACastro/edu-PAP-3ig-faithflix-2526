@@ -197,7 +197,7 @@
 - Todos os `RNF01..RNF40` mantêm-se ativos como contrato de qualidade, segurança, operação e conformidade.
 - Aplicação prática no MVP corrente:
   - requisitos de IA (`RNF34..RNF37`) são cumpridos em modo baseline, sem expansão para modelos avançados;
-  - requisitos de operação e hardening mantêm-se inalterados para fecho de gates `S4/S8/S12`.
+  - requisitos de operação e hardening mantêm-se inalterados para fecho de gates `S4/S8/S12/S13`.
 
 ---
 

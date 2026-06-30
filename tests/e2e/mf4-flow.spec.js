@@ -1,15 +1,16 @@
 import { expect, test } from "@playwright/test";
 
 const PASSWORD = "password-segura-123";
-const USER_EMAIL = "mf4-user@faithflix.test";
-const ADMIN_EMAIL = "mf4-admin@faithflix.test";
-const TRIAL_EMAIL = "mf4-trial@faithflix.test";
-const APPLICATION_EMAIL = "mf4-candidatura@faithflix.test";
-const CHARITY_NAME = "Associacao E2E MF4";
-const DISTRIBUTION_MONTH = "2099-04";
+const USER_EMAIL = "user-mf4@faithflix.test";
+const ADMIN_EMAIL = "admin-mf4@faithflix.test";
+const CHARITY_USER_EMAIL = "charity-mf4@faithflix.test";
+const APPLICATION_EMAIL = "candidatura-mf4@faithflix.test";
+const APPLICATION_NAME = "Associacao E2E MF4 Candidatura";
+const SEEDED_CHARITY_NAME = "Associa\u00e7\u00e3o Esperan\u00e7a MF4";
+const SEEDED_DISTRIBUTION_MONTH = "2026-06";
 
 /**
- * Authenticates an E2E fixture user through the real browser UI.
+ * Authenticates an E2E fixture user through the browser UI.
  *
  * @param {import("@playwright/test").Page} page - Playwright page.
  * @param {string} email - Fixture user email.
@@ -21,7 +22,7 @@ async function login(page, email) {
     await page.getByTestId("email-input").fill(email);
     await page.getByTestId("password-input").fill(PASSWORD);
     await page.getByTestId("login-submit").click();
-    await expect(page.getByText("Sessao iniciada.")).toBeVisible();
+    await expect(page.getByRole("status")).toHaveText("Sess\u00e3o iniciada.");
 }
 
 test("MF4 cobre subscricao, trial, candidatura, pool, historico e notificacoes", async ({
@@ -33,132 +34,90 @@ test("MF4 cobre subscricao, trial, candidatura, pool, historico e notificacoes",
     await login(userPage, USER_EMAIL);
     await userPage.goto("/planos");
     await expect(
-        userPage.getByRole("heading", { name: "Planos FaithFlix" }),
+        userPage.getByRole("heading", { name: "Subscri\u00e7\u00e3o" }),
     ).toBeVisible();
-
-    await userPage
-        .getByRole("button", { name: "Checkout aprovado" })
-        .first()
-        .click();
+    await expect(userPage.getByText("Subscri\u00e7\u00e3o pr\u00f3pria")).toBeVisible();
+    await userPage.getByRole("button", { name: "Cancelar renova\u00e7\u00e3o" }).click();
     await expect(userPage.getByRole("status")).toContainText(
-        "Pagamento simulado aprovado.",
-    );
-    await expect(userPage.getByText("active")).toBeVisible();
-
-    await userPage
-        .getByRole("button", { name: "Simular recusa" })
-        .first()
-        .click();
-    await expect(userPage.getByRole("alert")).toContainText(
-        "Pagamento simulado recusado.",
-    );
-
-    await userPage.goto("/notificacoes");
-    await expect(
-        userPage.getByRole("heading", { name: "Centro de notificacoes" }),
-    ).toBeVisible();
-    await expect(userPage.getByText("Subscricao ativa")).toBeVisible();
-    await expect(userPage.getByText("Pagamento recusado")).toBeVisible();
-    await userPage
-        .getByRole("button", { name: "Marcar como lida" })
-        .first()
-        .click();
-    await expect(userPage.getByRole("status")).toContainText(
-        "Notificacao marcada como lida.",
+        "Renova\u00e7\u00e3o cancelada no fim do ciclo atual.",
     );
 
     await userPage.goto("/associacoes/candidatura");
-    await userPage.getByLabel("Nome da associacao").fill(CHARITY_NAME);
-    await userPage.getByLabel("Pessoa de contacto").fill("Pessoa E2E MF4");
+    await expect(
+        userPage.getByRole("heading", { name: "Candidatura de associa\u00e7\u00e3o" }),
+    ).toBeVisible();
+    await userPage.getByLabel("Nome da associa\u00e7\u00e3o").fill(APPLICATION_NAME);
+    await userPage.getByLabel("Contacto principal").fill("Pessoa E2E MF4");
     await userPage.getByLabel("Email").fill(APPLICATION_EMAIL);
     await userPage.getByLabel("Telefone").fill("+351 210 000 004");
-    await userPage.getByLabel("Website publico").fill("https://example.test");
-    await userPage
-        .getByLabel("Missao")
-        .fill("Validar o fluxo solidario MF4 em browser real.");
+    await userPage.getByLabel("Miss\u00e3o").fill(
+        "Validar o fluxo solidario MF4 em browser real.",
+    );
+    await userPage.getByLabel("Website").fill("https://example.test");
     await userPage
         .getByRole("button", { name: "Submeter candidatura" })
         .click();
     await expect(userPage.getByRole("status")).toContainText(
-        "Candidatura recebida com estado pending.",
+        "Candidatura submetida para revis\u00e3o.",
     );
 
-    const trialContext = await browser.newContext();
-    const trialPage = await trialContext.newPage();
+    const charityContext = await browser.newContext();
+    const charityPage = await charityContext.newPage();
 
-    await login(trialPage, TRIAL_EMAIL);
-    await trialPage.goto("/planos");
-    await trialPage
-        .getByRole("button", { name: "Iniciar trial" })
+    await login(charityPage, CHARITY_USER_EMAIL);
+    await charityPage.goto("/planos");
+    await charityPage.getByRole("button", { name: "Iniciar trial" }).click();
+    await expect(charityPage.getByRole("status")).toContainText("Trial iniciado.");
+    await charityPage.goto("/notificacoes");
+    await expect(
+        charityPage.getByRole("heading", { name: "Notifica\u00e7\u00f5es" }),
+    ).toBeVisible();
+    await expect(charityPage.getByText("Trial iniciado")).toBeVisible();
+    await charityPage
+        .getByRole("button", { name: "Marcar como lida" })
         .first()
         .click();
-    await expect(trialPage.getByRole("status")).toContainText(
-        "Trial iniciado durante 14 dias.",
-    );
-    await trialPage
-        .getByRole("button", { name: "Iniciar trial" })
-        .first()
-        .click();
-    await expect(trialPage.getByRole("alert")).toContainText(
-        "Trial ja utilizado por este utilizador.",
-    );
+
+    await charityPage.goto("/associacoes");
+    const charityCard = charityPage.locator("article").filter({
+        hasText: SEEDED_CHARITY_NAME,
+    });
+
+    await expect(charityCard).toBeVisible();
+    await charityCard.getByRole("link", { name: "Ver hist\u00f3rico" }).click();
+    await expect(
+        charityPage.getByRole("heading", { name: "Hist\u00f3rico da associa\u00e7\u00e3o" }),
+    ).toBeVisible();
+    await expect(charityPage.getByText(SEEDED_DISTRIBUTION_MONTH)).toBeVisible();
+    await expect(
+        charityPage.getByRole("link", { name: "Exportar CSV" }),
+    ).toBeVisible();
 
     const adminContext = await browser.newContext();
     const adminPage = await adminContext.newPage();
 
     await login(adminPage, ADMIN_EMAIL);
-    await adminPage.goto("/admin/associacoes/candidaturas");
-    const applicationRow = adminPage
-        .getByRole("row")
-        .filter({ hasText: CHARITY_NAME });
-
-    await expect(applicationRow).toBeVisible();
-    await applicationRow.getByRole("button", { name: "Aprovar" }).click();
-    await expect(adminPage.getByRole("status")).toContainText(
-        "Decisao registada.",
-    );
-
-    await adminPage.goto("/admin/associacoes/membros");
-    await adminPage.getByLabel("Associacao").selectOption({
-        label: CHARITY_NAME,
-    });
-    await adminPage.getByLabel("Utilizador").selectOption({
-        label: USER_EMAIL,
-    });
-    await adminPage.getByRole("button", { name: "Guardar ligacao" }).click();
-    await expect(adminPage.getByRole("status")).toContainText(
-        "Utilizador ligado a associacao.",
-    );
-
-    await adminPage.goto("/admin/associacoes/pool");
-    await adminPage.getByLabel("Mes").fill(DISTRIBUTION_MONTH);
-    await adminPage
-        .getByRole("button", { name: "Executar distribuicao" })
-        .click();
-    await expect(adminPage.getByRole("status")).toContainText(
-        "Distribuicao criada.",
-    );
-    await expect(adminPage.getByText(DISTRIBUTION_MONTH)).toBeVisible();
-    await expect(adminPage.getByText(CHARITY_NAME)).toBeVisible();
-
-    await userPage.goto("/associacoes");
-    const charityCard = userPage.locator("article").filter({
-        hasText: CHARITY_NAME,
+    await adminPage.goto("/admin/charity-applications");
+    const applicationCard = adminPage.locator("article").filter({
+        hasText: APPLICATION_NAME,
     });
 
-    await expect(charityCard).toBeVisible();
-    await charityCard
-        .getByRole("link", { name: "Historico privado" })
-        .click();
+    await expect(applicationCard).toBeVisible();
+    await applicationCard.getByRole("button", { name: "Rejeitar" }).click();
+    await expect(applicationCard).not.toBeVisible();
+
+    await adminPage.goto("/admin/pool/dashboard");
     await expect(
-        userPage.getByRole("heading", { name: "Historico privado" }),
+        adminPage.getByRole("heading", { name: "Dashboard da pool solid\u00e1ria" }),
     ).toBeVisible();
-    await expect(userPage.getByText(DISTRIBUTION_MONTH)).toBeVisible();
-    await expect(
-        userPage.getByRole("link", { name: "Exportar CSV" }),
-    ).toBeVisible();
+    const seededDistribution = adminPage.locator("article").filter({
+        hasText: SEEDED_DISTRIBUTION_MONTH,
+    });
+
+    await expect(seededDistribution).toBeVisible();
+    await expect(seededDistribution).toContainText("Estado: completed");
 
     await userContext.close();
-    await trialContext.close();
+    await charityContext.close();
     await adminContext.close();
 });

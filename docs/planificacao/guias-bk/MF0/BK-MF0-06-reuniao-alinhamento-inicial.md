@@ -257,7 +257,7 @@ Confirmar que a equipa compreende plano, responsabilidades, backlog, DoD/evidenc
    - O que verificar: cada tópico tem decisão ou confirmação.
 
 2. **Objetivo (~15 min): Rever plano e macro fases com a equipa**
-   - Descricao detalhada do objetivo: confirmar que todos entendem `MF0..MF8`.
+   - Descricao detalhada do objetivo: confirmar que todos entendem `MF0..MF9`.
    - Justificacao: a equipa precisa perceber continuidade, não só o seu BK isolado.
    - Como fazer (2.1): pedir a cada aluno que explique uma macro fase.
    - Como fazer (2.2): corrigir interpretações que tratem MF0 como produto funcional.
