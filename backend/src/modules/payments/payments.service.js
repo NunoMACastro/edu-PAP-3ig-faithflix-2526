@@ -73,11 +73,18 @@ export async function ensurePaymentIndexes() {
  * @param {object} input Dados do checkout simulado.
  * @returns {Promise<object>} Resultado da tentativa.
  */
+/**
+ * Regista checkout simulado e ativa a subscrição quando o pagamento é aprovado.
+ *
+ * @param {string} userId Identificador do utilizador autenticado.
+ * @param {object} input Dados do checkout simulado.
+ * @returns {Promise<object>} Resultado da tentativa e estado da subscrição.
+ */
 export async function createSimulatedCheckout(userId, input) {
   const db = await getDb();
   const payload = assertCheckoutPayload(input);
   const now = new Date();
-  // O plano e validado antes de gravar a tentativa para evitar registos incoerentes.
+  // O plano é lido da base de dados para impedir compras de códigos inventados pelo browser.
   const plan = await db.collection("subscription_plans").findOne({
     code: payload.planCode,
     active: true,
@@ -101,7 +108,7 @@ export async function createSimulatedCheckout(userId, input) {
 
   const result = await db.collection("payment_attempts").insertOne(attempt);
   if (attempt.status === "failed") {
-    // Pagamento recusado pertence ao módulo de pagamentos, por isso a notificação nasce aqui.
+    // A tentativa recusada fica registada, mas nunca cria subscrição premium.
     await createNotification(userId, {
       type: "payment_failed",
       title: "Pagamento recusado",
@@ -111,6 +118,7 @@ export async function createSimulatedCheckout(userId, input) {
     return { paymentAttemptId: String(result.insertedId), status: "failed", message: attempt.failureReason };
   }
 
+  // `activateSubscription` concentra datas, estado e entitlements do plano escolhido.
   const subscription = await activateSubscription(userId, payload.planCode);
   return { paymentAttemptId: String(result.insertedId), status: "approved", ...subscription };
 }
