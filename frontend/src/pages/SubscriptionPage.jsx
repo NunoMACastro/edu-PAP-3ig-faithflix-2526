@@ -9,13 +9,13 @@ import { subscriptionsApi } from "../services/api/subscriptionsApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
 const moneyFormatter = new Intl.NumberFormat("pt-PT", {
-    currency: "EUR",
-    style: "currency",
+  currency: "EUR",
+  style: "currency",
 });
 
 const intervalLabels = {
-    monthly: "Mensal",
-    yearly: "Anual",
+  monthly: "Mensal",
+  yearly: "Anual",
 };
 
 const tierLabels = {
@@ -42,24 +42,24 @@ function formatDate(value) {
 }
 
 /**
- * Formata preço em cêntimos.
+ * Formata preço em cêntimos para euros no padrão português.
  *
- * @param {number} cents Valor em cêntimos.
- * @returns {string} Valor monetário em euros.
+ * @param {number} cents Valor monetário guardado em cêntimos.
+ * @returns {string} Valor formatado para a UI.
  */
 function formatPrice(cents) {
-    return moneyFormatter.format(cents / 100);
+  return moneyFormatter.format(Number(cents ?? 0) / 100);
 }
 
 /**
- * Formata a qualidade máxima para UI.
+ * Converte a qualidade técnica em texto compreensível para o utilizador.
  *
- * @param {string} quality Qualidade técnica.
- * @returns {string} Qualidade legível.
+ * @param {string} quality Qualidade máxima recebida da API.
+ * @returns {string} Qualidade apresentada na página.
  */
 function formatQuality(quality) {
-    if (quality === "2160p") return "4K";
-    return quality || "Automática";
+  if (quality === "2160p") return "4K";
+  return quality || "Automática";
 }
 
 /**
@@ -70,6 +70,49 @@ function formatQuality(quality) {
  */
 function familyUserLabel(user) {
     return user?.name || user?.email || "Utilizador";
+}
+
+/**
+ * Renderiza os planos públicos devolvidos pelo backend.
+ *
+ * @param {object} props Propriedades do componente.
+ * @param {object[]} props.plans Planos vindos de `subscriptionsApi.listPlans()`.
+ * @param {boolean} props.submitting Indica se existe uma operação em curso.
+ * @param {(planCode: string) => Promise<void>} props.onCheckout Handler do checkout simulado.
+ * @returns {JSX.Element} Secção de planos.
+ */
+function PlansSection({ plans, submitting, onCheckout }) {
+  return (
+    <section>
+      <h2>Planos</h2>
+      {plans.length === 0 ? (
+        <EmptyState title="Sem planos ativos" description="Volta a esta página depois de a equipa publicar novos planos." />
+      ) : null}
+      <div className="content-grid">
+        {plans.map((plan) => (
+          <article className="content-card" key={plan.code}>
+            <span className="content-card-eyebrow">{intervalLabels[plan.interval] ?? plan.interval}</span>
+            <h3>{plan.name}</h3>
+            <p className="content-card-meta">{formatPrice(plan.priceCents)}</p>
+            <p>Qualidade até {formatQuality(plan.maxQuality)}.</p>
+            <p>{plan.familySharing ? `${plan.maxFamilyMembers} utilizadores incluídos.` : "Acesso individual."}</p>
+            <p>{plan.solidaritySharePercent}% para a pool solidária.</p>
+            {plan.features?.length ? (
+              <ul>
+                {plan.features.map((feature) => (
+                  // Cada feature vem do backend para a UI não inventar benefícios do plano.
+                  <li key={feature}>{feature}</li>
+                ))}
+              </ul>
+            ) : null}
+            <button type="button" disabled={submitting} onClick={() => onCheckout(plan.code)}>
+              Pagar com método simulado
+            </button>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 /**
@@ -239,6 +282,7 @@ export function SubscriptionPage() {
 
             <section>
                 <h2>Planos</h2>
+                <PlansSection plans={plans} submitting={submitting} onCheckout={handleSimulatedCheckout} />
                 {plans.length === 0 ? (
                     <EmptyState title="Sem planos ativos" description="Volta a esta página depois de a equipa publicar novos planos." />
                 ) : null}

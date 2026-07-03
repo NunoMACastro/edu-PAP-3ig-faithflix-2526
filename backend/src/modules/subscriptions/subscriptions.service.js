@@ -21,6 +21,7 @@ import {
 
 const FAMILY_ACTIVE_STATUSES = ["pending", "active"];
 
+// backend/src/modules/subscriptions/subscriptions.service.js
 const QUALITY_RANKS = {
   "480p": 480,
   "720p": 720,
@@ -68,11 +69,12 @@ const DEFAULT_PLANS = [
     priceCents: 799,
     currency: "EUR",
     solidaritySharePercent: 20,
+    // Os códigos históricos continuam ativos e passam apenas a declarar o tier Pro.
     tier: "pro",
     maxQuality: "1080p",
     familySharing: false,
     maxFamilyMembers: 1,
-    features: ["Streaming ate Full HD", "Acesso premium individual", "Pool solidaria incluida"],
+    features: ["Streaming até Full HD", "Acesso premium individual", "Pool solidária incluída"],
     active: true,
   },
   {
@@ -86,26 +88,27 @@ const DEFAULT_PLANS = [
     maxQuality: "1080p",
     familySharing: false,
     maxFamilyMembers: 1,
-    features: ["Streaming ate Full HD", "Acesso premium individual", "Pool solidaria incluida"],
+    features: ["Streaming até Full HD", "Acesso premium individual", "Pool solidária incluída"],
     active: true,
   },
   {
     code: "faithflix-family-monthly",
-    name: "FaithFlix Familia Mensal",
+    name: "FaithFlix Família Mensal",
     interval: "monthly",
     priceCents: 1299,
     currency: "EUR",
     solidaritySharePercent: 20,
+    // Família desbloqueia partilha e 4K sem alterar o fluxo de pagamento simulado.
     tier: "family",
     maxQuality: "2160p",
     familySharing: true,
     maxFamilyMembers: 5,
-    features: ["Streaming ate 4K", "Partilha com ate 5 utilizadores", "Gestao familiar na app"],
+    features: ["Streaming até 4K", "Partilha com até 5 utilizadores", "Gestão familiar na app"],
     active: true,
   },
   {
     code: "faithflix-family-yearly",
-    name: "FaithFlix Familia Anual",
+    name: "FaithFlix Família Anual",
     interval: "yearly",
     priceCents: 12990,
     currency: "EUR",
@@ -114,7 +117,7 @@ const DEFAULT_PLANS = [
     maxQuality: "2160p",
     familySharing: true,
     maxFamilyMembers: 5,
-    features: ["Streaming ate 4K", "Partilha com ate 5 utilizadores", "Gestao familiar na app"],
+    features: ["Streaming até 4K", "Partilha com até 5 utilizadores", "Gestão familiar na app"],
     active: true,
   },
 ];
@@ -165,6 +168,12 @@ function asObjectId(id, label) {
  * @param {unknown} value Valor como `1080p`, `2160p` ou `4K`.
  * @returns {number} Ranking usado para comparacao.
  */
+/**
+ * Calcula o ranking numérico de uma qualidade de vídeo.
+ *
+ * @param {unknown} value Valor como `1080p`, `2160p` ou `4K`.
+ * @returns {number} Ranking usado para comparação segura.
+ */
 export function qualityRankForValue(value) {
   const normalized = String(value ?? "").trim().toLowerCase();
   if (QUALITY_RANKS[normalized]) {
@@ -178,7 +187,7 @@ export function qualityRankForValue(value) {
 /**
  * Resolve entitlements de um plano persistido.
  *
- * @param {object|null|undefined} plan Plano MongoDB.
+ * @param {object | null | undefined} plan Plano MongoDB.
  * @returns {object} Entitlements normalizados.
  */
 function entitlementsForPlan(plan) {
@@ -195,6 +204,7 @@ function entitlementsForPlan(plan) {
     maxFamilyMembers: Number(plan?.maxFamilyMembers ?? defaults.maxFamilyMembers),
   };
 }
+
 
 /**
  * Entitlements para uma subscricao concreta.
@@ -221,6 +231,12 @@ function entitlementsForSubscription(subscription, plan) {
  * @param {object} plan Documento MongoDB de `subscription_plans`.
  * @returns {object} Plano publico.
  */
+/**
+ * Remove campos internos de um plano antes de o expor ao frontend.
+ *
+ * @param {object} plan Documento MongoDB de `subscription_plans`.
+ * @returns {object} Plano público consumido pela UI.
+ */
 function publicPlan(plan) {
   const entitlements = entitlementsForPlan(plan);
 
@@ -232,6 +248,7 @@ function publicPlan(plan) {
     priceCents: plan.priceCents,
     currency: plan.currency,
     solidaritySharePercent: plan.solidaritySharePercent,
+    // A resposta pública entrega capacidades, não regras secretas nem campos internos.
     tier: entitlements.tier,
     maxQuality: entitlements.maxQuality,
     familySharing: entitlements.familySharing,
@@ -239,6 +256,7 @@ function publicPlan(plan) {
     features: Array.isArray(plan.features) ? plan.features : [],
   };
 }
+
 
 /**
  * Calcula se uma subscricao ainda autoriza acesso premium.
@@ -506,21 +524,15 @@ export function filterQualityOptionsByEntitlements(options = [], entitlements = 
 }
 
 /**
- * Cria indices e planos base usados por subscricoes e familia.
+ * Cria índices e planos base usados por subscrições e Família.
  *
- * @returns {Promise<void>} Termina quando indices e seed ficam prontos.
+ * @returns {Promise<void>} Termina quando índices e seed ficam prontos.
  */
 export async function ensureSubscriptionIndexes() {
   const db = await getDb();
   await db.collection("subscription_plans").createIndex({ code: 1 }, { unique: true });
   await db.collection("subscriptions").createIndex({ userId: 1 }, { unique: true });
   await db.collection("subscriptions").createIndex({ status: 1, currentPeriodEnd: 1 });
-  await db.collection("subscription_family_memberships").createIndex({ ownerUserId: 1, status: 1 });
-  await db.collection("subscription_family_memberships").createIndex({ memberUserId: 1, status: 1 });
-  await db.collection("subscription_family_memberships").createIndex(
-    { memberUserId: 1 },
-    { unique: true, partialFilterExpression: { status: { $in: FAMILY_ACTIVE_STATUSES } } },
-  );
 
   for (const plan of DEFAULT_PLANS) {
     await db.collection("subscription_plans").updateOne(
@@ -534,7 +546,7 @@ export async function ensureSubscriptionIndexes() {
 /**
  * Lista planos ativos disponíveis para escolha.
  *
- * @returns {Promise<{plans: object[]}>} Planos públicos ordenados por tier/preço.
+ * @returns {Promise<{ plans: object[] }>} Planos públicos ordenados por preço.
  */
 export async function listPlans() {
   const db = await getDb();
@@ -542,6 +554,7 @@ export async function listPlans() {
     .find({ active: true })
     .sort({ priceCents: 1 })
     .toArray();
+
   return { plans: plans.map(publicPlan) };
 }
 
