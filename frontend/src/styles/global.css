@@ -614,6 +614,18 @@ button:disabled {
     gap: 0.9rem;
 }
 
+.recommendation-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.recommendation-actions button,
+.recommendation-actions .button-link {
+    flex: 1 1 9rem;
+    min-width: 0;
+}
+
 .rating-button {
     min-width: 2.75rem;
 }

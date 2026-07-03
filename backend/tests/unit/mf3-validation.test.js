@@ -13,6 +13,14 @@ import {
 } from "../../src/modules/comments/comments.validation.js";
 import { listVisibleComments } from "../../src/modules/comments/comments.service.js";
 import { buildRecommendationExplanation } from "../../src/modules/recommendations/recommendation-explanations.js";
+import {
+    averageWeightedEmbedding,
+    buildContentEmbeddingInput,
+    calculateContentEmbeddingSourceHash,
+    cosineSimilarity,
+    generateEmbeddingVector,
+    generatePublishedContentEmbeddings,
+} from "../../src/modules/recommendations/content-embeddings.js";
 import { assertRatingValue } from "../../src/modules/ratings/ratings.validation.js";
 import { getRatingSummary } from "../../src/modules/ratings/ratings.service.js";
 import { searchContents } from "../../src/modules/search/search.service.js";
@@ -80,9 +88,128 @@ test("explicabilidade tem mensagens fechadas e fallback seguro", () => {
         buildRecommendationExplanation("cold-start-popular").confidence,
         "cold-start",
     );
+    assert.equal(
+        buildRecommendationExplanation("semantic-similarity").confidence,
+        "baseline+embeddings",
+    );
     assert.deepEqual(
         buildRecommendationExplanation("codigo-desconhecido").signals,
         ["catalogo publicado"],
+    );
+});
+
+test("embeddings calculam hash de fonte sensivel a alteracoes editoriais", () => {
+    const taxonomyId = new ObjectId();
+    const taxonomyNames = new Map([[String(taxonomyId), "Esperanca"]]);
+    const firstText = buildContentEmbeddingInput(
+        {
+            title: "Fe em Acao",
+            type: "movie",
+            synopsis: "Uma historia sobre coragem e comunidade.",
+            taxonomyIds: [taxonomyId],
+        },
+        taxonomyNames,
+    );
+    const secondText = buildContentEmbeddingInput(
+        {
+            title: "Fe em Acao",
+            type: "movie",
+            synopsis: "Uma historia sobre coragem, comunidade e familia.",
+            taxonomyIds: [taxonomyId],
+        },
+        taxonomyNames,
+    );
+
+    assert.match(firstText, /Temas: Esperanca/u);
+    assert.notEqual(
+        calculateContentEmbeddingSourceHash(firstText),
+        calculateContentEmbeddingSourceHash(secondText),
+    );
+});
+
+test("embeddings disabled nao chamam provider externo", async () => {
+    let called = false;
+    const vector = await generateEmbeddingVector("texto editorial", {
+        config: {
+            provider: "disabled",
+            model: "disabled-test",
+            dimensions: 4,
+            apiUrl: "",
+            apiKey: "",
+        },
+        fetchImpl: async () => {
+            called = true;
+            return { ok: true };
+        },
+    });
+
+    assert.equal(vector, null);
+    assert.equal(called, false);
+});
+
+test("geracao de embeddings em disabled termina sem base de dados", async () => {
+    const summary = await generatePublishedContentEmbeddings({
+        config: {
+            provider: "disabled",
+            model: "disabled-test",
+            dimensions: 4,
+            apiUrl: "",
+            apiKey: "",
+        },
+    });
+
+    assert.equal(summary.disabled, 1);
+    assert.equal(summary.processed, 0);
+});
+
+test("embeddings deterministic devolvem vector estavel com dimensao valida", async () => {
+    const config = {
+        provider: "deterministic",
+        model: "deterministic-test",
+        dimensions: 8,
+        apiUrl: "",
+        apiKey: "",
+    };
+    const first = await generateEmbeddingVector("fe esperanca familia", { config });
+    const second = await generateEmbeddingVector("fe esperanca familia", { config });
+
+    assert.equal(first.length, 8);
+    assert.deepEqual(first, second);
+});
+
+test("similaridade por cosseno ordena candidatos semanticamente proximos", () => {
+    const profile = averageWeightedEmbedding(
+        [
+            { vector: [1, 0, 0], weight: 5 },
+            { vector: [1, 0, 0], weight: 3 },
+        ],
+        3,
+    );
+    const close = cosineSimilarity(profile, [1, 0, 0]);
+    const distant = cosineSimilarity(profile, [0, 1, 0]);
+
+    assert.equal(close > distant, true);
+});
+
+test("provider externo rejeita vector com dimensao invalida", async () => {
+    await assert.rejects(
+        () =>
+            generateEmbeddingVector("texto editorial", {
+                config: {
+                    provider: "external",
+                    model: "external-test",
+                    dimensions: 3,
+                    apiUrl: "https://embeddings.example.test",
+                    apiKey: "test-key",
+                },
+                fetchImpl: async () => ({
+                    ok: true,
+                    async json() {
+                        return { embedding: [1, 2] };
+                    },
+                }),
+            }),
+        /dimensao invalida/u,
     );
 });
 

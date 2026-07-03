@@ -8,6 +8,7 @@ Backend Node.js/Express da app FaithFlix, criado na MF1 como base tecnica modula
 - `npm run dev`
 - `npm start`
 - `npm run smoke`
+- `npm run embeddings:generate`
 
 ## Rotas tecnicas nesta fase
 
@@ -25,6 +26,23 @@ Backend Node.js/Express da app FaithFlix, criado na MF1 como base tecnica modula
 - Todas as respostas incluem `x-request-id`.
 - Logs sao JSON por linha.
 - Cookies, tokens e passwords nao devem aparecer nos logs.
+
+## Recomendacoes
+
+- `GET /api/recommendations/me` devolve recomendacoes autenticadas com estrategia `weighted-baseline-v2`.
+- `POST /api/recommendations/feedback` guarda feedback explicito por conteudo recomendado.
+- `POST /api/recommendations/events` regista eventos agregados `shown`/`clicked`.
+- `npm run embeddings:generate` gera embeddings de conteudos publicados quando `EMBEDDINGS_PROVIDER` e `deterministic` ou `external`.
+- O modulo usa apenas sinais internos por defeito; provider externo de embeddings fica desligado com `EMBEDDINGS_PROVIDER=disabled`.
+- Quando existem embeddings guardados em `content_embeddings`, a recomendacao pode usar `weighted-baseline-v2+content-embeddings` sem devolver vectores na API publica.
+
+### Variaveis de embeddings
+
+- `EMBEDDINGS_PROVIDER=disabled|deterministic|external`
+- `EMBEDDINGS_MODEL`
+- `EMBEDDINGS_DIMENSIONS`
+- `EMBEDDINGS_API_URL`
+- `EMBEDDINGS_API_KEY`
 
 ## CORS local
 

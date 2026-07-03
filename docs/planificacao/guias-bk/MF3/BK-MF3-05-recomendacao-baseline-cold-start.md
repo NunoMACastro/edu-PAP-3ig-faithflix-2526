@@ -34,16 +34,22 @@ Recomendacao ajuda o utilizador a descobrir conteudos relevantes sem depender ap
 ### Scope-in
 
 - Criar endpoint autenticado `GET /api/recommendations/me`.
-- Usar sinais de `playback_progress`, `user_content_lists` e `content_ratings`.
+- Usar sinais de `playback_progress`, `user_content_lists`, `content_ratings` e feedback explícito de recomendação.
 - Respeitar apenas conteudos `published`.
 - Implementar cold start para utilizadores sem sinais.
 - Devolver grupos de recomendacao com `reasonCode`.
+- Guardar feedback autenticado em `POST /api/recommendations/feedback`.
+- Registar eventos agregados em `POST /api/recommendations/events`, sem expor historico detalhado.
+- Guardar embeddings opcionais de conteudos publicados em `content_embeddings`.
+- Criar script idempotente `backend/scripts/generate-content-embeddings.mjs`.
 - Criar cliente frontend `recommendationsApi`.
 - Criar pagina `/para-si`.
 
 ### Scope-out
 
-- Embeddings.
+- Vector database dedicado.
+- Embeddings persistentes por utilizador.
+- Provider externo ativo por defeito.
 - Modelos generativos.
 - Perfilacao opaca.
 - Partilha de dados com terceiros.
@@ -56,14 +62,18 @@ Recomendacao ajuda o utilizador a descobrir conteudos relevantes sem depender ap
 - `Cold start`: caso em que o utilizador ainda nao tem historico suficiente.
 - `Fallback`: resposta alternativa honesta quando faltam dados.
 - `reasonCode`: codigo tecnico que explica a origem da sugestao.
+- `Scoring ponderado`: soma de pesos simples para ordenar candidatos sem modelo opaco.
+- `Feedback explicito`: sinal dado pelo utilizador, como pedir mais conteúdos semelhantes ou esconder uma sugestao.
+- `Embedding de conteudo`: vector calculado a partir de titulo, sinopse, tipo e taxonomias de um conteudo publicado.
 
 ### Conceitos essenciais
 
 - `CANONICO`: `RF26` cobre recomendacoes personalizadas.
 - `CANONICO`: `RF27` cobre cold start.
-- `CANONICO`: os sinais permitidos nesta fase sao historico, favoritos, watchlist e ratings.
+- `CANONICO`: os sinais permitidos nesta fase sao historico, favoritos, watchlist, ratings e feedback explicito autenticado.
 - `CANONICO`: `RNF37` limita o uso destes dados ao fim de recomendacao.
-- `DERIVADO`: recomendacao baseline usa taxonomias e tipos mais frequentes nos sinais do utilizador.
+- `DERIVADO`: recomendacao baseline usa scoring ponderado com taxonomias, tipos, ratings, recencia e feedback, mantendo explicabilidade.
+- `DERIVADO`: embeddings de conteudo podem acrescentar bónus semantico moderado, sem substituir os filtros, cold start ou sinais baseline.
 - `DERIVADO`: a resposta tem grupos, porque os criterios de aceitacao pedem pelo menos 3 grupos relevantes.
 
 ### Tempo estimado
@@ -104,10 +114,13 @@ Recomendacao ajuda o utilizador a descobrir conteudos relevantes sem depender ap
 | --- | --- |
 | Endpoint | `GET /api/recommendations/me` |
 | Autenticacao | obrigatoria |
-| Sinais | historico, favoritos, watchlist, ratings |
+| Sinais | historico, favoritos, watchlist, ratings, feedback |
 | Cold start | recentes e melhor avaliados publicados |
-| Resposta | `groups`, `coldStart`, `signalsUsed` |
+| Resposta | `groups`, `coldStart`, `signalsUsed`, `strategy`, `generatedAt` |
 | Grupos | `because-your-themes`, `because-your-activity`, `popular-start` |
+| Embeddings opcionais | `content_embeddings`, `npm run embeddings:generate`, estrategia `weighted-baseline-v2+content-embeddings` quando aplicavel |
+| Feedback | `POST /api/recommendations/feedback` com `contentId` e `action` |
+| Eventos | `POST /api/recommendations/events` com batch limitado de `shown`/`clicked` |
 | Frontend | `recommendationsApi`, `ForYouPage` |
 | Handoff | `BK-MF3-06` transforma `reasonCode` em explicacao visivel |
 
@@ -577,8 +590,12 @@ Calcular recomendacao no frontend exigiria expor sinais pessoais e quebraria o p
 - Utilizador com historico, favoritos, watchlist ou ratings recebe `coldStart: false`.
 - A resposta contem ate 3 grupos principais.
 - Todos os items devolvidos sao conteudos `published`.
+- Conteudos repetidos entre grupos nao aparecem.
+- Feedback `not_interested` exclui o conteudo das proximas recomendacoes.
+- Limite parental do utilizador e respeitado antes de devolver candidatos.
 - O frontend `/para-si` mostra loading, erro, cold start e grupos.
 - A resposta inclui `signalsUsed` sem expor detalhes sensiveis.
+- Endpoints de feedback/eventos sem sessao devolvem `401`.
 
 ## Validacao final
 
@@ -595,8 +612,9 @@ Resultado esperado: build e testes passam; o `curl` sem sessao devolve `401`.
 - `pr`: referencia do PR/commit com modulo `recommendations`.
 - `proof`: resposta autenticada com `groups`.
 - `proof`: resposta de utilizador novo com `coldStart: true`.
+- `proof`: feedback guardado e conteudo removido das recomendacoes seguintes.
 - `proof`: captura da pagina `/para-si`.
-- `neg`: `401` sem sessao, lista vazia quando nao ha conteudos publicados, exclusao de conteudos nao publicados.
+- `neg`: `401` sem sessao, feedback invalido, lista vazia quando nao ha conteudos publicados, exclusao de conteudos nao publicados e conteudos acima do limite parental.
 
 ## Handoff
 

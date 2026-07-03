@@ -82,7 +82,16 @@ const requiredControls = [
     {
         file: "src/modules/recommendations/recommendations.routes.js",
         label: "RNF37 recomendacoes apenas para utilizador autenticado",
-        fragments: ["requireAuth", '"/me"'],
+        fragments: ["requireAuth", '"/me"', '"/feedback"', '"/events"'],
+    },
+    {
+        file: "src/modules/recommendations/content-embeddings.js",
+        label: "RNF37 embeddings centrados em conteudo editorial",
+        fragments: [
+            "buildContentEmbeddingInput",
+            "content_embeddings",
+            "histórico pessoal bruto",
+        ],
     },
     {
         file: "../frontend/src/services/api/apiClient.js",

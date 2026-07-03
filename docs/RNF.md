@@ -96,6 +96,8 @@
 | RNF36  | A IA de recomendação deve evitar perfis de recomendação enviesados e permitir reajustes manuais por administradores/curadores.                                                      | Ética           | Should     |
 | RNF37  | Os dados usados para recomendação (histórico, favoritos, ratings) devem ser tratados apenas para esse fim e não partilhados com terceiros.                                          | Privacidade     | Must       |
 
+Nota de implementação `real_dev` (2026-07-02): o módulo de recomendações mantém IA baseline auditável, com `GET /api/recommendations/me`, feedback/eventos autenticados, explicações por grupo e sem envio de histórico detalhado para terceiros. A camada opcional `content_embeddings` usa apenas texto editorial de conteúdos publicados, nao persiste embeddings de utilizador e nao devolve vectores na API publica. Qualquer provider externo de embeddings fica desligado por defeito e sujeito a revisão de privacidade antes de ativação.
+
 ---
 
 ## 7. Localização e Internacionalização
@@ -188,6 +190,8 @@
 -   Tecnologia:
     -   Serviço interno em Node.js ou Python (FastAPI)
     -   Possível uso de embeddings (OpenAI ou similar) para afinamento sem ser o foco principal.
+    -   No `real_dev` atual, a fase robusta usa Node.js interno com scoring ponderado, feedback explícito, eventos agregados e embeddings opcionais de conteúdo quando existem vectores em `content_embeddings`.
+    -   Provider externo continua desligado por defeito; o modo `deterministic` serve testes/desenvolvimento e nao representa IA semantica real.
 
 ---
 

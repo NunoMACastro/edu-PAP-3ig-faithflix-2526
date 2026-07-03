@@ -222,7 +222,7 @@ Nota: esta auditoria avalia guias BK, nao implementa codigo real da aplicacao. A
 - Comentarios: moderacao minima com estados `visible`, `pending_review`, `rejected`.
 - Pesquisa: MongoDB com query escapada, paginacao e filtros simples.
 - Discovery: publico e nao personalizado.
-- Recomendacao: baseline por regras simples, sem embeddings, sem modelos generativos e sem partilha de dados.
+- Recomendacao: baseline por regras simples com embeddings opcionais de conteudo, sem modelos generativos, sem embedding persistente de utilizador e sem partilha de historico pessoal bruto.
 - Explicabilidade: mensagens controladas por `reasonCode`.
 
 ## Drift documental encontrado

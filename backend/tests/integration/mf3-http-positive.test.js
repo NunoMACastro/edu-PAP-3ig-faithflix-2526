@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
 import { ObjectId } from "mongodb";
 import { setDbForTests } from "../../src/config/database.js";
+import { env } from "../../src/config/env.js";
 import { sessionConfig } from "../../src/config/session.js";
 import { hashToken } from "../../src/modules/auth/token.js";
 import { startTestServer } from "../helpers/test-server.js";
@@ -15,11 +16,17 @@ const adminId = new ObjectId("64f100000000000000000002");
 const movieId = new ObjectId("64f200000000000000000001");
 const documentaryId = new ObjectId("64f200000000000000000002");
 const relatedId = new ObjectId("64f200000000000000000003");
+const themeCandidateId = new ObjectId("64f200000000000000000004");
+const popularCandidateId = new ObjectId("64f200000000000000000005");
+const adultCandidateId = new ObjectId("64f200000000000000000006");
+const semanticCandidateId = new ObjectId("64f200000000000000000007");
 const taxonomyId = new ObjectId("64f300000000000000000001");
 const otherTaxonomyId = new ObjectId("64f300000000000000000002");
+const coldUserId = new ObjectId("64f100000000000000000003");
 
 const userToken = "a".repeat(64);
 const adminToken = "b".repeat(64);
+const coldUserToken = "c".repeat(64);
 
 let testServer;
 let db;
@@ -92,6 +99,10 @@ function matchesValue(actual, expected) {
             return actual >= expected.$gte;
         }
 
+        if ("$lte" in expected) {
+            return actual <= expected.$lte;
+        }
+
         if ("$gt" in expected) {
             return actual > expected.$gt;
         }
@@ -148,7 +159,7 @@ function compareBySort(sort) {
  * @param {unknown} taxonomyIds Valor recebido por `publicContent`.
  * @returns {unknown} Resultado devolvido por `publicContent`.
  */
-function publicContent({ _id, title, slug, type, taxonomyIds, publishedAt }) {
+function publicContent({ _id, title, slug, type, taxonomyIds, publishedAt, ageRating = 0 }) {
     return {
         _id,
         title,
@@ -158,8 +169,24 @@ function publicContent({ _id, title, slug, type, taxonomyIds, publishedAt }) {
         status: "published",
         synopsis: `${title} de teste`,
         publishedAt,
+        ageRating,
         assets: { posterUrl: `/media/${slug}.jpg` },
     };
+}
+
+/**
+ * Documenta `embeddingVector`, mantendo explícita a responsabilidade desta função no módulo.
+ *
+ * @param {unknown} first Valor recebido por `embeddingVector`.
+ * @param {unknown} second Valor recebido por `embeddingVector`.
+ * @returns {unknown} Resultado devolvido por `embeddingVector`.
+ */
+function embeddingVector(first, second = 0) {
+    return Array.from({ length: env.embeddings.dimensions }, (_, index) => {
+        if (index === 0) return first;
+        if (index === 1) return second;
+        return 0;
+    });
 }
 
 /**
@@ -411,12 +438,20 @@ function createTestDb() {
                 name: "Utilizador MF3",
                 email: "mf3-user@example.test",
                 role: "user",
+                parentalMaxAgeRating: 18,
             },
             {
                 _id: adminId,
                 name: "Moderador MF3",
                 email: "mf3-admin@example.test",
                 role: "moderator",
+            },
+            {
+                _id: coldUserId,
+                name: "Utilizador Novo",
+                email: "mf3-cold@example.test",
+                role: "user",
+                parentalMaxAgeRating: 12,
             },
         ]),
         sessions: createCollection([
@@ -430,6 +465,12 @@ function createTestDb() {
                 _id: new ObjectId(),
                 userId: adminId,
                 tokenHash: hashToken(adminToken),
+                expiresAt: new Date("2999-01-01T00:00:00.000Z"),
+            },
+            {
+                _id: new ObjectId(),
+                userId: coldUserId,
+                tokenHash: hashToken(coldUserToken),
                 expiresAt: new Date("2999-01-01T00:00:00.000Z"),
             },
         ]),
@@ -457,6 +498,39 @@ function createTestDb() {
                 type: "movie",
                 taxonomyIds: [otherTaxonomyId],
                 publishedAt: new Date("2026-01-01T00:00:00.000Z"),
+            }),
+            publicContent({
+                _id: themeCandidateId,
+                title: "Caminhos de Fe",
+                slug: "caminhos-de-fe",
+                type: "documentary",
+                taxonomyIds: [taxonomyId],
+                publishedAt: new Date("2026-01-04T00:00:00.000Z"),
+            }),
+            publicContent({
+                _id: popularCandidateId,
+                title: "Familia em Missao",
+                slug: "familia-em-missao",
+                type: "series",
+                taxonomyIds: [otherTaxonomyId],
+                publishedAt: new Date("2026-01-05T00:00:00.000Z"),
+            }),
+            publicContent({
+                _id: adultCandidateId,
+                title: "Debate Adulto",
+                slug: "debate-adulto",
+                type: "movie",
+                taxonomyIds: [otherTaxonomyId],
+                publishedAt: new Date("2026-01-06T00:00:00.000Z"),
+                ageRating: 18,
+            }),
+            publicContent({
+                _id: semanticCandidateId,
+                title: "Graca em Familia",
+                slug: "graca-em-familia",
+                type: "series",
+                taxonomyIds: [otherTaxonomyId],
+                publishedAt: new Date("2026-01-07T00:00:00.000Z"),
             }),
         ]),
         taxonomies: createCollection([
@@ -494,6 +568,9 @@ function createTestDb() {
                 progressSeconds: 120,
             },
         ]),
+        content_embeddings: createCollection([]),
+        recommendation_feedback: createCollection([]),
+        recommendation_events: createCollection([]),
     };
 
     return {
@@ -679,9 +756,151 @@ test("MF3 devolve recomendacoes positivas com explicabilidade por grupo", async 
     assert.ok(recommendations.signalsUsed.includes("favorites"));
     assert.ok(recommendations.signalsUsed.includes("history"));
     assert.equal(recommendations.groups.length, 3);
+    assert.equal(recommendations.strategy, "weighted-baseline-v2");
 
     for (const group of recommendations.groups) {
         assert.equal(group.explanation.title, "Porque recomendamos");
         assert.equal("message" in group.explanation, true);
     }
+
+    const itemIds = recommendations.groups.flatMap((group) =>
+        group.items.map((item) => item.id),
+    );
+    assert.equal(new Set(itemIds).size, itemIds.length);
+    assert.equal(itemIds.includes(String(movieId)), false);
+    assert.equal(itemIds.includes(String(documentaryId)), false);
+});
+
+test("MF3 devolve cold start autenticado sem sinais positivos", async () => {
+    const response = await fetch(`${testServer.baseUrl}/api/recommendations/me`, {
+        headers: { cookie: authCookie(coldUserToken) },
+    });
+    const recommendations = await json(response);
+
+    assert.equal(response.status, 200);
+    assert.equal(recommendations.coldStart, true);
+    assert.deepEqual(recommendations.signalsUsed, []);
+    assert.equal(recommendations.groups.length, 3);
+    assert.equal(
+        recommendations.groups
+            .flatMap((group) => group.items)
+            .some((item) => item.id === String(adultCandidateId)),
+        false,
+    );
+});
+
+test("MF3 guarda feedback e eventos de recomendacao autenticados", async () => {
+    const feedbackResponse = await fetch(
+        `${testServer.baseUrl}/api/recommendations/feedback`,
+        {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+                cookie: authCookie(),
+            },
+            body: JSON.stringify({
+                contentId: relatedId,
+                action: "not_interested",
+            }),
+        },
+    );
+    const feedback = await json(feedbackResponse);
+
+    assert.equal(feedbackResponse.status, 200);
+    assert.equal(feedback.feedback.saved, true);
+    assert.equal(feedback.feedback.action, "not_interested");
+
+    const response = await fetch(`${testServer.baseUrl}/api/recommendations/me`, {
+        headers: { cookie: authCookie() },
+    });
+    const recommendations = await json(response);
+    const itemIds = recommendations.groups.flatMap((group) =>
+        group.items.map((item) => item.id),
+    );
+
+    assert.equal(itemIds.includes(String(relatedId)), false);
+
+    const eventResponse = await fetch(
+        `${testServer.baseUrl}/api/recommendations/events`,
+        {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+                cookie: authCookie(),
+            },
+            body: JSON.stringify({
+                events: [
+                    {
+                        eventType: "shown",
+                        contentId: themeCandidateId,
+                        groupId: "because-your-themes",
+                        reasonCode: "themes-from-user-signals",
+                    },
+                ],
+            }),
+        },
+    );
+    const eventResult = await json(eventResponse);
+
+    assert.equal(eventResponse.status, 202);
+    assert.equal(eventResult.accepted, 1);
+    assert.equal(
+        db.collection("recommendation_events").rows.some(
+            (event) =>
+                event.eventType === "shown" &&
+                sameId(event.contentId, themeCandidateId),
+        ),
+        true,
+    );
+});
+
+test("MF3 usa embeddings existentes sem expor vectores na API publica", async () => {
+    const now = new Date("2026-01-08T00:00:00.000Z");
+
+    await db.collection("content_embeddings").insertOne({
+        contentId: movieId,
+        model: env.embeddings.model,
+        dimensions: env.embeddings.dimensions,
+        sourceHash: "source-movie",
+        vector: embeddingVector(1, 0),
+        createdAt: now,
+        updatedAt: now,
+    });
+    await db.collection("content_embeddings").insertOne({
+        contentId: documentaryId,
+        model: env.embeddings.model,
+        dimensions: env.embeddings.dimensions,
+        sourceHash: "source-documentary",
+        vector: embeddingVector(1, 0),
+        createdAt: now,
+        updatedAt: now,
+    });
+    await db.collection("content_embeddings").insertOne({
+        contentId: semanticCandidateId,
+        model: env.embeddings.model,
+        dimensions: env.embeddings.dimensions,
+        sourceHash: "source-semantic",
+        vector: embeddingVector(1, 0),
+        createdAt: now,
+        updatedAt: now,
+    });
+
+    const response = await fetch(`${testServer.baseUrl}/api/recommendations/me`, {
+        headers: { cookie: authCookie() },
+    });
+    const recommendations = await json(response);
+    const items = recommendations.groups.flatMap((group) => group.items);
+    const semanticGroup = recommendations.groups.find(
+        (group) => group.reasonCode === "semantic-similarity",
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(
+        recommendations.strategy,
+        "weighted-baseline-v2+content-embeddings",
+    );
+    assert.ok(recommendations.signalsUsed.includes("embeddings"));
+    assert.ok(items.some((item) => item.id === String(semanticCandidateId)));
+    assert.equal(items.some((item) => "vector" in item), false);
+    assert.equal(semanticGroup.explanation.confidence, "baseline+embeddings");
 });

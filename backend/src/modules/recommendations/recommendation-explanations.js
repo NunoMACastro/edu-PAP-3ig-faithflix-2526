@@ -24,6 +24,13 @@ const EXPLANATIONS = {
         signals: ["ratings agregados", "catalogo publicado"],
         confidence: "baseline",
     },
+    "semantic-similarity": {
+        title: "Porque recomendamos",
+        message:
+            "Este grupo combina a recomendacao baseline com conteudos semelhantes aos que demonstraste preferir.",
+        signals: ["afinidade semantica", "atividade", "catalogo publicado"],
+        confidence: "baseline+embeddings",
+    },
     "cold-start-popular": {
         title: "Porque recomendamos",
         message:

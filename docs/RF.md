@@ -103,6 +103,8 @@
 | RF27   | Cold start                   | Utilizador/IA | Should     | RF03             |
 | RF28   | Explicabilidade              | Utilizador    | Could      | RF26             |
 
+Nota de implementação `real_dev` (2026-07-02): RF26-RF28 são cumpridos por recomendação ponderada e explicável (`weighted-baseline-v2`), usando sinais internos autenticados, feedback explícito do utilizador e fallback cold start. A app suporta uma camada opcional `weighted-baseline-v2+content-embeddings` baseada em embeddings de conteúdos publicados; modelos externos continuam desligados por defeito e não são requisito obrigatório do MVP corrente.
+
 ---
 
 ### 8. Subscrições

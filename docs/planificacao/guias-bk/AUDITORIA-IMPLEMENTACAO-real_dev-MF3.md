@@ -2,6 +2,8 @@
 
 > Execucao revalidada em `2026-06-12` no repositorio local FaithFlix, com nova leitura estatica e comandos de validacao executados nesta auditoria.
 
+> Atualizacao tecnica em `2026-07-02`: `BK-MF3-05` passou a incluir embeddings opcionais de conteudo (`content_embeddings`) e `BK-MF3-06` passou a explicar `semantic-similarity` sem expor vectores, scores internos ou historico detalhado.
+
 ## Resultado geral
 
 - Estado: PASS_COM_RISCOS
@@ -30,8 +32,8 @@
 | `BK-MF3-02` | CONFORME | Comentarios curtos, estados de moderacao, listagem publica sem `userId`, remocao por autor/admin/moderator e UI no detalhe. | Sem falha bloqueante. | Nao detetado. | `referencia_privada_docente/backend/src/modules/comments/*`, `CommentsPanel.jsx`, teste HTTP positivo. |
 | `BK-MF3-03` | CONFORME | Pesquisa publica paginada sobre `contents`/`taxonomies`, apenas `published`, query `2..80`, cliente e rota `/pesquisa`. | Sem falha bloqueante. | Nao detetado. | `search.service.js`, `SearchPage.jsx`, teste HTTP positivo. |
 | `BK-MF3-04` | CONFORME | Filtros, sort `title/recent/rating`, discovery home com `recent/documentaries/top-rated` e relacionados sem incluir o conteudo atual. | Sem falha bloqueante. | Nao detetado. | `discovery.service.js`, `SearchFilters.jsx`, `DiscoveryHomePage.jsx`, `RelatedContent.jsx`, teste HTTP positivo. |
-| `BK-MF3-05` | CONFORME | Recomendacoes autenticadas com sinais permitidos, cold start, grupos esperados e apenas conteudos publicados. | Sem falha bloqueante. | Nao detetado. | `recommendations.service.js`, `ForYouPage.jsx`, teste HTTP positivo. |
-| `BK-MF3-06` | CONFORME | `explanation` por grupo, mensagens fechadas em portugues, sem IDs internos nem historico detalhado. | Sem falha bloqueante. | Nao detetado. | `recommendation-explanations.js`, `RecommendationExplanation.jsx`, teste unitario e HTTP. |
+| `BK-MF3-05` | CONFORME_ATUALIZADO | Recomendacoes autenticadas com sinais permitidos, cold start, grupos esperados, embeddings opcionais de conteudo e apenas conteudos publicados. | Sem falha bloqueante. | Nao detetado. | `recommendations.service.js`, `content-embeddings.js`, `ForYouPage.jsx`, teste HTTP positivo. |
+| `BK-MF3-06` | CONFORME_ATUALIZADO | `explanation` por grupo, mensagens fechadas em portugues, `semantic-similarity` agregado, sem IDs internos, vectores nem historico detalhado. | Sem falha bloqueante. | Nao detetado. | `recommendation-explanations.js`, `RecommendationExplanation.jsx`, teste unitario e HTTP. |
 
 ## Matriz de coerencia entre MFs
 
@@ -92,21 +94,21 @@
 
 ### BK-MF3-05 - Recomendacao baseline + cold start
 
-- Estado: CONFORME
-- Esperado: `GET /api/recommendations/me` autenticado, sinais `playback_progress`, `user_content_lists` e `content_ratings`, apenas `published`, cold start, `groups`, `coldStart`, `signalsUsed`, `reasonCode`, cliente `recommendationsApi` e pagina `/para-si`.
-- Observado: rota exige `requireAuth`; service usa `req.user.id`, carrega apenas sinais permitidos, exclui conteudos ja usados, devolve grupos `because-your-themes`, `because-your-activity` e `popular-start`; cold start devolve grupos populares/recentes/catalogo.
+- Estado: CONFORME_ATUALIZADO em 2026-07-02
+- Esperado: `GET /api/recommendations/me` autenticado, sinais `playback_progress`, `user_content_lists`, `content_ratings` e feedback, apenas `published`, cold start, `groups`, `coldStart`, `signalsUsed`, `reasonCode`, `strategy`, cliente `recommendationsApi`, pagina `/para-si` e embeddings opcionais de conteudo sem provider externo ativo por defeito.
+- Observado: rota exige `requireAuth`; service usa `req.user.id`, carrega apenas sinais permitidos, exclui conteudos ja usados, respeita limite parental, deduplica grupos, aplica feedback `not_interested`, devolve grupos `because-your-themes`, `because-your-activity` e `popular-start`; quando existem vectores em `content_embeddings`, calcula perfil semantico temporario em runtime e usa estrategia `weighted-baseline-v2+content-embeddings`; cold start devolve grupos populares/recentes/catalogo.
 - Cumpre: sim.
 - Falhas: sem falha relevante.
-- Negativos: `401` sem cookie; fallback cold start coberto por codigo e explicabilidade.
-- Evidencia: `referencia_privada_docente/backend/src/modules/recommendations/recommendations.service.js:73`, `referencia_privada_docente/backend/src/modules/recommendations/recommendations.service.js:266`, `referencia_privada_docente/backend/src/modules/recommendations/recommendations.routes.js:8`, `referencia_privada_docente/backend/tests/integration/mf3-http-positive.test.js:525`.
+- Negativos: `401` sem cookie; feedback inválido; fallback cold start; exclusão de conteúdo publicado acima do limite parental.
+- Evidencia: `backend/src/modules/recommendations/recommendations.service.js`, `backend/src/modules/recommendations/content-embeddings.js`, `backend/scripts/generate-content-embeddings.mjs`, `backend/src/modules/recommendations/recommendations.routes.js`, `backend/tests/integration/mf3-http-positive.test.js`, `backend/tests/smoke/app.smoke.test.js`.
 - Riscos: baixo.
 - Handoff: `BK-MF3-06` consome `reasonCode`.
 
 ### BK-MF3-06 - Explicabilidade de recomendacao
 
-- Estado: CONFORME
-- Esperado: manter `GET /api/recommendations/me`, acrescentar `explanation` por grupo, mensagens simples em portugues de Portugal, sem IDs internos nem historico detalhado, componente `RecommendationExplanation`.
-- Observado: mapa fechado de explicacoes, fallback seguro para `reasonCode` desconhecido, frontend mostra explicacao por grupo.
+- Estado: CONFORME_ATUALIZADO em 2026-07-02
+- Esperado: manter `GET /api/recommendations/me`, acrescentar `explanation` por grupo, mensagens simples em portugues de Portugal, sem IDs internos, vectores nem historico detalhado, componente `RecommendationExplanation`.
+- Observado: mapa fechado de explicacoes, fallback seguro para `reasonCode` desconhecido, `semantic-similarity` explica afinidade semantica agregada, frontend mostra explicacao por grupo e feedback operacional sem expor scores internos.
 - Cumpre: sim.
 - Falhas: sem falha relevante.
 - Negativos: `reasonCode` desconhecido devolve explicacao neutra.

@@ -11,6 +11,18 @@
 
 A `MF3` implementa descoberta, comunidade e recomendacao baseline no produto real em `referencia_privada_docente`, sem antecipar monetizacao, privacidade avancada, administracao futura ou motores externos de pesquisa/IA.
 
+### Atualizacao real_dev - 2026-07-02
+
+- `BK-MF3-05` evoluiu para `weighted-baseline-v2`, mantendo o endpoint `GET /api/recommendations/me` retrocompativel.
+- O backend passou a usar scoring ponderado com favoritos, watchlist, historico, ratings positivos, taxonomias, tipos, recencia e feedback explicito.
+- Foram adicionados `POST /api/recommendations/feedback` e `POST /api/recommendations/events`, ambos autenticados e sem `userId` vindo do frontend.
+- A recomendacao respeita `published`, exclusao de conteudos usados como sinal, deduplicacao entre grupos, feedback `not_interested` e limite parental do utilizador.
+- A UI `/para-si` passou a mostrar acoes de feedback por conteudo recomendado e a registar eventos agregados `shown`/`clicked` sem bloquear navegacao.
+- Foi adicionada camada opcional `content_embeddings` para embeddings de conteudos publicados, com provider externo desligado por defeito.
+- `npm run embeddings:generate` gera vectores de forma idempotente quando `EMBEDDINGS_PROVIDER` e `deterministic` ou `external`.
+- A evolucao continua sem embeddings persistentes de utilizador, sem vector database dedicado e sem modelos generativos ativos.
+- Validacao desta entrega: backend `58/58` fora da sandbox, frontend build `PASS`, hardening scanner `PASS`, planificacao `66/66` e `git diff --check` limpo.
+
 Scope real confirmado nos BKs:
 
 - `BK-MF3-01`: ratings de 1 a 5 estrelas e agregacao publica.
@@ -67,8 +79,8 @@ Scope real confirmado nos BKs:
 | `BK-MF3-02` | IMPLEMENTADO | `referencia_privada_docente/backend/src/modules/comments/*`, `referencia_privada_docente/frontend/src/components/comments/CommentsPanel.jsx` | `npm test`, `npm run build` | Comentarios visiveis, pendentes por link, remocao por autor/admin/moderator. |
 | `BK-MF3-03` | IMPLEMENTADO | `referencia_privada_docente/backend/src/modules/search/*`, `referencia_privada_docente/frontend/src/pages/SearchPage.jsx` | `npm test`, `npm run build` | Pesquisa publica paginada sobre conteudos publicados e taxonomias. |
 | `BK-MF3-04` | IMPLEMENTADO | `referencia_privada_docente/backend/src/modules/discovery/*`, `SearchFilters.jsx`, `RelatedContent.jsx` | `npm test`, `npm run build` | Filtros, sort, carrosseis editoriais e relacionados. |
-| `BK-MF3-05` | IMPLEMENTADO | `referencia_privada_docente/backend/src/modules/recommendations/recommendations.service.js`, `ForYouPage.jsx` | `npm test`, `npm run build` | Recomendacao baseline com historico, favoritos, watchlist, ratings e cold start. |
-| `BK-MF3-06` | IMPLEMENTADO | `recommendation-explanations.js`, `RecommendationExplanation.jsx` | `npm test`, `npm run build` | Explicacoes fechadas por `reasonCode`, sem expor IDs ou historico detalhado. |
+| `BK-MF3-05` | IMPLEMENTADO_ATUALIZADO | `referencia_privada_docente/backend/src/modules/recommendations/recommendations.service.js`, `content-embeddings.js`, `ForYouPage.jsx` | `npm test`, `npm run build`, `check-security-baseline.mjs` | Recomendacao ponderada `weighted-baseline-v2`, embeddings opcionais de conteudo, cold start, feedback, eventos e limite parental. |
+| `BK-MF3-06` | IMPLEMENTADO_ATUALIZADO | `recommendation-explanations.js`, `RecommendationExplanation.jsx` | `npm test`, `npm run build` | Explicacoes fechadas por `reasonCode`, incluindo `semantic-similarity`, sem expor IDs, scores internos, vectores ou historico detalhado. |
 
 ## Ficheiros criados
 
@@ -89,9 +101,11 @@ Scope real confirmado nos BKs:
 - `referencia_privada_docente/backend/src/modules/discovery/discovery.controller.js`
 - `referencia_privada_docente/backend/src/modules/discovery/discovery.routes.js`
 - `referencia_privada_docente/backend/src/modules/recommendations/recommendation-explanations.js`
+- `referencia_privada_docente/backend/src/modules/recommendations/content-embeddings.js`
 - `referencia_privada_docente/backend/src/modules/recommendations/recommendations.service.js`
 - `referencia_privada_docente/backend/src/modules/recommendations/recommendations.controller.js`
 - `referencia_privada_docente/backend/src/modules/recommendations/recommendations.routes.js`
+- `referencia_privada_docente/backend/scripts/generate-content-embeddings.mjs`
 - `referencia_privada_docente/backend/tests/unit/mf3-validation.test.js`
 - `referencia_privada_docente/frontend/src/services/api/ratingsApi.js`
 - `referencia_privada_docente/frontend/src/services/api/commentsApi.js`
@@ -131,12 +145,17 @@ Scope real confirmado nos BKs:
 - `GET /api/discovery/home`
 - `GET /api/discovery/related/:contentId`
 - `GET /api/recommendations/me`
+- `POST /api/recommendations/feedback`
+- `POST /api/recommendations/events`
 
 ## Modelos/schemas criados/editados
 
 - `content_ratings`: `userId`, `contentId`, `value`, `createdAt`, `updatedAt`; indice unico `userId + contentId`.
 - `content_comments`: `userId`, `contentId`, `body`, `status`, `moderationReason`, `createdAt`, `updatedAt`; estados `visible`, `pending_review`, `rejected`.
 - Search/discovery/recommendations reutilizam `contents`, `taxonomies`, `user_content_lists`, `playback_progress` e `content_ratings`.
+- `recommendation_feedback`: feedback autenticado por `userId + contentId`, com acoes `more_like_this`, `less_like_this`, `not_interested` e `seen`.
+- `recommendation_events`: eventos agregados autenticados `shown`/`clicked`, guardando `contentId`, `groupId`, `reasonCode`, `strategy` e `createdAt`.
+- `content_embeddings`: embeddings de conteudos publicados por `contentId + model`, com `dimensions`, `sourceHash`, `vector`, `createdAt` e `updatedAt`.
 
 ## Services/controllers/routes criados/editados
 

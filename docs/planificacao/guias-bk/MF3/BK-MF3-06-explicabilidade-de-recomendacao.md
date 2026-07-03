@@ -38,6 +38,8 @@ Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumen
 - Mostrar "Porque recomendamos" na pagina `/para-si`.
 - Explicar cold start de forma honesta.
 - Garantir que a explicacao nao revela IDs internos nem historico detalhado.
+- Explicar a estrategia `weighted-baseline-v2` como regra ponderada simples, sem mostrar scores internos.
+- Explicar `semantic-similarity` como afinidade agregada de conteudos semelhantes, sem mostrar vectores.
 
 ### Scope-out
 
@@ -46,6 +48,7 @@ Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumen
 - Explicacoes por modelo generativo.
 - Exportacao de dados pessoais.
 - Alteracao dos sinais permitidos.
+- Expor pesos internos, scores por utilizador ou historico detalhado na UI.
 
 ### Glossario rapido
 
@@ -61,6 +64,8 @@ Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumen
 - `CANONICO`: `RNF37` impede usar dados de recomendacao para outro fim.
 - `DERIVADO`: a explicacao fica ao nivel do grupo, porque o BK anterior devolve grupos.
 - `DERIVADO`: `reasonCode` desconhecido recebe uma mensagem neutra, para evitar quebrar a UI.
+- `DERIVADO`: feedback e eventos ajudam a robustez, mas a explicacao publica continua agregada por grupo.
+- `DERIVADO`: embeddings de conteudo podem aparecer como sinal agregado, mas nunca como vector, score bruto ou historico detalhado.
 
 ### Tempo estimado
 
@@ -99,7 +104,8 @@ Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumen
 | Novo campo por grupo | `explanation` |
 | Explicacao | mensagem simples em portugues de Portugal |
 | Privacidade | sem IDs internos, sem lista detalhada de historico |
-| Frontend | `RecommendationExplanation`, `ForYouPage` atualizado |
+| Embeddings | `semantic-similarity` explica afinidade semantica agregada sem expor vectores |
+| Frontend | `RecommendationExplanation`, `ForYouPage` atualizado com feedback explicito |
 | Handoff | `BK-MF4-01` pode iniciar monetizacao sem alterar descoberta |
 
 ### Formato final do grupo
@@ -364,6 +370,7 @@ Se a explicacao ficar fora do grupo, o utilizador pode nao perceber a que sugest
 - Cold start mostra mensagem clara de poucos sinais.
 - A UI `/para-si` mostra "Porque recomendamos" por grupo visivel.
 - A explicacao nao contem `userId`, `contentId` de historico, emails ou tokens.
+- A UI pode mostrar feedback operacional, mas nao mostra score interno nem pesos individuais.
 - `reasonCode` desconhecido recebe mensagem fallback.
 
 ## Validacao final

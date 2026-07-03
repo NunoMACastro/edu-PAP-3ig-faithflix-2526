@@ -86,7 +86,13 @@ test("sessao com cookie em formato invalido nao autentica", async () => {
 });
 
 test("MF3 protege rotas autenticadas sem cookie de sessao", async () => {
-    const [ratingResponse, commentResponse, recommendationsResponse] =
+    const [
+        ratingResponse,
+        commentResponse,
+        recommendationsResponse,
+        feedbackResponse,
+        eventsResponse,
+    ] =
         await Promise.all([
             fetch(`${testServer.baseUrl}/api/ratings/64f000000000000000000001`, {
                 method: "PUT",
@@ -99,11 +105,33 @@ test("MF3 protege rotas autenticadas sem cookie de sessao", async () => {
                 body: JSON.stringify({ body: "Muito bom" }),
             }),
             fetch(`${testServer.baseUrl}/api/recommendations/me`),
+            fetch(`${testServer.baseUrl}/api/recommendations/feedback`, {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                    contentId: "64f000000000000000000001",
+                    action: "not_interested",
+                }),
+            }),
+            fetch(`${testServer.baseUrl}/api/recommendations/events`, {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                    events: [
+                        {
+                            eventType: "shown",
+                            contentId: "64f000000000000000000001",
+                        },
+                    ],
+                }),
+            }),
         ]);
 
     assert.equal(ratingResponse.status, 401);
     assert.equal(commentResponse.status, 401);
     assert.equal(recommendationsResponse.status, 401);
+    assert.equal(feedbackResponse.status, 401);
+    assert.equal(eventsResponse.status, 401);
 });
 
 test("MF3 devolve 400 em negativos publicos antes de consultar dados", async () => {

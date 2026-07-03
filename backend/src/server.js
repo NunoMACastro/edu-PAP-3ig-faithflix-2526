@@ -19,6 +19,7 @@ import { ensureLibraryIndexes } from "./modules/library/library.service.js";
 import { ensureNotificationIndexes } from "./modules/notifications/notifications.service.js";
 import { ensurePaymentIndexes } from "./modules/payments/payments.service.js";
 import { ensurePlaybackIndexes } from "./modules/playback/playback.service.js";
+import { ensureRecommendationIndexes } from "./modules/recommendations/recommendations.service.js";
 import { ensureSubscriptionIndexes } from "./modules/subscriptions/subscriptions.service.js";
 import { logger } from "./utils/logger.js";
 
@@ -28,6 +29,7 @@ await ensureCatalogIndexes();
 await ensureTaxonomyIndexes();
 await ensurePlaybackIndexes();
 await ensureLibraryIndexes();
+await ensureRecommendationIndexes();
 await ensureSubscriptionIndexes();
 await ensurePaymentIndexes();
 await ensureNotificationIndexes();
