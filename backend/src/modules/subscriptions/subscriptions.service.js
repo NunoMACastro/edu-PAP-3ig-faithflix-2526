@@ -205,6 +205,33 @@ function entitlementsForPlan(plan) {
   };
 }
 
+// backend/src/modules/subscriptions/subscriptions.service.js
+/**
+ * Filtra opções de qualidade conforme entitlements sem expor URLs bloqueadas.
+ *
+ * @param {object[]} options Opções vindas do catálogo.
+ * @param {object} entitlements Entitlements efetivos do utilizador.
+ * @returns {object[]} Opções públicas para o player.
+ */
+export function filterQualityOptionsByEntitlements(options = [], entitlements = ENTITLEMENTS.none) {
+  const maxRank = Number(entitlements.qualityRank ?? qualityRankForValue(entitlements.maxQuality));
+
+  return options.map((option) => {
+    const rank = qualityRankForValue(option.value ?? option.label);
+    if (!rank || rank <= maxRank) {
+      return { ...option, locked: false };
+    }
+
+    // Remover URLs bloqueadas é a barreira real; `locked` é apenas feedback para a UI.
+    const { playbackUrl: _playbackUrl, src: _src, ...safeOption } = option;
+    return {
+      ...safeOption,
+      locked: true,
+      requiredTier: "family",
+      lockedReason: "Disponível no plano Família.",
+    };
+  });
+}
 
 /**
  * Entitlements para uma subscricao concreta.

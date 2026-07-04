@@ -16,6 +16,43 @@ import {
     ensureMediaPreferenceIndexes,
 } from "./media-preferences.service.js";
 import { assertProgressPayload } from "./playback.validation.js";
+import {
+  filterQualityOptionsByEntitlements,
+  getEffectiveSubscriptionAccess,
+  qualityRankForValue,
+} from "../subscriptions/subscriptions.service.js";
+
+/**
+ * Resolve média reproduzível sem construir URLs a partir de input do utilizador.
+ *
+ * @param {Record<string, unknown>} content Documento de conteúdo publicado.
+ * @param {{ audioLanguage: string, quality: string }} preferences Preferências guardadas.
+ * @param {Record<string, unknown>} entitlements Entitlements efetivos.
+ * @returns {{ playbackUrl: string, selectedAudioLanguage: string, selectedQuality: string }} Média segura.
+ */
+function resolvePlayableMedia(content, preferences, entitlements) {
+  const selectedAudio = content.tracks?.audio?.find(
+    (track) => track.language === preferences.audioLanguage,
+  );
+  const qualityOptions = filterQualityOptionsByEntitlements(
+    content.qualityOptions ?? [],
+    entitlements,
+  );
+  const allowedQualityOptions = qualityOptions
+    .filter((option) => !option.locked && option.playbackUrl)
+    .sort((left, right) => qualityRankForValue(left.value) - qualityRankForValue(right.value));
+  const selectedQuality = allowedQualityOptions.find(
+    (option) => option.value === preferences.quality,
+  );
+  // O fallback evita falha de reprodução quando o utilizador tinha preferido 4K num plano Pro.
+  const fallbackQuality = selectedQuality ?? allowedQualityOptions[allowedQualityOptions.length - 1];
+
+  return {
+    playbackUrl: selectedAudio?.src ?? fallbackQuality?.playbackUrl ?? content.media.playbackUrl,
+    selectedAudioLanguage: selectedAudio?.language ?? "",
+    selectedQuality: fallbackQuality?.value ?? "",
+  };
+}
 
 /**
  * Converte uma string de id em ObjectId com erro de domínio.
@@ -112,35 +149,59 @@ function assertParentalAccess(user, content) {
     }
 }
 
+// backend/src/modules/playback/playback.service.js
 /**
- * Converte conteúdo para o formato de resposta de reprodução.
+ * Converte conteúdo para o formato público de reprodução.
  *
- * @param {Record<string, unknown>} content - Documento de conteúdo.
- * @param {Record<string, string>} preferences - Preferências do utilizador.
+ * @param {Record<string, unknown>} content Documento de conteúdo.
+ * @param {Record<string, string>} preferences Preferências do utilizador.
  * @param {Record<string, unknown>} entitlements Entitlements efetivos.
  * @returns {Record<string, unknown>} Conteúdo público de reprodução.
  */
 function publicPlaybackContent(content, preferences, entitlements) {
-    return {
-        id: String(content._id),
-        title: content.title,
-        durationSeconds: content.durationSeconds,
-        media: resolvePlayableMedia(content, preferences, entitlements),
-        tracks: content.tracks ?? { subtitles: [], audio: [] },
-        qualityOptions: filterQualityOptionsByEntitlements(
-            content.qualityOptions ?? [],
-            entitlements,
-        ),
-        preferences,
-        entitlements,
-    };
+  return {
+    id: String(content._id),
+    title: content.title,
+    durationSeconds: content.durationSeconds,
+    media: resolvePlayableMedia(content, preferences, entitlements),
+    tracks: content.tracks ?? { subtitles: [], audio: [] },
+    // A UI recebe o estado das opções, mas não recebe URL acima do plano.
+    qualityOptions: filterQualityOptionsByEntitlements(content.qualityOptions ?? [], entitlements),
+    preferences,
+    entitlements,
+  };
 }
 
 /**
- * Garante que existem os índices de reprodução.
+ * Carrega dados de reprodução de conteúdo publicado para um utilizador autenticado.
  *
- * @returns {Promise<void>} Termina depois da criação de índices.
+ * @param {string} contentId Id do conteúdo.
+ * @param {string} userId Id autenticado.
+ * @returns {Promise<{ content: Record<string, unknown>, progress: object | null }>} Resposta de reprodução.
  */
+export async function getPlayback(contentId, userId) {
+  const db = await getDb();
+  const contentObjectId = asObjectId(contentId, "Conteúdo");
+  const userObjectId = asObjectId(userId, "Utilizador");
+  const content = await db.collection("contents").findOne({ _id: contentObjectId, status: "published" });
+
+  if (!content) {
+    throw new HttpError(404, "Conteúdo não encontrado.");
+  }
+
+  const user = await db.collection("users").findOne({ _id: userObjectId });
+  assertParentalAccess(user, content);
+
+  const preferences = await getMediaPreferences(userId);
+  const effectiveAccess = await getEffectiveSubscriptionAccess(userId);
+  const progress = await db.collection("playback_progress").findOne({ userId: userObjectId, contentId: contentObjectId });
+
+  return {
+    content: publicPlaybackContent(content, preferences, effectiveAccess.entitlements),
+    progress: publicProgress(progress, content.durationSeconds),
+  };
+}
+
 export async function ensurePlaybackIndexes() {
     const db = await getDb();
     await db
@@ -155,37 +216,31 @@ export async function ensurePlaybackIndexes() {
 /**
  * Carrega dados de reprodução de conteúdo publicado para um utilizador autenticado.
  *
- * @param {string} contentId - Id do conteúdo.
- * @param {string} userId - Authenticated user id.
- * @returns {Promise<{ content: Record<string, unknown>, progress: ReturnType<typeof publicProgress> }>} Resposta de reprodução.
+ * @param {string} contentId Id do conteúdo.
+ * @param {string} userId Id autenticado.
+ * @returns {Promise<{ content: Record<string, unknown>, progress: object | null }>} Resposta de reprodução.
  */
 export async function getPlayback(contentId, userId) {
-    const db = await getDb();
-    const contentObjectId = asObjectId(contentId, "Conteudo");
-    const userObjectId = asObjectId(userId, "Utilizador");
-    const content = await db.collection("contents").findOne({
-        _id: contentObjectId,
-        status: "published",
-    });
+  const db = await getDb();
+  const contentObjectId = asObjectId(contentId, "Conteúdo");
+  const userObjectId = asObjectId(userId, "Utilizador");
+  const content = await db.collection("contents").findOne({ _id: contentObjectId, status: "published" });
 
-    if (!content) {
-        throw new HttpError(404, "Conteudo nao encontrado.");
-    }
+  if (!content) {
+    throw new HttpError(404, "Conteúdo não encontrado.");
+  }
 
-    const user = await db.collection("users").findOne({ _id: userObjectId });
-    assertParentalAccess(user, content);
+  const user = await db.collection("users").findOne({ _id: userObjectId });
+  assertParentalAccess(user, content);
 
-    const preferences = await getMediaPreferences(userId);
-    const effectiveAccess = await getEffectiveSubscriptionAccess(userId);
-    const progress = await db.collection("playback_progress").findOne({
-        userId: userObjectId,
-        contentId: contentObjectId,
-    });
+  const preferences = await getMediaPreferences(userId);
+  const effectiveAccess = await getEffectiveSubscriptionAccess(userId);
+  const progress = await db.collection("playback_progress").findOne({ userId: userObjectId, contentId: contentObjectId });
 
-    return {
-        content: publicPlaybackContent(content, preferences, effectiveAccess.entitlements),
-        progress: publicProgress(progress, content.durationSeconds),
-    };
+  return {
+    content: publicPlaybackContent(content, preferences, effectiveAccess.entitlements),
+    progress: publicProgress(progress, content.durationSeconds),
+  };
 }
 
 /**
