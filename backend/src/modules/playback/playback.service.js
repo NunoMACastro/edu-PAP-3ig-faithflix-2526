@@ -16,11 +16,6 @@ import {
     ensureMediaPreferenceIndexes,
 } from "./media-preferences.service.js";
 import { assertProgressPayload } from "./playback.validation.js";
-import {
-  filterQualityOptionsByEntitlements,
-  getEffectiveSubscriptionAccess,
-  qualityRankForValue,
-} from "../subscriptions/subscriptions.service.js";
 
 /**
  * Resolve média reproduzível sem construir URLs a partir de input do utilizador.
@@ -91,44 +86,6 @@ function publicProgress(progress, durationSeconds) {
         durationSeconds: progress.durationSeconds,
         completed: progress.completed,
         lastWatchedAt: progress.lastWatchedAt,
-    };
-}
-
-/**
- * Resolve media reproduzível sem construir URLs a partir de input do utilizador.
- *
- * @param {Record<string, unknown>} content - Documento de conteúdo.
- * @param {{ audioLanguage: string, quality: string }} preferences - Preferências do utilizador.
- * @param {Record<string, unknown>} entitlements - Entitlements efetivos do utilizador.
- * @returns {{ playbackUrl: string, selectedAudioLanguage: string, selectedQuality: string }} Playable media.
- */
-function resolvePlayableMedia(content, preferences, entitlements) {
-    const selectedAudio = content.tracks?.audio?.find(
-        (track) => track.language === preferences.audioLanguage,
-    );
-    const qualityOptions = filterQualityOptionsByEntitlements(
-        content.qualityOptions ?? [],
-        entitlements,
-    );
-    const allowedQualityOptions = qualityOptions
-        .filter((option) => !option.locked && option.playbackUrl)
-        .sort(
-            (left, right) =>
-                qualityRankForValue(left.value) - qualityRankForValue(right.value),
-        );
-    const selectedQuality = allowedQualityOptions.find(
-        (option) => option.value === preferences.quality,
-    );
-    const fallbackQuality =
-        selectedQuality ?? allowedQualityOptions[allowedQualityOptions.length - 1];
-
-    return {
-        playbackUrl:
-            selectedAudio?.src ??
-            fallbackQuality?.playbackUrl ??
-            content.media.playbackUrl,
-        selectedAudioLanguage: selectedAudio?.language ?? "",
-        selectedQuality: fallbackQuality?.value ?? "",
     };
 }
 
@@ -213,35 +170,6 @@ export async function ensurePlaybackIndexes() {
     await ensureMediaPreferenceIndexes();
 }
 
-/**
- * Carrega dados de reprodução de conteúdo publicado para um utilizador autenticado.
- *
- * @param {string} contentId Id do conteúdo.
- * @param {string} userId Id autenticado.
- * @returns {Promise<{ content: Record<string, unknown>, progress: object | null }>} Resposta de reprodução.
- */
-export async function getPlayback(contentId, userId) {
-  const db = await getDb();
-  const contentObjectId = asObjectId(contentId, "Conteúdo");
-  const userObjectId = asObjectId(userId, "Utilizador");
-  const content = await db.collection("contents").findOne({ _id: contentObjectId, status: "published" });
-
-  if (!content) {
-    throw new HttpError(404, "Conteúdo não encontrado.");
-  }
-
-  const user = await db.collection("users").findOne({ _id: userObjectId });
-  assertParentalAccess(user, content);
-
-  const preferences = await getMediaPreferences(userId);
-  const effectiveAccess = await getEffectiveSubscriptionAccess(userId);
-  const progress = await db.collection("playback_progress").findOne({ userId: userObjectId, contentId: contentObjectId });
-
-  return {
-    content: publicPlaybackContent(content, preferences, effectiveAccess.entitlements),
-    progress: publicProgress(progress, content.durationSeconds),
-  };
-}
 
 /**
  * Guarda progresso de reprodução para um par utilizador/conteúdo.

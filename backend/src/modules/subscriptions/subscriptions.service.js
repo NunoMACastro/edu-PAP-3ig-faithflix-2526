@@ -205,34 +205,6 @@ function entitlementsForPlan(plan) {
   };
 }
 
-// backend/src/modules/subscriptions/subscriptions.service.js
-/**
- * Filtra opções de qualidade conforme entitlements sem expor URLs bloqueadas.
- *
- * @param {object[]} options Opções vindas do catálogo.
- * @param {object} entitlements Entitlements efetivos do utilizador.
- * @returns {object[]} Opções públicas para o player.
- */
-export function filterQualityOptionsByEntitlements(options = [], entitlements = ENTITLEMENTS.none) {
-  const maxRank = Number(entitlements.qualityRank ?? qualityRankForValue(entitlements.maxQuality));
-
-  return options.map((option) => {
-    const rank = qualityRankForValue(option.value ?? option.label);
-    if (!rank || rank <= maxRank) {
-      return { ...option, locked: false };
-    }
-
-    // Remover URLs bloqueadas é a barreira real; `locked` é apenas feedback para a UI.
-    const { playbackUrl: _playbackUrl, src: _src, ...safeOption } = option;
-    return {
-      ...safeOption,
-      locked: true,
-      requiredTier: "family",
-      lockedReason: "Disponível no plano Família.",
-    };
-  });
-}
-
 /**
  * Entitlements para uma subscricao concreta.
  *
@@ -560,10 +532,21 @@ export async function ensureSubscriptionIndexes() {
   await db.collection("subscription_plans").createIndex({ code: 1 }, { unique: true });
   await db.collection("subscriptions").createIndex({ userId: 1 }, { unique: true });
   await db.collection("subscriptions").createIndex({ status: 1, currentPeriodEnd: 1 });
+  await db.collection("subscription_family_memberships").createIndex({ ownerUserId: 1, status: 1 });
+  await db.collection("subscription_family_memberships").createIndex({ memberUserId: 1, status: 1 });
+  await db.collection("subscription_family_memberships").createIndex(
+    { memberUserId: 1 },
+    {
+      // A base de dados também defende a regra de negócio, não apenas o service.
+      unique: true,
+      partialFilterExpression: { status: { $in: FAMILY_ACTIVE_STATUSES } },
+    },
+  );
 
   for (const plan of DEFAULT_PLANS) {
     await db.collection("subscription_plans").updateOne(
       { code: plan.code },
+      // O upsert preserva códigos antigos e acrescenta os campos Família do BK-MF9-01.
       { $set: { ...plan, updatedAt: new Date() }, $setOnInsert: { createdAt: new Date() } },
       { upsert: true },
     );

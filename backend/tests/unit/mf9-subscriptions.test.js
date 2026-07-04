@@ -350,6 +350,114 @@ test("MF9 partilha familiar cria convite, aceita e remove acesso efetivo", async
   assert.equal(await hasActiveSubscriptionAccess(String(memberId)), false);
 });
 
+test("MF9 bloqueia owner sem Família, membro pago e duplicação familiar", async () => {
+  const proOwnerId = new ObjectId();
+  const familyOwnerId = new ObjectId();
+  const paidMemberId = new ObjectId();
+  const invitedMemberId = new ObjectId();
+  const future = new Date("2999-01-01T00:00:00.000Z");
+
+  setCollectionsForTests({
+    users: collection([
+      { _id: proOwnerId, name: "Owner Pro", email: "owner-pro@example.test", role: "user" },
+      { _id: familyOwnerId, name: "Owner Família", email: "owner-family@example.test", role: "user" },
+      { _id: paidMemberId, name: "Pago", email: "pago@example.test", role: "user" },
+      { _id: invitedMemberId, name: "Convidado", email: "convidado@example.test", role: "user" },
+    ]),
+    subscriptions: collection([
+      {
+        _id: new ObjectId(),
+        userId: proOwnerId,
+        status: "active",
+        planCode: "faithflix-monthly",
+        currentPeriodEnd: future,
+      },
+      {
+        _id: new ObjectId(),
+        userId: familyOwnerId,
+        status: "active",
+        planCode: "faithflix-family-monthly",
+        currentPeriodEnd: future,
+      },
+      {
+        _id: new ObjectId(),
+        userId: paidMemberId,
+        status: "active",
+        planCode: "faithflix-monthly",
+        currentPeriodEnd: future,
+      },
+    ]),
+    subscription_plans: collection(planRows()),
+    subscription_family_memberships: collection([
+      {
+        _id: new ObjectId(),
+        ownerUserId: familyOwnerId,
+        memberUserId: invitedMemberId,
+        status: "pending",
+        invitedEmail: "convidado@example.test",
+      },
+    ]),
+    notifications: collection([]),
+  });
+
+  await assert.rejects(
+    () => inviteFamilyMember(String(proOwnerId), { email: "pago@example.test" }),
+    /Plano Família ativo/,
+  );
+
+  await assert.rejects(
+    () => inviteFamilyMember(String(familyOwnerId), { email: "pago@example.test" }),
+    /subscrição paga ativa/,
+  );
+
+  // O duplicado prova que a regra de uma Família aberta por membro não fica só na UI.
+  await assert.rejects(
+    () => inviteFamilyMember(String(familyOwnerId), { email: "convidado@example.test" }),
+    /partilha familiar ativa ou pendente/,
+  );
+});
+
+test("MF9 rejeita aceite de convite por outro utilizador", async () => {
+  const ownerId = new ObjectId();
+  const memberId = new ObjectId();
+  const otherUserId = new ObjectId();
+  const invitationId = new ObjectId();
+  const future = new Date("2999-01-01T00:00:00.000Z");
+
+  setCollectionsForTests({
+    users: collection([
+      { _id: ownerId, name: "Owner", email: "owner@example.test", role: "user" },
+      { _id: memberId, name: "Membro", email: "membro@example.test", role: "user" },
+      { _id: otherUserId, name: "Outro", email: "outro@example.test", role: "user" },
+    ]),
+    subscriptions: collection([
+      {
+        _id: new ObjectId(),
+        userId: ownerId,
+        status: "active",
+        planCode: "faithflix-family-monthly",
+        currentPeriodEnd: future,
+      },
+    ]),
+    subscription_plans: collection(planRows()),
+    subscription_family_memberships: collection([
+      {
+        _id: invitationId,
+        ownerUserId: ownerId,
+        memberUserId: memberId,
+        status: "pending",
+        invitedEmail: "membro@example.test",
+      },
+    ]),
+    notifications: collection([]),
+  });
+
+  await assert.rejects(
+    () => acceptFamilyInvitation(String(otherUserId), String(invitationId)),
+    /Convite familiar não encontrado/,
+  );
+});
+
 test("MF9 bloqueia convites sem plano Família e membros com subscrição paga", async () => {
   const proOwnerId = new ObjectId();
   const paidMemberId = new ObjectId();
