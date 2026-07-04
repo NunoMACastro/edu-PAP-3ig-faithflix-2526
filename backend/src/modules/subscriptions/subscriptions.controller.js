@@ -72,6 +72,7 @@ export async function getMyFamilyController(req, res) {
  * @returns {Promise<void>} Envia `201` com o convite.
  */
 export async function postFamilyInvitation(req, res) {
+  // O userId vem da sessão para impedir leitura de famílias de outros utilizadores.
   res.status(201).json(await inviteFamilyMember(req.user.id, req.body));
 }
 

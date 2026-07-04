@@ -35,3 +35,5 @@ subscriptionsRouter.post("/family/invitations/:id/accept", requireAuth, asyncHan
 subscriptionsRouter.post("/family/invitations/:id/decline", requireAuth, asyncHandler(postDeclineFamilyInvitation));
 subscriptionsRouter.delete("/family/members/:memberId", requireAuth, asyncHandler(deleteFamilyMember));
 subscriptionsRouter.post("/family/leave", requireAuth, asyncHandler(postLeaveFamily));
+
+
