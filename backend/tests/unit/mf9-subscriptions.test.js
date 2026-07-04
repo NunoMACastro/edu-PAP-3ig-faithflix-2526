@@ -388,6 +388,7 @@ test("MF9 bloqueia convites sem plano Família e membros com subscrição paga",
 
 test("MF9 filtra qualidade e não expõe playbackUrl bloqueado", () => {
   const filtered = filterQualityOptionsByEntitlements(
+    // O cenário inclui 4K com URL para provar que o backend remove dados sensíveis em planos Pro.
     [
       { value: "1080p", label: "Full HD", playbackUrl: "https://media/1080.mp4" },
       { value: "2160p", label: "4K", playbackUrl: "https://media/4k.mp4" },
@@ -395,6 +396,7 @@ test("MF9 filtra qualidade e não expõe playbackUrl bloqueado", () => {
     { qualityRank: 1080, maxQuality: "1080p" },
   );
 
+  // A qualidade permitida fica reproduzível; a bloqueada fica apenas informativa.
   assert.equal(filtered[0].locked, false);
   assert.equal(filtered[0].playbackUrl, "https://media/1080.mp4");
   assert.equal(filtered[1].locked, true);
@@ -435,6 +437,7 @@ test("MF9 playback faz fallback para qualidade permitida", async () => {
         durationSeconds: 1200,
         media: { playbackUrl: "https://media/default.mp4" },
         tracks: { subtitles: [], audio: [] },
+        // O teste simula conteúdo com 4K para provar que o plano Pro fica limitado.
         qualityOptions: [
           { value: "1080p", label: "Full HD", playbackUrl: "https://media/1080.mp4" },
           { value: "2160p", label: "4K", playbackUrl: "https://media/4k.mp4" },
@@ -445,6 +448,7 @@ test("MF9 playback faz fallback para qualidade permitida", async () => {
 
   const response = await getPlayback(String(contentId), String(userId));
 
+  // A resposta pública deve reproduzir a melhor qualidade permitida e nunca a URL bloqueada.
   assert.equal(response.content.media.playbackUrl, "https://media/1080.mp4");
   assert.equal(response.content.qualityOptions[1].locked, true);
   assert.equal("playbackUrl" in response.content.qualityOptions[1], false);

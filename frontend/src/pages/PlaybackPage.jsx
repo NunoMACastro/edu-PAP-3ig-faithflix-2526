@@ -274,21 +274,20 @@ export function PlaybackPage() {
                     </select>
                 </label>
                 <label>
-                    Qualidade
-                    <select
-                        value={qualityValue}
-                        onChange={(event) =>
-                            updatePreference("quality", event.target.value)
-                        }
-                    >
-                        <option value="">Automática</option>
-                        {playback.content.qualityOptions.map((option) => (
-                            <option key={option.value} value={option.value} disabled={option.locked}>
-                                {option.locked ? `${option.label} - Plano Família` : option.label}
-                            </option>
+                Qualidade
+                <select
+                    value={qualityValue}
+                    onChange={(event) => updatePreference("quality", event.target.value)}
+                >
+                    <option value="">Automática</option>
+                {playback.content.qualityOptions.map((option) => (
+                // `locked` vem do backend; a UI só reflete a decisão e não calcula permissões.
+                <option key={option.value} value={option.value} disabled={option.locked}>
+                  {option.locked ? `${option.label} - Plano Família` : option.label}
+                     </option>
                         ))}
-                    </select>
-                </label>
+            </select>
+            </label>
             </div>
             <video
                 ref={videoRef}
