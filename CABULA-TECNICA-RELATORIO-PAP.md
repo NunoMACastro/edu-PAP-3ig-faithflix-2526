@@ -29,14 +29,6 @@ O backend está organizado por módulos de domínio. Cada módulo concentra uma 
 
 Esta separação facilita manutenção e evolução, porque cada domínio pode ser alterado sem misturar responsabilidades com os restantes.
 
-Frase para relatório:
-
-> A arquitetura do FaithFlix segue uma divisão modular por domínio funcional. O frontend apresenta a experiência ao utilizador e o backend centraliza regras de negócio, validação, autenticação, autorização e persistência de dados. Esta separação melhora a manutenção, a segurança e a rastreabilidade das funcionalidades.
-
-Frase para defesa:
-
-> O frontend mostra a aplicação; o backend decide, valida e guarda. Cada área está separada por módulos para o projeto ser mais fácil de manter.
-
 ## Identidade, Contas E Perfis
 
 O sistema de identidade é a base da plataforma. Antes de guardar favoritos, histórico, subscrições ou preferências, o sistema precisa de saber quem é o utilizador.
