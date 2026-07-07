@@ -375,8 +375,6 @@ Inclui:
 
 ## Passagens Bíblicas E Estudo Bíblico Integrado
 
-Nota de escopo: esta secção deve ser apresentada como visão futura ou conceito de produto, salvo se vier a ser formalizada como requisito e implementada.
-
 As passagens bíblicas podem enriquecer a experiência do FaithFlix, associando referências bíblicas aos conteúdos audiovisuais. Em vez de um conteúdo ter apenas título, sinopse e imagem, pode também ter referências espirituais relacionadas.
 
 Uma passagem bíblica deve ser tratada como dado estruturado:
@@ -408,3 +406,281 @@ Uma forma forte de fechar a explicação técnica é mostrar que o FaithFlix nã
 Texto final sugerido:
 
 > O FaithFlix foi estruturado como uma aplicação web modular, com separação clara entre frontend, backend, base de dados e domínios funcionais. Cada módulo responde a uma área do produto, como identidade, catálogo, streaming, biblioteca pessoal, recomendações, subscrições, pool solidária, privacidade e administração. Esta organização permite manter o sistema escalável, seguro, testável e alinhado com os objetivos da PAP.
+
+## Sugestão de Organização para a Apresentação
+
+Tendo em conta a quantidade de sistemas do FaithFlix, a apresentação deve seguir uma ordem progressiva. O objetivo é evitar que os alunos comecem por explicar recomendações, subscrições ou pool solidária antes de o júri perceber a base técnica da aplicação.
+
+Em vez de apresentar a aplicação como uma lista de páginas, é melhor apresentar por camadas:
+
+1. base técnica, identidade e perfis;
+2. catálogo, metadados, streaming e reprodutor;
+3. biblioteca pessoal, feedback e continuidade;
+4. pesquisa, descoberta, recomendações e embeddings;
+5. subscrições, pagamentos simulados, trial, planos e qualidade;
+6. pool solidária e associações;
+7. passagens bíblicas e curadoria cristã;
+8. notificações, privacidade e consentimentos;
+9. administração, métricas e operação;
+10. segurança, testes, performance e acessibilidade.
+
+### 1. Base Técnica, Identidade E Perfis
+
+Primeiro deve ser explicada a fundação da plataforma.
+
+Inclui:
+
+- frontend React;
+- backend Node.js/Express;
+- MongoDB;
+- API REST;
+- autenticação;
+- sessão autenticada;
+- roles `user`, `moderator` e `admin`;
+- validação e autorização no backend.
+
+Mensagem-chave:
+
+> Antes de falar de catálogo, streaming, recomendações ou subscrições, é preciso explicar como o FaithFlix sabe quem é o utilizador e que permissões essa pessoa tem.
+
+Nesta parte, os alunos não precisam de explicar todas as rotas. Devem mostrar a ideia principal: o frontend apresenta a interface, mas o backend decide quem pode fazer cada operação.
+
+### 2. Catálogo, Metadados, Streaming E Reprodutor
+
+Depois da base técnica, deve entrar o catálogo, porque é o centro da aplicação.
+
+Inclui:
+
+- filmes, séries, episódios e documentários;
+- título, sinopse, duração e classificação etária;
+- imagens;
+- taxonomias e temas;
+- estado editorial, como rascunho, publicado ou arquivado;
+- dados de media;
+- opções de qualidade, áudio e legendas;
+- reprodutor;
+- progresso de visualização.
+
+Mensagem-chave:
+
+> O catálogo não é apenas uma lista de vídeos. É a fonte estruturada que alimenta pesquisa, detalhe, reprodução, recomendações e administração.
+
+Aqui é importante reforçar que só conteúdos publicados devem aparecer para utilizadores finais. Conteúdos em rascunho ou arquivados pertencem ao circuito administrativo.
+
+### 3. Biblioteca Pessoal, Feedback E Continuidade
+
+Depois do catálogo, deve ser explicado como cada utilizador interage com os conteúdos.
+
+Inclui:
+
+- favoritos;
+- watchlist;
+- histórico;
+- progresso de visualização;
+- ratings;
+- comentários;
+- "continuar a ver";
+- biblioteca pessoal.
+
+Mensagem-chave:
+
+> Depois de existirem conteúdos, o sistema começa a guardar a relação de cada utilizador com esses conteúdos.
+
+Esta parte é útil para mostrar integração. Um favorito não serve apenas para aparecer numa lista; também pode alimentar recomendações. Um progresso de vídeo não serve apenas para retomar a reprodução; também ajuda a perceber atividade.
+
+### 4. Pesquisa, Descoberta, Recomendações E Embeddings
+
+Só depois de explicar catálogo e sinais do utilizador deve entrar a descoberta personalizada.
+
+Inclui:
+
+- pesquisa por termo;
+- filtros;
+- página inicial;
+- conteúdos relacionados;
+- página "Para si";
+- recomendações baseline;
+- cold start;
+- explicabilidade;
+- embeddings de conteúdo;
+- perfil semântico temporário do utilizador.
+
+Mensagem-chave:
+
+> As recomendações dependem de duas coisas: conteúdos bem descritos e sinais de atividade do utilizador.
+
+Nesta parte, os alunos devem distinguir três ideias:
+
+- pesquisa: o utilizador procura diretamente;
+- descoberta: a aplicação sugere grupos e conteúdos;
+- recomendação: o sistema usa sinais como favoritos, watchlist, histórico, ratings positivos e embeddings para ordenar sugestões.
+
+Também devem explicar que os embeddings não são dados pessoais permanentes do utilizador. Os embeddings pertencem aos conteúdos. O perfil semântico do utilizador é calculado temporariamente durante o pedido de recomendação.
+
+### 5. Subscrições, Pagamentos Simulados, Trial, Planos E Qualidade
+
+Depois da experiência de conteúdo, deve ser explicado como o acesso é controlado.
+
+Inclui:
+
+- planos;
+- subscrição ativa, expirada, cancelada ou em trial;
+- ciclo mensal ou anual;
+- pagamento simulado;
+- renovação;
+- cancelamento;
+- planos Pro e Família;
+- entitlements;
+- partilha familiar;
+- qualidade por plano.
+
+Mensagem-chave:
+
+> O frontend pode mostrar botões e estados, mas quem decide se o utilizador tem acesso é sempre o backend.
+
+Aqui convém explicar que os pagamentos são simulados por ser uma PAP. Isto permite demonstrar o fluxo completo sem processar cartões reais nem dados financeiros sensíveis.
+
+Também é uma boa altura para explicar que a qualidade de streaming deve ser controlada no backend. Se um plano não permite determinada qualidade, o frontend não deve receber o URL dessa qualidade.
+
+### 6. Pool Solidária E Associações
+
+Depois das subscrições, faz sentido apresentar a componente solidária, porque depende da existência de receita/subscrições.
+
+Inclui:
+
+- candidatura de associação;
+- revisão por administrador;
+- estado aprovado/rejeitado;
+- elegibilidade;
+- cálculo mensal da pool;
+- distribuição em cêntimos;
+- rotação de associações;
+- histórico de distribuição;
+- idempotência por mês.
+
+Mensagem-chave:
+
+> A pool solidária transforma parte da receita das subscrições num mecanismo controlado e auditável de apoio a associações.
+
+Esta é uma das partes mais fortes para a defesa, porque mostra que o projeto não é só streaming. Tem uma componente social, com regras de justiça, validação administrativa e histórico.
+
+### 7. Passagens Bíblicas E Curadoria Cristã
+
+Depois da componente solidária, pode ser apresentada a identidade cristã editorial da plataforma.
+
+Inclui:
+
+- livro bíblico;
+- capítulo e versículos;
+- tradução;
+- texto da passagem;
+- tema;
+- reflexão;
+- estado editorial;
+- associação entre passagem e conteúdo;
+- apresentação na página de detalhe;
+- curadoria por admin ou moderator.
+
+Mensagem-chave:
+
+> As passagens bíblicas ligam os conteúdos audiovisuais a uma camada espiritual e editorial, sem depender de interpretações automáticas sem validação humana.
+
+Aqui os alunos devem explicar que uma passagem bíblica não deve ser apenas texto solto. Deve ser dado estruturado, validado e publicado por alguém com permissão editorial.
+
+### 8. Notificações, Privacidade E Consentimentos
+
+Depois dos sistemas principais, devem entrar os mecanismos de comunicação e proteção de dados.
+
+Inclui:
+
+- notificações in-app;
+- alertas de subscrição;
+- avisos de pagamento;
+- alertas de candidatura;
+- avisos de distribuição da pool;
+- preferências;
+- exportação de dados;
+- eliminação ou anonimização de conta;
+- consentimentos;
+- minimização de dados.
+
+Mensagem-chave:
+
+> O FaithFlix guarda dados pessoais e sinais de atividade, por isso precisa de regras claras de privacidade e controlo pelo utilizador.
+
+Nesta parte, convém reforçar que dados como histórico, ratings, comentários, favoritos, subscrições e notificações pertencem à conta do utilizador e não devem ser expostos a outros utilizadores.
+
+### 9. Administração, Métricas E Operação
+
+No fim da explicação funcional, deve entrar a camada administrativa.
+
+Inclui:
+
+- gestão de utilizadores;
+- bloqueio e reativação de contas;
+- alteração de roles;
+- gestão de catálogo;
+- gestão de passagens bíblicas;
+- revisão de candidaturas de associações;
+- execução da distribuição da pool;
+- métricas;
+- integrações;
+- logs e auditoria;
+- health-check.
+
+Mensagem-chave:
+
+> A administração mostra que o FaithFlix foi pensado para ser operado e mantido, não apenas para funcionar numa demonstração isolada.
+
+Esta secção deve mostrar maturidade técnica. Operações críticas devem exigir `admin` ou `moderator`, conforme o caso, e não devem estar disponíveis para utilizadores comuns.
+
+### 10. Segurança, Testes, Performance E Acessibilidade
+
+Por fim, devem ser apresentados os aspetos transversais que tornam a aplicação confiável.
+
+Inclui:
+
+- autenticação segura;
+- sessões protegidas;
+- validação de input;
+- autorização por roles;
+- proteção de dados pessoais;
+- testes backend;
+- testes de contratos HTTP;
+- regressão frontend;
+- build de produção;
+- paginação e filtros;
+- estados de loading e erro;
+- acessibilidade;
+- layout responsivo.
+
+Mensagem-chave:
+
+> Para além das funcionalidades visíveis, o projeto tem mecanismos técnicos para reduzir erros, proteger dados e facilitar manutenção.
+
+Esta parte deve ser curta, mas forte. O objetivo não é explicar todos os testes, mas mostrar que a equipa validou regras importantes e pensou em segurança, performance e experiência de utilização.
+
+### Regra Para Evitar Confusão
+
+Sempre que surgir uma funcionalidade que depende de outra ainda não explicada, pode ser usada esta frase:
+
+> Esta funcionalidade depende de conceitos que vamos explicar mais à frente, por isso agora só a vamos situar no mapa geral.
+
+Frase útil para abrir a parte técnica:
+
+> O FaithFlix junta streaming, personalização, subscrições, impacto social, curadoria cristã e administração. Vamos explicar por ordem, porque alguns sistemas dependem dos anteriores.
+
+Uma sequência de demonstração possível seria:
+
+1. login;
+2. catálogo;
+3. página de detalhe com metadados e passagens bíblicas;
+4. reprodução e progresso;
+5. favorito, watchlist, rating ou comentário;
+6. pesquisa e recomendações;
+7. subscrição ou plano;
+8. associação/pool solidária;
+9. painel admin;
+10. privacidade, métricas e evidência de testes.
+
+Esta organização ajuda a apresentação a ter uma narrativa clara: primeiro a base, depois os conteúdos, depois a interação do utilizador, depois a personalização, depois a sustentabilidade financeira e solidária, e no fim a robustez técnica.
