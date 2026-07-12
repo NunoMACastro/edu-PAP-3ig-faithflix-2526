@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF6-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-05-acessibilidade-e-ux-final.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
@@ -86,6 +86,9 @@ Depois deste BK, a aplicação tem um `SkipLink`, um `main` semântico com desti
 - `CANONICO`: `RNF01` pede navegação clara entre catálogo, pesquisa, player, perfil, subscrição e associações. Isto significa que o utilizador deve conseguir perceber onde está, para onde pode ir e como regressar a uma área principal.
 - `CANONICO`: `RNF02` pede estados visuais claros para botões, cards e links. Um estado visual evita que o utilizador fique sem feedback depois de clicar, tabular ou tentar usar um controlo desativado.
 - `CANONICO`: `RNF03` pede layout responsivo em desktop, tablet e smartphone. A hierarquia visual deve manter-se, mesmo quando o header quebra linha ou os cards passam para uma coluna.
+- `CANONICO`: o header público não acumula operações de staff. `BK-MF7-02`
+  fecha a navegação com `AdminLayout`, sidebar/drawer e landing por role; este BK
+  prepara acessibilidade pública sem criar um segundo menu administrativo plano.
 - `CANONICO`: `RNF04` pede contraste adequado, tamanho mínimo de fonte, headings e labels semânticos. O HTML correto ajuda utilizadores, leitores de ecrã e manutenção futura.
 - `CANONICO`: `RNF06` pede player simples, com controlos sempre visíveis ou facilmente acessíveis. O player não deve depender exclusivamente do rato.
 - `DERIVADO`: o skip link é uma solução mínima e standard para evitar que utilizadores de teclado atravessem toda a navegação em cada página.
@@ -345,10 +348,6 @@ const navItems = [
     { to: "/para-si", label: "Para si", visibility: "authenticated" },
     { to: "/notificacoes", label: "Notificações", visibility: "authenticated" },
     { to: "/conta", label: "Conta", visibility: "authenticated" },
-    { to: "/admin/catalogo", label: "Admin catálogo", visibility: "admin" },
-    { to: "/admin/utilizadores", label: "Admin utilizadores", visibility: "admin" },
-    { to: "/admin/metricas", label: "Métricas", visibility: "admin" },
-    { to: "/admin/integracoes", label: "Integrações", visibility: "admin" },
 ];
 
 /**
@@ -383,9 +382,6 @@ function renderNavItem(item) {
 function canShowNavItem(item, session) {
     if (item.visibility === "public") return true;
     if (item.visibility === "authenticated") return session.status === "authenticated";
-    if (item.visibility === "admin") {
-        return session.status === "authenticated" && session.isAdmin;
-    }
     return false;
 }
 
@@ -552,7 +548,11 @@ import { MediaPreferenceControls } from "../components/playback/MediaPreferenceC
 
 5. Explicação do código.
 
-No `AppHeader`, os textos visíveis passam a usar português de Portugal com acentuação: `Início`, `Catálogo`, `Associações`, `Métricas` e `Integrações`. Isto cumpre `RNF01` porque a navegação fica mais clara, e ajuda `RNF04` porque o `nav` tem uma descrição acessível: `aria-label="Navegação principal"`.
+No `AppHeader`, os textos visíveis passam a usar português de Portugal com
+acentuação: `Início`, `Catálogo` e `Associações`. As operações administrativas
+não entram neste array: a cadeia final move-as para `AdminNavigation` dentro de
+`AdminLayout`. Isto cumpre `RNF01` porque a navegação pública fica clara e ajuda
+`RNF04` porque o `nav` tem `aria-label="Navegação principal"`.
 
 O array `navItems` continua a usar as mesmas rotas. Isto preserva os contratos validados em `BK-MF6-02` e evita quebrar React Router. A entrada de cada item junta `visibility` a `{ to, label }`; a saída é uma ligação `NavLink` apenas quando o estado confirmado permite mostrá-la. O header preserva o login e o logout criados em `BK-MF2-01`: uma falha de logout não limpa a sessão nem navega, e `unavailable` permite repetir a confirmação sem fingir que o utilizador saiu.
 
@@ -569,7 +569,7 @@ O erro comum que este passo evita é tratar UX como opinião vaga. Aqui tens alt
 
 Valida visualmente:
 
-- header mostra `Início`, `Catálogo`, `Associações`, `Métricas` e `Integrações`;
+- header público mostra `Início`, `Catálogo` e `Associações`, sem links admin;
 - leitor de ecrã ou inspeção DOM mostra `aria-label="Navegação principal"`;
 - player mostra `Áudio`, `Automática` e `Opções de média`;
 - `data-testid="faithflix-player"`, erro, retry e adapter continuam presentes;
@@ -675,7 +675,8 @@ Se algum botão não tiver foco visível, se uma mensagem de erro não explicar 
 - `SkipLink` existe e funciona com teclado.
 - `AppLayout` tem `main` com `id="conteudo-principal"` e `tabIndex={-1}`.
 - O CSS do skip link é legível, aparece ao foco e não usa `display: none`.
-- `AppHeader` mantém as rotas reais e usa textos visíveis em português de Portugal.
+- `AppHeader` mantém apenas as rotas públicas/pessoais adequadas e usa textos
+  visíveis em português de Portugal; as rotas admin pertencem ao shell do MF7.
 - O player mantém `controls`, `data-testid="faithflix-player"` e labels claras.
 - Build frontend termina sem erro.
 - A evidence cobre responsividade, teclado, botões, formulários e player.
@@ -711,9 +712,14 @@ Validação manual obrigatória:
 
 `BK-MF6-06` deve receber `docs/evidence/MF6/BK-MF6-05-acessibilidade-ux.md` como uma das provas para o gate técnico final. O gate só deve marcar acessibilidade/UX como `PASS` quando a evidence tiver build real, validação manual real e negativos executados.
 
-`BK-MF7-02` deve reutilizar estes resultados para a matriz RNF, distinguindo o que foi validado manualmente do que ficou como risco residual.
+`BK-MF7-02` deve reutilizar estes resultados para a matriz RNF e criar o shell
+administrativo dedicado, distinguindo o que foi validado manualmente do que
+ficou como risco residual. Não deve voltar a inserir links admin no `AppHeader`.
 
 #### Changelog
+
+- `2026-07-12`: header público separado da navegação administrativa; handoff
+  obrigatório para `AdminLayout`/`AdminNavigation` em `BK-MF7-02`.
 
 - `2026-04-13`: guia inicial criado em formato genérico.
 - `2026-06-18`: guia revisto com skip link, layout acessível, CSS e evidence final de UX.

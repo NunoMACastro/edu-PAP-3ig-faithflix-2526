@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF4-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-05-distribuicao-mensal-rotacao.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
@@ -1011,8 +1011,10 @@ Acrescenta rotas admin ao router existente.
  */
 import {
   getDistributionByMonth,
+  previewMonthlyDistribution,
   runMonthlyDistribution,
 } from "./pool-distribution.service.js";
+import { assertDistributionPreviewToken } from "./pool-distribution.validation.js";
 
 function assertObjectBody(body) {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
@@ -1033,11 +1035,23 @@ function assertObjectBody(body) {
  */
 export async function postMonthlyDistribution(req, res) {
   const body = assertObjectBody(req.body);
+  const previewToken = assertDistributionPreviewToken(body.previewToken);
   res.status(201).json(await runMonthlyDistribution(
     body.month,
     req.user.id,
-    { trigger: "admin", requestId: req.id },
+    {
+      trigger: "admin",
+      requestId: req.id,
+      expectedPreviewToken: previewToken,
+    },
   ));
+}
+
+/**
+ * Calcula a preview atual sem escrever distribuição ou audit log.
+ */
+export async function getMonthlyDistributionPreview(req, res) {
+  res.status(200).json(await previewMonthlyDistribution(req.params.month));
 }
 
 /**
@@ -1063,6 +1077,12 @@ charitiesRouter.post(
 );
 
 charitiesRouter.get(
+  "/pool/distributions/:month/preview",
+  requireRole(["admin"]),
+  asyncHandler(getMonthlyDistributionPreview),
+);
+
+charitiesRouter.get(
   "/pool/distributions/:month",
   requireRole(["admin"]),
   asyncHandler(getMonthlyDistribution),
@@ -1084,9 +1104,10 @@ A execução e admin porque mexe em valores de distribuição. A consulta fica a
 6. Validação do passo.
 
 ```bash
+curl -i http://localhost:3000/api/charities/pool/distributions/2026-06/preview
 curl -i -X POST http://localhost:3000/api/charities/pool/distributions \
   -H "Content-Type: application/json" \
-  -d '{"month":"2026-06"}'
+  -d '{"month":"2026-06","previewToken":"<token SHA-256 devolvido pela preview>"}'
 ```
 
 Sem admin deve devolver `401` ou `403`.
@@ -1109,7 +1130,8 @@ Dar ao admin uma UI mínima para executar o mês e ver resultado.
 3. Instrucoes concretas.
 
 Preserva o import de `apiClient` e o objeto `charitiesApi` criado nos BKs
-anteriores. Acrescenta `runDistribution` e `getDistribution` sem voltar a
+anteriores. Acrescenta `previewDistribution`, `runDistribution` e
+`getDistribution` sem voltar a
 declarar o export nem remover candidatura/review/membership.
 
 4. Código completo.
@@ -1124,8 +1146,21 @@ Object.assign(charitiesApi, {
  * @param {string} month Mês no formato `YYYY-MM`.
  * @returns {Promise<{ distribution: object }>} Distribuição criada.
  */
-runDistribution(month, options = {}) {
-  return apiClient.post("/api/charities/pool/distributions", { month }, options);
+runDistribution(month, previewToken, options = {}) {
+  return apiClient.post(
+    "/api/charities/pool/distributions",
+    { month, previewToken },
+    options,
+  );
+},
+/**
+ * Obtém uma preview sem escrita antes do commit financeiro.
+ */
+previewDistribution(month, options = {}) {
+  return apiClient.get(
+    `/api/charities/pool/distributions/${encodeURIComponent(month)}/preview`,
+    options,
+  );
 },
 /**
  * Consulta uma distribuição mensal já criada.
@@ -1152,6 +1187,7 @@ getDistribution(month, options = {}) {
  * persistido sem recalcular valores críticos no browser.
  */
 import { useEffect, useRef, useState } from "react";
+import { ConfirmDialog } from "../components/admin/ConfirmDialog.jsx";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
@@ -1174,41 +1210,72 @@ export function formatLocalMonth(date = new Date()) {
  */
 export function AdminPoolDistributionPage() {
   const [month, setMonth] = useState(() => formatLocalMonth());
+  const [preview, setPreview] = useState(null);
   const [distribution, setDistribution] = useState(null);
   const [error, setError] = useState("");
+  const [previewing, setPreviewing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const runControllerRef = useRef(null);
 
   useEffect(() => () => runControllerRef.current?.abort(), []);
 
   /**
-   * Executa a distribuição no backend e mostra o resultado gravado.
+   * Obtém uma preview sem escrita e invalida qualquer preview anterior.
    *
    * @param {React.FormEvent<HTMLFormElement>} event Evento do formulário.
    * @returns {Promise<void>}
    */
-  async function handleRun(event) {
+  async function handlePreview(event) {
     event.preventDefault();
-
-    if (!globalThis.confirm(`Confirmas o fecho da distribuição de ${month}?`)) {
-      return;
-    }
     if (runControllerRef.current) return;
     const controller = new AbortController();
     runControllerRef.current = controller;
-
     setError("");
+    setPreview(null);
     setDistribution(null);
-    setSubmitting(true);
+    setPreviewing(true);
     try {
-      const response = await charitiesApi.runDistribution(month, {
+      const response = await charitiesApi.previewDistribution(month, {
         signal: controller.signal,
       });
       if (controller.signal.aborted) return;
-      setDistribution(response.distribution);
+      setPreview(response.preview);
     } catch (apiError) {
       if (controller.signal.aborted || apiError?.name === "AbortError") return;
       setError(toUserMessage(apiError));
+    } finally {
+      if (runControllerRef.current === controller) {
+        runControllerRef.current = null;
+        setPreviewing(false);
+      }
+    }
+  }
+
+  async function handleRun() {
+    if (!preview?.previewToken || runControllerRef.current) return;
+    const controller = new AbortController();
+    runControllerRef.current = controller;
+    setSubmitting(true);
+    setError("");
+    try {
+      const response = await charitiesApi.runDistribution(
+        preview.month,
+        preview.previewToken,
+        { signal: controller.signal },
+      );
+      if (controller.signal.aborted) return;
+      setDistribution(response.distribution);
+      setConfirmOpen(false);
+    } catch (apiError) {
+      if (controller.signal.aborted || apiError?.name === "AbortError") return;
+      if (apiError?.code === "POOL_PREVIEW_STALE") {
+        setPreview(null);
+        setConfirmOpen(false);
+        setError("Os dados mudaram. Gera uma nova pré-visualização.");
+      } else {
+        setError(toUserMessage(apiError));
+      }
     } finally {
       if (runControllerRef.current === controller) {
         runControllerRef.current = null;
@@ -1221,10 +1288,18 @@ export function AdminPoolDistributionPage() {
     <main>
       <h1>Distribuição mensal</h1>
       {error && <p role="alert">{error}</p>}
-      <form onSubmit={handleRun}>
-        <label>Mês<input type="month" value={month} onChange={(event) => setMonth(event.target.value)} disabled={submitting} required /></label>
-        <button type="submit" disabled={submitting}>{submitting ? "A executar..." : "Executar distribuição"}</button>
+      <form onSubmit={handlePreview}>
+        <label>Mês<input type="month" value={month} onChange={(event) => { setMonth(event.target.value); setPreview(null); }} disabled={previewing || submitting} required /></label>
+        <button type="submit" disabled={previewing || submitting}>{previewing ? "A calcular..." : "Pré-visualizar"}</button>
       </form>
+      {preview ? (
+        <section>
+          <h2>Pré-visualização de {preview.month}</h2>
+          <p>Total: {(preview.totalPoolCents / 100).toFixed(2)} EUR</p>
+          <p>Associações: {preview.items.length}</p>
+          <button type="button" onClick={() => setConfirmOpen(true)}>Rever e distribuir</button>
+        </section>
+      ) : null}
       {distribution && (
         <section>
           <h2>{distribution.month}</h2>
@@ -1237,6 +1312,16 @@ export function AdminPoolDistributionPage() {
           ))}
         </section>
       )}
+      <ConfirmDialog
+        open={confirmOpen}
+        title={`Distribuir a pool de ${preview?.month ?? "mês selecionado"}`}
+        confirmLabel="Distribuir agora"
+        busy={submitting}
+        onCancel={() => !submitting && setConfirmOpen(false)}
+        onConfirm={handleRun}
+      >
+        <p>O commit usa o token da preview; qualquer alteração financeira obriga nova revisão.</p>
+      </ConfirmDialog>
     </main>
   );
 }
@@ -1256,15 +1341,19 @@ const AdminPoolDistributionPage = lazyNamedPage(
 
 5. Explicação do código ou da decisão.
 
-A UI não recalcula valores no browser. Mostra apenas o resultado produzido pelo backend. A rota administrativa usa uma declaração lazy própria antes do primeiro uso e conserva o router cumulativo.
+A UI não recalcula valores no browser. Mostra a preview autoritativa, pede
+confirmação acessível e envia o respetivo token no commit. A rota administrativa
+usa uma declaração lazy própria e conserva o router cumulativo.
 
 6. Validação do passo.
 
-Executar um mês e repetir o mesmo mês.
+Gerar preview, cancelar, gerar de novo, confirmar e repetir o mesmo mês. Alterar
+um dado financeiro entre preview e commit deve devolver `POOL_PREVIEW_STALE`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Calcular no frontend abriria divergencia entre interface e dados persistidos.
+Calcular no frontend ou aceitar commit sem token abriria divergência entre o que
+o admin reviu e os dados persistidos.
 
 #### Critérios de aceite
 
@@ -1296,6 +1385,9 @@ Calcular no frontend abriria divergencia entre interface e dados persistidos.
 - Sem admin, endpoints devolvem `401` ou `403`.
 - A UI inicializa o mês civil local sem `toISOString()`, exige confirmação e
   impede uma segunda submissão enquanto o fecho está em curso.
+- A preview não escreve `pool_distributions` nem audit log; o commit exige
+  `previewToken` e um token stale devolve `409 POOL_PREVIEW_STALE` antes de
+  qualquer escrita.
 
 #### Validação final
 
@@ -1338,6 +1430,9 @@ function rotationOffsetForMonth(year, monthNumber, charities) {
 ```
 
 #### Changelog
+
+- `2026-07-12`: fecho manual alinhado ao contrato preview -> confirmação ->
+  commit com `previewToken`; token stale falha antes de distribuição/audit.
 
 - `2026-06-13`: guia reescrito com algoritmo mensal, idempotência, rotação, endpoints admin, UI e negativos.
 - `2026-07-10`: fonte da pool corrigida para pagamentos v2 aprovados/não estimados, snapshot imutável, mês UTC fechado, replay e worker com lease.

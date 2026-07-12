@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF4-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-04-aprovacao-entrada-pool.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
@@ -625,6 +625,7 @@ reviewApplication(id, input, options = {}) {
  * `admin` e a regra de decisão única são aplicadas.
  */
 import { useEffect, useRef, useState } from "react";
+import { ConfirmDialog } from "../components/admin/ConfirmDialog.jsx";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
@@ -640,6 +641,9 @@ export function AdminCharityApplicationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [decision, setDecision] = useState("");
+  const [reason, setReason] = useState("");
   const [busyIds, setBusyIds] = useState(() => new Set());
   const [reloadVersion, setReloadVersion] = useState(0);
   const contextVersionRef = useRef(0);
@@ -691,17 +695,17 @@ export function AdminCharityApplicationsPage() {
   /**
    * Envia a decisão do admin e recarrega a lista para evitar segunda decisão.
    *
-   * @param {string} id Identificador da candidatura.
-   * @param {"approved" | "rejected"} decision Decisão escolhida.
    * @returns {Promise<void>}
    */
-  async function decide(application, decision) {
-    const id = application.id;
+  async function decide() {
+    if (!selected || !["approved", "rejected"].includes(decision)) return;
+    const normalizedReason = reason.trim();
+    if (decision === "rejected" && (normalizedReason.length < 10 || normalizedReason.length > 500)) {
+      setError("O motivo da rejeição deve ter entre 10 e 500 caracteres.");
+      return;
+    }
+    const id = selected.id;
     if (reservationsRef.current.has(id)) return;
-    const actionLabel = decision === "approved" ? "aprovar" : "rejeitar";
-    if (!window.confirm(
-      `Confirmas ${actionLabel} ${application.name}? A decisão fica registada e não pode ser repetida.`,
-    )) return;
 
     const contextVersion = contextVersionRef.current;
     const controller = new AbortController();
@@ -713,11 +717,14 @@ export function AdminCharityApplicationsPage() {
     try {
       await charitiesApi.reviewApplication(id, {
         decision,
-        reason: decision === "rejected" ? "Não cumpre os critérios mínimos da pool." : "",
+        reason: decision === "rejected" ? normalizedReason : "",
       }, { signal: controller.signal });
       if (controller.signal.aborted || contextVersion !== contextVersionRef.current) return;
       setApplications((current) => current.filter((item) => item.id !== id));
       setStatus(decision === "approved" ? "Candidatura aprovada." : "Candidatura rejeitada.");
+      setSelected(null);
+      setDecision("");
+      setReason("");
       setReloadVersion((value) => value + 1);
     } catch (apiError) {
       if (controller.signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
@@ -757,19 +764,41 @@ export function AdminCharityApplicationsPage() {
           <button
             type="button"
             disabled={busyIds.has(application.id)}
-            onClick={() => decide(application, "approved")}
+            onClick={() => { setSelected(application); setDecision("approved"); setReason(""); }}
           >
             {busyIds.has(application.id) ? "A processar..." : "Aprovar"}
           </button>
           <button
             type="button"
             disabled={busyIds.has(application.id)}
-            onClick={() => decide(application, "rejected")}
+            onClick={() => { setSelected(application); setDecision("rejected"); setReason(application.reviewReason ?? ""); }}
           >
             {busyIds.has(application.id) ? "A processar..." : "Rejeitar"}
           </button>
         </article>
       ))}
+      <ConfirmDialog
+        open={Boolean(selected)}
+        title={decision === "approved" ? "Aprovar candidatura" : "Rejeitar candidatura"}
+        confirmLabel={decision === "approved" ? "Aprovar e criar associação" : "Rejeitar candidatura"}
+        busy={selected ? busyIds.has(selected.id) : false}
+        onCancel={() => { setSelected(null); setDecision(""); setReason(""); }}
+        onConfirm={decide}
+      >
+        {selected ? (
+          <div>
+            <p><strong>{selected.name}</strong></p>
+            <p>{selected.mission}</p>
+            <p>{selected.contactName} · {selected.contactEmail} · {selected.phone}</p>
+            {decision === "rejected" ? (
+              <label>
+                Motivo da rejeição
+                <textarea value={reason} minLength={10} maxLength={500} required onChange={(event) => setReason(event.target.value)} />
+              </label>
+            ) : null}
+          </div>
+        ) : null}
+      </ConfirmDialog>
       {!loading && !error && pagination.totalPages > 1 ? (
         <nav aria-label="Paginação de candidaturas">
           <button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>
@@ -821,7 +850,8 @@ Sem reload apos decisão, o admin pode tentar decidir duas vezes.
 #### Critérios de aceite
 
 - Admin aprova candidatura pendente e a API cria uma associação `active` e `eligible`.
-- Admin rejeita candidatura pendente com motivo e não cria associação.
+- Admin revê contacto/missão e rejeita candidatura pendente com motivo humano
+  explícito de 10..500 caracteres; não cria associação.
 - O validator exige body objeto não-null/não-array, `decision` string no enum e
   `reason` string até 500 caracteres; não existe coerção por `String(...)`.
 - Utilizador sem admin não consegue decidir candidaturas.
@@ -829,7 +859,7 @@ Sem reload apos decisão, o admin pode tentar decidir duas vezes.
   com `code: "APPLICATION_ALREADY_REVIEWED"`.
 - A decisão, a eventual associação e o audit log fazem commit ou rollback em
   conjunto; o audit inclui o `requestId` quando existe.
-- A UI exige confirmação, bloqueia apenas a linha ativa, cancela pedidos no
+- A UI usa diálogo acessível, bloqueia apenas a linha ativa, cancela pedidos no
   unmount e não aplica respostas antigas.
 - A paginação mostra o total da API e permite chegar a candidaturas para além da
   primeira página sem exceder `limit: 50`.
@@ -874,6 +904,9 @@ return runInTransaction(async ({ db, session }) => {
 ```
 
 #### Changelog
+
+- `2026-07-12`: detalhe de candidatura e motivo de rejeição editável 10..500
+  substituem a razão fixa e a confirmação nativa.
 
 - `2026-06-13`: guia reescrito com aprovação, rejeição, entrada na pool, admin UI e negativos.
 - `2026-07-10`: revisão tornada concorrente e transacional, com audit sanitizado,

@@ -161,7 +161,7 @@ o progresso no episódio e mostram `Tn En`.
 ## Migração de bases locais anteriores
 
 Antes de arrancar a API sobre uma base não descartável, executar o diagnóstico
-read-only a partir de `backend/`:
+read-only a partir de `real_dev/backend/`:
 
 ```bash
 npm run migrate:series-episodes
@@ -176,7 +176,7 @@ npm run migrate:series-episodes -- --apply --mapping ./mapping-series.json
 
 O ficheiro contém listas `episodes` (`episodeId`, `seriesId`, `seasonNumber`,
 `episodeNumber`) e `seriesProgress` (`seriesId`, `episodeId`). O exemplo
-`backend/scripts/series-episodes.mapping.example.json` usa apenas os IDs
+`real_dev/backend/scripts/series-episodes.mapping.example.json` usa apenas os IDs
 determinísticos da demo; não deve ser aplicado a outra base sem revisão.
 
 O arranque é bloqueado enquanto existir um episódio publicado sem série/posição

@@ -70,6 +70,7 @@ WORKER_GUIDE_PATH = GUIDES_ROOT / "MF4/BK-MF4-01-planos-ciclo-subscricao.md"
 POOL_GUIDE_PATH = GUIDES_ROOT / "MF4/BK-MF4-05-distribuicao-mensal-rotacao.md"
 ROUTES_GUIDE_PATH = GUIDES_ROOT / "MF7/BK-MF7-02-navegacao-segura-por-sessao-e-perfil.md"
 WORKER_RUNBOOK_PATH = Path("docs/runbooks/WORKER-LOCAL.md")
+DEMO_RUNBOOK_PATH = Path("docs/runbooks/DEMO-DATASET.md")
 SAFE_E2E_EVIDENCE_PATH = EVIDENCE_ROOT / "MF8/TESTES-FINAIS-CRIADOS.md"
 MF9_REGRESSION_EVIDENCE_PATH = EVIDENCE_ROOT / "MF9/REGRESSAO-MF9.md"
 STUDENT_RUNBOOK_PATH = GUIDES_ROOT / "MF9/ARRANQUE-LOCAL-MF9.md"
@@ -2553,6 +2554,14 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
                 "version !== requestVersionRef.current",
                 "setAppliedFilters({ ...draftFilters });",
                 "setRetryVersion((current) => current + 1)",
+                "export async function exportMetricsCsv",
+                '"/export.csv"',
+                "exportCsv(filters = {}, options = {})",
+                "apiClient.download(",
+                "Exportar CSV",
+                "metrics.catalog.published",
+                "metrics.solidarity.distributedCents",
+                "metrics.integrations.enabled",
             ),
             (),
         ),
@@ -2579,6 +2588,11 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
                 "if (error?.code !== 11000) throw error;",
                 "return persistIntegrationSetting({ ...command, upsert: false });",
                 "await ensureIntegrationIndexes();",
+                "const [drafts, setDrafts] = useState({});",
+                "Alterações por guardar",
+                "function cancelDraft(integration)",
+                "ConfirmDialog",
+                "Guardar alterações",
             ),
             (),
         ),
@@ -2592,6 +2606,15 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
                 "const inspectedDb = connectionDb.getSiblingDB(dbName);",
             ),
             ('mongosh "$MONGODB_URI/$MONGODB_DB_NAME"',),
+        ),
+        (
+            DEMO_RUNBOOK_PATH,
+            "composition.demo_runbook_reference",
+            (
+                "a partir de `real_dev/backend/`",
+                "`real_dev/backend/scripts/series-episodes.mapping.example.json`",
+            ),
+            ("a partir de `backend/`",),
         ),
         (
             PERFORMANCE_GUIDE_PATH,
@@ -2608,7 +2631,14 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
         (
             POOL_GUIDE_PATH,
             "composition.charities_api",
-            ("Object.assign(charitiesApi",),
+            (
+                "Object.assign(charitiesApi",
+                "previewDistribution(month, options = {})",
+                '"/pool/distributions/:month/preview"',
+                "assertDistributionPreviewToken",
+                "expectedPreviewToken: previewToken",
+                "POOL_PREVIEW_STALE",
+            ),
             ("export const charitiesApi = {",),
         ),
         (
@@ -2713,6 +2743,10 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
                 "CONTENT_VERSION_CONFLICT",
                 "toUserMessage(requestError)",
                 "createTaxonomy(input, options = {})",
+                "AdminCatalogListPage",
+                'path="catalogo/novo"',
+                'path="catalogo/:contentId/editar"',
+                'path="catalogo/taxonomias"',
             ),
             (),
         ),
@@ -2721,9 +2755,10 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
             "composition.lazy_routes",
             (
                 "lazyNamedPage",
-                'to: "/notificacoes"',
+                'path="/notificacoes"',
                 "async function handleLogout()",
-                "AdminCatalogPage",
+                "AdminLayout",
+                "AdminCatalogListPage",
                 "AdminCharityMembersPage",
                 'setStatus("unavailable")',
             ),
@@ -2781,6 +2816,19 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
                 'env.nodeEnv === "production"',
             ),
             (),
+        ),
+        (
+            AUTH_GUIDE_PATH,
+            "composition.auth_role_landing",
+            (
+                "export function getDefaultAuthenticatedPath(user)",
+                'if (user?.role === "admin") return "/admin";',
+                'if (user?.role === "moderator") return "/admin/catalogo";',
+                "export function resolveAuthenticatedPath(user, requestedPath = null)",
+                "getSafeRedirectPath(requestedPath) ?? getDefaultAuthenticatedPath(user)",
+                "navigate(resolveAuthenticatedPath(currentUser, redirectTo)",
+            ),
+            ("const authenticationDestination =",),
         ),
         (
             GUIDES_ROOT / "MF3/BK-MF3-05-recomendacao-baseline-cold-start.md",
@@ -2853,11 +2901,14 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
             "composition.rbac_mobile",
             (
                 'allowedRoles = ["admin"]',
-                'visibility: "catalog-manager"',
                 '["admin", "moderator"]',
-                'className="menu-toggle"',
-                'event.key !== "Escape"',
-                "toggleRef.current?.focus()",
+                'element={withAdminRoute(<AdminLayout />, ["admin", "moderator"])}',
+                "ADMIN_NAVIGATION_GROUPS",
+                "AdminLayout",
+                "dialog.showModal()",
+                "onCancel={(event) =>",
+                "menuButtonRef.current?.focus()",
+                "Ver site público",
             ),
             (),
         ),
@@ -2902,7 +2953,9 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
             "composition.admin_review_ui",
             (
                 "const reservationsRef = useRef(new Set());",
-                "window.confirm(",
+                "ConfirmDialog",
+                "const normalizedReason = reason.trim();",
+                "normalizedReason.length < 10 || normalizedReason.length > 500",
                 "new AbortController()",
                 "totalPages",
                 "toUserMessage(apiError)",
@@ -2917,6 +2970,10 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
                 "new AbortController()",
                 "toUserMessage(apiError)",
                 "aria-busy={submitting}",
+                '"/admin/lookup"',
+                "lookupAdminCharities(search, options = {})",
+                'role="combobox"',
+                "ConfirmDialog",
             ),
             (),
         ),
@@ -2996,11 +3053,11 @@ def validate_composed_tutorial_contracts(root: Path) -> list[dict[str, str]]:
     titles_end = route_metadata_text.find("];", titles_start)
     title_block = "" if titles_start < 0 or titles_end < 0 else route_metadata_text[titles_start:titles_end]
     documented_routes = re.findall(r'\{\s*path:\s*"([^"]+)"', title_block)
-    if len(documented_routes) != 22 or len(set(documented_routes)) != 22:
+    if len(documented_routes) != 31 or len(set(documented_routes)) != 31:
         errors.append(
             make_error(
                 "composition.route_metadata",
-                "22 unique functional route metadata entries",
+                "31 unique functional route metadata entries",
                 f"count={len(documented_routes)}; unique={len(set(documented_routes))}",
             ),
         )

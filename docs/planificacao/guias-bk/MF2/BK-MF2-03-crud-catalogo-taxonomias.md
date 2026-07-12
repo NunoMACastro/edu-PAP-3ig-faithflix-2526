@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF2-04`
 - `guia_path`: `docs/planificacao/guias-bk/MF2/BK-MF2-03-crud-catalogo-taxonomias.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
@@ -164,6 +164,7 @@ ou simplificada do cliente público.
 | Revisoes | `GET /api/catalog/:id/revisions`, `POST /api/catalog/:id/revisions/:revisionId/revert` |
 | Publicacao repetida | no-op idempotente: preserva `version`, `publishedAt` e contagem de revisões |
 | Guards | `admin` e `moderator` gerem catalogo; `user` consulta apenas publicado |
+| UI final | `/admin/catalogo` é list-first; criação, edição e taxonomias usam `/novo`, `/:contentId/editar` e `/taxonomias` dentro de `AdminLayout` |
 | Handoff | `BK-MF2-04` recebe metadados públicos, `mediaStatus` e `isPlayable`; não recebe fontes |
 
 ##### Modelo `Content` no storage interno
@@ -1837,7 +1838,7 @@ Se a página filtrar drafts apenas no browser, a API continua a expor conteúdo
 indevido. Se não abortar pedidos antigos, uma resposta lenta pode substituir o
 filtro ou página atual.
 
-### Passo 7 - Criar gestão admin metadata-only
+### Passo 7 - Criar gestão admin metadata-only e preparar decomposição list-first
 
 1. Objetivo funcional do passo no contexto da app.
 
@@ -1845,18 +1846,20 @@ Permitir a `admin` e `moderator` listar, criar, carregar uma linha para edição
 atualizar e arquivar conteúdos, incluindo assets editoriais e taxonomias.
 
 2. Ficheiros envolvidos.
-    - CRIAR: `frontend/src/pages/AdminCatalogPage.jsx`
+    - CRIAR: `frontend/src/pages/AdminCatalogPage.jsx` como checkpoint funcional MF2
     - EDITAR: `frontend/src/routes/AppRoutes.jsx`
     - LOCALIZACAO: ficheiro completo para pagina; trecho de rotas
 
 3. Instruções do que fazer.
 
-Cria a página completa abaixo. O formulário usa apenas a allowlist editorial
+Cria a página completa abaixo como checkpoint desta macrofase. O formulário usa apenas a allowlist editorial
 do backend, carrega taxonomias existentes, permite criar uma nova taxonomia e
 aplica as seleções ao conteúdo. Arquivo, despublicação e reversão exigem
-confirmação; cada linha fica ocupada apenas durante a sua própria operação.
+confirmação; cada linha fica ocupada apenas durante a sua própria operação. Na
+composição final, este checkpoint não fica como página monolítica: a tabela,
+criação, edição e taxonomias são separadas nas rotas indicadas depois do snippet.
 
-4. Código completo, correto e integrado com a app final.
+4. Código completo para o checkpoint MF2 e contrato obrigatório da app final.
 
 ```jsx
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -2601,6 +2604,26 @@ const AdminCatalogPage = lazyNamedPage(() => import("../pages/AdminCatalogPage.j
 <Route path="/admin/catalogo" element={<AdminCatalogPage />} />
 ```
 
+O fragmento anterior fecha o comportamento MF2, mas é substituído na composição
+final por bindings lazy separados, sem duplicar os services/validators:
+
+```jsx
+// Cada binding mantém uma responsabilidade visual e reutiliza o mesmo contrato editorial.
+const AdminCatalogListPage = lazyNamedPage(() => import("../pages/AdminCatalogListPage.jsx"), "AdminCatalogListPage");
+const AdminCatalogCreatePage = lazyNamedPage(() => import("../pages/AdminCatalogCreatePage.jsx"), "AdminCatalogCreatePage");
+const AdminCatalogEditPage = lazyNamedPage(() => import("../pages/AdminCatalogEditPage.jsx"), "AdminCatalogEditPage");
+const AdminTaxonomiesPage = lazyNamedPage(() => import("../pages/AdminTaxonomiesPage.jsx"), "AdminTaxonomiesPage");
+
+<Route path="catalogo" element={<AdminCatalogListPage />} />
+<Route path="catalogo/novo" element={<AdminCatalogCreatePage />} />
+<Route path="catalogo/:contentId/editar" element={<AdminCatalogEditPage />} />
+<Route path="catalogo/taxonomias" element={<AdminTaxonomiesPage />} />
+```
+
+Estas quatro rotas são filhas de `/admin`/`AdminLayout` no `BK-MF7-02`.
+`/admin/catalogo` começa pela pesquisa/listagem; criar e editar nunca obrigam a
+percorrer um formulário longo antes da tabela.
+
 5. Explicação do código.
 
 A UI usa os endpoints existentes e paginados para ler/criar/editar/arquivar
@@ -2771,8 +2794,9 @@ catalogRouter.post("/", requireRole(["admin", "moderator"]), asyncHandler(postCo
 - [ ] `/catalogo` pagina até 24 itens, preserva o filtro e permite repetir uma falha.
 - [ ] Trocar página/filtro ou desmontar a rota aborta/ignora a leitura anterior.
 - [ ] Slug/ID com `/`, espaço ou `?` gera um único segmento codificado no link de detalhe.
-- [ ] `/admin/catalogo` cria conteúdos e taxonomias, carrega uma linha completa
-  para edição de metadata/assets/taxonomias e permite guardar ou cancelar.
+- [ ] `/admin/catalogo` apresenta pesquisa, filtros, estados e paginação antes
+  de qualquer formulário; `/novo`, `/:contentId/editar` e `/taxonomias` isolam
+  as respetivas tarefas e permitem guardar/cancelar.
 - [ ] Arquivo, despublicação e reversão exigem confirmação; cancelar não envia
   pedido e cada ação aplica busy state apenas à linha afetada.
 - [ ] Falhas remotas usam mensagens seguras, e conflito de versão recarrega a
@@ -2809,7 +2833,8 @@ Regista evidence com respostas de `curl`, screenshot de `/catalogo`, screenshot 
 - Screenshot de `/catalogo` com conteudos publicados.
 - Teste comportamental de retry, cancelamento de catálogo/discovery e link de
   detalhe com slug codificado.
-- Screenshot de `/admin/catalogo` com gestao e reversao para roles autorizadas.
+- Screenshots de `/admin/catalogo`, `/admin/catalogo/novo`, edição e taxonomias
+  para roles autorizadas, provando que a landing é list-first.
 
 #### Handoff
 
@@ -2836,6 +2861,9 @@ O `BK-MF2-04` deve usar `GET /api/catalog/:idOrSlug` sobre a colecao `contents`,
   intervalo e versão sem coagir o payload recebido.
 
 #### Changelog
+
+- `2026-07-12`: checkpoint MF2 distinguido da composição final list-first;
+  catálogo admin separado em listagem, criação, edição e taxonomias dentro do shell admin.
 
 - `2026-07-10`: migrado para tutorial v2; o Passo 6 passou a conter a única
   implementação pública paginada, cancelável, repetível e com links codificados.

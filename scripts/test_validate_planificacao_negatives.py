@@ -1253,13 +1253,24 @@ def mutate_final_recommendations_api(root: Path) -> None:
 
 
 def mutate_moderator_catalog_scope(root: Path) -> None:
-    """Remove moderator access from the only administrative route it may use."""
+    """Remove moderator access from the administrative shell."""
 
     replace_once(
         root,
         "docs/planificacao/guias-bk/MF7/BK-MF7-02-navegacao-segura-por-sessao-e-perfil.md",
-        'element={withAdminRoute(<AdminCatalogPage />, ["admin", "moderator"])}',
-        'element={withAdminRoute(<AdminCatalogPage />, ["admin"])}',
+        'element={withAdminRoute(<AdminLayout />, ["admin", "moderator"])}',
+        'element={withAdminRoute(<AdminLayout />, ["admin"])}',
+    )
+
+
+def mutate_auth_role_landing(root: Path) -> None:
+    """Send administrators back to the public home by default."""
+
+    replace_once(
+        root,
+        "docs/planificacao/guias-bk/MF2/BK-MF2-01-registo-login-recuperacao-password.md",
+        'if (user?.role === "admin") return "/admin";',
+        'if (user?.role === "admin") return "/";',
     )
 
 
@@ -1307,6 +1318,17 @@ def mutate_admin_review_reservation(root: Path) -> None:
     )
 
 
+def mutate_admin_review_reason(root: Path) -> None:
+    """Replace the bounded human rejection reason with an unconditional value."""
+
+    replace_once(
+        root,
+        "docs/planificacao/guias-bk/MF4/BK-MF4-04-aprovacao-entrada-pool.md",
+        "normalizedReason.length < 10 || normalizedReason.length > 500",
+        "false",
+    )
+
+
 def mutate_charity_report_submission_guard(root: Path) -> None:
     """Remove the synchronous submission guard from charity membership UI."""
 
@@ -1315,6 +1337,17 @@ def mutate_charity_report_submission_guard(root: Path) -> None:
         "docs/planificacao/guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md",
         "const submissionRef = useRef(null);",
         "const currentSubmission = null;",
+    )
+
+
+def mutate_charity_admin_lookup(root: Path) -> None:
+    """Remove the safe named charity lookup from the membership guide."""
+
+    replace_once(
+        root,
+        "docs/planificacao/guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md",
+        'charitiesRouter.get("/admin/lookup", requireRole(["admin"]), asyncHandler(getAdminCharityLookup));',
+        'charitiesRouter.get("/admin/all", requireRole(["admin"]), asyncHandler(getAdminCharityLookup));',
     )
 
 
@@ -1395,6 +1428,17 @@ def mutate_metrics_admin(root: Path) -> None:
     )
 
 
+def mutate_metrics_csv(root: Path) -> None:
+    """Remove the private aggregate CSV endpoint from the metrics guide."""
+
+    replace_once(
+        root,
+        "docs/planificacao/guias-bk/MF5/BK-MF5-05-painel-de-metricas-admin.md",
+        '    "/export.csv",',
+        '    "/export-removed",',
+    )
+
+
 def mutate_integrations_config(root: Path) -> None:
     """Remove the unique constraint that serializes integration upserts."""
 
@@ -1403,6 +1447,39 @@ def mutate_integrations_config(root: Path) -> None:
         "docs/planificacao/guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md",
         '{ unique: true, name: "integration_settings_key_unique" },',
         '{ name: "integration_settings_key_non_unique" },',
+    )
+
+
+def mutate_integrations_draft(root: Path) -> None:
+    """Remove the local draft that prevents immediate integration writes."""
+
+    replace_once(
+        root,
+        "docs/planificacao/guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md",
+        "const [drafts, setDrafts] = useState({});",
+        "const drafts = {};",
+    )
+
+
+def mutate_pool_preview_token(root: Path) -> None:
+    """Drop the preview token from the manual financial commit."""
+
+    replace_once(
+        root,
+        "docs/planificacao/guias-bk/MF4/BK-MF4-05-distribuicao-mensal-rotacao.md",
+        "expectedPreviewToken: previewToken,",
+        "expectedPreviewToken: null,",
+    )
+
+
+def mutate_demo_runbook_reference_root(root: Path) -> None:
+    """Point the private-reference migration procedure at the student root."""
+
+    replace_once(
+        root,
+        "docs/runbooks/DEMO-DATASET.md",
+        "a partir de `real_dev/backend/`",
+        "a partir de `backend/`",
     )
 
 
@@ -1917,6 +1994,12 @@ CASES = (
         "composition.final_pages",
     ),
     NegativeCase("moderator_catalog_scope", mutate_moderator_catalog_scope, "composition.rbac_mobile"),
+    NegativeCase("auth_role_landing", mutate_auth_role_landing, "composition.auth_role_landing"),
+    NegativeCase(
+        "demo_runbook_reference_root",
+        mutate_demo_runbook_reference_root,
+        "composition.demo_runbook_reference",
+    ),
     NegativeCase("mobile_reduced_motion", mutate_mobile_reduced_motion, "composition.mobile_css"),
     NegativeCase(
         "consents_confirmed_snapshot",
@@ -1925,11 +2008,13 @@ CASES = (
     ),
     NegativeCase("admin_users_reservation", mutate_admin_users_reservation, "composition.admin_users_ui"),
     NegativeCase("admin_review_reservation", mutate_admin_review_reservation, "composition.admin_review_ui"),
+    NegativeCase("admin_review_reason", mutate_admin_review_reason, "composition.admin_review_ui"),
     NegativeCase(
         "charity_report_submission_guard",
         mutate_charity_report_submission_guard,
         "composition.charity_reports_ui",
     ),
+    NegativeCase("charity_admin_lookup", mutate_charity_admin_lookup, "composition.charity_reports_ui"),
     NegativeCase("family_member_path_encoding", mutate_family_member_path_encoding, "composition.family_ui"),
     NegativeCase("worker_job_claim", mutate_worker_job_claim, "composition.worker_jobs"),
     NegativeCase("monthly_pool_worker", mutate_monthly_pool_worker, "composition.pool_worker"),
@@ -1945,9 +2030,15 @@ CASES = (
     ),
     NegativeCase("export_security", mutate_export_security, "composition.export_security"),
     NegativeCase("metrics_admin", mutate_metrics_admin, "composition.metrics_admin"),
+    NegativeCase("metrics_csv", mutate_metrics_csv, "composition.metrics_admin"),
     NegativeCase(
         "integrations_config",
         mutate_integrations_config,
+        "composition.integrations_config",
+    ),
+    NegativeCase(
+        "integrations_draft",
+        mutate_integrations_draft,
         "composition.integrations_config",
     ),
     NegativeCase("auth_middleware_path", mutate_auth_middleware_path, "composition.auth_middleware_path"),
@@ -1972,6 +2063,7 @@ CASES = (
     ),
     NegativeCase("charity_contract", mutate_charity_contract, "composition.charity_contract"),
     NegativeCase("pool_finance", mutate_pool_finance, "composition.pool_finance"),
+    NegativeCase("pool_preview_token", mutate_pool_preview_token, "composition.charities_api"),
     NegativeCase("performance_probe", mutate_performance_probe, "composition.performance_probe"),
     NegativeCase("navigation_session", mutate_navigation_session, "composition.navigation_session"),
     NegativeCase("delete_account_ui", mutate_delete_account_ui, "composition.delete_account_ui"),

@@ -288,7 +288,7 @@ Nota de implementação da referência docente `real_dev` (atualizada em 2026-07
 -   O frontend distingue `loading`, `authenticated`, `anonymous` e `unavailable`; uma falha de rede ou `5xx` não pode ser tratada como logout.
 -   Enquanto a sessão estiver `unavailable`, CTAs privados ficam bloqueados e oferecem nova confirmação; não redirecionam para login nem apresentam o utilizador como anónimo.
 -   Um `401` limpa o contexto local e o token CSRF em memória. O logout concluído apresenta uma ação visível e navega para `/`.
--   Login e registo navegam para `/` quando não existe destino. O parâmetro `next` só é aceite quando representa um path da mesma origem, sem protocolo, backslash ou caracteres de controlo.
+-   Login e registo dão precedência a um `next` interno seguro. Sem `next`, a landing depende da role confirmada pelo backend: `admin` entra em `/admin`, `moderator` em `/admin/catalogo` e as restantes contas em `/`. O destino nunca aceita outra origin, protocolo, backslash ou caracteres de controlo.
 -   Leituras e mutações da conta são canceláveis. Perfil e limite parental não podem ser gravados em paralelo; vazio, decimal ou valor fora de `0..18` não chama a API parental.
 
 ### Catálogo editorial (RF06–RF10)
@@ -383,6 +383,7 @@ Nota de prova da referência docente (2026-07-10): estes contratos foram validad
 ### Pool de Associações (RF41–RF48)
 
 -   O fecho é executado pelo worker para o mês UTC anterior e recusa o mês atual ou futuro com `409 ACCOUNTING_MONTH_NOT_CLOSED`.
+-   O fecho manual por admin exige primeiro `GET /api/charities/pool/distributions/:month/preview`, que não escreve distribuição nem audit log. O commit envia `{ month, previewToken }`; se a base financeira ou a elegibilidade mudar, devolve `409 POOL_PREVIEW_STALE`, não escreve e obriga a gerar nova preview.
 -   A receita elegível exige cumulativamente `payment_attempts.schemaVersion: 2`, `status: "approved"`, `accountingEstimate: false` e `approvedAt` dentro do intervalo UTC fechado-aberto do mês.
 -   Documentos legacy sem versão e qualquer backfill com `accountingEstimate: true` ficam excluídos; não é permitido reconstruir silenciosamente contabilidade histórica exata.
 -   A distribuição guarda `paymentSnapshots` e um `financialSnapshot` imutável com contagem, receita aprovada e limites do período; relatórios posteriores leem o snapshot e não recalculam o passado.
@@ -407,11 +408,21 @@ final do histórico e CSV continua no backend.
 -   A submissão pública de candidaturas admite, no máximo, 5 pedidos por IP e por hora; o pedido 6 devolve `429 RATE_LIMITED` e `Retry-After`.
 -   Só pode existir uma candidatura `pending` por email, protegida por índice parcial; duplicação concorrente devolve `409 PENDING_APPLICATION_EXISTS`.
 -   A revisão reclama condicionalmente uma candidatura ainda `pending`. Decisão, eventual associação `active/eligible` e audit log fazem commit na mesma transação; rejeição não cria associação e uma segunda decisão devolve `409 APPLICATION_ALREADY_REVIEWED`.
+-   A rejeição administrativa exige motivo explícito entre 10 e 500 caracteres; a interface mostra o detalhe da candidatura e nunca substitui a decisão humana por uma razão fixa.
 -   Ligar um utilizador a uma associação e o respetivo audit log são transacionais. Repetir a mesma ligação é idempotente; tentar transferir implicitamente para outra associação devolve `409 CHARITY_MEMBERSHIP_EXISTS`.
+-   A interface de membership pesquisa associações ativas/elegíveis por nome e utilizadores operacionais por nome/email, confirma as duas entidades humanas e só depois envia os respetivos IDs. O lookup de associações expõe apenas `{ id, name }`.
 -   Uma membership só pode ser criada para uma conta operacional, isto é, não bloqueada nem eliminada. Conta indisponível devolve `404 USER_NOT_OPERATIONAL` e não cria membership nem audit log.
 -   `PATCH /api/users/:id/admin` altera role/estado com audit log no mesmo commit. Bloquear uma conta revoga todas as sessões na mesma transação e o último admin ativo é protegido com `409 LAST_ACTIVE_ADMIN`.
 -   Audit de utilizadores e associações guarda apenas estado operacional mínimo e campos alterados; email, telefone, contactos e snapshots pessoais integrais não são persistidos no evento.
 -   A prova atual destes contratos é local, com doubles e fault injection; não constitui validação de transações num replica set real.
+
+### Administração e operação (RF58–RF60)
+
+-   Sessões `admin` usam `/admin` como dashboard e shell dedicado; `moderator` entra em `/admin/catalogo`. O backoffice não mistura o header/footer público e oferece apenas um context switch explícito `Ver site público`.
+-   A navegação administrativa é filtrada por role, agrupada por domínio e mantém sidebar em desktop, drawer acessível até `1024px`, breadcrumb, foco e logout próprios.
+-   O catálogo administrativo é list-first e separa listagem, criação, edição e taxonomias; passagens bíblicas separam listagem, criação, edição e associações.
+-   `GET /api/admin/metrics` devolve apenas agregados de utilizadores, catálogo, subscrições/família, solidariedade, integrações e métricas anónimas. `GET /api/admin/metrics/export.csv` reutiliza o mesmo intervalo/RBAC e nunca inclui PII individual.
+-   Alterações de integrações permanecem em draft local até Guardar; Cancelar repõe o estado confirmado e Guardar apresenta um diálogo com o diff antes de emitir um único `PATCH`.
 
 ---
 
@@ -443,3 +454,4 @@ Projeto académico orientado para fins educativos no âmbito da PAP.
 -   **2026-07-10** - Alinhadas paginação e ordem estável de listas pessoais/continuar a ver, pesquisa URL-driven e proteções contra races em biblioteca, ratings e comentários.
 -   **2026-07-10** - Sincronizados cancelamento/retry em catálogo, pesquisa, detalhe, passagens e conta, codificação de segmentos e distinção entre sessão indisponível e logout.
 -   **2026-07-10** - Consolidado o contrato de email/password e a matriz cumulativa de rate limiting para autenticação, candidaturas, pesquisa, recomendações e eliminação de conta.
+-   **2026-07-12** - Alinhados landing por role, shell administrativo dedicado, rotas editoriais list-first, preview financeira com token stale, candidaturas, memberships, métricas CSV e drafts de integrações com a aplicação fechada.

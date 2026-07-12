@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF5-04`
 - `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
@@ -467,6 +467,28 @@ export async function listPublicCharities() {
 }
 
 /**
+ * Pesquisa associações operacionais sem devolver contactos ou snapshots.
+ */
+export async function listAdminCharityLookup({ search = "", page = "1", limit = "10" } = {}) {
+  const normalizedSearch = search.trim();
+  const safePage = Number(page);
+  const safeLimit = Number(limit);
+  if (normalizedSearch.length < 2 || normalizedSearch.length > 80) throw httpError(400, "INVALID_SEARCH");
+  if (!Number.isInteger(safePage) || safePage < 1 || !Number.isInteger(safeLimit) || safeLimit < 1 || safeLimit > 20) {
+    throw httpError(400, "INVALID_PAGINATION");
+  }
+  const literal = normalizedSearch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const db = await getDb();
+  const rows = await db.collection("charities").find({
+    status: "active",
+    poolStatus: "eligible",
+    name: { $regex: literal, $options: "i" },
+  }).project({ name: 1 }).sort({ name: 1, _id: 1 })
+    .skip((safePage - 1) * safeLimit).limit(safeLimit).toArray();
+  return { charities: rows.map((row) => ({ id: String(row._id), name: row.name })) };
+}
+
+/**
  * Converte histórico de uma associação para CSV simples.
  *
  * @param {{ rows: object[] }} history Histórico devolvido por `getCharityHistory`.
@@ -528,6 +550,7 @@ import {
   getPoolDashboard,
   historyToCsv,
   linkUserToCharity,
+  listAdminCharityLookup,
   listPublicCharities,
 } from "./charity-reports.service.js";
 
@@ -623,6 +646,13 @@ export async function getCharityHistoryCsv(req, res) {
 export async function getPublicCharities(_req, res) {
   res.status(200).json(await listPublicCharities());
 }
+
+/**
+ * Pesquisa apenas associações operacionais para o autocomplete admin.
+ */
+export async function getAdminCharityLookup(req, res) {
+  res.status(200).json(await listAdminCharityLookup(req.query));
+}
 ```
 
 Rotas a adicionar:
@@ -630,6 +660,7 @@ Rotas a adicionar:
 ```js
 // A rota pública vem antes de `/:id/...` para evitar ambiguidades de routing.
 charitiesRouter.get("/public", asyncHandler(getPublicCharities));
+charitiesRouter.get("/admin/lookup", requireRole(["admin"]), asyncHandler(getAdminCharityLookup));
 charitiesRouter.get("/pool/dashboard", requireRole(["admin"]), asyncHandler(getPoolDashboardController));
 charitiesRouter.post("/:id/members", requireRole(["admin"]), asyncHandler(postCharityMember));
 charitiesRouter.get("/:id/history", requireAuth, asyncHandler(getCharityHistoryController));
@@ -652,6 +683,7 @@ await ensureCharityReportIndexes();
 
 ```bash
 curl -i http://localhost:3000/api/charities/public
+curl -i "http://localhost:3000/api/charities/admin/lookup?search=esperanca&page=1&limit=10"
 curl -i http://localhost:3000/api/charities/ID/history
 curl -i -X POST http://localhost:3000/api/charities/ID/members -H "Content-Type: application/json" -d '{"userId":"USER_ID"}'
 ```
@@ -704,6 +736,13 @@ listPublicCharities(options = {}) {
  */
 getPoolDashboard(options = {}) {
   return apiClient.get("/api/charities/pool/dashboard", options);
+},
+/**
+ * Pesquisa associações ativas/elegíveis sem expor contactos.
+ */
+lookupAdminCharities(search, options = {}) {
+  const query = new URLSearchParams({ search, page: "1", limit: "10" });
+  return apiClient.get(`/api/charities/admin/lookup?${query}`, options);
 },
 /**
  * Obtem histórico privado de uma associação.
@@ -988,12 +1027,13 @@ export function CharityHistoryPage() {
 /**
  * Módulo da página administrativa de ligação entre utilizador e associação.
  *
- * Envia IDs explícitos para um endpoint protegido por `admin`, permitindo criar
- * ownership operacional sem transformar associações em utilizadores comuns.
+ * Pesquisa entidades humanas e só envia os IDs depois de confirmação nominal.
  */
 import { useEffect, useRef, useState } from "react";
+import { ConfirmDialog } from "../components/admin/ConfirmDialog.jsx";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
+import { userApi } from "../services/api/userApi.js";
 
 /**
  * Painel admin para criar ownership entre utilizador e associação.
@@ -1001,37 +1041,47 @@ import { toUserMessage } from "../services/api/apiErrors.js";
  * @returns {JSX.Element} Formulário administrativo de ligacao.
  */
 export function AdminCharityMembersPage() {
-  const [charityId, setCharityId] = useState("");
-  const [userId, setUserId] = useState("");
+  const [charitySearch, setCharitySearch] = useState("");
+  const [userSearch, setUserSearch] = useState("");
+  const [charityResults, setCharityResults] = useState([]);
+  const [userResults, setUserResults] = useState([]);
+  const [charity, setCharity] = useState(null);
+  const [user, setUser] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const submissionRef = useRef(null);
-  const mountedRef = useRef(true);
 
   useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-      submissionRef.current?.abort();
-      submissionRef.current = null;
-    };
-  }, []);
+    if (charity || charitySearch.trim().length < 2) return undefined;
+    const controller = new AbortController();
+    charitiesApi.lookupAdminCharities(charitySearch.trim(), { signal: controller.signal })
+      .then((response) => setCharityResults(response.charities ?? []))
+      .catch((requestError) => requestError?.code !== "REQUEST_ABORTED" && setError(toUserMessage(requestError)));
+    return () => controller.abort();
+  }, [charity, charitySearch]);
+
+  useEffect(() => {
+    if (user || userSearch.trim().length < 2) return undefined;
+    const controller = new AbortController();
+    userApi.listUsers(
+      { search: userSearch.trim(), status: "active", page: 1, limit: 10 },
+      { signal: controller.signal },
+    ).then((response) => setUserResults(response.users ?? []))
+      .catch((requestError) => requestError?.code !== "REQUEST_ABORTED" && setError(toUserMessage(requestError)));
+    return () => controller.abort();
+  }, [user, userSearch]);
+
+  useEffect(() => () => submissionRef.current?.abort(), []);
 
   /**
    * Envia a ligacao para o backend e mostra o resultado.
    *
-   * @param {React.FormEvent<HTMLFormElement>} event Evento do formulário.
    * @returns {Promise<void>}
    */
-  async function handleSubmit(event) {
-    event.preventDefault();
-    if (submissionRef.current) return;
-    const normalizedCharityId = charityId.trim();
-    const normalizedUserId = userId.trim();
-    if (!window.confirm(
-      `Ligar o utilizador ${normalizedUserId} à associação ${normalizedCharityId}? Esta ação concede acesso ao histórico privado.`,
-    )) return;
+  async function handleSubmit() {
+    if (!charity || !user || submissionRef.current) return;
 
     const controller = new AbortController();
     submissionRef.current = controller;
@@ -1041,36 +1091,52 @@ export function AdminCharityMembersPage() {
 
     try {
       const response = await charitiesApi.linkUserToCharity(
-        normalizedCharityId,
-        normalizedUserId,
+        charity.id,
+        user.id,
         { signal: controller.signal },
       );
-      if (controller.signal.aborted || !mountedRef.current) return;
-      setStatus(`Utilizador ligado à associação ${response.membership.charityId}.`);
+      if (controller.signal.aborted) return;
+      setStatus(`${user.name} foi ligado a ${charity.name}.`);
+      setConfirmOpen(false);
     } catch (apiError) {
       if (controller.signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
-      if (!mountedRef.current) return;
       setError(toUserMessage(apiError));
     } finally {
       if (submissionRef.current === controller) submissionRef.current = null;
-      if (mountedRef.current) setSubmitting(false);
+      setSubmitting(false);
     }
   }
 
   return (
-    <main>
+    <main aria-busy={submitting}>
       <h1>Ligar utilizador a associação</h1>
-      <form onSubmit={handleSubmit} aria-busy={submitting}>
-        <label htmlFor="charityId">ID da associação</label>
-        <input id="charityId" value={charityId} disabled={submitting} onChange={(event) => setCharityId(event.target.value)} required />
-        <label htmlFor="userId">ID do utilizador</label>
-        <input id="userId" value={userId} disabled={submitting} onChange={(event) => setUserId(event.target.value)} required />
-        <button type="submit" disabled={submitting}>
-          {submitting ? "A guardar..." : "Guardar ligação"}
-        </button>
-      </form>
+      <label>Associação
+        <input role="combobox" aria-autocomplete="list" value={charitySearch} onChange={(event) => { setCharity(null); setCharitySearch(event.target.value); }} />
+      </label>
+      <ul role="listbox">{charityResults.map((item) => (
+        <li key={item.id}><button type="button" onClick={() => { setCharity(item); setCharitySearch(item.name); setCharityResults([]); }}>{item.name}</button></li>
+      ))}</ul>
+      <label>Utilizador
+        <input role="combobox" aria-autocomplete="list" value={userSearch} onChange={(event) => { setUser(null); setUserSearch(event.target.value); }} />
+      </label>
+      <ul role="listbox">{userResults.map((item) => (
+        <li key={item.id}><button type="button" onClick={() => { setUser(item); setUserSearch(`${item.name} · ${item.email}`); setUserResults([]); }}>{item.name} · {item.email}</button></li>
+      ))}</ul>
+      <button type="button" disabled={!charity || !user || submitting} onClick={() => setConfirmOpen(true)}>
+        Rever ligação
+      </button>
       {status && <p role="status">{status}</p>}
       {error && <p role="alert">{error}</p>}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Confirmar membership"
+        confirmLabel="Ligar utilizador"
+        busy={submitting}
+        onCancel={() => !submitting && setConfirmOpen(false)}
+        onConfirm={handleSubmit}
+      >
+        <p><strong>{user?.name}</strong> será ligado a <strong>{charity?.name}</strong>.</p>
+      </ConfirmDialog>
     </main>
   );
 }
@@ -1127,6 +1193,8 @@ Expor email da associação na página pública pode criar risco de privacidade 
 
 - `GET /api/charities/public` devolve associações elegíveis sem contactos internos.
 - `GET /api/charities/pool/dashboard` exige admin.
+- `GET /api/charities/admin/lookup` exige admin, aceita pesquisa paginada e
+  devolve apenas `{ id, name }` de associações ativas/elegíveis.
 - `POST /api/charities/:id/members` exige admin e liga um utilizador existente a uma associação elegível.
 - Repetir a mesma ligação é idempotente e não duplica auditoria; tentar outra
   associação devolve `409` com `code: "CHARITY_MEMBERSHIP_EXISTS"`.
@@ -1147,6 +1215,8 @@ Expor email da associação na página pública pode criar risco de privacidade 
 - CSV devolve `text/csv` com linhas coerentes com o histórico.
 - Membership exige confirmação, busy state e cancelamento; duplo clique ou
   unmount não produz duas ligações nem feedback tardio.
+- A UI pesquisa por nome/email com pedidos canceláveis, apresenta resultados
+  humanos alcançáveis por teclado e nunca pede IDs técnicos ao operador.
 - Páginas pública, dashboard e histórico usam abort/epoch, permitem retry e
   ignoram respostas abortadas/antigas; `completed` é apresentado como
   `Distribuída` e enums desconhecidos como `Indisponível`.
@@ -1188,6 +1258,9 @@ if (String(membership.charityId) === String(charityId)) return;
 ```
 
 #### Changelog
+
+- `2026-07-12`: formulário por IDs substituído por lookups canceláveis,
+  seleção nominal e confirmação acessível antes de enviar apenas os IDs.
 
 - `2026-06-13`: guia reescrito com dashboard, histórico privado, CSV, página pública e ownership.
 - `2026-07-10`: membership administrativa tornada transacional e auditada,

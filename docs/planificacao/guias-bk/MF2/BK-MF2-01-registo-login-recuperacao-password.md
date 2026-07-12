@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF2-02`
 - `guia_path`: `docs/planificacao/guias-bk/MF2/BK-MF2-01-registo-login-recuperacao-password.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
@@ -128,9 +128,10 @@ Identidade e a porta de entrada da aplicacao. Sem esta entrega, os BKs de perfil
   mostrar áreas públicas como se o cookie tivesse sido revogado.
 - Um `401` limpa a sessão e o token CSRF em memória. `POST /api/session/logout`
   devolve `204`; depois do sucesso, a UI limpa o contexto e navega para `/`.
-- Registo e login chamam `refreshSession()` antes de navegar. Sem `next`, o destino
-  é `/`; com `next`, só é aceite um path da mesma origem, sem `//`, backslash,
-  protocolo, input malformado ou caracteres de controlo.
+- Registo e login chamam `refreshSession()` antes de navegar. Um `next` interno
+  seguro tem precedência; sem ele, `admin` entra em `/admin`, `moderator` em
+  `/admin/catalogo` e as restantes contas em `/`. `//`, backslash, protocolo,
+  input malformado e caracteres de controlo são sempre recusados.
 - O destino validado fica apenas em memória/URL. Tokens de sessão e CSRF nunca
   são guardados em `localStorage` ou `sessionStorage`.
 
@@ -174,7 +175,7 @@ Identidade e a porta de entrada da aplicacao. Sem esta entrega, os BKs de perfil
 | Recuperacao | `POST /api/auth/forgot-password`, `POST /api/auth/reset-password` |
 | Frontend | `SessionContext`, `authApi`, `AuthForms`, `authRedirect`, rota `/login` |
 | Estado de sessão | `loading|authenticated|anonymous|unavailable`; `401` limpa, rede/`5xx` preserva estado indisponível |
-| Navegação após auth | `/` por defeito; `next` apenas quando `getSafeRedirectPath(...)` confirma path interno |
+| Navegação após auth | `next` interno seguro; sem ele, landing por role através de `resolveAuthenticatedPath(...)` |
 
 ##### Decisões técnicas
 
@@ -1573,7 +1574,8 @@ Ligar a UI aos endpoints de auth usando o `apiClient` da `MF1`.
 
 Cria `authApi.js`, o contexto e o validador de destino. `LoginPage` lê `next`,
 valida-o e passa apenas o resultado seguro a `AuthForms`. Depois de registo/login,
-o formulário atualiza a sessão autoritativa e navega para esse destino ou `/`.
+o formulário atualiza a sessão autoritativa e navega para esse destino ou para a
+landing da role confirmada (`admin`, `moderator` ou utilizador comum).
 Em `AppRoutes`, não importes a página de forma eager nem substituas o router:
 troca apenas a declaração lazy de `LoginPage` pela versão indicada, mantendo
 `RouteLifecycle`, `ErrorBoundary`, `Suspense` e todas as restantes rotas.
@@ -1673,6 +1675,16 @@ export function getSafeRedirectPath(value) {
   if (!isSafeInternalPath(value)) return null;
   const parsed = new URL(value, "https://faithflix.invalid");
   return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+}
+
+export function getDefaultAuthenticatedPath(user) {
+  if (user?.role === "admin") return "/admin";
+  if (user?.role === "moderator") return "/admin/catalogo";
+  return "/";
+}
+
+export function resolveAuthenticatedPath(user, requestedPath = null) {
+  return getSafeRedirectPath(requestedPath) ?? getDefaultAuthenticatedPath(user);
 }
 
 export function buildLoginRedirectPath(returnTo) {
@@ -1809,7 +1821,7 @@ import { useNavigate } from "react-router-dom";
 import { useSession } from "../../context/SessionContext.jsx";
 import { authApi } from "../../services/api/authApi.js";
 import { toUserMessage } from "../../services/api/apiErrors.js";
-import { getSafeRedirectPath } from "../../utils/authRedirect.js";
+import { resolveAuthenticatedPath } from "../../utils/authRedirect.js";
 
 const INITIAL_FORM = { name: "", email: "", password: "", token: "" };
 
@@ -1822,7 +1834,6 @@ export function AuthForms({ redirectTo = null }) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
-  const authenticationDestination = getSafeRedirectPath(redirectTo) ?? "/";
 
   function updateField(event) {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
@@ -1838,16 +1849,16 @@ export function AuthForms({ redirectTo = null }) {
     try {
       if (mode === "register") {
         await authApi.register({ name: form.name, email: form.email, password: form.password });
-        await refreshSession();
+        const currentUser = await refreshSession();
         setStatus("Conta criada e sessao iniciada.");
-        navigate(authenticationDestination, { replace: true });
+        navigate(resolveAuthenticatedPath(currentUser, redirectTo), { replace: true });
       }
 
       if (mode === "login") {
         await authApi.login({ email: form.email, password: form.password });
-        await refreshSession();
+        const currentUser = await refreshSession();
         setStatus("Sessao iniciada.");
-        navigate(authenticationDestination, { replace: true });
+        navigate(resolveAuthenticatedPath(currentUser, redirectTo), { replace: true });
       }
 
       if (mode === "forgot") {
@@ -1987,7 +1998,8 @@ async function handleLogout() {
 O frontend nunca lê o cookie. O browser envia-o automaticamente porque o
 `apiClient` usa `credentials: "include"`. `refreshSession()` confirma no backend
 o utilizador acabado de autenticar. `getSafeRedirectPath()` recusa destinos
-externos ou ambíguos; sem destino válido, a navegação termina em `/`.
+externos ou ambíguos; sem destino válido, `resolveAuthenticatedPath()` escolhe
+`/admin`, `/admin/catalogo` ou `/` a partir da role devolvida pela sessão.
 `buildLoginRedirectPath()` reutiliza a mesma decisão para os links protegidos
 dos BKs seguintes e codifica `next`, em vez de concatenar um destino bruto. O token de
 recuperação nunca é apresentado pela UI pública. O botão `Sair` só limpa/navega
@@ -1996,10 +2008,11 @@ mantém o estado e mostra o erro.
 
 6. Validação do passo.
 
-Arranca backend e frontend. Abre `/login`, cria uma conta e confirma navegação
-para `/`. Repete com `/login?next=%2Fconta` e confirma `/conta`. Testa também
-`next=//evil.example`, backslashes e valores codificados: todos devem terminar
-em `/`. Simula falha de rede em `/api/session/me` e confirma estado
+Arranca backend e frontend. Abre `/login` e confirma as landings sem `next`:
+utilizador em `/`, moderator em `/admin/catalogo` e admin em `/admin`. Repete com
+`/login?next=%2Fconta` e confirma `/conta`, independentemente da role. Testa
+também `next=//evil.example`, backslashes e valores codificados: todos devem usar
+a landing segura da role. Simula falha de rede em `/api/session/me` e confirma estado
 `unavailable`, sem apresentar o utilizador como anónimo.
 
 7. Cenário negativo/erro esperado.
@@ -2113,7 +2126,9 @@ req.user = resolved?.user ?? null;
   browser continuam a exigir Origin permitido, inclusive com sessão válida.
 - Qualquer outra mutation autenticada exige Origin e `X-CSRF-Token` válidos.
 - O frontend distingue `loading|authenticated|anonymous|unavailable`; falha de rede não é logout.
-- Login/registo navegam para `/` ou para um `next` interno validado; destinos externos, backslashes e caracteres de controlo são recusados.
+- Login/registo dão precedência a um `next` interno validado; sem ele, admin
+  entra em `/admin`, moderator em `/admin/catalogo` e user em `/`. Destinos
+  externos, backslashes e caracteres de controlo são recusados.
 - Logout visível limpa o contexto apenas depois do backend responder e navega para `/`.
 - Pelo menos cinco negativos ficam registados.
 
@@ -2183,5 +2198,6 @@ Para `BK-MF2-02`, entregar:
 - `2026-07-10`: migrado para o contrato tutorial v2 e integrada a validação
   estrita diretamente nos snippets executáveis.
 - 2026-07-10: alinhado o contrato frontend de sessão, `200 {user:null}`, logout `204`, estados fechados e safe-next same-origin com fallback `/`.
+- 2026-07-12: fallback de autenticação alinhado à role confirmada, preservando precedência de `next` interno seguro.
 
 - `2026-05-31`: Corrigido o guia para fechar sessao real com MongoDB, cookie HttpOnly, `req.user`, recuperacao de password, frontend e negativos.

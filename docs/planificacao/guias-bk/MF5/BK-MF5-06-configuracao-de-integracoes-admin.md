@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF6-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-06-configuracao-de-integracoes-admin.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
@@ -707,6 +707,7 @@ export const integrationsApi = {
 ```jsx
 // frontend/src/pages/AdminIntegrationsPage.jsx
 import { useEffect, useRef, useState } from "react";
+import { ConfirmDialog } from "../components/admin/ConfirmDialog.jsx";
 import { integrationsApi } from "../services/api/integrationsApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
@@ -724,6 +725,8 @@ const MODE_LABELS = {
  */
 export function AdminIntegrationsPage() {
     const [integrations, setIntegrations] = useState([]);
+    const [drafts, setDrafts] = useState({});
+    const [confirming, setConfirming] = useState(null);
     const [loading, setLoading] = useState(true);
     const [busyKeys, setBusyKeys] = useState(() => new Set());
     const [error, setError] = useState("");
@@ -743,6 +746,10 @@ export function AdminIntegrationsPage() {
             .then((response) => {
                 if (controller.signal.aborted || version !== requestVersionRef.current) return;
                 setIntegrations(response.integrations);
+                setDrafts(Object.fromEntries(response.integrations.map((item) => [
+                    item.key,
+                    { enabled: item.enabled, mode: item.mode, publicConfig: item.publicConfig ?? {} },
+                ])));
                 setLoading(false);
             })
             .catch((requestError) => {
@@ -768,18 +775,12 @@ export function AdminIntegrationsPage() {
      * Atualiza uma integração no backend.
      *
      * @param {Record<string, unknown>} integration Integração atual.
-     * @param {Record<string, unknown>} changes Alterações locais.
      * @returns {Promise<void>} Termina quando a integração é atualizada.
      */
-    async function updateIntegration(integration, changes) {
+    async function updateIntegration(integration) {
         if (mutationControllersRef.current.has(integration.key)) return;
-        const changedField = Object.hasOwn(changes, "enabled") ? "estado" : "modo";
-        const nextValue = Object.hasOwn(changes, "enabled")
-            ? (changes.enabled ? "ativar" : "desativar")
-            : `mudar para ${MODE_LABELS[changes.mode]}`;
-        if (!globalThis.confirm(
-            `Confirmas ${nextValue} em ${integration.label}? Esta ação altera o ${changedField} operacional.`,
-        )) return;
+        const draft = drafts[integration.key];
+        if (!draft) return;
 
         const version = requestVersionRef.current;
         const controller = new AbortController();
@@ -791,12 +792,7 @@ export function AdminIntegrationsPage() {
         try {
             const response = await integrationsApi.updateIntegration(
                 integration.key,
-                {
-                    enabled: integration.enabled,
-                    mode: integration.mode,
-                    publicConfig: integration.publicConfig ?? {},
-                    ...changes,
-                },
+                draft,
                 { signal: controller.signal },
             );
             if (controller.signal.aborted || version !== requestVersionRef.current) return;
@@ -806,6 +802,12 @@ export function AdminIntegrationsPage() {
                 ),
             );
             setStatus("Integração atualizada.");
+            setDrafts((current) => ({ ...current, [integration.key]: {
+                enabled: response.integration.enabled,
+                mode: response.integration.mode,
+                publicConfig: response.integration.publicConfig ?? {},
+            } }));
+            setConfirming(null);
         } catch (requestError) {
             if (
                 controller.signal.aborted
@@ -828,6 +830,18 @@ export function AdminIntegrationsPage() {
         }
     }
 
+    function updateDraft(key, changes) {
+        setDrafts((current) => ({ ...current, [key]: { ...current[key], ...changes } }));
+    }
+
+    function cancelDraft(integration) {
+        setDrafts((current) => ({ ...current, [integration.key]: {
+            enabled: integration.enabled,
+            mode: integration.mode,
+            publicConfig: integration.publicConfig ?? {},
+        } }));
+    }
+
     return (
         <section className="page-section">
             <p className="section-kicker">Admin</p>
@@ -837,9 +851,13 @@ export function AdminIntegrationsPage() {
             {!loading && error ? <button type="button" onClick={() => setRetryVersion((current) => current + 1)}>Tentar novamente</button> : null}
             {status ? <p role="status">{status}</p> : null}
             <div className="metric-grid">
-                {integrations.map((integration) => (
+                {integrations.map((integration) => {
+                    const draft = drafts[integration.key] ?? integration;
+                    const dirty = draft.enabled !== integration.enabled || draft.mode !== integration.mode;
+                    return (
                     <article key={integration.key} aria-busy={busyKeys.has(integration.key)}>
                         <h2>{integration.label}</h2>
+                        {dirty ? <span>Alterações por guardar</span> : null}
                         <p>
                             Variáveis:{" "}
                             {integration.requiredEnvVars.length > 0
@@ -849,10 +867,10 @@ export function AdminIntegrationsPage() {
                         <label>
                             <input
                                 type="checkbox"
-                                checked={integration.enabled}
+                                checked={draft.enabled}
                                 disabled={busyKeys.has(integration.key)}
                                 onChange={(event) =>
-                                    updateIntegration(integration, {
+                                    updateDraft(integration.key, {
                                         enabled: event.target.checked,
                                     })
                                 }
@@ -862,10 +880,10 @@ export function AdminIntegrationsPage() {
                         <label>
                             Modo
                             <select
-                                value={integration.mode}
+                                value={draft.mode}
                                 disabled={busyKeys.has(integration.key)}
                                 onChange={(event) =>
-                                    updateIntegration(integration, {
+                                    updateDraft(integration.key, {
                                         mode: event.target.value,
                                     })
                                 }
@@ -877,9 +895,23 @@ export function AdminIntegrationsPage() {
                                 ))}
                             </select>
                         </label>
+                        <button type="button" disabled={!dirty || busyKeys.has(integration.key)} onClick={() => setConfirming(integration)}>Guardar</button>
+                        <button type="button" disabled={!dirty || busyKeys.has(integration.key)} onClick={() => cancelDraft(integration)}>Cancelar</button>
                     </article>
-                ))}
+                );})}
             </div>
+            <ConfirmDialog
+                open={Boolean(confirming)}
+                title="Confirmar configuração"
+                confirmLabel="Guardar alterações"
+                busy={confirming ? busyKeys.has(confirming.key) : false}
+                onCancel={() => setConfirming(null)}
+                onConfirm={() => updateIntegration(confirming)}
+            >
+                {confirming ? <p>
+                    Estado: {confirming.enabled ? "Ativa" : "Desativada"} → {drafts[confirming.key]?.enabled ? "Ativa" : "Desativada"}; modo: {MODE_LABELS[confirming.mode]} → {MODE_LABELS[drafts[confirming.key]?.mode]}.
+                </p> : null}
+            </ConfirmDialog>
         </section>
     );
 }
@@ -899,11 +931,14 @@ const AdminIntegrationsPage = lazyNamedPage(
 
 5. Explicação do código.
 
-A página mostra label, chave, variáveis necessárias e controles de estado/modo. Não há campo para segredo. O admin vê nomes de variáveis, mas os valores ficam fora da aplicação. A rota mantém lazy loading e só acrescenta o binding e o `Route` ao ficheiro cumulativo.
+A página mantém estado/modo em draft local, sinaliza alterações por guardar e só
+envia um PATCH depois de Guardar e confirmar o diff. Cancelar repõe o snapshot
+autoritativo. Não há campo para segredo.
 
 6. Validação do passo.
 
-Abre `/admin/integracoes` como admin e alterna uma integração. A página deve mostrar `Integração atualizada.`.
+Abre `/admin/integracoes`, altera estado e modo, cancela e confirma zero PATCH.
+Repete, guarda, confirma o diff e observa `Integração atualizada.`.
 
 7. Cenário negativo/erro esperado.
 
@@ -1090,7 +1125,8 @@ Uma integração desconhecida deve falhar com `404`. Um modo desconhecido deve f
 - Alteração e evento `integration.update` partilham a mesma transação/sessão;
   fault injection no audit deixa zero configuração parcial.
 - A página `/admin/integracoes` mostra loading, erro, sucesso e lista de integrações.
-- Cancelar confirmação repõe o controlo; duplo clique produz um pedido por linha;
+- Alterações ficam em draft com `Alterações por guardar`; Cancelar repõe o
+  snapshot sem PATCH e Guardar confirma o diff. Duplo clique produz um pedido por linha;
   unmount aborta leituras/mutações sem aplicar resposta tardia.
 - `enabled` textual, campo fora da allowlist, mais de 20 campos, valor acima de
   500 caracteres, `credential|authorization|private_key`, controlo, Bearer ou URL
@@ -1112,6 +1148,7 @@ Depois valida no browser:
 
 - admin abre `/admin/integracoes`;
 - alterna uma integração;
+- cancela uma alteração e confirma zero PATCH; guarda outra e confirma um PATCH;
 - utilizador sem admin recebe erro;
 - chave inexistente em `PATCH` devolve `404`.
 
@@ -1135,6 +1172,9 @@ upsert e `/api/admin/integrations`. `BK-MF6-02` cobre cancelamento/busy em
 `private_key`, control characters e URL com userinfo e confirma zero persistência.
 
 #### Changelog
+
+- `2026-07-12`: edição imediata substituída por draft local, Guardar/Cancelar e
+  confirmação do diff antes do único PATCH.
 
 - `2026-04-13`: criado guia base com contrato pedagógico v3.
 - `2026-06-16`: guia reescrito com integrações controladas, auditoria, frontend e handoff para MF6.

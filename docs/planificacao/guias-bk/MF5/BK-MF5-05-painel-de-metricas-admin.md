@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF5-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-05-painel-de-metricas-admin.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
@@ -37,6 +37,7 @@ Como se trata de administração, a regra é minimizar exposição. O painel nã
 
 - Criar módulo backend `admin-metrics`.
 - Criar endpoint admin `GET /api/admin/metrics`.
+- Criar export privado `GET /api/admin/metrics/export.csv` com o mesmo RBAC e intervalo.
 - Validar intervalo temporal opcional.
 - Agregar contagens por coleção.
 - Criar cliente frontend `metricsApi`.
@@ -47,7 +48,7 @@ Como se trata de administração, a regra é minimizar exposição. O painel nã
 #### Scope-out
 
 - Gráficos avançados.
-- Exportação PDF/CSV.
+- Exportação PDF ou ficheiros com linhas pessoais.
 - Dados pessoais individuais.
 - Monitorização técnica de infraestrutura.
 - Alertas automáticos.
@@ -56,7 +57,8 @@ Como se trata de administração, a regra é minimizar exposição. O painel nã
 
 Antes deste BK, a administração consegue gerir utilizadores, associações e pool, mas não tem visão agregada de operação.
 
-Depois deste BK, existe um endpoint admin com métricas agregadas e uma página frontend para leitura rápida.
+Depois deste BK, existe um endpoint admin com métricas agregadas, dashboard
+operacional e exportação CSV igualmente agregada.
 
 #### Pré-requisitos
 
@@ -88,6 +90,7 @@ Na privacidade, todas as respostas são agregadas. Isto reduz risco de exposiç�
 | Camada | Contrato |
 | --- | --- |
 | Backend route | `GET /api/admin/metrics?from=&to=` |
+| Export | `GET /api/admin/metrics/export.csv?from=&to=`; `text/csv`, privado, sem PII |
 | Autorização | `requireRole(["admin"])` |
 | Validator | `assertMetricsRange(query)` |
 | Service | `getAdminMetrics(query)` |
@@ -433,6 +436,28 @@ export async function getAdminMetricsController(req, res) {
         metrics: await getAdminMetrics(req.query),
     });
 }
+
+function metricsToCsv(metrics) {
+    const rows = [
+        ["metric", "value"],
+        ["users.total", metrics.users.total],
+        ["catalog.published", metrics.catalog.published],
+        ["subscriptions.active", metrics.subscriptions.active],
+        ["subscriptions.familyMembers", metrics.subscriptions.familyMembers],
+        ["solidarity.approvedCharities", metrics.solidarity.approvedCharities],
+        ["solidarity.distributedCents", metrics.solidarity.distributedCents],
+        ["integrations.enabled", metrics.integrations.enabled],
+    ];
+    return rows.map((row) => row.join(",")).join("\n");
+}
+
+export async function exportMetricsCsv(req, res) {
+    const metrics = await getAdminMetrics(req.query);
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="faithflix-metricas.csv"');
+    res.setHeader("Cache-Control", "private, no-store");
+    return res.status(200).send(metricsToCsv(metrics));
+}
 ```
 
 ```js
@@ -440,7 +465,7 @@ export async function getAdminMetricsController(req, res) {
 import { Router } from "express";
 import { asyncHandler } from "../../utils/async-handler.js";
 import { requireRole } from "../../middlewares/auth.middleware.js";
-import { getAdminMetricsController } from "./admin-metrics.controller.js";
+import { exportMetricsCsv, getAdminMetricsController } from "./admin-metrics.controller.js";
 
 export const adminMetricsRouter = Router();
 
@@ -448,6 +473,11 @@ adminMetricsRouter.get(
     "/",
     requireRole(["admin"]),
     asyncHandler(getAdminMetricsController),
+);
+adminMetricsRouter.get(
+    "/export.csv",
+    requireRole(["admin"]),
+    asyncHandler(exportMetricsCsv),
 );
 ```
 
@@ -513,6 +543,16 @@ export const metricsApi = {
             options,
         );
     },
+    exportCsv(filters = {}, options = {}) {
+        const params = new URLSearchParams();
+        if (filters.from) params.set("from", filters.from);
+        if (filters.to) params.set("to", filters.to);
+        const query = params.toString();
+        return apiClient.download(
+            `/api/admin/metrics/export.csv${query ? `?${query}` : ""}`,
+            options,
+        );
+    },
 };
 ```
 
@@ -545,6 +585,9 @@ export function AdminMetricsPage() {
     const [draftFilters, setDraftFilters] = useState(EMPTY_FILTERS);
     const [appliedFilters, setAppliedFilters] = useState(EMPTY_FILTERS);
     const [retryVersion, setRetryVersion] = useState(0);
+    const [exporting, setExporting] = useState(false);
+    const [exportStatus, setExportStatus] = useState("");
+    const exportControllerRef = useRef(null);
     const requestVersionRef = useRef(0);
 
     useEffect(() => {
@@ -582,6 +625,8 @@ export function AdminMetricsPage() {
         };
     }, [appliedFilters, retryVersion]);
 
+    useEffect(() => () => exportControllerRef.current?.abort(), []);
+
     /**
      * Valida e aplica os campos visíveis sem reutilizar uma leitura antiga.
      *
@@ -597,6 +642,31 @@ export function AdminMetricsPage() {
 
         // Um novo objeto agenda também a repetição intencional do mesmo intervalo.
         setAppliedFilters({ ...draftFilters });
+    }
+
+    async function handleExport() {
+        if (exporting) return;
+        const controller = new AbortController();
+        exportControllerRef.current = controller;
+        setExporting(true);
+        setExportStatus("");
+        try {
+            const file = await metricsApi.exportCsv(appliedFilters, { signal: controller.signal });
+            const url = URL.createObjectURL(file.blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = file.filename || "faithflix-metricas.csv";
+            link.click();
+            URL.revokeObjectURL(url);
+            setExportStatus("Exportação CSV preparada.");
+        } catch (requestError) {
+            if (requestError?.code !== "REQUEST_ABORTED") setError(toUserMessage(requestError));
+        } finally {
+            if (exportControllerRef.current === controller) {
+                exportControllerRef.current = null;
+                setExporting(false);
+            }
+        }
     }
 
     return (
@@ -628,7 +698,12 @@ export function AdminMetricsPage() {
                     />
                 </label>
                 <button type="submit" disabled={loading}>Atualizar</button>
+                <button type="button" disabled={loading || exporting} onClick={handleExport}>
+                    {exporting ? "A exportar..." : "Exportar CSV"}
+                </button>
             </form>
+
+            {exportStatus ? <p role="status">{exportStatus}</p> : null}
 
             {loading ? <p role="status">A carregar métricas...</p> : null}
             {!loading && error ? (
@@ -655,12 +730,14 @@ export function AdminMetricsPage() {
                     </article>
                     <article>
                         <h2>Conteúdos</h2>
-                        <p>Publicados: {metrics.content.published}</p>
+                        <p>Publicados: {metrics.catalog.published}</p>
+                        <p>Media pendente: {metrics.catalog.mediaPending}</p>
                     </article>
                     <article>
                         <h2>Subscrições</h2>
                         <p>Ativas: {metrics.subscriptions.active}</p>
                         <p>Períodos experimentais: {metrics.subscriptions.trialing}</p>
+                        <p>Membros familiares: {metrics.subscriptions.familyMembers}</p>
                     </article>
                     <article>
                         <h2>Notificações</h2>
@@ -673,11 +750,16 @@ export function AdminMetricsPage() {
                     </article>
                     <article>
                         <h2>Associações</h2>
-                        <p>Elegíveis: {metrics.charities.approvedInPool}</p>
+                        <p>Elegíveis: {metrics.solidarity.approvedCharities}</p>
                         <p>
                             Total solidário:{" "}
-                            {moneyFormatter.format(metrics.charities.solidarityCents / 100)}
+                            {moneyFormatter.format(metrics.solidarity.distributedCents / 100)}
                         </p>
+                    </article>
+                    <article>
+                        <h2>Integrações</h2>
+                        <p>Ativas: {metrics.integrations.enabled}/{metrics.integrations.total}</p>
+                        <p>Inválidas: {metrics.integrations.invalid}</p>
                     </article>
                 </div>
             ) : null}
@@ -788,10 +870,14 @@ Se `from` for posterior a `to`, o teste falha de propósito porque o backend dev
 #### Critérios de aceite
 
 - `GET /api/admin/metrics` existe.
+- `GET /api/admin/metrics/export.csv` exige admin, reutiliza o intervalo e
+  devolve `text/csv` agregado com `private, no-store`, sem nomes/emails.
 - A rota exige admin.
 - Filtros temporais aceitam apenas valores escalares `YYYY-MM-DD`, com calendário real,
   ordem válida e intervalo máximo de 366 dias.
 - A resposta contém apenas métricas agregadas.
+- A resposta inclui os domínios `catalog`, `subscriptions`/família,
+  `solidarity` e `integrations`, usados também pelo dashboard `/admin`.
 - Utilizadores ativos exigem `accountStatus: "active"` e não aceitam um
   `status` legacy bloqueado/inativo; estado canónico ausente ou desconhecido
   falha fechado.
@@ -825,6 +911,7 @@ Depois valida no browser:
 - `pr`: referência do commit ou PR.
 - `proof`: output do teste de validação.
 - `proof`: captura de `/admin/metricas`.
+- `proof`: CSV agregado do mesmo intervalo, revisto sem PII.
 - `neg`: utilizador sem admin recebe `403`.
 - `neg`: array, vazio explícito, data impossível, campo desconhecido, inversão
   ou mais de 366 dias devolvem `400`.
@@ -839,6 +926,9 @@ Depois valida no browser:
 deve cobrir submit, retry, cancelamento e resposta fora de ordem.
 
 #### Changelog
+
+- `2026-07-12`: métricas expandidas para dashboard operacional e exportação CSV
+  privada/cancelável, sem linhas pessoais.
 
 - `2026-04-13`: criado guia base com contrato pedagógico v3.
 - `2026-06-16`: guia reescrito com métricas agregadas, rota admin, frontend e teste.

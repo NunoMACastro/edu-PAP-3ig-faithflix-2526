@@ -18,12 +18,13 @@
 - `excluded_implementation_roots`: `backend`, `frontend`
 - `baseline_commit`: `1f33e61d1751fcae702ee92d1865fccfe295a0e0`
 - `data_inicio`: `2026-07-09`
+- `data_ultima_revalidacao_documental`: `2026-07-12`
 - `commits_permitidos`: `nao`
 - `migracao_db_atual_permitida`: `nao`
 - `seed_db_atual_permitida`: `nao`
 - `gate_maximo`: `GO_LOCAL_COM_RESSALVAS`
 - `gate_producao`: `NO_GO_PRODUCAO`
-- `fase_ativa`: `FASE_9_DOCUMENTAL_VALIDADA`
+- `fase_ativa`: `FECHO_DOCUMENTAL_POS_REMEDIACAO_ADMIN_VALIDADO`
 - `fase_documental_estado`: `VALIDADO`
 - `subfase_documental_ativa`: `-`
 - `estado_execucao`: `BLOQUEADO_PRODUTO`
@@ -34,6 +35,29 @@
 O worktree ja continha alteracoes do utilizador antes desta correcao. Em particular, existiam alteracoes em `backend/`, `frontend/`, `mockup/`, `package.json`, `playwright.config.js` e varios documentos/evidences. Essas alteracoes sao pre-existentes, pertencem ao utilizador e nao podem ser limpas, revertidas ou atribuidas a esta execucao.
 
 `git check-ignore -v` confirmou que `real_dev/` e ignorado por `.gitignore:2` (`# Prof`). Por decisao do utilizador, a referencia docente permanece privada e ignorada neste repositorio.
+
+### Checkpoint corrente pós-remediação administrativa — 2026-07-12
+
+Este checkpoint substitui apenas o resumo documental corrente; as execuções e
+contagens datadas de 2026-07-10 permanecem abaixo como histórico imutável.
+
+- A implementação de referência continuou congelada durante esta correção.
+- O fecho funcional/UX posterior está documentado em
+  `docs/evidence/AUDITORIA-UI-UX-AREA-ADMIN-2026-07-12.md`, agora com metadata
+  D0 e fronteira explícita entre decisão atual e baseline anterior.
+- O contrato ativo passou a refletir landing por role, `AdminLayout` dedicado,
+  catálogo/passagens list-first, preview financeira com `previewToken`, motivo
+  humano de rejeição, lookup nominal de memberships, CSV agregado e drafts de
+  integrações.
+- `npm run test:docs` passou com `66` BK, `66` guias, `94` requisitos, `10` MF
+  views e `33` evidences.
+- `python3 scripts/test_validate_planificacao_negatives.py` passou com baseline
+  verde e `150/150` classes de drift isoladas recusadas.
+- `NO_GO_PRODUCAO`, bloqueios de credencial/replica set/restore e limites de
+  media/infraestrutura mantêm-se. A correção documental não os reclassifica.
+
+Decisão corrente: `DOCUMENTACAO_ALINHADA_COM_REAL_DEV_FECHADO` e
+`GO_LOCAL_COM_RESSALVAS`; produção continua `NO_GO_PRODUCAO`.
 
 ## 2. Decisoes vinculativas
 

@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF1-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF1/BK-MF1-02-estrutura-base-frontend-componentes.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
@@ -345,6 +345,7 @@ const TITLES = [
     { path: "/", title: "Início" },
     { path: "/catalogo", title: "Catálogo" },
     { path: "/catalogo/:idOrSlug", title: "Detalhe do conteúdo" },
+    { path: "/catalogo/:seriesSlug/episodios/:episodeSlug", title: "Detalhe do episódio" },
     { path: "/ver/:contentId", title: "Reprodução" },
     { path: "/login", title: "Entrar" },
     { path: "/associacoes", title: "Associações" },
@@ -356,7 +357,15 @@ const TITLES = [
     { path: "/pesquisa", title: "Pesquisa" },
     { path: "/para-si", title: "Para si" },
     { path: "/biblioteca", title: "Biblioteca" },
+    { path: "/admin", title: "Dashboard administrativo" },
     { path: "/admin/catalogo", title: "Administração do catálogo" },
+    { path: "/admin/catalogo/novo", title: "Novo conteúdo" },
+    { path: "/admin/catalogo/:contentId/editar", title: "Editar conteúdo" },
+    { path: "/admin/catalogo/taxonomias", title: "Taxonomias do catálogo" },
+    { path: "/admin/passagens-biblicas", title: "Administração de passagens bíblicas" },
+    { path: "/admin/passagens-biblicas/novo", title: "Nova passagem bíblica" },
+    { path: "/admin/passagens-biblicas/:passageId/editar", title: "Editar passagem bíblica" },
+    { path: "/admin/passagens-biblicas/associacoes", title: "Associações de passagens bíblicas" },
     { path: "/admin/utilizadores", title: "Administração de utilizadores" },
     { path: "/admin/charity-applications", title: "Candidaturas" },
     { path: "/admin/pool/distribution", title: "Distribuição da pool" },
@@ -1210,6 +1219,8 @@ Abrir no browser as rotas principais e confirmar que nao ha erros na consola.
 - `BK-MF2-03` e `BK-MF2-04` podem substituir o catalogo controlado por dados reais, mantendo rotas e layout.
 
 #### Changelog
+
+- `2026-07-12`: registry final de títulos alinhado ao episódio canónico e ao backoffice com dashboard e rotas editoriais list-first.
 
 - `2026-07-10`: router final consolidado com páginas lazy, ErrorBoundary,
   títulos por rota e lifecycle acessível dependente apenas do pathname.

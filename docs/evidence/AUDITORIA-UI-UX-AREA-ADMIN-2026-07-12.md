@@ -1,5 +1,11 @@
 # Auditoria UI/UX da área administrativa — FaithFlix
 
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: remediação e revalidação local do backoffice em `real_dev`; não prova produção, DB externa, browsers branded ou dispositivos físicos
+
 - Data: 2026-07-12
 - Implementação auditada: `real_dev/frontend` e contratos de autorização em `real_dev/backend`
 - Âmbito: auditoria, remediação integral e revalidação
@@ -18,7 +24,7 @@ original.
 
 | Finding | Estado | Evidência de correção |
 | --- | --- | --- |
-| `ADM-UX-001` | Fechado | `PublicLayout` e `AdminLayout` separados; rotas admin sem header/footer públicos. |
+| `ADM-UX-001` | Fechado | `AppLayout` e `AdminLayout` separados; rotas admin sem header/footer públicos. |
 | `ADM-UX-002` | Fechado | Landing centralizada: admin em `/admin`, moderator em `/admin/catalogo`, com precedência de `next` interno seguro. |
 | `ADM-UX-003` | Fechado | Sidebar desktop e drawer a `<=1024px`; nenhum controlo fora do viewport na matriz 320–2048 px. |
 | `ADM-UX-004` | Fechado | Drawer modal com scroll próprio; topbar manteve 68 px em todos os breakpoints medidos. |

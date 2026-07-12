@@ -17,11 +17,13 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF7-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-02-navegacao-segura-por-sessao-e-perfil.md`
-- `last_updated`: `2026-07-10`
+- `last_updated`: `2026-07-12`
 
 #### Objetivo
 
-Neste BK vais criar um contexto de sessão no frontend, chamar `authApi.me()`, distinguir visitante, utilizador autenticado e administrador, esconder links administrativos indevidos e proteger rotas administrativas com uma guarda visual.
+Neste BK vais criar um contexto de sessão no frontend, chamar `authApi.me()`,
+distinguir visitante, utilizador autenticado e staff, proteger rotas
+administrativas e separar o backoffice da navegação pública.
 
 O resultado observável é `docs/evidence/MF7/NAVEGACAO-SEGURA-POR-PERFIL.md`, com provas de que visitante e utilizador comum não veem nem abrem áreas admin, enquanto o backend continua a devolver `401` e `403` nas operações críticas.
 
@@ -36,7 +38,8 @@ Este BK fecha o risco visual mais crítico da MF7: uma interface que mostra link
 - Criar `SessionContext` para carregar a sessão atual através de `authApi.me()`.
 - Envolver a aplicação com `SessionProvider`.
 - Criar `AdminRoute` para bloquear visualmente páginas admin.
-- Filtrar links do header conforme o perfil.
+- Criar `AdminLayout` e `AdminNavigation` com grupos filtrados por role.
+- Manter o `AppHeader` exclusivamente público/pessoal.
 - Provar negativos de visitante e utilizador comum.
 
 #### Scope-out
@@ -54,7 +57,8 @@ Este BK fecha o risco visual mais crítico da MF7: uma interface que mostra link
 - Estado antes: o header pode apresentar links administrativos sem contexto de perfil.
 - Estado depois: o frontend conhece `loading`, `anonymous`, `authenticated` e
   `unavailable`; `admin` é uma role derivada do utilizador autenticado.
-- Estado depois: rotas admin têm guarda visual e o backend continua a ser a autoridade final.
+- Estado depois: rotas admin têm guarda visual, shell próprio e landing por role;
+  o backend continua a ser a autoridade final.
 
 #### Pré-requisitos
 
@@ -107,8 +111,9 @@ em que uma falha operacional seja convertida em logout ou em sessão anónima.
 | Backend | `backend/src/middlewares/auth.middleware.js` | Mantém `401` e `403` nas rotas protegidas. |
 | Frontend | `frontend/src/context/SessionContext.jsx` | Carrega e partilha sessão atual. |
 | Frontend | `frontend/src/components/auth/AdminRoute.jsx` | Bloqueia visualmente páginas admin. |
-| Frontend | `frontend/src/components/layout/AppHeader.jsx` | Filtra links por perfil. |
-| Frontend | `frontend/src/routes/AppRoutes.jsx` | Envolve rotas admin com guarda visual. |
+| Frontend | `frontend/src/layouts/AdminLayout.jsx` | Separa shell, foco, breadcrumb e drawer administrativos. |
+| Frontend | `frontend/src/components/admin/AdminNavigation.jsx` | Agrupa e filtra links por role. |
+| Frontend | `frontend/src/routes/AppRoutes.jsx` | Compõe layout e guards numa árvore `/admin`. |
 | Evidence | `docs/evidence/MF7/NAVEGACAO-SEGURA-POR-PERFIL.md` | Provas positivas e negativas. |
 
 #### Ficheiros a criar/editar/rever
@@ -116,7 +121,8 @@ em que uma falha operacional seja convertida em logout ou em sessão anónima.
 - CRIAR: `frontend/src/context/SessionContext.jsx`
 - CRIAR: `frontend/src/components/auth/AdminRoute.jsx`
 - EDITAR: `frontend/src/main.jsx`
-- EDITAR: `frontend/src/components/layout/AppHeader.jsx`
+- CRIAR: `frontend/src/layouts/AdminLayout.jsx`
+- CRIAR: `frontend/src/components/admin/AdminNavigation.jsx`
 - EDITAR: `frontend/src/routes/AppRoutes.jsx`
 - REVER: `frontend/src/services/api/authApi.js`
 - REVER: `frontend/src/services/api/apiClient.js`
@@ -410,30 +416,30 @@ Se o backend ficar indisponível, o estado esperado é `unavailable`, não
 mensagem `useSession deve ser usado dentro de SessionProvider.` indica uma
 integração incompleta.
 
-### Passo 3 - Filtrar header e proteger rotas admin
+### Passo 3 - Criar o shell administrativo e proteger rotas
 
 1. Objetivo funcional do passo no contexto da app.
 
-Esconder links privilegiados para visitantes/utilizadores comuns, permitir ao
-`moderator` apenas a gestão de catálogo e manter as restantes áreas exclusivas
-de `admin`.
+Separar a experiência administrativa da pública, permitir ao `moderator` apenas
+a gestão editorial e manter as restantes áreas exclusivas de `admin`.
 
 2. Ficheiros envolvidos.
     - CRIAR: `frontend/src/components/auth/AuthenticatedRoute.jsx`
     - CRIAR: `frontend/src/components/auth/AdminRoute.jsx`
-    - EDITAR: `frontend/src/components/layout/AppHeader.jsx`
+    - CRIAR: `frontend/src/components/admin/AdminNavigation.jsx`
+    - CRIAR: `frontend/src/layouts/AdminLayout.jsx`
     - EDITAR: `frontend/src/routes/AppRoutes.jsx`
     - LOCALIZAÇÃO: criar os dois componentes completos e fazer apenas a composição
       indicada na tabela de rotas já existente.
 
 3. Instruções do que fazer.
 
-Cria `AuthenticatedRoute.jsx` e `AdminRoute.jsx`, substitui a lista de links do
-header por links com `visibility`, envolve as páginas pessoais com a primeira
-guarda e todas as páginas `/admin/...` com a segunda. Em
-`AppRoutes.jsx` não substituas o router nem os imports lazy construídos em
-`BK-MF1-02`: a alteração deste BK é apenas o import da guarda e a composição do
-valor `element` das rotas administrativas.
+Cria `AuthenticatedRoute.jsx` e `AdminRoute.jsx`. Mantém `AppHeader` apenas para
+rotas públicas/pessoais e cria `AdminNavigation` com grupos por role. O
+`AdminLayout` fornece sidebar desktop, drawer modal móvel, breadcrumb, logout e
+um único context switch `Ver site público`. Em `AppRoutes.jsx`, compõe este
+layout numa árvore `/admin` sem substituir os imports lazy, `Suspense`,
+`ErrorBoundary` ou `RouteLifecycle` construídos em `BK-MF1-02`.
 
 4. Código completo, correto e integrado com a app final.
 
@@ -519,114 +525,77 @@ export function AdminRoute({ children, allowedRoles = ["admin"] }) {
 ```
 
 ```jsx
-// frontend/src/components/layout/AppHeader.jsx
-/**
- * @file Cabeçalho principal com navegação FaithFlix filtrada por sessão.
- */
+// frontend/src/components/admin/AdminNavigation.jsx
+import { NavLink } from "react-router-dom";
+import { useSession } from "../../context/SessionContext.jsx";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+export const ADMIN_NAVIGATION_GROUPS = [
+  // A lista fechada torna a matriz role -> grupo auditável sem espalhar condições pelos links.
+  { label: "Visão geral", roles: ["admin"], items: [{ to: "/admin", label: "Dashboard", end: true }] },
+  { label: "Conteúdo", roles: ["admin", "moderator"], items: [
+    { to: "/admin/catalogo", label: "Catálogo" },
+    { to: "/admin/passagens-biblicas", label: "Passagens bíblicas" },
+  ] },
+  { label: "Utilizadores", roles: ["admin"], items: [
+    { to: "/admin/utilizadores", label: "Contas e permissões" },
+  ] },
+  { label: "Solidariedade", roles: ["admin"], items: [
+    { to: "/admin/charity-applications", label: "Candidaturas" },
+    { to: "/admin/charity-members", label: "Membros" },
+    { to: "/admin/pool/distribution", label: "Distribuição mensal" },
+    { to: "/admin/pool/dashboard", label: "Histórico da pool" },
+  ] },
+  { label: "Operação", roles: ["admin"], items: [
+    { to: "/admin/metricas", label: "Métricas" },
+    { to: "/admin/integracoes", label: "Integrações" },
+  ] },
+];
+
+export function AdminNavigation({ onNavigate }) {
+  const { user } = useSession();
+  // Filtrar o grupo inteiro evita renderizar headings vazios para moderator.
+  return (
+    <nav aria-label="Navegação administrativa">
+      {ADMIN_NAVIGATION_GROUPS.filter((group) => group.roles.includes(user?.role)).map((group) => (
+        <section key={group.label}>
+          <h2>{group.label}</h2>
+          {group.items.map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end} onClick={onNavigate}>
+              {item.label}
+            </NavLink>
+          ))}
+        </section>
+      ))}
+    </nav>
+  );
+}
+```
+
+```jsx
+// frontend/src/components/layout/SessionActionButton.jsx
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSession } from "../../context/SessionContext.jsx";
 import { toUserMessage } from "../../services/api/apiErrors.js";
 
-const navItems = [
-  { to: "/", label: "Início", visibility: "public" },
-  { to: "/catalogo", label: "Catálogo", visibility: "public" },
-  { to: "/pesquisa", label: "Pesquisa", visibility: "public" },
-  { to: "/para-si", label: "Para si", visibility: "authenticated" },
-  { to: "/biblioteca", label: "Biblioteca", visibility: "authenticated" },
-  { to: "/notificacoes", label: "Notificações", visibility: "authenticated" },
-  { to: "/associacoes", label: "Associações", visibility: "public" },
-  { to: "/planos", label: "Planos", visibility: "public" },
-  { to: "/conta", label: "Conta", visibility: "authenticated" },
-  { to: "/admin/catalogo", label: "Admin catálogo", visibility: "catalog-manager" },
-  { to: "/admin/utilizadores", label: "Admin utilizadores", visibility: "admin" },
-  { to: "/admin/metricas", label: "Métricas", visibility: "admin" },
-  { to: "/admin/integracoes", label: "Integrações", visibility: "admin" },
-  { to: "/admin/charity-applications", label: "Candidaturas", visibility: "admin" },
-  { to: "/admin/pool/distribution", label: "Distribuição", visibility: "admin" },
-  { to: "/admin/pool/dashboard", label: "Pool solidária", visibility: "admin" },
-  { to: "/admin/charity-members", label: "Membros", visibility: "admin" },
-];
-
-/**
- * Devolve a classe CSS de um item de navegação conforme o estado da rota.
- *
- * @param {{ isActive: boolean }} routeState Estado passado pelo React Router.
- * @returns {string} Classes CSS da ligação.
- */
-function getNavLinkClassName({ isActive }) {
-  return isActive ? "nav-link nav-link-active" : "nav-link";
-}
-
-/**
- * Decide se um item pode aparecer para o perfil atual.
- *
- * @param {{ visibility: string }} item Item de navegação.
- * @param {{ status: string, isAdmin: boolean, isModerator: boolean }} session Estado de sessão.
- * @returns {boolean} Verdadeiro quando o link deve ser visível.
- */
-function canShowNavItem(item, session) {
-  if (item.visibility === "public") return true;
-  if (item.visibility === "authenticated") return session.status === "authenticated";
-  if (item.visibility === "catalog-manager") {
-    return session.status === "authenticated"
-      && (session.isAdmin || session.isModerator);
-  }
-  if (item.visibility === "admin") {
-    return session.status === "authenticated" && session.isAdmin;
-  }
-  return false;
-}
-
-/**
- * Renderiza o cabeçalho visível em todas as páginas.
- *
- * @returns {JSX.Element} Cabeçalho com marca e navegação filtrada.
- */
-export function AppHeader() {
+export function SessionActionButton() {
   const session = useSession();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const [loggingOut, setLoggingOut] = useState(false);
   const loggingOutRef = useRef(false);
-  const [logoutError, setLogoutError] = useState("");
-  const [menuOpen, setMenuOpen] = useState(false);
-  const toggleRef = useRef(null);
-  const menuId = useId();
-  const visibleItems = navItems.filter((item) => canShowNavItem(item, session));
-
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (!menuOpen) return undefined;
-
-    function handleEscape(event) {
-      if (event.key !== "Escape") return;
-      setMenuOpen(false);
-      toggleRef.current?.focus();
-    }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [menuOpen]);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleLogout() {
     if (loggingOutRef.current) return;
     loggingOutRef.current = true;
     setLoggingOut(true);
-    setLogoutError("");
-
+    setError("");
     try {
-      // Só terminamos a navegação depois de a sessão ter sido revogada no servidor.
+      // Só navega depois da revogação remota; uma falha mantém a sessão visível.
       await session.logout();
-      setMenuOpen(false);
       navigate("/", { replace: true });
     } catch (requestError) {
-      // Uma falha operacional mantém a identidade local e permite repetir a ação.
-      setLogoutError(toUserMessage(requestError));
+      setError(toUserMessage(requestError));
     } finally {
       loggingOutRef.current = false;
       setLoggingOut(false);
@@ -634,88 +603,87 @@ export function AppHeader() {
   }
 
   return (
-    <header className="app-header">
-      <NavLink className="brand-link" to="/" aria-label="FaithFlix - início">
-        <span className="brand-mark" aria-hidden="true">F</span>
-        <span className="brand-name">FaithFlix</span>
-      </NavLink>
-
-      <button
-        ref={toggleRef}
-        className="menu-toggle"
-        type="button"
-        aria-expanded={menuOpen}
-        aria-controls={menuId}
-        onClick={() => setMenuOpen((open) => !open)}
-      >
-        {menuOpen ? "Fechar menu" : "Abrir menu"}
+    <div>
+      <button type="button" disabled={loggingOut} onClick={handleLogout}>
+        {loggingOut ? "A sair..." : "Sair"}
       </button>
+      {error ? <p role="alert">{error}</p> : null}
+    </div>
+  );
+}
+```
 
-      <nav
-        id={menuId}
-        className="main-nav"
-        data-open={menuOpen ? "true" : "false"}
-        aria-label="Navegação principal"
+```jsx
+// frontend/src/layouts/AdminLayout.jsx
+import { useEffect, useRef, useState } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { SkipLink } from "../components/a11y/SkipLink.jsx";
+import { AdminNavigation } from "../components/admin/AdminNavigation.jsx";
+import { SessionActionButton } from "../components/layout/SessionActionButton.jsx";
+
+export function AdminLayout() {
+  const { pathname } = useLocation();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const dialogRef = useRef(null);
+  const menuButtonRef = useRef(null);
+
+  useEffect(() => setDrawerOpen(false), [pathname]);
+  useEffect(() => {
+    // O dialog nativo oferece Escape e isolamento modal sem uma dependência nova.
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (drawerOpen && !dialog.open) dialog.showModal();
+    if (!drawerOpen && dialog.open) dialog.close();
+  }, [drawerOpen]);
+
+  return (
+    <div className="admin-shell">
+      <SkipLink />
+      <aside className="admin-sidebar">
+        <Link to="/admin">FaithFlix <small>Administração</small></Link>
+        <AdminNavigation />
+        <a href="/" target="_blank" rel="noreferrer">Ver site público</a>
+      </aside>
+      <div className="admin-workspace">
+        <header className="admin-topbar">
+          <button ref={menuButtonRef} type="button" onClick={() => setDrawerOpen(true)}>
+            Menu
+          </button>
+          <p aria-label="Breadcrumb">Administração / {pathname.split("/").filter(Boolean).slice(1).join(" / ")}</p>
+          <SessionActionButton />
+        </header>
+        <main id="conteudo-principal" tabIndex={-1}><Outlet /></main>
+      </div>
+      <dialog
+        ref={dialogRef}
+        aria-label="Navegação administrativa"
+        onCancel={(event) => { event.preventDefault(); setDrawerOpen(false); }}
+        onClose={() => menuButtonRef.current?.focus()}
       >
-        {visibleItems.map((item) => (
-          <NavLink
-            key={item.to}
-            className={getNavLinkClassName}
-            to={item.to}
-            onClick={() => setMenuOpen(false)}
-          >
-            {item.label}
-          </NavLink>
-        ))}
-        {session.status === "anonymous" ? (
-          <NavLink
-            className={getNavLinkClassName}
-            to="/login"
-            onClick={() => setMenuOpen(false)}
-          >
-            Entrar
-          </NavLink>
-        ) : null}
-        {session.status === "authenticated" ? (
-          <button type="button" disabled={loggingOut} onClick={handleLogout}>
-            {loggingOut ? "A sair..." : "Sair"}
-          </button>
-        ) : null}
-      </nav>
-      {session.status === "unavailable" ? (
-        <div role="alert">
-          <p>{session.error || "Não foi possível confirmar a sessão."}</p>
-          <button type="button" onClick={() => session.refreshSession().catch(() => {})}>
-            Tentar confirmar sessão
-          </button>
-        </div>
-      ) : null}
-      {logoutError ? <p role="alert">{logoutError}</p> : null}
-    </header>
+        <button type="button" onClick={() => setDrawerOpen(false)}>Fechar</button>
+        <AdminNavigation onNavigate={() => setDrawerOpen(false)} />
+        <a href="/" target="_blank" rel="noreferrer">Ver site público</a>
+      </dialog>
+    </div>
   );
 }
 ```
 
 5. Explicação do código.
 
-`AdminRoute` distingue os quatro estados: loading, visitante, indisponibilidade
-com retry e sessão confirmada sem permissão. `unavailable` nunca redireciona para
-login nem se apresenta como `403`. `AppHeader` usa `visibility` por link e não
-mostra CTAs privados enquanto a sessão está incerta. O login continua
-alcançável para visitantes, `/notificacoes` e todas as áreas admin ficam na
-navegação autorizada, e `handleLogout` só navega/limpa depois de sucesso ou
-`401`; uma falha operacional mantém a sessão e mostra retry. A barreira de
-segurança essencial continua no backend. Em ecrã estreito, o botão semântico
-expõe `aria-expanded`/`aria-controls`; mudar de rota fecha o menu e `Escape`
-fecha-o devolvendo o foco ao botão.
+`AdminRoute` distingue loading, visitante, indisponibilidade com retry e sessão
+sem permissão. `AdminNavigation` filtra grupos pela role confirmada e
+`AdminLayout` impede que o backoffice herde o header/footer público. O `dialog`
+trata Escape nativamente, fecha ao navegar e devolve foco ao botão. A barreira
+de segurança essencial continua no backend.
 
 6. Validação do passo.
 
 Valida manualmente três perfis e uma falha operacional:
 
-- visitante: não vê links de conta privada nem admin;
-- utilizador comum: vê áreas autenticadas, mas não vê admin;
-- admin: vê os links admin.
+- visitante e user: não montam `AdminLayout`;
+- moderator: entra em `/admin/catalogo` e vê apenas o grupo Conteúdo;
+- admin: entra em `/admin`, vê os cinco grupos e um único `Ver site público`;
 - backend indisponível: não vê links privados/login automático, recebe mensagem
   segura e consegue repetir a leitura da sessão.
 - logout com sucesso: mostra `Sair`, termina a sessão e navega para `/`;
@@ -738,11 +706,11 @@ Garantir que todas as rotas admin usam a guarda visual e deixar prova objetiva p
 
 3. Instruções do que fazer.
 
-Importa `AuthenticatedRoute` e `AdminRoute` em `AppRoutes.jsx`. Envolve todas as
-rotas pessoais e administrativas na tabela que já existe. Mantém sem alterações `lazy`, `Suspense`,
-`ErrorBoundary`, `RouteLifecycle`, `AppLayout`, todas as rotas públicas e todos
-os componentes de página já declarados. Depois cria a evidence com a matriz
-abaixo.
+Importa `AuthenticatedRoute`, `AdminRoute` e `AdminLayout` em `AppRoutes.jsx`.
+Envolve as rotas pessoais e cria uma árvore nested `/admin` guardada para
+`admin|moderator`. Mantém sem alterações `lazy`, `Suspense`, `ErrorBoundary`,
+`RouteLifecycle`, `AppLayout`, todas as rotas públicas e os componentes já
+declarados. Depois cria a evidence com a matriz abaixo.
 
 Antes de editar os `element`, confirma que cada binding já foi declarado por
 `lazyNamedPage` no BK proprietário. Não voltes a declarar nenhum destes nomes
@@ -750,7 +718,9 @@ em MF7:
 
 | Binding lazy já existente | BK proprietário |
 | --- | --- |
-| `AdminCatalogPage` | `BK-MF2-03` |
+| `AdminDashboardPage` | fecho administrativo da referência |
+| `AdminCatalogListPage`, `AdminCatalogCreatePage`, `AdminCatalogEditPage`, `AdminTaxonomiesPage` | `BK-MF2-03` + decomposição final |
+| `AdminBiblicalPassagesListPage`, `AdminBiblicalPassagesPage` | catálogo/passagens + decomposição final |
 | `AdminUsersPage` | `BK-MF2-02` |
 | `AdminMetricsPage` | `BK-MF5-05` |
 | `AdminIntegrationsPage` | `BK-MF5-06` |
@@ -769,6 +739,10 @@ guia. Não compenses a falta com um `import ...Page from` eager.
 // ADICIONAR junto dos imports existentes; não substituir os imports lazy.
 import { AdminRoute } from "../components/auth/AdminRoute.jsx";
 import { AuthenticatedRoute } from "../components/auth/AuthenticatedRoute.jsx";
+import { useSession } from "../context/SessionContext.jsx";
+import { AdminLayout } from "../layouts/AdminLayout.jsx";
+// ADICIONAR `Navigate` ao import existente de `react-router-dom`.
+import { Navigate } from "react-router-dom";
 
 function withAuthenticatedRoute(page) {
   return <AuthenticatedRoute>{page}</AuthenticatedRoute>;
@@ -784,11 +758,18 @@ function withAdminRoute(page, allowedRoles = ["admin"]) {
   // A composição não altera como a página é importada nem o lifecycle da rota.
   return <AdminRoute allowedRoles={allowedRoles}>{page}</AdminRoute>;
 }
+
+function AdminIndexRoute() {
+  const { user } = useSession();
+  // Moderator não recebe o dashboard reservado ao admin.
+  if (user?.role === "moderator") return <Navigate to="/admin/catalogo" replace />;
+  return <AdminDashboardPage />;
+}
 ```
 
 ```jsx
 // frontend/src/routes/AppRoutes.jsx
-// EDITAR apenas o valor `element` destas rotas na tabela existente.
+// MANTER estas rotas pessoais na árvore pública existente.
 <>
 <Route path="/para-si" element={withAuthenticatedRoute(<ForYouPage />)} />
 <Route path="/biblioteca" element={withAuthenticatedRoute(<MyLibraryPage />)} />
@@ -799,18 +780,27 @@ function withAdminRoute(page, allowedRoles = ["admin"]) {
   path="/associacoes/:charityId/historico"
   element={withAuthenticatedRoute(<CharityHistoryPage />)}
 />
-<Route
-  path="/admin/catalogo"
-  element={withAdminRoute(<AdminCatalogPage />, ["admin", "moderator"])}
-/>
-<Route path="/admin/utilizadores" element={withAdminRoute(<AdminUsersPage />)} />
-<Route path="/admin/metricas" element={withAdminRoute(<AdminMetricsPage />)} />
-<Route path="/admin/integracoes" element={withAdminRoute(<AdminIntegrationsPage />)} />
-<Route path="/admin/charity-applications" element={withAdminRoute(<AdminCharityApplicationsPage />)} />
-<Route path="/admin/pool/distribution" element={withAdminRoute(<AdminPoolDistributionPage />)} />
-<Route path="/admin/pool/dashboard" element={withAdminRoute(<AdminPoolDashboardPage />)} />
-<Route path="/admin/charity-members" element={withAdminRoute(<AdminCharityMembersPage />)} />
 </>
+
+// CRIAR uma única árvore administrativa fora de <Route element={<AppLayout />}>.
+<Route path="/admin" element={withAdminRoute(<AdminLayout />, ["admin", "moderator"])}>
+  <Route index element={<AdminIndexRoute />} />
+  <Route path="catalogo" element={<AdminCatalogListPage />} />
+  <Route path="catalogo/novo" element={<AdminCatalogCreatePage />} />
+  <Route path="catalogo/:contentId/editar" element={<AdminCatalogEditPage />} />
+  <Route path="catalogo/taxonomias" element={<AdminTaxonomiesPage />} />
+  <Route path="passagens-biblicas" element={<AdminBiblicalPassagesListPage />} />
+  <Route path="passagens-biblicas/novo" element={<AdminBiblicalPassagesPage />} />
+  <Route path="passagens-biblicas/:passageId/editar" element={<AdminBiblicalPassagesPage />} />
+  <Route path="passagens-biblicas/associacoes" element={<AdminBiblicalPassagesPage />} />
+  <Route path="utilizadores" element={withAdminRoute(<AdminUsersPage />)} />
+  <Route path="metricas" element={withAdminRoute(<AdminMetricsPage />)} />
+  <Route path="integracoes" element={withAdminRoute(<AdminIntegrationsPage />)} />
+  <Route path="charity-applications" element={withAdminRoute(<AdminCharityApplicationsPage />)} />
+  <Route path="pool/distribution" element={withAdminRoute(<AdminPoolDistributionPage />)} />
+  <Route path="pool/dashboard" element={withAdminRoute(<AdminPoolDashboardPage />)} />
+  <Route path="charity-members" element={withAdminRoute(<AdminCharityMembersPage />)} />
+</Route>
 ```
 
 ```md
@@ -833,21 +823,23 @@ function withAdminRoute(page, allowedRoles = ["admin"]) {
 
 | Perfil | Ação | Resultado esperado | Resultado observado | Estado |
 | --- | --- | --- | --- | --- |
-| Visitante | Abrir header | Não vê links admin | A preencher | A preencher |
+| Visitante | Abrir header público | Não vê links admin | A preencher | A preencher |
 | Visitante | Abrir /admin/metricas | Redireciona para /login | A preencher | A preencher |
-| Utilizador comum | Abrir header | Não vê links admin | A preencher | A preencher |
+| Utilizador comum | Abrir header público | Não vê links admin | A preencher | A preencher |
 | Utilizador comum | Abrir /admin/metricas | Mostra aviso de permissão | A preencher | A preencher |
-| Moderador | Abrir header | Vê apenas Admin catálogo | A preencher | A preencher |
+| Moderador | Login sem `next` | Entra em `/admin/catalogo` | A preencher | A preencher |
 | Moderador | Abrir /admin/catalogo | Vê gestão editorial | A preencher | A preencher |
 | Moderador | Abrir /admin/metricas | Mostra aviso de permissão | A preencher | A preencher |
-| Admin | Abrir header | Vê links admin | A preencher | A preencher |
+| Admin | Login sem `next` | Entra em `/admin` e vê dashboard | A preencher | A preencher |
+| Admin | Abrir drawer a 390 px e carregar Escape | Fecha e devolve foco ao botão | A preencher | A preencher |
 | Admin | Abrir /admin/metricas | Vê página de métricas | A preencher | A preencher |
 | Backend | Chamar rota admin sem sessão | 401 | A preencher | A preencher |
 | Backend | Chamar rota admin como user | 403 | A preencher | A preencher |
 
 ## Handoff para BK-MF7-03
 
-- Header filtrado por sessão:
+- AppHeader sem operações administrativas:
+- AdminLayout/sidebar/drawer confirmados:
 - Links públicos confirmados:
 - Links admin confirmados:
 - Riscos visuais que passam para tokens/layout:
@@ -855,10 +847,10 @@ function withAdminRoute(page, allowedRoles = ["admin"]) {
 
 5. Explicação do código.
 
-`withAdminRoute` evita repetir `<AdminRoute>` em cada rota sem reconstruir o
-router. A allowlist explícita `admin | moderator` aplica-se apenas ao catálogo,
-em paridade com o backend; as restantes rotas conservam o default `admin`. A
-tabela continua lazy e conserva `ErrorBoundary`, `Suspense`,
+`withAdminRoute` evita repetir `<AdminRoute>` sem reconstruir o router. A
+allowlist `admin | moderator` aplica-se ao shell e o filtro da navegação limita
+moderator ao domínio editorial; as rotas operacionais continuam com o default
+`admin`. A tabela nested conserva `ErrorBoundary`, `Suspense`,
 `RouteLifecycle` e todas as rotas recebidas dos BK anteriores. A evidence
 separa visitante, user, admin e backend para provar que a UI não está a esconder
 um problema de autorização. O próximo BK pode focar layout e tokens porque este
@@ -884,15 +876,19 @@ Se uma rota `/admin/...` não estiver envolvida por `AdminRoute`, o BK fica inco
   sem pedidos filhos e authenticated renderiza a página.
 - Visitantes não veem links admin.
 - Utilizadores comuns não veem links admin.
-- Moderadores veem apenas `Admin catálogo` e entram em `/admin/catalogo`.
+- Admin entra em `/admin`; moderator entra em `/admin/catalogo`; user entra em `/`.
+- Moderadores veem apenas o grupo Conteúdo e entram em `/admin/catalogo`.
 - Moderadores não entram nas restantes rotas administrativas.
-- Rotas `/admin/...` usam `AdminRoute`.
+- Rotas `/admin/...` usam `AdminLayout` dentro de `AdminRoute`.
+- O backoffice não renderiza `AppHeader`/`AppFooter`, tem sidebar/drawer,
+  breadcrumb e um único `Ver site público`.
+- Drawer fecha com Escape/navegação e devolve foco ao botão quando aplicável.
 - O ref síncrono de logout impede dois POST mesmo quando há duplo clique antes
   do render que aplica `disabled`.
 - `AppRoutes.jsx` mantém imports lazy, `Suspense`, `ErrorBoundary`,
   `RouteLifecycle` e todas as rotas públicas anteriores.
 - Backend continua a devolver `401` e `403` nas rotas protegidas.
-- Evidence contém pelo menos onze verificações de perfil e permissão.
+- Evidence contém pelo menos doze verificações de perfil, permissão, landing e foco.
 
 #### Validação final
 
@@ -915,11 +911,14 @@ Se uma rota `/admin/...` não estiver envolvida por `AdminRoute`, o BK fica inco
 
 #### Handoff
 
-- `BK-MF7-03` recebe header filtrado por sessão e pode refinar visualmente a navegação.
+- `BK-MF7-03` recebe `AppLayout` público e `AdminLayout` separados e pode refinar visualmente os dois shells.
 - `BK-MF7-05` recebe negativos de perfil para repetir no gate visual.
 - Qualquer falha backend `401/403` fica fora deste BK e deve ser tratada como bloqueio antes do gate.
 
 #### Changelog
+
+- `2026-07-12`: substituído o menu admin dentro do header público por
+  `AdminLayout`/`AdminNavigation`, árvore nested, landing por role e drawer acessível.
 
 - `2026-07-10`: router corrigido como composição aditiva sobre a tabela lazy;
   preservados ErrorBoundary, lifecycle e rotas anteriores.
