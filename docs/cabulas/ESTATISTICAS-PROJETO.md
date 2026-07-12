@@ -17,8 +17,8 @@ Base do levantamento: checkout local `faithflix`
 
 | Categoria                            |                                           Âmbito | Ficheiros | Linhas | Média por ficheiro |
 | ------------------------------------ | -----------------------------------------------: | --------: | -----: | -----------------: |
-| Total de documentação e planificação |                                   `docs/**/*.md` |       166 |  83014 |             500.08 |
-| Documentação geral                   | `docs/**/*.md`, excluindo `docs/planificacao/**` |        48 |   7189 |             149.77 |
+| Total de documentação e planificação |                                   `docs/**/*.md` |       166 |  83707 |             504.26 |
+| Documentação geral                   | `docs/**/*.md`, excluindo `docs/planificacao/**` |        48 |   7882 |             164.21 |
 | Planificação                         |                      `docs/planificacao/**/*.md` |       118 |  75825 |             642.58 |
 
 A maior parte da documentação textual do projeto está na planificação. A planificação representa `118` dos `166` ficheiros Markdown contabilizados.
@@ -86,7 +86,7 @@ As linhas de teste representam `33.12%` das linhas dos ficheiros próprios da ap
 ## Leitura Rápida
 
 - O projeto tem `166` ficheiros Markdown de documentação e planificação.
-- A documentação e planificação somam `83014` linhas.
+- A documentação e planificação somam `83707` linhas.
 - A app em `real_dev` tem `420` ficheiros próprios textuais, incluindo código e auxiliares do projeto.
 - Esses ficheiros próprios da app somam `92032` linhas.
 - Dentro desses ficheiros, o código estrito soma `410` ficheiros e `84712` linhas.

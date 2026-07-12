@@ -1,10 +1,14 @@
 # Cábula Técnica Para Relatório PAP - FaithFlix
 
+Data de atualização: 2026-07-12
+Base de verificação: `real_dev/backend/src` e `real_dev/frontend/src`
+Estado documental: `CURRENT`
+
 ## Objetivo Do Documento
 
 Este documento serve como apoio aos alunos para escreverem e apresentarem o relatório técnico da PAP. A linguagem é técnica, mas explicada de forma acessível, para que possa ser usada tanto no relatório como na preparação da defesa.
 
-O FaithFlix é uma plataforma de streaming cristão que junta catálogo audiovisual, contas de utilizador, reprodução de conteúdos, recomendações, subscrições e impacto social através de uma pool solidária de associações. Algumas secções descrevem funcionalidades centrais do MVP; outras podem ser usadas como visão final ou evolução futura, quando indicado.
+O FaithFlix é uma plataforma de streaming cristão que junta catálogo audiovisual, contas de utilizador, reprodução de conteúdos, recomendações, subscrições e impacto social através de uma pool solidária de associações. As secções seguintes descrevem a implementação fechada em `real_dev`; uma capacidade só é apresentada como evolução futura quando isso é indicado explicitamente.
 
 ## Visão Técnica Geral
 
@@ -44,6 +48,8 @@ Este domínio inclui:
 - papéis de utilizador, como `user`, `moderator` e `admin`.
 
 Depois do login, o backend associa os pedidos a um utilizador autenticado. Isto permite que cada operação pessoal seja feita sobre a conta correta. O frontend não deve enviar manualmente o `userId` para operações sensíveis; o backend deve obter a identidade a partir da sessão.
+
+Depois de login ou registo, um destino interno seguro indicado por `next` tem prioridade. Sem `next`, a landing depende da role: `admin` segue para `/admin`, `moderator` para `/admin/catalogo` e `user` para `/`. O mesmo resolver é usado quando uma sessão já autenticada tenta abrir uma rota anónima.
 
 As permissões também dependem deste domínio. Um utilizador comum pode ver conteúdos e gerir a sua própria conta. Um moderador pode gerir conteúdos. Um administrador pode aceder a operações críticas, como gestão de utilizadores, candidaturas de associações, distribuição da pool ou métricas.
 
@@ -87,7 +93,7 @@ Esta informação também é útil para outros módulos. O histórico e os favor
 
 As classificações permitem que os utilizadores avaliem conteúdos. O sistema guarda a avaliação individual e calcula dados agregados, como média e número total de avaliações.
 
-Os comentários curtos permitem feedback textual. Como podem ser públicos, devem ter validação e moderação. Comentários com links, linguagem imprópria ou conteúdo suspeito podem ficar pendentes de revisão.
+Os comentários curtos permitem feedback textual. Como podem ser públicos, têm validação e moderação. A regra automática atual coloca comentários com links em `pending_review`; administradores e moderadores podem depois alterar manualmente o estado e registar um motivo de moderação. Não existe um classificador automático de linguagem imprópria.
 
 Este domínio tem duas utilidades:
 
@@ -137,9 +143,9 @@ Cada grupo recomendado deve incluir uma explicação simples, por exemplo:
 
 ### Embeddings De Conteúdo
 
-Como estado final pretendido, a recomendação pode ser melhorada com embeddings. Um embedding é uma representação numérica de um conteúdo. Em vez de comparar apenas palavras iguais, o sistema compara significado.
+O sistema atual complementa a recomendação baseline com embeddings locais determinísticos de conteúdos publicados. Um embedding é uma representação numérica de um conteúdo. Em vez de comparar apenas palavras iguais, o sistema compara significado; quando não existem embeddings utilizáveis, a recomendação mantém o fallback baseline/cold start.
 
-Para gerar embeddings, o sistema pode usar texto editorial dos conteúdos, como:
+Para gerar embeddings, o sistema usa texto editorial dos conteúdos, como:
 
 - título;
 - sinopse;
@@ -147,7 +153,7 @@ Para gerar embeddings, o sistema pode usar texto editorial dos conteúdos, como:
 - taxonomias;
 - temas.
 
-Os embeddings pertencem aos conteúdos, não aos utilizadores. O sistema pode construir temporariamente um perfil semântico com base nos conteúdos que o utilizador viu, guardou ou avaliou positivamente. Depois compara esse perfil com os embeddings dos conteúdos disponíveis.
+Os embeddings pertencem aos conteúdos, não aos utilizadores. Durante o pedido, o sistema constrói temporariamente um perfil semântico com base nos conteúdos que o utilizador viu, guardou ou avaliou positivamente. Depois compara esse perfil com os embeddings dos conteúdos disponíveis.
 
 Esta comparação permite encontrar conteúdos semanticamente parecidos, mesmo que não tenham exatamente os mesmos termos.
 
@@ -220,6 +226,8 @@ O fluxo tem várias etapas:
 
 O cálculo monetário é feito em cêntimos para evitar erros de ponto flutuante. Só entram documentos com `schemaVersion: 2`, `status: "approved"`, `accountingEstimate: false` e `approvedAt` dentro do mês já fechado. Legacy e backfills estimados ficam excluídos. A distribuição guarda snapshots e é idempotente: repetir o mês devolve o registo anterior sem duplicar valores.
 
+O fecho manual usa confirmação em duas fases. Primeiro, `GET /api/charities/pool/distributions/:month/preview` calcula uma pré-visualização sem escrever nem gerar audit. A interface apresenta o valor e as beneficiárias; só depois envia `POST /api/charities/pool/distributions` com `month` e `previewToken`. Se os dados mudarem entre as duas fases, o backend devolve `409 POOL_PREVIEW_STALE` antes de qualquer commit e obriga a gerar uma nova pré-visualização.
+
 A elegibilidade das associações é congelada no fecho mensal. Se não existir beneficiária elegível, o sistema guarda um ledger imutável `deferred_no_eligible_charities`, vazio e terminal: não repete indefinidamente nem distribui o mês retroativamente após uma aprovação posterior. O worker recupera atrasos em lotes de, no máximo, 120 meses pendentes por passagem e continua nos ciclos seguintes.
 
 A rotação garante justiça e deriva deterministicamente do próprio mês, por isso não muda conforme a ordem em que jobs antigos sejam executados.
@@ -270,7 +278,7 @@ Princípios importantes:
 
 ## Administração, Métricas E Operação
 
-A administração permite gerir a plataforma no dia a dia. Nem todas as operações devem estar disponíveis para utilizadores comuns.
+A administração permite gerir a plataforma no dia a dia. O backoffice usa um `AdminLayout` dedicado, separado do `AppLayout` público, com navegação por role, sidebar/drawer responsivo, breadcrumb e uma ligação explícita para o site público. Utilizadores comuns não podem abrir esta árvore de rotas.
 
 Funções administrativas típicas:
 
@@ -283,6 +291,10 @@ Funções administrativas típicas:
 - consultar métricas;
 - configurar integrações.
 
+O catálogo administrativo segue uma navegação list-first: listagem, criação, edição e taxonomias têm rotas próprias. As passagens bíblicas usam o mesmo princípio para listagem, criação/edição e associações a conteúdos. Operações editoriais podem aceitar `admin` ou `moderator`; utilizadores, candidaturas, memberships, pool, métricas e integrações permanecem exclusivas de `admin`.
+
+Ao rejeitar uma candidatura, o administrador consulta o detalhe e escreve um motivo entre 10 e 500 caracteres. A ligação utilizador-associação usa pesquisas canceláveis por nome/email e confirma os nomes escolhidos antes de enviar os IDs ao backend. O lookup de associações devolve apenas `{ id, name }` de entidades operacionais elegíveis.
+
 O painel de métricas ajuda a acompanhar o estado da plataforma. Pode apresentar:
 
 - total de utilizadores;
@@ -294,13 +306,17 @@ O painel de métricas ajuda a acompanhar o estado da plataforma. Pode apresentar
 - total distribuído pela pool;
 - eventos de consentimento.
 
-As operações críticas devem exigir role `admin` e gerar evidência/auditoria. O audit administrativo retém apenas o estado operacional e os campos alterados: email, telefone, contactos, credenciais e snapshots pessoais integrais não fazem parte do evento.
+As métricas incluem ainda agregados de catálogo, família, solidariedade e integrações. O intervalo selecionado pode ser exportado por `GET /api/admin/metrics/export.csv`; a resposta é privada, sem PII e descarregada através do cliente autenticado.
+
+Na configuração de integrações, alterações locais ficam como drafts com o estado `Alterações por guardar`. `Cancelar` repõe os valores persistidos; `Guardar` apresenta o diff para confirmação e só depois executa um único `PATCH`.
+
+As operações administrativas críticas exigem a role prevista para o domínio e geram evidência/auditoria. O audit administrativo retém apenas o estado operacional e os campos alterados: email, telefone, contactos, credenciais e snapshots pessoais integrais não fazem parte do evento.
 
 Uma ligação `charity_memberships` só pode ser criada para uma conta não bloqueada nem eliminada. Como é dado associado ao utilizador, entra na exportação RGPD e é removida na eliminação transacional da própria conta, sem afetar ligações de terceiros.
 
 ## Planos Pro/Família, Partilha Familiar E Qualidade Por Plano
 
-Além da subscrição base, o FaithFlix pode ter planos avançados. Os planos Pro e Família acrescentam regras de acesso, benefícios e limites de qualidade.
+O FaithFlix disponibiliza planos Pro e Família, mensais e anuais, com regras de acesso, benefícios e limites de qualidade resolvidos pelo backend.
 
 Um entitlement é uma permissão associada ao plano. Exemplos:
 
@@ -348,7 +364,7 @@ Pontos técnicos importantes:
 
 ### Testes
 
-O projeto deve ter testes para validar:
+O projeto tem testes para validar:
 
 - regras de backend;
 - contratos HTTP;
@@ -391,9 +407,9 @@ Inclui:
 
 ## Passagens Bíblicas E Estudo Bíblico Integrado
 
-As passagens bíblicas podem enriquecer a experiência do FaithFlix, associando referências bíblicas aos conteúdos audiovisuais. Em vez de um conteúdo ter apenas título, sinopse e imagem, pode também ter referências espirituais relacionadas.
+As passagens bíblicas enriquecem a experiência do FaithFlix, associando referências bíblicas aos conteúdos audiovisuais. Um conteúdo pode apresentar referências espirituais relacionadas além do título, sinopse e imagem.
 
-Uma passagem bíblica deve ser tratada como dado estruturado:
+Uma passagem bíblica é tratada como dado estruturado:
 
 - livro;
 - capítulo;
@@ -405,7 +421,7 @@ Uma passagem bíblica deve ser tratada como dado estruturado:
 - estado editorial;
 - comentário/reflexão opcional.
 
-Esta estrutura permitiria:
+Esta estrutura permite:
 
 - mostrar passagens na página de detalhe;
 - filtrar conteúdos por tema bíblico;
@@ -413,7 +429,7 @@ Esta estrutura permitiria:
 - apoiar uso formativo em grupos, igrejas ou famílias;
 - reforçar a identidade cristã da plataforma.
 
-Como envolve conteúdo religioso, a publicação deve ser feita por administradores ou curadores. Isto evita referências fora de contexto ou interpretações automáticas sem validação humana.
+Como envolve conteúdo religioso, a criação, edição e publicação exigem `admin` ou `moderator`. Isto evita referências fora de contexto ou interpretações automáticas sem validação humana.
 
 ## Como Fechar No Relatório
 
@@ -459,7 +475,7 @@ Mensagem-chave:
 
 > Antes de falar de catálogo, streaming, recomendações ou subscrições, é preciso explicar como o FaithFlix sabe quem é o utilizador e que permissões essa pessoa tem.
 
-Nesta parte, os alunos não precisam de explicar todas as rotas. Devem mostrar a ideia principal: o frontend apresenta a interface, mas o backend decide quem pode fazer cada operação.
+Nesta parte, os alunos não precisam de explicar todas as rotas. Devem mostrar a ideia principal: o frontend apresenta a interface, mas o backend decide quem pode fazer cada operação. Podem ainda demonstrar a landing segura por role: `/admin`, `/admin/catalogo` ou `/` quando não existe um `next` interno válido.
 
 ### 2. Catálogo, Metadados, Streaming E Reprodutor
 
@@ -586,6 +602,10 @@ Na demonstração, explica que o valor vem do snapshot de pagamentos v2 do mês
 UTC fechado. Não uses memberships familiares, subscrições atualmente ativas ou
 preços atuais para reconstruir o passado.
 
+Antes do commit, mostra a pré-visualização do mês e explica que o `previewToken`
+impede distribuir valores que já ficaram desatualizados. Um `409
+POOL_PREVIEW_STALE` não escreve ledger nem audit.
+
 Esta é uma das partes mais fortes para a defesa, porque mostra que o projeto não é só streaming. Tem uma componente social, com regras de justiça, validação administrativa e histórico.
 
 ### 7. Passagens Bíblicas E Curadoria Cristã
@@ -656,7 +676,7 @@ Mensagem-chave:
 
 > A administração mostra que o FaithFlix foi pensado para ser operado e mantido, não apenas para funcionar numa demonstração isolada.
 
-Esta secção deve mostrar maturidade técnica. Operações críticas devem exigir `admin` ou `moderator`, conforme o caso, e não devem estar disponíveis para utilizadores comuns.
+Esta secção deve mostrar maturidade técnica. Convém distinguir o `AdminLayout` do site público, mostrar a navegação por role e explicar que as operações críticas exigem `admin` ou `moderator`, conforme o domínio. A exportação CSV de métricas, os lookups nominais, as confirmações e os drafts de integrações demonstram prevenção de erro operacional sem expor PII.
 
 ### 10. Segurança, Testes, Performance E Acessibilidade
 
