@@ -1,0 +1,38 @@
+{
+    "name": "faithflix-backend",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "node --watch src/server.js",
+        "start": "node src/server.js",
+        "worker": "node src/worker.js",
+        "test": "node --test",
+        "test:unit": "node --test tests/unit/*.test.js",
+        "test:integration": "node --test tests/integration/*.test.js",
+        "test:contracts": "node --test tests/unit/media-boundary.test.js tests/unit/playback-contract.test.js",
+        "test:security": "node --test tests/unit/security-controls.test.js tests/integration/security-http.test.js && node scripts/check-security-baseline.mjs",
+        "smoke": "node --test tests/smoke/*.test.js",
+        "promote:admin": "node scripts/promote-admin.js",
+        "seed:e2e": "node scripts/seed-mf2-e2e.js",
+        "seed:e2e:mf4": "node scripts/seed-mf4-e2e.js",
+        "seed:e2e:mf9": "node scripts/seed-mf9-e2e.js",
+        "seed:demo": "node --env-file=.env scripts/seed-demo.js",
+        "seed:demo:verify": "node --env-file=.env scripts/seed-demo-verify.js",
+        "seed:biblical-passages": "node scripts/seed-biblical-passages.js",
+        "migrate:payment-attempts:v2": "node scripts/migrate-payment-attempts-v2.js",
+        "migrate:series-episodes": "node scripts/migrate-series-episodes.js",
+        "backup:db": "node scripts/backup-database.js",
+        "restore:verify": "node scripts/verify-database-restore.js",
+        "embeddings:generate": "node scripts/generate-content-embeddings.js",
+        "benchmark:recommendations": "node scripts/benchmark-recommendations.js",
+        "dev:reset-token": "node scripts/show-dev-reset-token.js"
+    },
+    "dependencies": {
+        "express": "^4.19.2",
+        "mongodb": "^6.16.0"
+    },
+    "engines": {
+        "node": ">=20"
+    }
+}
