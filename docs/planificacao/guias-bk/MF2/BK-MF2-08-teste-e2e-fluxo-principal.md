@@ -12,729 +12,1204 @@
 - `esforco`: `M`
 - `dependencias`: `BK-MF2-06,BK-MF2-07`
 - `rf_rnf`: `RNF07, RNF08`
-- `fase_documental`: `Fase 1`
+- `fase_documental`: `Fase 2`
 - `sprint`: `S04`
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF3-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF2/BK-MF2-08-teste-e2e-fluxo-principal.md`
-- `last_updated`: `2026-05-31`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
-### Objetivo pedagogico
+Neste BK vais aprender a distinguir duas provas Playwright diferentes:
 
-Neste BK vais criar um teste end-to-end do fluxo principal da MF2: login, detalhe, favoritos, watchlist, player, progresso e biblioteca pessoal. A entrega valida `RNF07` e `RNF08` com medicoes objetivas.
+1. o E2E funcional da MF2, que percorre login, catálogo, detalhe, biblioteca e
+   progresso e que exige uma base `_e2e` dedicada e um seed separado;
+2. a prova browser isolada do player, que usa apenas `preview`, route
+   interception e fixtures sintéticas locais progressive/HLS/DASH, sem backend,
+   seed ou MongoDB.
 
-No fim, deves conseguir explicar porque um E2E testa integracao real no browser, como preparar dados previsiveis e como medir tempos relevantes sem depender de observacao manual.
+A prova browser de media já demonstrada na referência é `9/9`: três protocolos
+em Chromium, Firefox e WebKit. O E2E funcional MF2 não foi reexecutado neste
+checkpoint e não pode ser apresentado como prova atual.
 
-### Importancia funcional
+#### Importância
 
-Depois dos BKs 01 a 07, a MF2 já tem várias peças ligadas. Este teste confirma que a experiência principal funciona de ponta a ponta e que uma regressão numa rota, seletor, sessão ou player é detetada cedo.
+Um elemento `<video>` renderizado não prova que existe reprodução. A prova
+isolada exige uma fonte canónica, media válida, `loadedmetadata`/`canplay`,
+cleanup do adapter e zero pedidos externos. Ao mesmo tempo, esta fixture de
+canvas não representa vídeo real nem mede produção; por isso não fecha `RNF08`
+ou `RNF10`.
 
-### Scope-in
+Separar as suites evita dois falsos verdes frequentes:
 
-- Instalar e configurar Playwright.
-- Criar seed de dados para utilizador e conteudo publicado.
-- Garantir seletores estáveis nos componentes principais.
-- Testar login, detalhe, favoritos, watchlist, player, progresso e biblioteca.
-- Medir `RNF07` no catalogo principal e `RNF08` no arranque do video.
+- usar mocks de API/media e dizer que login, DB e fluxo funcional passaram;
+- medir uma fixture local de 320×180 e apresentá-la como 4K, CDN ou streaming
+  real.
 
-### Scope-out
+#### Scope-in
 
-- Cobertura E2E de todos os fluxos admin.
-- Testes cross-browser completos.
-- Testes de carga.
-- Testes de acessibilidade automatizados completos.
-- Pipeline CI remoto.
+- Gerar fixtures sintéticas de canvas num fMP4 H.264 baseline local.
+- Manter checksums SHA-256 dos três binários.
+- Servir MP4 progressive, HLS e DASH por route interception com HTTP Range.
+- Executar o frontend apenas por build/`preview` em `mode=test`.
+- Intercetar sessão, CSRF e playback no browser, sem arrancar backend.
+- Bloquear rede não-loopback.
+- Validar uma única `content.source = { url, protocol, mimeType }`.
+- Confirmar que `qualityOptions` e `tracks` públicas não contêm fontes.
+- Automatizar Chromium, Firefox e WebKit.
+- Registar separadamente o E2E funcional MF2 como pendente enquanto não existir
+  DB `_e2e` dedicada autorizada.
 
-### Glossario rapido
+#### Scope-out
 
-- `E2E`: teste que executa o fluxo como um utilizador no browser.
-- `Seed`: dados controlados criados antes do teste.
-- `Selector estavel`: atributo pensado para teste, como `data-testid`.
-- `RNF07`: requisito de carregamento inicial.
-- `RNF08`: requisito de arranque de video.
+- Vídeos, pessoas, filmes, séries ou áudio reais.
+- Prova de resolução 4K, CDN, ABR, DRM ou latência de produção.
+- Teste de 100 streams simultâneos.
+- Execução de seed, migração ou escrita em MongoDB na suite de media.
+- Promover o resultado isolado a prova do fluxo funcional MF2.
+- Safari real, Chrome/Edge branded e revisão manual final.
 
-### Conceitos essenciais
+#### Estado antes e depois
 
-- O teste deve usar rotas reais: `/login`, `/catalogo/:idOrSlug`, `/ver/:contentId` e `/biblioteca`.
-- Dados de teste devem ser criados por script e nao manualmente.
-- O seed deve limpar apenas a fixture E2E, nunca colecoes inteiras.
-- `data-testid` evita testes frageis baseados em layout.
-- O teste deve falhar se o video nao existir ou nao conseguir tocar.
-- O E2E complementa testes unitarios e manuais; nao os substitui.
+- Estado antes: aplicam-se os BKs declarados em `dependencias`, os RF/RNF do Header e os artefactos já entregues pelas fases anteriores.
+- Estado depois: ficam implementáveis e verificáveis apenas os resultados listados em `Scope-in`, sem antecipar o `Scope-out`.
+
+#### Pré-requisitos
+
+- Node.js e dependências root/frontend instaladas.
+- Browsers Playwright locais disponíveis.
+- Build frontend compatível com `--mode test`.
+- Porta de preview loopback livre.
+- Nenhuma variável MongoDB é necessária para `test:media:browser`.
+- Se o E2E funcional MF2 for tentado noutra sessão, tem de existir primeiro uma
+  DB dedicada cujo nome termine em `_e2e`; esta condição não autoriza executá-lo
+  neste checkpoint.
+
+#### Glossário
+
+- `fMP4`: MP4 fragmentado com inicialização `ftyp/moov` e fragmentos
+  `moof/mdat`.
+- `progressive`: fonte MP4 ligada diretamente ao elemento de vídeo.
+- `HLS`: manifest `.m3u8`; usa suporte nativo ou `hls.js`.
+- `DASH`: manifest `.mpd`; usa `dashjs`.
+- `preview-only`: o teste serve um build estático Vite; não usa watcher/dev
+  server.
+- `route interception`: Playwright responde a pedidos controlados sem depender
+  de servidores ou Internet.
+- `loopback`: hosts locais `127.0.0.1`, `localhost` e `::1`.
+
+#### Conceitos teóricos essenciais
+
+- A resposta autenticada de playback contém exatamente uma fonte autorizada em
+  `content.source`.
+- `source.protocol` só aceita `progressive`, `hls` ou `dash`.
+- `qualityOptions` expõe apenas `value`, `label`, `locked`, `selected` e,
+  opcionalmente, `requiredTier`/`lockedReason`; nunca contém URL.
+- `tracks` públicas são descritores sem `url`, `src`, `playbackUrl` ou `source`.
+- O browser não escolhe nem constrói fontes; liga o adapter indicado pelo
+  backend/interception.
+- `loadedmetadata` e `canplay` provam o adapter local, não performance real.
+- O E2E funcional e a prova isolada de media têm comandos, dados e estados
+  independentes.
 
 ### Tempo estimado
 
-- Preparar seed e asset de media: 35 min.
-- Configurar Playwright: 35 min.
-- Adicionar seletores estáveis: 30 min.
-- Escrever fluxo E2E: 75 min.
-- Medir RNF07/RNF08 e recolher evidence: 45 min.
+- Rever contratos e separar suites: 20 min.
+- Gerar/verificar fixtures e checksums: 35 min.
+- Configurar rede e API interceptada: 45 min.
+- Configurar preview e matriz browser: 35 min.
+- Executar/diagnosticar os nove casos: 45 min.
+- Registar evidence e limites: 20 min.
 
 ### Erros comuns
 
-- Testar apenas endpoints e chamar isso de E2E.
-- Depender de dados criados manualmente.
-- Medir performance sem guardar o valor observado.
-- Apagar colecoes completas num seed local.
-- Usar rota `/library` quando a app usa `/biblioteca`.
-- Ignorar o ficheiro de video necessario para `RNF08`.
+- Encadear seed e browser no mesmo script.
+- Usar `vite dev`/watcher como servidor de evidence formal.
+- Ativar `reuseExistingServer` e reutilizar uma app desconhecida.
+- Arrancar backend/MongoDB para um teste que pode ser totalmente interceptado.
+- Expor URLs em cada opção de qualidade.
+- Permitir Internet porque as fixtures são locais.
+- Tratar a label `4K` como resolução física da fixture.
+- Fechar `RNF08`, `RNF10` ou streaming real com `canplay` local.
 
 ### Check de compreensao
 
-- [ ] Sei explicar o que o E2E cobre e o que nao cobre.
-- [ ] Sei executar seed antes do teste.
-- [ ] Sei interpretar uma falha de `RNF07` ou `RNF08`.
-- [ ] Sei anexar evidence ao PR/defesa.
+- [ ] Sei explicar a diferença entre E2E funcional e prova browser isolada.
+- [ ] Sei porque a suite de media não usa seed nem DB.
+- [ ] Sei identificar a única fonte pública autorizada.
+- [ ] Sei explicar o papel dos checksums.
+- [ ] Sei justificar `RNF23=PARCIAL_VALIDADO` e
+      `RNF08/RNF10=NAO_PROVADO`.
 
-## Bloco operacional (obrigatorio)
+#### Arquitetura do BK
 
-### Pre-condicoes
-
-- `BK-MF2-01` a `BK-MF2-07` concluidos.
-- Backend e frontend arrancam localmente.
-- MongoDB acessivel.
-- Existe `frontend/public/media/piloto.mp4`, com video curto e leve para teste.
-- Existe rota `/login`.
-- Existem seletores `auth-form`, `email-input`, `password-input`, `login-submit`, `content-detail`, `faithflix-player` e `my-library`.
-
-### Contrato tecnico deste BK
-
-| Area | Contrato |
+| Área | Contrato |
 | --- | --- |
-| Ferramenta | Playwright |
-| Browser | Chromium |
-| Seed | `backend/scripts/seed-mf2-e2e.js` |
-| Teste | `tests/e2e/mf2-flow.spec.js` |
-| RNF07 | catalogo principal carrega em menos de 3000 ms no ambiente local |
-| RNF08 | video dispara evento `playing` ate 3000 ms depois de `play()` |
-| Evidence | relatorio Playwright e logs de medicoes |
+| Config media | `playwright.media.config.js` |
+| Spec media | `tests/e2e/media-fixtures.spec.js` |
+| Política de rede | `tests/e2e/network-policy.js` e fixture Playwright comum |
+| Fixtures | `tests/fixtures/media/` |
+| Geração | `scripts/generate-synthetic-media.mjs` |
+| Integridade | `scripts/check-media-fixtures.mjs` |
+| Frontend | build + `preview --mode test`; sem dev server/watch |
+| Backend/DB/seed | não arrancam nem são usados na suite media |
+| Browsers | Chromium, Firefox e WebKit |
+| Matriz | 3 protocolos × 3 browsers = 9 casos |
+| DTO | uma única `content.source`; opções/faixas sem fontes |
+| Rede | apenas loopback; qualquer host externo é abortado/falha |
+| E2E MF2 funcional | separado e `NAO_REVALIDADO` neste checkpoint |
 
-### Decisao sobre dependencia
+### Manifesto das fixtures sintéticas
 
-`DERIVADO`: `@playwright/test` e uma `devDependency` justificada neste BK porque:
+As fixtures são geradas localmente por um `canvas` animado, sem conteúdo real,
+áudio ou downloads. O resultado atual é H.264 baseline, 320×180, cerca de 12 fps
+e duração curta:
 
-- `node:test` nao controla browser real;
-- `RNF07` e `RNF08` precisam de medir interface e video;
-- Playwright e standard para E2E em apps React/Vite;
-- a dependencia fica isolada em testes e nao entra no bundle de producao.
+| Ficheiro | Função |
+| --- | --- |
+| `synthetic-progressive.mp4` | fMP4 completo para progressive |
+| `synthetic-init.mp4` | inicialização `ftyp/moov` para HLS/DASH |
+| `synthetic-segment.m4s` | fragmentos `moof/mdat` |
+| `synthetic.m3u8` | HLS VOD local com `EXT-X-MAP` |
+| `synthetic.mpd` | DASH estático local com `SegmentList` |
 
-### Guia de execucao (passo-a-passo)
+Checksums auditados em 2026-07-10:
 
-### Passo 1 - Criar package raiz para E2E
+```text
+8275def5ed2b836720880da54bce49f8de0aeb137f85b6ded5543e5883a93e20  synthetic-progressive.mp4
+a310f52c490f9b3b04dfbd8c355265c4f918bc92207bbf36e574a72cc5e5e917  synthetic-init.mp4
+50c9b1272b5f225c244a405a06ba7a41b18a3a7c30e034138ee396df5e5ca004  synthetic-segment.m4s
+```
+
+Uma regeneração pode produzir bytes diferentes entre browser/OS. Alterar uma
+fixture exige revisão deliberada e atualização dos checksums; nunca aceitar o
+novo hash automaticamente só para fazer o teste passar.
+
+### Decisoes tecnicas
+
+- `CANONICO`: media sintética é prova técnica local, não conteúdo do produto.
+- `CANONICO`: `test:media:browser` tem zero seed, zero backend e zero DB.
+- `CANONICO`: build e preview usam `mode=test`; produção não é apontada para uma
+  API HTTP loopback fictícia.
+- `CANONICO`: `reuseExistingServer` fica `false` em evidence formal.
+- `CANONICO`: toda a API necessária é interceptada e a política de rede é
+  fail-closed fora de loopback.
+- `CANONICO`: o DTO público tem uma única fonte; listas públicas não transportam
+  fontes alternativas.
+- `DERIVADO`: o E2E funcional MF2 mantém seed separado e só poderá ser executado
+  com guard + DB `_e2e` explícita.
+
+#### Ficheiros a criar/editar/rever
+
+- EDITAR: `package.json`
+- REVER: `frontend/package.json`
+- REVER: `tests/e2e/mf2-flow.spec.js`
+- CRIAR: `backend/scripts/seed-safety.js`
+- EDITAR: `backend/scripts/seed-mf2-e2e.js`
+- EDITAR: `backend/scripts/seed-mf4-e2e.js`
+- EDITAR: `backend/scripts/seed-mf9-e2e.js`
+- EDITAR: `backend/src/config/env.js`
+
+#### Tutorial técnico linear
+
+### Passo 1 - Separar os scripts de media do E2E funcional
 
 1. Objetivo do passo.
 
-Adicionar scripts E2E na raiz do projeto sem misturar dependencias no frontend ou backend.
+Garantir que a prova do player não pode acidentalmente ligar a MongoDB ou correr
+o seed MF2.
 
 2. Ficheiros envolvidos.
-    - CRIAR ou EDITAR: `package.json`
-    - LOCALIZACAO: ficheiro raiz
+    - EDITAR: `package.json`
+    - REVER: `frontend/package.json`
+    - LOCALIZACAO: scripts root e script `preview`
 
 3. Instrucoes concretas.
 
-Se ja existir `package.json` na raiz, acrescenta apenas os scripts e a devDependency.
+Cria scripts dedicados. Não reutilizes `e2e:mf2` e não introduzas
+`seed:e2e:*`, `MONGODB_*` ou `TEST_MONGODB_*` nestes comandos.
 
-4. Codigo completo.
+4. Codigo aplicavel.
 
 ```json
 {
-  "private": true,
-  "type": "module",
   "scripts": {
-    "e2e:install": "playwright install chromium",
-    "e2e:mf2": "npm --prefix backend run seed:e2e && playwright test tests/e2e/mf2-flow.spec.js"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.54.0"
+    "check:media": "node scripts/check-media-fixtures.mjs",
+    "test:media:browser": "VITE_API_BASE_URL=http://127.0.0.1:3199 npm --prefix frontend run build -- --mode test && npm exec playwright -- test --config=playwright.media.config.js"
   }
 }
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicacao.
 
-O script `e2e:mf2` cria dados previsiveis antes de abrir o browser.
+A API loopback é apenas a origem que Playwright interceta. `--mode test` impede
+usar a configuração de produção e `preview` serve exatamente o build acabado de
+criar.
 
-6. Validacao do passo.
+6. Validacao.
 
 ```bash
-npm install
-npm run e2e:install
+npm run check:media
+npm exec playwright -- test --config=playwright.media.config.js --list
 ```
 
-Resultado esperado: Playwright instala Chromium.
+Resultado esperado: integridade `PASS` e nove casos descobertos.
 
-7. Caso negativo, erro comum ou risco que este passo evita.
+7. Negativo.
 
-Sem browser instalado, o teste falha antes de validar a app.
+Se o script contiver seed, backend, MongoDB ou `vite dev`, a separação falhou.
 
-### Passo 2 - Criar configuracao Playwright
+### Passo 2 - Gerar e verificar o fMP4 de canvas
 
 1. Objetivo do passo.
 
-Arrancar backend e frontend automaticamente durante o teste.
+Produzir media mínima sem conteúdo real nem dependência de Internet.
 
 2. Ficheiros envolvidos.
-    - CRIAR: `playwright.config.js`
-    - LOCALIZACAO: ficheiro completo
+    - CRIAR/EDITAR: `scripts/generate-synthetic-media.mjs`
+    - CRIAR/EDITAR: `tests/fixtures/media/*`
+    - CRIAR/EDITAR: `scripts/check-media-fixtures.mjs`
 
 3. Instrucoes concretas.
 
-Cria a configuracao abaixo na raiz.
+O gerador usa Chromium local, `canvas.captureStream(12)` e `MediaRecorder` com
+`video/mp4;codecs=avc1.42E01E`. Separa a inicialização e o fragmento, normaliza
+timing e escreve HLS/DASH locais. O checker calcula SHA-256 e rejeita
+`http://`/`https://` dentro dos manifests/README.
+
+4. Comandos.
+
+```bash
+node scripts/generate-synthetic-media.mjs --output-dir=tests/fixtures/media
+node scripts/check-media-fixtures.mjs
+```
+
+5. Explicacao.
+
+O checksum torna alterações binárias observáveis. O vídeo mostra apenas formas
+e texto de diagnóstico desenhados em canvas; não é um asset editorial.
+
+6. Validacao.
+
+Confirma `ftyp/moov` na inicialização, `moof/mdat` no segmento e os três hashes
+da tabela.
+
+7. Negativo.
+
+Não regenerar fixtures durante uma validação normal. Se o hash divergir, parar e
+rever a causa.
+
+### Passo 3 - Aplicar uma política de rede fail-closed
+
+1. Objetivo do passo.
+
+Servir as fixtures por interception, incluindo pedidos Range, e bloquear
+qualquer rede não-loopback.
+
+2. Ficheiros envolvidos.
+    - CRIAR/EDITAR: `tests/e2e/network-policy.js`
+    - CRIAR/EDITAR: `tests/e2e/test.js`
+
+3. Instrucoes concretas.
+
+Instala uma route global automática antes de cada teste. Valida primeiro o host,
+responde aos paths `/__fixtures__/...` apenas em loopback, continua os restantes
+pedidos locais e aborta o exterior. A fixture automática acumula cada tentativa
+externa e falha no teardown, mesmo quando a página tolera o pedido abortado.
+
+4. Codigo aplicavel.
+
+```js
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
+
+const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
+const FIXTURE_ROOT = resolve("tests/fixtures/media");
+
+const fixtureRoutes = new Map([
+  ["/__fixtures__/synthetic-progressive.mp4", { path: resolve(FIXTURE_ROOT, "synthetic-progressive.mp4"), contentType: "video/mp4" }],
+  ["/__fixtures__/synthetic-init.mp4", { path: resolve(FIXTURE_ROOT, "synthetic-init.mp4"), contentType: "video/mp4" }],
+  ["/__fixtures__/synthetic-segment.m4s", { path: resolve(FIXTURE_ROOT, "synthetic-segment.m4s"), contentType: "video/mp4" }],
+  ["/__fixtures__/synthetic.m3u8", { path: resolve(FIXTURE_ROOT, "synthetic.m3u8"), contentType: "application/vnd.apple.mpegurl" }],
+  ["/__fixtures__/synthetic.mpd", { path: resolve(FIXTURE_ROOT, "synthetic.mpd"), contentType: "application/dash+xml" }],
+]);
+
+function parseByteRange(header, size) {
+  const match = String(header ?? "").match(/^bytes=(\d+)-(\d*)$/u);
+  if (!match) return null;
+
+  const start = Number(match[1]);
+  const requestedEnd = match[2] ? Number(match[2]) : size - 1;
+  const end = Math.min(requestedEnd, size - 1);
+  return Number.isInteger(start) && Number.isInteger(end) && start <= end
+    ? { start, end }
+    : null;
+}
+
+async function fulfillFixtureWithOptionalRange(route, fixture) {
+  const body = await readFile(fixture.path);
+  const rangeHeader = route.request().headers().range;
+  const range = parseByteRange(rangeHeader, body.length);
+
+  // Um Range malformado falha explicitamente; nunca se responde 200 ao pedido inválido.
+  if (rangeHeader && !range) {
+    await route.fulfill({
+      status: 416,
+      headers: { "content-range": `bytes */${body.length}` },
+    });
+    return;
+  }
+
+  if (range) {
+    const partialBody = body.subarray(range.start, range.end + 1);
+    await route.fulfill({
+      status: 206,
+      contentType: fixture.contentType,
+      headers: {
+        "accept-ranges": "bytes",
+        "content-range": `bytes ${range.start}-${range.end}/${body.length}`,
+        "content-length": String(partialBody.length),
+      },
+      body: partialBody,
+    });
+    return;
+  }
+
+  await route.fulfill({
+    status: 200,
+    contentType: fixture.contentType,
+    headers: {
+      "accept-ranges": "bytes",
+      "content-length": String(body.length),
+    },
+    body,
+  });
+}
+
+export async function installDeterministicNetworkPolicy(context) {
+  const externalAttempts = new Set();
+
+  // Uma única route global cobre também pedidos internos criados por HLS/DASH.
+  await context.route("**/*", async (route) => {
+    const requestUrl = new URL(route.request().url());
+
+    // O host é validado antes do pathname para uma origem externa nunca se disfarçar de fixture.
+    if (!LOOPBACK_HOSTS.has(requestUrl.hostname)) {
+      externalAttempts.add(
+        `${requestUrl.protocol}//${requestUrl.host}${requestUrl.pathname}`,
+      );
+      await route.abort("blockedbyclient");
+      return;
+    }
+
+    const fixture = fixtureRoutes.get(requestUrl.pathname);
+    if (fixture) {
+      await fulfillFixtureWithOptionalRange(route, fixture);
+      return;
+    }
+
+    await route.continue();
+  });
+
+  return Object.freeze({
+    assertNoExternalRequests() {
+      if (externalAttempts.size > 0) {
+        // O erro expõe apenas a contagem; querystrings potencialmente sensíveis não entram no output.
+        throw new Error(`EXTERNAL_NETWORK_ATTEMPT:${externalAttempts.size}`);
+      }
+    },
+  });
+}
+```
+
+`tests/e2e/test.js` instala a política como fixture automática e verifica a
+contagem no teardown de cada teste:
+
+```js
+import { expect, test as base } from "@playwright/test";
+import { installDeterministicNetworkPolicy } from "./network-policy.js";
+
+export { expect };
+
+export const test = base.extend({
+  deterministicNetworkPolicy: [
+    async ({ context }, use) => {
+      // A fixture automática cobre todos os testes que importam `test` deste módulo.
+      const policy = await installDeterministicNetworkPolicy(context);
+      await use(policy);
+      policy.assertNoExternalRequests();
+    },
+    { auto: true },
+  ],
+});
+```
+
+5. Explicacao.
+
+HLS/DASH fazem vários pedidos. A allowlist global evita que uma biblioteca ou
+manifest alterado contacte uma origem externa sem o teste perceber. Validar o
+host antes de procurar a fixture impede que
+`https://externo.invalid/__fixtures__/synthetic.m3u8` seja satisfeito como se
+fosse local. O erro final contém apenas a contagem para não copiar querystrings.
+
+6. Validacao.
+
+Confirma respostas `200`/`206`, `Accept-Ranges` e `Content-Range` válidos. Num
+teste negativo, pede uma fixture através de um host não-loopback: o pedido deve
+ser abortado e o teardown deve falhar com `EXTERNAL_NETWORK_ATTEMPT:1`.
+
+7. Negativo.
+
+Uma URL fora de loopback tem de ser abortada e registada como falha, não
+silenciosamente ignorada. As specs importam sempre `test` e `expect` de
+`./test.js`, nunca diretamente de `@playwright/test`.
+
+### Passo 4 - Configurar preview-only em mode test
+
+1. Objetivo do passo.
+
+Executar um build determinístico, sem watcher e sem reutilizar processos.
+
+2. Ficheiros envolvidos.
+    - CRIAR/EDITAR: `playwright.media.config.js`
+
+3. Instrucoes concretas.
+
+Usa apenas a spec de media, output temporário e três engines. O servidor é o
+`preview` do frontend em loopback.
 
 4. Codigo completo.
 
 ```js
 import { defineConfig, devices } from "@playwright/test";
 
+// A matriz cobre engines distintas; browsers branded e Safari real permanecem validação manual.
+// `reuseExistingServer: false` impede que um servidor antigo contamine a execução formal.
 export default defineConfig({
   testDir: "tests/e2e",
-  timeout: 60_000,
-  expect: { timeout: 10_000 },
-  reporter: [["list"], ["html", { outputFolder: "test-results/mf2-html-report", open: "never" }]],
+  testMatch: "media-fixtures.spec.js",
+  outputDir: "/tmp/faithflix-media-playwright",
   use: {
-    baseURL: "http://127.0.0.1:5173",
-    trace: "retain-on-failure",
-    screenshot: "only-on-failure",
-    video: "retain-on-failure",
+    baseURL: "http://127.0.0.1:5182",
+    serviceWorkers: "block",
+    trace: "off",
+    screenshot: "off",
+    video: "off",
   },
   projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],
-  webServer: [
-    {
-      command: "npm --prefix backend run dev",
-      url: "http://127.0.0.1:3000/health",
-      reuseExistingServer: true,
-      timeout: 30_000,
-    },
-    {
-      command: "npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173",
-      url: "http://127.0.0.1:5173",
-      reuseExistingServer: true,
-      timeout: 30_000,
-    },
-  ],
+  webServer: {
+    command: "npm --prefix frontend run preview -- --mode test --host 127.0.0.1 --port 5182",
+    url: "http://127.0.0.1:5182",
+    reuseExistingServer: false,
+  },
 });
 ```
 
-5. Explicacao do codigo ou da decisao.
+5. Explicacao.
 
-`webServer` garante que o teste usa a app real. `reuseExistingServer` evita conflito se ja estiveres a desenvolver localmente.
+`reuseExistingServer:false` garante que o processo pertence à execução. Desligar
+traces/screenshots/vídeo evita artefactos desnecessários para esta matriz curta.
 
-6. Validacao do passo.
+6. Validacao.
 
-```bash
-npx playwright test --list
-```
+O comando `--list` deve mostrar progressive, HLS e DASH em cada engine.
 
-Resultado esperado: o comando lista testes quando o ficheiro do passo 6 existir.
+7. Negativo.
 
-7. Caso negativo, erro comum ou risco que este passo evita.
+Uma execução em `development`/watcher ou contra um preview já aberto não serve
+como evidence formal.
 
-Executar E2E contra servidores arrancados manualmente sem controlo torna resultados pouco repetiveis.
-
-### Passo 3 - Criar seed MF2
+### Passo 5 - Intercetar sessão e playback com DTO fechado
 
 1. Objetivo do passo.
 
-Criar utilizador e conteudo publicado previsiveis para o fluxo E2E.
+Carregar a página real do player sem backend e sem fontes alternativas públicas.
 
 2. Ficheiros envolvidos.
-    - EDITAR: `backend/package.json`
-    - CRIAR: `backend/scripts/seed-mf2-e2e.js`
-    - LOCALIZACAO: script completo
+    - CRIAR/EDITAR: `tests/e2e/media-fixtures.spec.js`
 
 3. Instrucoes concretas.
 
-Adiciona o script `seed:e2e` ao `backend/package.json` e cria o ficheiro abaixo.
+Intercepta `session/me`, CSRF, playback, progresso e preferências. O playback
+devolve exatamente uma fonte e arrays sem URLs.
 
-4. Codigo completo.
+4. Codigo aplicavel.
 
-Trecho esperado em `backend/package.json`:
-
-```json
-{
-  "scripts": {
-    "seed:e2e": "node scripts/seed-mf2-e2e.js"
-  }
+```js
+// A resposta é exclusivamente sintética e local; não prova streaming real, CDN, 4K ou carga.
+function playbackResponse(protocol, fixture) {
+  return {
+    content: {
+      id: `synthetic-${protocol}`,
+      title: `Fixture sintética ${protocol}`,
+      mediaStatus: "ready",
+      isPlayable: true,
+      source: {
+        url: fixture.url,
+        protocol,
+        mimeType: fixture.mimeType,
+      },
+      selectedAudioLanguage: "pt",
+      selectedQuality: "720p",
+      // As opções descrevem seleção/bloqueio, mas nunca incluem URLs alternativas.
+      qualityOptions: [
+        {
+          value: "720p",
+          label: "Fixture local",
+          locked: false,
+          selected: true,
+        },
+      ],
+      tracks: { subtitles: [], audio: [] },
+      preferences: {
+        subtitleLanguage: "",
+        audioLanguage: "pt",
+        quality: "720p",
+      },
+    },
+    progress: { currentTimeSeconds: 0 },
+  };
 }
 ```
 
-`backend/scripts/seed-mf2-e2e.js`
+5. Explicacao.
+
+O frontend exercita routing, sessão, `PlaybackPage` e adapters reais. Só a
+fronteira HTTP é simulada. Isso não equivale a autenticação, autorização ou DB
+end-to-end.
+
+6. Validacao.
+
+No handler, responde apenas a endpoints esperados e usa `404
+UNEXPECTED_TEST_REQUEST` para qualquer API não prevista.
+
+7. Negativo.
+
+Se uma opção/faixa contiver `url`, `src`, `playbackUrl` ou `source`, o teste deve
+falhar por violação do DTO público.
+
+### Passo 6 - Validar os nove casos browser
+
+1. Objetivo do passo.
+
+Exigir `loadedmetadata`/`canplay`, zero alertas e zero pedidos externos para cada
+protocolo/engine.
+
+2. Ficheiros envolvidos.
+    - EXECUTAR: `scripts/check-media-fixtures.mjs`
+    - EXECUTAR: `tests/e2e/media-fixtures.spec.js`
+
+3. Instrucoes concretas.
+
+Corre primeiro o checker e depois a matriz. Não executes seeds e não definas
+qualquer variável MongoDB.
+
+4. Comandos.
+
+```bash
+npm run check:media
+npm run test:media:browser
+```
+
+5. Explicacao.
+
+O teste faz `video.play()` muted apenas para permitir que Chromium peça buffer
+DASH. O sucesso exige `readyState >= 3`, que corresponde a `canplay`.
+
+6. Validacao.
+
+Evidence atual da referência, registada em 2026-07-10: `9/9` — progressive,
+HLS e DASH chegaram a `canplay` em Chromium, Firefox e WebKit, com sessão/API
+intercetadas, zero rede externa, zero backend, zero MongoDB e zero seeds.
+
+7. Negativo.
+
+Um resultado `8/9` permanece falha. Não reduzir a expectativa, não retirar DASH
+e não marcar o browser como verde só porque chegou a metadata.
+
+### Passo 7 - Classificar e isolar o E2E funcional MF2
+
+1. Objetivo do passo.
+
+Evitar que a prova isolada seja usada para fechar o fluxo de produto e definir
+um procedimento futuro que não consiga atingir a base normal.
+
+2. Ficheiros envolvidos.
+    - REVER: `tests/e2e/mf2-flow.spec.js`
+    - CRIAR: `backend/scripts/seed-safety.js`
+    - EDITAR: `backend/scripts/seed-mf2-e2e.js`
+    - EDITAR: `backend/scripts/seed-mf4-e2e.js`
+    - EDITAR: `backend/scripts/seed-mf9-e2e.js`
+    - EDITAR: `backend/src/config/env.js`
+    - REVER: `playwright.config.js`
+
+3. Instrucoes concretas.
+
+Mantém estes estados separados:
+
+| Prova | Estado atual | Condição de fecho |
+| --- | --- | --- |
+| Media browser isolada | `VALIDADO_LOCAL 9/9` | Já cobre adapters/DTO locais |
+| E2E funcional MF2 atual | `NAO_REVALIDADO` | Seed separado + DB `_e2e` dedicada + três engines |
+| `RNF08` | `NAO_PROVADO` | Vídeo e infraestrutura reais + medição reproduzível |
+| `RNF10` | `NAO_PROVADO` | Streaming real + teste de carga a 100 reproduções |
+| `RNF23` | `PARCIAL_VALIDADO` | Adapters locais verdes; entrega real ainda pendente |
+
+Para qualquer execução funcional futura, os guardas são cumulativos:
+`NODE_ENV=test`; opt-in `ALLOW_E2E_SEED=true` apenas no comando de seed;
+`TEST_MONGODB_URI` loopback, sem username/password e com `replicaSet`;
+`TEST_MONGODB_DB_NAME` explícito e terminado em `_e2e`; `E2E_RUN_ID` novo e
+compatível com o nome da base. O browser recebe
+exatamente os mesmos `TEST_MONGODB_*`, nunca `MONGODB_*`. Enquanto o run
+marker não cobrir todos os documentos criados pelos services, cada execução
+formal usa um nome de DB novo. Seed e browser nunca são encadeados num único
+script.
+
+4. Codigo.
+
+No `env.js` cumulativo, importa o guard puro e escolhe a configuração de DB
+antes de construir `env`. Em `test`, a aplicação e o browser usam diretamente
+`TEST_MONGODB_*`; não existe cópia para `MONGODB_*` nem fallback:
 
 ```js
-import { ObjectId } from "mongodb";
-import { getDb } from "../src/config/database.js";
-import { hashPassword } from "../src/modules/auth/auth.password.js";
+import { assertE2eRuntimeEnvironment } from "../../scripts/seed-safety.js";
 
-const db = await getDb();
-const now = new Date();
-const userId = new ObjectId();
-const contentId = new ObjectId();
-const email = "e2e@faithflix.test";
-const E2E_TAG = "mf2-e2e";
+const nodeEnv = process.env.NODE_ENV ?? "development";
+const E2E_MARKERS = [
+  "ALLOW_E2E_SEED",
+  "E2E_SUITE_ID",
+  "E2E_RUN_ID",
+  "TEST_MONGODB_URI",
+  "TEST_MONGODB_DB_NAME",
+];
+const formalE2eRequested = nodeEnv === "test" && E2E_MARKERS.some(
+  (name) => Boolean(process.env[name]),
+);
 
-const existingUser = await db.collection("users").findOne({ email });
-
-if (existingUser) {
-  await db.collection("sessions").deleteMany({ userId: existingUser._id });
-  await db.collection("playback_progress").deleteMany({ userId: existingUser._id });
-  await db.collection("user_content_lists").deleteMany({ userId: existingUser._id });
-  await db.collection("media_preferences").deleteMany({ userId: existingUser._id });
-  await db.collection("users").deleteOne({ _id: existingUser._id });
-}
-
-const conflictingContent = await db.collection("contents").findOne({
-  slug: "piloto-faithflix",
-  e2eFixture: { $ne: E2E_TAG },
-});
-
-if (conflictingContent) {
+if (
+  nodeEnv === "test" &&
+  (process.env.MONGODB_URI || process.env.MONGODB_DB_NAME)
+) {
   throw new Error(
-    'Conteudo com slug "piloto-faithflix" ja existe sem fixture E2E. Seed abortada para preservar dados locais.',
+    "NODE_ENV=test recusa MONGODB_URI e MONGODB_DB_NAME; usa TEST_MONGODB_* ou setDbForTests().",
   );
 }
 
-await db.collection("contents").deleteMany({ e2eFixture: E2E_TAG });
-await db.collection("playback_progress").deleteMany({ e2eFixture: E2E_TAG });
-await db.collection("user_content_lists").deleteMany({ e2eFixture: E2E_TAG });
-await db.collection("media_preferences").deleteMany({ e2eFixture: E2E_TAG });
+const e2eDatabase = formalE2eRequested
+  ? assertE2eRuntimeEnvironment(process.env)
+  : null;
+const mongodbUri = e2eDatabase?.mongoUri ?? (
+  nodeEnv === "test" ? null : parseMongoUri(required("MONGODB_URI"))
+);
+const mongodbDbName = e2eDatabase?.mongoDbName ?? (
+  nodeEnv === "test" ? null : parseDatabaseName(required("MONGODB_DB_NAME"))
+);
 
-await db.collection("users").insertOne({
-  _id: userId,
-  name: "Utilizador E2E",
-  email,
-  passwordHash: await hashPassword("password-segura-123"),
-  role: "user",
-  parentalMaxAgeRating: 18,
-  e2eFixture: E2E_TAG,
-  createdAt: now,
-  updatedAt: now,
+// No Object.freeze existente, substitui apenas as três propriedades equivalentes.
+export const env = Object.freeze({
+  // ...restantes propriedades cumulativas já criadas
+  nodeEnv,
+  mongodbUri,
+  mongodbDbName,
+  // ...rateLimitPepper, sessão, origins e restantes propriedades cumulativas
 });
-
-await db.collection("contents").insertOne({
-  _id: contentId,
-  title: "Piloto FaithFlix",
-  slug: "piloto-faithflix",
-  synopsis: "Conteudo curto usado para validar o fluxo principal da MF2.",
-  type: "movie",
-  durationSeconds: 120,
-  ageRating: 6,
-  status: "published",
-  taxonomyIds: [],
-  assets: {
-    posterUrl: "",
-    backdropUrl: "",
-  },
-  media: {
-    playbackUrl: "/media/piloto.mp4",
-  },
-  tracks: {
-    subtitles: [],
-    audio: [{ language: "pt", label: "Portugues", src: "/media/piloto.mp4" }],
-  },
-  qualityOptions: [
-    { label: "720p", value: "720p", playbackUrl: "/media/piloto.mp4" },
-  ],
-  createdBy: userId,
-  updatedBy: userId,
-  e2eFixture: E2E_TAG,
-  publishedAt: now,
-  createdAt: now,
-  updatedAt: now,
-});
-
-console.log(`Seed MF2 E2E concluida: ${email} / ${contentId.toString()}`);
-process.exit(0);
 ```
 
-5. Explicacao do codigo ou da decisao.
-
-O seed limpa apenas dados marcados com `e2eFixture: "mf2-e2e"` e dados do utilizador E2E controlado. Se encontrar o slug reservado sem tag de fixture, aborta com erro claro em vez de apagar conteudo local legitimo. Depois cria um conteudo publicado com slug conhecido.
-
-6. Validacao do passo.
-
-```bash
-npm --prefix backend run seed:e2e
-```
-
-Resultado esperado: mensagem `Seed MF2 E2E concluida`.
-
-7. Caso negativo, erro comum ou risco que este passo evita.
-
-Sem filtros de limpeza restritos, o seed pode apagar dados locais que nao pertencem ao teste.
-
-### Passo 4 - Confirmar media de teste
-
-1. Objetivo do passo.
-
-Garantir que o player tem um ficheiro real para medir `RNF08`.
-
-2. Ficheiros envolvidos.
-    - CRIAR: `frontend/public/media/piloto.mp4`
-    - LOCALIZACAO: asset local
-
-3. Instrucoes concretas.
-
-Adiciona um video curto, leve e sem direitos externos.
-
-4. Codigo completo.
-
-Nao ha codigo JS neste passo. O ficheiro deve cumprir:
-
-- menos de 5 MB;
-- pelo menos 20 segundos;
-- arranque rapido em browser local;
-- caminho final `/media/piloto.mp4`.
-
-5. Explicacao do codigo ou da decisao.
-
-`RNF08` mede o evento `playing`; sem media real, nao ha reproducao a medir.
-
-6. Validacao do passo.
-
-Com o frontend a correr:
-
-```bash
-curl -i http://127.0.0.1:5173/media/piloto.mp4
-```
-
-Resultado esperado: `200`.
-
-7. Caso negativo, erro comum ou risco que este passo evita.
-
-Se o ficheiro nao existir, o E2E deve falhar porque o player nao consegue arrancar.
-
-### Passo 5 - Acrescentar seletores estáveis
-
-1. Objetivo do passo.
-
-Dar ao E2E pontos de referencia estaveis nos componentes principais.
-
-2. Ficheiros envolvidos.
-    - EDITAR: `frontend/src/components/auth/AuthForms.jsx`
-    - CONFIRMAR: `frontend/src/pages/ContentDetailPage.jsx`
-    - CONFIRMAR: `frontend/src/pages/PlaybackPage.jsx`
-    - CONFIRMAR: `frontend/src/pages/MyLibraryPage.jsx`
-    - LOCALIZACAO: atributos JSX
-
-3. Instrucoes concretas.
-
-Adiciona os atributos abaixo. Os BKs 04, 05 e 07 já indicaram os restantes seletores.
-
-4. Codigo completo.
-
-Em `AuthForms.jsx`, mantem o estado `form` criado no `BK-MF2-01` e acrescenta apenas `data-testid`:
-
-```jsx
-import { useState } from "react";
-import { authApi } from "../../services/api/authApi.js";
-
-const INITIAL_FORM = { name: "", email: "", password: "", token: "" };
-
-export function AuthForms() {
-  const [mode, setMode] = useState("login");
-  const [form, setForm] = useState(INITIAL_FORM);
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("");
-  const [error, setError] = useState("");
-
-  function updateField(event) {
-    setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
-  }
-
-  async function submit(event) {
-    event.preventDefault();
-    setLoading(true);
-    setError("");
-    setStatus("");
-
-    try {
-      if (mode === "register") {
-        await authApi.register({ name: form.name, email: form.email, password: form.password });
-        setStatus("Conta criada e sessao iniciada.");
-      }
-
-      if (mode === "login") {
-        await authApi.login({ email: form.email, password: form.password });
-        setStatus("Sessao iniciada.");
-      }
-
-      if (mode === "forgot") {
-        const response = await authApi.forgotPassword({ email: form.email });
-        setStatus(response.message);
-      }
-
-      if (mode === "reset") {
-        await authApi.resetPassword({ token: form.token, password: form.password });
-        setStatus("Password atualizada. Ja podes iniciar sessao.");
-      }
-    } catch (requestError) {
-      setError(requestError.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <section className="auth-panel" data-testid="auth-form">
-      <div className="auth-tabs" aria-label="Autenticacao">
-        {["login", "register", "forgot", "reset"].map((item) => (
-          <button key={item} type="button" className={mode === item ? "active" : ""} onClick={() => setMode(item)}>
-            {item}
-          </button>
-        ))}
-      </div>
-
-      <form onSubmit={submit} className="auth-form">
-        {mode === "register" ? (
-          <label>
-            Nome
-            <input data-testid="name-input" name="name" value={form.name} onChange={updateField} autoComplete="name" />
-          </label>
-        ) : null}
-
-        {mode !== "reset" ? (
-          <label>
-            Email
-            <input data-testid="email-input" name="email" type="email" value={form.email} onChange={updateField} autoComplete="email" />
-          </label>
-        ) : null}
-
-        {mode === "reset" ? (
-          <label>
-            Token
-            <input data-testid="token-input" name="token" value={form.token} onChange={updateField} />
-          </label>
-        ) : null}
-
-        {mode !== "forgot" ? (
-          <label>
-            Password
-            <input data-testid="password-input" name="password" type="password" value={form.password} onChange={updateField} autoComplete="current-password" />
-          </label>
-        ) : null}
-
-        <button data-testid={mode === "login" ? "login-submit" : `${mode}-submit`} type="submit" disabled={loading}>
-          {loading ? "A validar..." : "Confirmar"}
-        </button>
-      </form>
-
-      {status ? <p className="form-status">{status}</p> : null}
-      {error ? <p className="form-error">{error}</p> : null}
-    </section>
-  );
-}
-```
-
-Confirmar que existem:
-
-```jsx
-<main data-testid="content-detail">
-<video data-testid="faithflix-player">
-<main data-testid="my-library">
-```
-
-5. Explicacao do codigo ou da decisao.
-
-`data-testid` reduz fragilidade quando o texto ou layout mudam. O exemplo usa o mesmo estado `form`, `updateField` e `submit` do BK-MF2-01.
-
-6. Validacao do passo.
-
-Abre `/login` e verifica no DevTools que existem `auth-form`, `email-input`, `password-input` e `login-submit`.
-
-7. Caso negativo, erro comum ou risco que este passo evita.
-
-Se abandonares o estado `form`, partes o componente definido no BK-MF2-01.
-
-### Passo 6 - Criar teste E2E
-
-1. Objetivo do passo.
-
-Automatizar o fluxo principal da MF2 no browser real.
-
-2. Ficheiros envolvidos.
-    - CRIAR: `tests/e2e/mf2-flow.spec.js`
-    - LOCALIZACAO: ficheiro completo
-
-3. Instrucoes concretas.
-
-Cria o teste abaixo. Ele usa as rotas e seletores entregues nos BKs anteriores.
-
-4. Codigo completo.
+Os comentários representam propriedades já existentes, não autorizam um
+`env` truncado. Conserva todas as propriedades anteriores. `null` é deliberado:
+um teste unitário sem markers não liga a MongoDB e só obtém uma base através de
+`setDbForTests(dbDouble)`. No `backend/src/config/database.js` cumulativo de
+`BK-MF1-04`, acrescenta este guard antes de construir o `MongoClient` e conserva
+o restante módulo:
 
 ```js
-import { expect, test } from "@playwright/test";
+export async function getMongoClient() {
+  // Test sem lane E2E só pode chegar aos services através do double explícito.
+  if (!env.mongodbUri || !env.mongodbDbName) {
+    throw new Error(
+      "MongoDB indisponivel em test sem TEST_MONGODB_*; injeta um DB double com setDbForTests().",
+    );
+  }
 
-test("MF2 fluxo principal: login, detalhe, listas, player e biblioteca", async ({ page }) => {
-  await page.goto("/login");
-  await expect(page.getByTestId("auth-form")).toBeVisible();
-  await page.getByTestId("email-input").fill("e2e@faithflix.test");
-  await page.getByTestId("password-input").fill("password-segura-123");
-  await page.getByTestId("login-submit").click();
-  await expect(page.getByText("Sessao iniciada.")).toBeVisible();
-
-  const catalogStart = performance.now();
-  await page.goto("/catalogo");
-  await expect(page.getByRole("heading", { name: /catalogo/i })).toBeVisible();
-  await expect(page.getByText("Piloto FaithFlix")).toBeVisible();
-  const catalogLoadMs = performance.now() - catalogStart;
-  console.log(`RNF07 catalogLoadMs=${Math.round(catalogLoadMs)}`);
-  expect(catalogLoadMs).toBeLessThan(3000);
-
-  await page.goto("/catalogo/piloto-faithflix");
-  await expect(page.getByTestId("content-detail")).toBeVisible();
-
-  await page.getByRole("button", { name: /adicionar aos favoritos/i }).click();
-  await page.getByRole("button", { name: /adicionar a watchlist/i }).click();
-  await page.getByRole("link", { name: /reproduzir/i }).click();
-
-  const player = page.getByTestId("faithflix-player");
-  await expect(player).toBeVisible();
-
-  const playStartMs = await player.evaluate(async (video) => {
-    video.muted = true;
-    const start = performance.now();
-
-    await video.play();
-
-    if (!video.paused && !video.ended) {
-      return performance.now() - start;
-    }
-
-    await new Promise((resolve, reject) => {
-      const timeout = window.setTimeout(() => reject(new Error("Video nao iniciou dentro do limite.")), 3000);
-      video.addEventListener("playing", () => {
-        window.clearTimeout(timeout);
-        resolve();
-      }, { once: true });
+  if (!clientPromise) {
+    const client = new MongoClient(env.mongodbUri);
+    clientPromise = client.connect().catch((error) => {
+      clientPromise = null;
+      throw error;
     });
+  }
+  return clientPromise;
+}
+```
 
-    return performance.now() - start;
+`getDb()` continua a devolver primeiro `testDb`, por isso unitários in-memory
+funcionam sem URI. Integração transacional e browser E2E não usam esse escape:
+qualquer marker chama o guard completo e exige a lane `TEST_MONGODB_*`.
+`ALLOW_E2E_SEED` é apenas marker fail-closed em `env.js`; só a CLI de seed lhe
+atribui autorização de escrita.
+
+Cria primeiro o guard completo. Ele não importa `env.js` nem `database.js`,
+logo uma seed nunca consegue herdar o fallback ou a base normal da aplicação.
+
+`backend/scripts/seed-safety.js`
+
+```js
+const RUN_ID_PATTERN = /^[a-z0-9][a-z0-9_-]{7,47}$/u;
+const SUITE_ID_PATTERN = /^mf(?:2|4|9)$/u;
+const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
+
+function required(source, name) {
+  const value = source[name]?.trim();
+  if (!value) throw new Error(`${name} tem de ser definida explicitamente.`);
+  return value;
+}
+
+function assertTestMongoUri(value) {
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error("TEST_MONGODB_URI invalida.");
+  }
+
+  if (parsed.protocol !== "mongodb:") {
+    throw new Error("TEST_MONGODB_URI exige mongodb:// local.");
+  }
+  if (parsed.username || parsed.password) {
+    throw new Error("TEST_MONGODB_URI nao pode conter credenciais.");
+  }
+  if (!LOOPBACK_HOSTS.has(parsed.hostname)) {
+    throw new Error("TEST_MONGODB_URI tem de usar apenas loopback.");
+  }
+  if (!parsed.searchParams.get("replicaSet")?.trim()) {
+    throw new Error("TEST_MONGODB_URI exige replicaSet explicito.");
+  }
+
+  return value;
+}
+
+export function assertE2eRuntimeEnvironment(source = process.env) {
+  const suiteId = required(source, "E2E_SUITE_ID");
+  if (!SUITE_ID_PATTERN.test(suiteId)) {
+    throw new Error("Suite E2E desconhecida.");
+  }
+  if (source.NODE_ENV !== "test") {
+    throw new Error("E2E exige NODE_ENV=test.");
+  }
+  if (source.MONGODB_URI || source.MONGODB_DB_NAME) {
+    throw new Error("Seeds E2E recusam MONGODB_URI e MONGODB_DB_NAME.");
+  }
+
+  const runId = required(source, "E2E_RUN_ID");
+  if (!RUN_ID_PATTERN.test(runId)) {
+    throw new Error("E2E_RUN_ID exige 8-48 caracteres ASCII seguros.");
+  }
+
+  const mongoUri = assertTestMongoUri(required(source, "TEST_MONGODB_URI"));
+  const mongoDbName = required(source, "TEST_MONGODB_DB_NAME");
+  const expectedDbName = `faithflix_${suiteId}_${runId}_e2e`;
+
+  if (mongoDbName !== expectedDbName) {
+    throw new Error(
+      `TEST_MONGODB_DB_NAME tem de ser exatamente ${expectedDbName}.`,
+    );
+  }
+
+  return Object.freeze({ suiteId, runId, mongoUri, mongoDbName });
+}
+
+export function assertE2eSeedEnvironment(expectedSuiteId, source = process.env) {
+  const config = assertE2eRuntimeEnvironment(source);
+
+  if (config.suiteId !== expectedSuiteId) {
+    throw new Error("E2E_SUITE_ID nao corresponde a seed executada.");
+  }
+  if (source.ALLOW_E2E_SEED !== "true") {
+    throw new Error("Seeds E2E exigem ALLOW_E2E_SEED=true.");
+  }
+
+  return config;
+}
+
+function markerFilter(marker) {
+  return {
+    "e2eFixture.suite": marker.suite,
+    "e2eFixture.run": marker.run,
+  };
+}
+
+export function createFixtureContext(db, { suiteId, runId }) {
+  const marker = Object.freeze({ suite: suiteId, run: runId });
+  const fields = Object.freeze({ e2eFixture: marker });
+  const exactMarker = markerFilter(marker);
+  const markedDb = new Proxy(db, {
+    get(targetDb, property) {
+      if (property !== "collection") {
+        const value = Reflect.get(targetDb, property, targetDb);
+        return typeof value === "function" ? value.bind(targetDb) : value;
+      }
+
+      return (collectionName) => {
+        const collection = targetDb.collection(collectionName);
+        return new Proxy(collection, {
+          get(targetCollection, operation) {
+            if (operation === "insertOne") {
+              return (document, options) => targetCollection.insertOne(
+                { ...document, ...fields },
+                options,
+              );
+            }
+            if (operation === "insertMany") {
+              return (documents, options) => targetCollection.insertMany(
+                documents.map((document) => ({ ...document, ...fields })),
+                options,
+              );
+            }
+            if (operation === "replaceOne" || operation === "findOneAndReplace") {
+              return (filter, replacement, options) => targetCollection[operation](
+                filter,
+                { ...replacement, ...fields },
+                options,
+              );
+            }
+            if (["updateOne", "updateMany", "findOneAndUpdate"].includes(operation)) {
+              return (filter, update, options = {}) => {
+                const serializedUpdate = JSON.stringify(update) ?? "";
+                if (serializedUpdate.includes('"e2eFixture')) {
+                  throw new Error("Uma seed nao pode alterar o marker E2E.");
+                }
+                const markedUpdate = options.upsert
+                  ? {
+                      ...update,
+                      $setOnInsert: { ...update.$setOnInsert, ...fields },
+                    }
+                  : update;
+                return targetCollection[operation](filter, markedUpdate, options);
+              };
+            }
+            if (["deleteOne", "deleteMany", "bulkWrite"].includes(operation)) {
+              throw new Error(
+                `${String(operation)} nao e permitido no seed proxy; usa fixture.cleanup().`,
+              );
+            }
+
+            const value = Reflect.get(
+              targetCollection,
+              operation,
+              targetCollection,
+            );
+            return typeof value === "function"
+              ? value.bind(targetCollection)
+              : value;
+          },
+        });
+      };
+    },
   });
 
-  console.log(`RNF08 playStartMs=${Math.round(playStartMs)}`);
-  expect(playStartMs).toBeLessThan(3000);
+  return Object.freeze({
+    marker,
+    fields,
+    db: markedDb,
+    async cleanup(plan) {
+      // Primeira passagem: nenhuma escrita acontece enquanto houver conflito.
+      for (const entry of plan) {
+        if (!entry.collectionName || !Array.isArray(entry.reservedSelectors)) {
+          throw new Error("Plano de cleanup E2E invalido.");
+        }
+        if (entry.reservedSelectors.length === 0) continue;
 
-  await page.waitForTimeout(16_000);
-  await player.evaluate((video) => video.pause());
+        const conflict = await db.collection(entry.collectionName).findOne(
+          {
+            $and: [
+              { $or: entry.reservedSelectors },
+              { $nor: [exactMarker] },
+            ],
+          },
+          { projection: { _id: 1 } },
+        );
 
-  await page.goto("/biblioteca");
-  await expect(page.getByTestId("my-library")).toBeVisible();
-  await expect(page.getByText("Piloto FaithFlix")).toBeVisible();
-});
+        if (conflict) {
+          throw new Error(
+            `${entry.collectionName} contem dados reservados sem o marker desta execução.`,
+          );
+        }
+      }
+
+      // Segunda passagem: apenas documentos desta suite/run podem ser apagados.
+      for (const entry of plan) {
+        await db.collection(entry.collectionName).deleteMany(exactMarker);
+      }
+    },
+  });
+}
+
+async function openIsolatedDatabase(config) {
+  // O driver só é carregado depois de todos os guardas terem passado.
+  const { MongoClient } = await import("mongodb");
+  const client = new MongoClient(config.mongoUri);
+
+  try {
+    await client.connect();
+    return { client, db: client.db(config.mongoDbName) };
+  } catch (error) {
+    await client.close();
+    throw error;
+  }
+}
+
+export async function runE2eSeedCli({ suiteId, seed }) {
+  let client;
+  let closeApplicationDatabase;
+  try {
+    const config = assertE2eSeedEnvironment(suiteId);
+    const connection = await openIsolatedDatabase(config);
+    client = connection.client;
+    const fixture = createFixtureContext(connection.db, config);
+    const { closeDatabase, setDbForTests } = await import(
+      "../src/config/database.js"
+    );
+    setDbForTests(fixture.db);
+    closeApplicationDatabase = closeDatabase;
+    await seed({ db: fixture.db, fixture });
+    console.log(`Seed ${suiteId} concluida para run ${config.runId}.`);
+  } catch (error) {
+    console.error(`Seed ${suiteId} recusada: ${error.message}`);
+    process.exitCode = 1;
+  } finally {
+    try {
+      await closeApplicationDatabase?.();
+    } finally {
+      await client?.close();
+    }
+  }
+}
 ```
 
-5. Explicacao do codigo ou da decisao.
+Depois integra **as três seeds**, sem reescrever os documentos de domínio já
+ensinados nos respetivos BKs. Remove imports/chamadas a `getDb()`, elimina os
+`deleteOne/deleteMany` antigos e obtém sempre `db` do callback; o único cleanup
+permitido é `fixture.cleanup()`. Cada insert/replace/upsert da fixture recebe
+o marker automaticamente pelo proxy; `setDbForTests()` aponta os services para
+o mesmo proxy, por isso os documentos criados por helpers também ficam
+marcados. Deletes diretos e `bulkWrite` são recusados para impedir escritas que
+contornem a marcação.
 
-O teste mede catalogo principal e arranque do video com `performance.now()`, guarda logs e valida que a biblioteca mostra o conteudo depois das acoes.
+```js
+// seed-mf2-e2e.js
+import { runE2eSeedCli } from "./seed-safety.js";
 
-6. Validacao do passo.
+async function seedMf2E2e({ db, fixture }) {
+  await fixture.cleanup([
+    { collectionName: "subscription_plans", reservedSelectors: [{ code: { $in: ["faithflix-monthly", "faithflix-yearly", "faithflix-family-monthly", "faithflix-family-yearly"] } }] },
+    { collectionName: "users", reservedSelectors: [{ email: "e2e@faithflix.test" }] },
+    { collectionName: "contents", reservedSelectors: [{ slug: "piloto-faithflix" }] },
+    { collectionName: "sessions", reservedSelectors: [{ userId }] },
+    { collectionName: "subscriptions", reservedSelectors: [{ userId }] },
+    { collectionName: "trials", reservedSelectors: [{ userId }] },
+    { collectionName: "playback_progress", reservedSelectors: [{ userId }, { contentId }] },
+    { collectionName: "user_content_lists", reservedSelectors: [{ userId }, { contentId }] },
+    { collectionName: "media_preferences", reservedSelectors: [{ userId }] },
+  ]);
+  // Mantém aqui, sem alterações, todos os inserts completos já existentes.
+  // O `db` recebido é o proxy que acrescenta o marker automaticamente.
+}
+
+await runE2eSeedCli({ suiteId: "mf2", seed: seedMf2E2e });
+```
+
+O mesmo wrapper é obrigatório nas seeds MF4 e MF9; os seletores abaixo são a
+allowlist mínima de colisões a copiar para os respetivos planos de cleanup.
+
+```js
+// seed-mf4-e2e.js
+import { runE2eSeedCli } from "./seed-safety.js";
+
+async function seedMf4E2e({ db, fixture }) {
+  await fixture.cleanup([
+    { collectionName: "subscription_plans", reservedSelectors: [{ code: { $in: ["faithflix-monthly", "faithflix-yearly", "faithflix-family-monthly", "faithflix-family-yearly"] } }] },
+    { collectionName: "sessions", reservedSelectors: [{ userId: { $in: [adminId, userId, charityUserId] } }] },
+    { collectionName: "users", reservedSelectors: [{ email: { $in: [ADMIN_EMAIL, USER_EMAIL, CHARITY_USER_EMAIL] } }] },
+    { collectionName: "charity_applications", reservedSelectors: [{ email: APPLICATION_EMAIL }] },
+    { collectionName: "charities", reservedSelectors: [{ name: CHARITY_NAME }] },
+    { collectionName: "charity_memberships", reservedSelectors: [{ charityId }] },
+    { collectionName: "subscriptions", reservedSelectors: [{ userId: { $in: [userId, charityUserId] } }] },
+    { collectionName: "trials", reservedSelectors: [{ userId: { $in: [userId, charityUserId] } }] },
+    { collectionName: "payment_attempts", reservedSelectors: [{ userId: { $in: [userId, charityUserId] } }] },
+    { collectionName: "notifications", reservedSelectors: [{ userId: { $in: [userId, charityUserId] } }] },
+    { collectionName: "pool_distributions", reservedSelectors: [{ month: DISTRIBUTION_MONTH }] },
+  ]);
+  // Mantém aqui todos os inserts MF4 existentes, usando apenas este `db`.
+}
+
+await runE2eSeedCli({ suiteId: "mf4", seed: seedMf4E2e });
+```
+
+`backend/scripts/seed-mf9-e2e.js` — patch de integração:
+
+```js
+import { runE2eSeedCli } from "./seed-safety.js";
+
+async function seedMf9E2e({ db, fixture }) {
+  await fixture.cleanup([
+    { collectionName: "subscription_plans", reservedSelectors: [{ code: { $in: ["faithflix-monthly", "faithflix-yearly", "faithflix-family-monthly", "faithflix-family-yearly"] } }] },
+    { collectionName: "sessions", reservedSelectors: [{ userId: { $in: [ownerId, memberId, proId] } }] },
+    { collectionName: "users", reservedSelectors: [{ email: { $in: [OWNER_EMAIL, MEMBER_EMAIL, PRO_EMAIL] } }] },
+    { collectionName: "subscriptions", reservedSelectors: [{ userId: { $in: [ownerId, memberId, proId] } }] },
+    { collectionName: "trials", reservedSelectors: [{ userId: { $in: [ownerId, memberId, proId] } }] },
+    { collectionName: "subscription_family_memberships", reservedSelectors: [{ ownerUserId: ownerId }, { memberUserId: memberId }] },
+    { collectionName: "payment_attempts", reservedSelectors: [{ userId: { $in: [ownerId, memberId, proId] } }] },
+    { collectionName: "notifications", reservedSelectors: [{ userId: { $in: [ownerId, memberId, proId] } }] },
+    { collectionName: "contents", reservedSelectors: [{ slug: CONTENT_SLUG }] },
+    { collectionName: "playback_progress", reservedSelectors: [{ contentId }] },
+    { collectionName: "user_content_lists", reservedSelectors: [{ contentId }] },
+    { collectionName: "media_preferences", reservedSelectors: [{ userId: { $in: [ownerId, memberId, proId] } }] },
+  ]);
+  // Mantém aqui todos os inserts MF9 existentes, usando apenas este `db`.
+}
+
+await runE2eSeedCli({ suiteId: "mf9", seed: seedMf9E2e });
+```
+
+Estes são patches de integração sobre seeds já existentes, não substitutos dos
+respetivos corpos. Não apagues nenhum insert de domínio. IDs, emails, slugs e
+mês fixos entram em `reservedSelectors`; se algum pertencer a um documento sem
+o marker exato, todo o cleanup aborta antes da primeira escrita.
+
+Exemplo documental para uma execução futura autorizada; troca o timestamp por
+um identificador novo e não executes estes comandos nesta correção:
 
 ```bash
-npm run e2e:mf2
+NODE_ENV=test \
+ALLOW_E2E_SEED=true \
+E2E_SUITE_ID='mf2' \
+E2E_RUN_ID='20260710t120000' \
+RATE_LIMIT_PEPPER='faithflix-e2e-test-only-pepper-20260710' \
+FRONTEND_ORIGINS='http://127.0.0.1:5173' \
+TEST_MONGODB_URI='mongodb://127.0.0.1:27017/?replicaSet=rs0' \
+TEST_MONGODB_DB_NAME='faithflix_mf2_20260710t120000_e2e' \
+npm --prefix backend run seed:e2e
+
+NODE_ENV=test \
+E2E_SUITE_ID='mf2' \
+E2E_RUN_ID='20260710t120000' \
+RATE_LIMIT_PEPPER='faithflix-e2e-test-only-pepper-20260710' \
+FRONTEND_ORIGINS='http://127.0.0.1:5173' \
+TEST_MONGODB_URI='mongodb://127.0.0.1:27017/?replicaSet=rs0' \
+TEST_MONGODB_DB_NAME='faithflix_mf2_20260710t120000_e2e' \
+npm exec playwright -- test tests/e2e/mf2-flow.spec.js --config=playwright.config.js
 ```
 
-Resultado esperado: teste passa e imprime `RNF07 catalogLoadMs` e `RNF08 playStartMs`.
+5. Explicacao.
 
-7. Caso negativo, erro comum ou risco que este passo evita.
+O primeiro comando pode escrever apenas depois de todos os guardas passarem. O
+segundo é uma invocação Playwright válida fora de scripts npm e reutiliza a
+mesma DB isolada, `E2E_SUITE_ID` e `E2E_RUN_ID`, sem receber autorização de
+seed. O pepper é uma constante exclusivamente de teste, não uma credencial de
+produção. Uma URI remota, com
+credenciais, sem `replicaSet`, um nome sem `_e2e`, qualquer `MONGODB_*` ou
+uma DB reutilizada enquanto existirem documentos sem marker deve abortar antes
+da ligação. O `9/9` media não satisfaz estas condições nem prova o fluxo MF2.
 
-Se o teste falhar em `/biblioteca`, confirma primeiro se a rota foi montada no `BK-MF2-07`.
+6. Validacao.
 
-### Passo 7 - Recolher evidence e interpretar falhas
+Revisa estaticamente o par de comandos e confirma os dois conjuntos iguais de
+`TEST_MONGODB_*`/`E2E_SUITE_ID`/`E2E_RUN_ID`, o opt-in presente apenas no seed e a ausência total de
+`MONGODB_URI`/`MONGODB_DB_NAME`. O procedimento permanece
+`NAO_EXECUTADO`; não registes `PASS` sem uma execução autorizada e evidence
+nova.
 
-1. Objetivo do passo.
+7. Negativo.
 
-Guardar prova objetiva da execucao e transformar falhas em diagnostico acionavel.
-
-2. Ficheiros envolvidos.
-    - LER: `test-results/mf2-html-report`
-    - LER: logs do terminal
-    - VALIDAR: screenshots e traces em falha
-
-3. Instrucoes concretas.
-
-Depois de correr o teste, guarda no registo da tarefa os tempos impressos e o estado do relatorio.
-
-4. Codigo completo.
-
-```bash
-npm run e2e:mf2
-npx playwright show-report test-results/mf2-html-report
-```
-
-5. Explicacao do codigo ou da decisao.
-
-O relatorio HTML permite rever screenshots, traces e videos retidos em falha.
-
-6. Validacao do passo.
-
-Evidence minima:
-
-- estado final do teste;
-- valor observado de `RNF07 catalogLoadMs`;
-- valor observado de `RNF08 playStartMs`;
-- screenshot ou trace se falhar.
-
-7. Caso negativo, erro comum ou risco que este passo evita.
-
-Sem evidence, uma falha de performance fica dificil de distinguir de falha de seed, media ou rota.
+Qualquer frase “RNF08 passou”, “4K real”, “streaming real” ou “E2E MF2 completo”
+baseada apenas nesta matriz bloqueia o fecho. O mesmo acontece se seed/browser
+forem unidos, se a URI não for loopback+replica set, se a DB não for nova
+`*_e2e` ou se o browser receber variáveis `MONGODB_*`.
 
 ## Snippet tecnico aplicavel
 
 ```js
-await page.goto("/catalogo");
-await expect(page.getByText("Piloto FaithFlix")).toBeVisible();
-await page.goto("/catalogo/piloto-faithflix");
-await expect(page.getByTestId("content-detail")).toBeVisible();
-await page.getByRole("link", { name: /reproduzir/i }).click();
+// O contrato permite uma única fonte no envelope autenticado e zero fontes nas opções.
+expect(Object.keys(playback.content.source).sort()).toEqual([
+  "mimeType",
+  "protocol",
+  "url",
+]);
+expect(
+  playback.content.qualityOptions.some((option) =>
+    ["url", "src", "playbackUrl", "source"].some((field) => field in option),
+  ),
+).toBe(false);
 ```
 
-## Criterios de aceite (mensuraveis)
+#### Critérios de aceite
 
-- [ ] `npm run e2e:mf2` executa seed antes do teste.
-- [ ] O seed limpa apenas dados associados a `mf2-e2e` e ao email E2E controlado, nunca conteudo por slug solto.
-- [ ] O teste faz login por `/login`.
-- [ ] O teste mede `RNF07` em `/catalogo`.
-- [ ] O teste valida `/catalogo/piloto-faithflix`.
-- [ ] O teste usa `/ver/:contentId` atraves do link de reproducao.
-- [ ] O teste valida favoritos e watchlist.
-- [ ] O teste valida `/biblioteca`.
-- [ ] `RNF07` e `RNF08` sao medidos e registados.
-- [ ] Falhas guardam trace, screenshot ou video.
+- [ ] `check:media` confirma os três SHA-256 e zero URL externa.
+- [ ] O build e o preview usam `mode=test`.
+- [ ] `reuseExistingServer` está `false`.
+- [ ] A política global aborta qualquer host não-loopback.
+- [ ] A API é totalmente intercetada; o backend não arranca.
+- [ ] A suite media não lê/escreve MongoDB e não executa seed.
+- [ ] Cada resposta contém exatamente uma `content.source` canónica.
+- [ ] `qualityOptions` e `tracks` públicas não contêm fontes.
+- [ ] Progressive, HLS e DASH chegam a `canplay` em Chromium, Firefox e WebKit.
+- [ ] A contagem esperada é `9/9`, sem skip crítico.
+- [ ] A fixture de canvas é descrita como 320×180 sintética, nunca como 4K real.
+- [ ] `RNF08` e `RNF10` permanecem `NAO_PROVADO`.
+- [ ] `RNF23` fica no máximo `PARCIAL_VALIDADO`.
+- [ ] O E2E funcional MF2 permanece separado e não é declarado como revalidado.
+- [ ] `seed-safety.js` valida todos os guardas antes de importar o driver ou ligar.
+- [ ] MF2, MF4 e MF9 usam `runE2eSeedCli`, `E2E_RUN_ID` e marker `suite/run`.
+- [ ] O cleanup pré-valida todas as colisões e apaga apenas pelo marker exato.
+- [ ] Uma DB formal é nova por run enquanto qualquer service criar documentos
+  sem marker; seed e browser usam os mesmos `TEST_MONGODB_*` sem `MONGODB_*`.
 
-## Validacao final
+#### Validação final
 
 ```bash
-npm run e2e:mf2
+npm run check:media
+npm exec playwright -- test --config=playwright.media.config.js --list
+npm run test:media:browser
 ```
 
-Regista no PR/defesa os valores de `RNF07` e `RNF08`, juntamente com o estado do relatorio Playwright.
+Na correção documental de 2026-07-10, não se voltou a executar a matriz browser;
+o `9/9` citado é a execução atual já registada no report canónico. Não executar
+`seed:*`, `e2e:mf2`, migrações ou DB para validar este guia.
 
-## Evidence para PR/defesa
+#### Evidence para PR/defesa
 
-- Output de `npm run e2e:mf2`.
-- Linha de log `RNF07 catalogLoadMs=...` com valor inferior a `3000`.
-- Linha de log `RNF08 playStartMs=...` com valor inferior a `3000`.
-- Relatorio Playwright em `test-results/mf2-html-report`.
-- Screenshot, trace ou video quando existir falha.
-- Nota curta a indicar que o fluxo passou por `/login`, `/catalogo/piloto-faithflix`, `/ver/:contentId` e `/biblioteca`.
-- Nota curta a indicar que o seed nao apaga colecoes inteiras.
+- Output do checker com checksums válidos e zero URLs externas.
+- Lista de nove casos por protocolo/engine.
+- Resultado `9/9` da matriz preview-only.
+- Prova de que `session/me`, CSRF e playback foram intercetados.
+- Prova de rede externa vazia.
+- DTO com uma única `content.source` e listas sem fontes.
+- Nota explícita: sem backend, DB, seed, media real, 4K real, CDN ou carga.
+- Estados finais: `RNF08=NAO_PROVADO`, `RNF10=NAO_PROVADO`,
+  `RNF23=PARCIAL_VALIDADO`.
 
-## Handoff
+#### Handoff
 
-A `MF3` pode assumir que existe um fluxo principal autenticado e validado: login, catalogo, detalhe, reproducao, progresso, listas pessoais e biblioteca.
+O `BK-MF3-01` pode consumir os contratos de identidade/conteúdo, mas não deve
+assumir que o E2E funcional MF2 ou a performance real ficaram fechados. O gate
+final deve manter a separação entre prova browser local e fluxo funcional com
+DB dedicada.
 
 ## Proximo BK recomendado
 
-`BK-MF3-01` - Ratings e agregacao.
+`BK-MF3-01` - Ratings e comentários.
 
-## Changelog
+#### Changelog
 
-- 2026-05-31: Alinhados criterios, evidence, handoff e changelog com o contrato do guia.
-- 2026-05-31: Corrigidos seed E2E, seletores de login e medição de `RNF07` no catálogo principal.
+- 2026-07-10: criado o guard E2E copiável e integrado o contrato nas seeds
+  MF2/MF4/MF9, com DB única por run, marker suite/run e cleanup em duas passagens.
+- 2026-07-10: guia reescrito para separar E2E funcional de media preview-only;
+  documentados fMP4 canvas/checksums, route interception, loopback, três engines,
+  DTO `content.source`, prova atual `9/9` e limites RNF sem seed/DB.
+- 2026-05-31: alinhados critérios, evidence, handoff e changelog com o contrato
+  inicial do guia.

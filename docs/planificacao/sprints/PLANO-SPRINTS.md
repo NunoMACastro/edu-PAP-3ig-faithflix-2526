@@ -148,7 +148,7 @@ Remediacao minima:
 ### Gate Sprint 4 (S4)
 
 1. Cobertura da matriz `MATRIZ-CANONICA-BK.md` para requisitos de gate.
-2. Conformidade dos guias BK com template v3 (especificidade + snippets + proximos BKs reais).
+2. Conformidade dos guias BK com o contrato `tutorial-v2` de 16 secções e passos nos sete pontos.
 3. Criterios de aceite mensuraveis presentes nos guias da janela.
 4. Evidence minima (`pr`, `proof`, `neg`) validada.
 
@@ -184,7 +184,7 @@ Remediacao minima:
 - `numero de blockers`
 - `numero de regressoes`
 - `tempo medio de fecho por BK`
-- `% guias conformes ao template v3`
+- `% guias conformes ao contrato tutorial-v2`
 - `% requisitos com rastreabilidade validada na matriz RF/RNF`
 - `carga total de sprint (pontos)`
 

@@ -6,7 +6,7 @@ import { ObjectId } from "mongodb";
 import { HttpError } from "../../utils/http-error.js";
 
 export const SEARCH_SORTS = ["title", "recent", "rating"];
-export const SEARCH_TYPES = ["movie", "series", "episode", "documentary"];
+export const SEARCH_TYPES = ["movie", "series", "documentary"];
 
 /**
  * Escapes user text before building a regular expression.

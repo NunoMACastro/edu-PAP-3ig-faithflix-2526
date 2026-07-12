@@ -9,7 +9,6 @@ const CONTENT_TYPES = [
     { value: "", label: "Todos os tipos" },
     { value: "movie", label: "Filmes" },
     { value: "series", label: "Séries" },
-    { value: "episode", label: "Episódios" },
     { value: "documentary", label: "Documentários" },
 ];
 

@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF7-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-04-refinamento-paginas-principais-estados-ux.md`
-- `last_updated`: `2026-06-23`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -315,56 +315,81 @@ Substitui os dois ficheiros pelas versões completas abaixo. Mantém `catalogApi
  * @file Página pública de catálogo FaithFlix.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ContinueWatchingStrip } from "../components/playback/ContinueWatchingStrip.jsx";
 import { ContentCard } from "../components/ui/ContentCard.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { catalogApi } from "../services/api/catalogApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
+const PAGE_LIMIT = 24;
+const CONTENT_TYPES = ["movie", "series", "episode", "documentary"];
+
+function parsePositivePage(value) {
+  return /^\d+$/.test(value ?? "") && Number(value) > 0 ? Number(value) : 1;
+}
+
 /**
- * Mostra conteúdos publicados e o bloco "continuar a ver".
+ * Mostra todos os conteúdos publicados através de paginação navegável.
  *
  * @returns {JSX.Element} Página de catálogo.
  */
 export function CatalogPage() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const [state, setState] = useState({
+    status: "loading",
+    items: [],
+    total: 0,
+    error: "",
+  });
+  const requestedType = searchParams.get("type") ?? "";
+  const type = CONTENT_TYPES.includes(requestedType) ? requestedType : "";
+  const page = parsePositivePage(searchParams.get("page"));
 
   useEffect(() => {
+    const controller = new AbortController();
     let active = true;
+    setState((current) => ({ ...current, status: "loading", error: "" }));
 
-    /**
-     * Carrega o catálogo público sem alterar a regra backend de publicação.
-     *
-     * @returns {Promise<void>} Termina depois de atualizar o estado visual.
-     */
-    async function loadCatalog() {
-      try {
-        const response = await catalogApi.listPublished();
-
-        if (active) {
-          setItems(response.items);
-        }
-      } catch (requestError) {
-        if (active) {
-          setError(toUserMessage(requestError));
-        }
-      } finally {
-        // A flag evita atualizar estado se o utilizador sair da página durante o pedido.
-        if (active) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadCatalog();
+    catalogApi.listPublished(
+      { type, page, limit: PAGE_LIMIT },
+      { signal: controller.signal },
+    ).then((response) => {
+      if (!active || controller.signal.aborted) return;
+      setState({
+        status: "ready",
+        items: Array.isArray(response.items) ? response.items : [],
+        total: Number.isSafeInteger(response.total) ? response.total : 0,
+        error: "",
+      });
+    }).catch((requestError) => {
+      if (!active || requestError?.code === "REQUEST_ABORTED") return;
+      setState((current) => ({
+        ...current,
+        status: "error",
+        error: toUserMessage(requestError),
+      }));
+    });
 
     return () => {
       active = false;
+      controller.abort();
     };
-  }, []);
+  }, [page, reloadVersion, type]);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(state.total / PAGE_LIMIT)),
+    [state.total],
+  );
+
+  function updateLocation(nextType, nextPage) {
+    const next = new URLSearchParams();
+    if (nextType) next.set("type", nextType);
+    if (nextPage > 1) next.set("page", String(nextPage));
+    setSearchParams(next);
+  }
 
   return (
     <section className="page-section">
@@ -372,11 +397,31 @@ export function CatalogPage() {
       <h1>Catálogo FaithFlix</h1>
       <ContinueWatchingStrip />
 
-      {loading ? <p role="status">A carregar catálogo...</p> : null}
-      {error ? (
-        <EmptyState title="Não foi possível carregar o catálogo" description={error} tone="error" />
+      <label htmlFor="catalog-type">Tipo</label>
+      <select
+        id="catalog-type"
+        value={type}
+        onChange={(event) => updateLocation(event.target.value, 1)}
+      >
+        <option value="">Todos</option>
+        {CONTENT_TYPES.map((value) => (
+          <option key={value} value={value}>{value}</option>
+        ))}
+      </select>
+
+      {state.status === "loading" ? <p role="status">A carregar catálogo...</p> : null}
+      {state.status === "error" ? (
+        <EmptyState
+          title="Não foi possível carregar o catálogo"
+          description={state.error}
+          tone="error"
+        >
+          <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+            Tentar novamente
+          </button>
+        </EmptyState>
       ) : null}
-      {!loading && !error && items.length === 0 ? (
+      {state.status === "ready" && state.items.length === 0 ? (
         <EmptyState
           title="Ainda não existem conteúdos publicados"
           description="Volta a esta página depois de o catálogo público ser atualizado."
@@ -384,7 +429,7 @@ export function CatalogPage() {
       ) : null}
 
       <section className="content-grid" aria-label="Conteúdos publicados">
-        {items.map((content) => (
+        {state.items.map((content) => (
           <ContentCard
             key={content.id}
             eyebrow={content.type}
@@ -392,10 +437,30 @@ export function CatalogPage() {
             description={content.synopsis}
             imageUrl={content.assets?.posterUrl}
             imageAlt={`Cartaz de ${content.title}`}
-            to={`/catalogo/${content.slug}`}
+            to={`/catalogo/${encodeURIComponent(content.slug ?? content.id)}`}
           />
         ))}
       </section>
+
+      {state.status === "ready" ? (
+        <nav aria-label="Paginação do catálogo">
+          <button
+            type="button"
+            disabled={page <= 1}
+            onClick={() => updateLocation(type, page - 1)}
+          >
+            Anterior
+          </button>
+          <span>Página {page} de {totalPages} ({state.total})</span>
+          <button
+            type="button"
+            disabled={page >= totalPages}
+            onClick={() => updateLocation(type, page + 1)}
+          >
+            Seguinte
+          </button>
+        </nav>
+      ) : null}
     </section>
   );
 }
@@ -407,68 +472,142 @@ export function CatalogPage() {
  * @file Página de pesquisa unificada do FaithFlix.
  */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { SearchFilters } from "../components/search/SearchFilters.jsx";
 import { ContentCard } from "../components/ui/ContentCard.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { searchApi } from "../services/api/searchApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
-const INITIAL_FILTERS = {
-  query: "",
+const PAGE_LIMIT = 12;
+const INITIAL_FORM = {
+  q: "",
   type: "",
   taxonomyId: "",
   sort: "title",
 };
 
+function parsePositivePage(value) {
+  return /^\d+$/.test(value ?? "") && Number(value) > 0 ? Number(value) : 1;
+}
+
 /**
- * Permite pesquisar conteúdos publicados por texto, tipo e taxonomia.
+ * Mantém query, filtros e página na URL e cancela respostas obsoletas.
  *
  * @returns {JSX.Element} Página de pesquisa.
  */
 export function SearchPage() {
-  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [form, setForm] = useState(INITIAL_FORM);
   const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [requestStatus, setRequestStatus] = useState("idle");
   const [error, setError] = useState("");
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const requestVersionRef = useRef(0);
+  const urlState = searchParams.toString();
+  const query = searchParams.get("q") ?? "";
+  const type = searchParams.get("type") ?? "";
+  const taxonomyId = searchParams.get("taxonomyId") ?? "";
+  const sort = searchParams.get("sort") ?? "title";
+  const page = parsePositivePage(searchParams.get("page"));
 
-  /**
-   * Executa a pesquisa com os filtros atuais.
-   *
-   * @param {React.FormEvent<HTMLFormElement>} event Evento do formulário.
-   * @returns {Promise<void>} Termina quando a API responde ou falha.
-   */
-  async function submitSearch(event) {
-    event.preventDefault();
-    setLoading(true);
+  useEffect(() => {
+    setForm({
+      q: query,
+      type,
+      taxonomyId,
+      sort,
+    });
+  }, [query, sort, taxonomyId, type]);
+
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setResult(null);
+      setRequestStatus("idle");
+      setError("");
+      return undefined;
+    }
+
+    const version = ++requestVersionRef.current;
+    const controller = new AbortController();
+    setRequestStatus("loading");
     setError("");
+    setResult(null);
 
-    try {
-      // A API de pesquisa continua a aplicar publicação e filtros; a UI só apresenta o resultado.
-      const response = await searchApi.search({
-        ...filters,
-        page: 1,
-        limit: 12,
-      });
+    searchApi.search({
+      q: query,
+      type,
+      taxonomyId,
+      sort,
+      page,
+      limit: PAGE_LIMIT,
+    }, { signal: controller.signal }).then((response) => {
+      if (controller.signal.aborted || version !== requestVersionRef.current) return;
       setResult(response);
-    } catch (requestError) {
+      setRequestStatus("ready");
+    }).catch((requestError) => {
+      if (requestError?.code === "REQUEST_ABORTED") return;
+      if (version !== requestVersionRef.current) return;
       setResult(null);
       setError(toUserMessage(requestError));
-    } finally {
-      setLoading(false);
-    }
+      setRequestStatus("error");
+    });
+
+    return () => controller.abort();
+  }, [page, query, reloadVersion, sort, taxonomyId, type, urlState]);
+
+  /**
+   * Publica a intenção atual na URL e regressa à primeira página.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} event Evento do formulário.
+   * @returns {void}
+   */
+  function submitSearch(event) {
+    event.preventDefault();
+    const q = form.q.trim();
+    if (q.length < 2) return;
+    const next = new URLSearchParams({ q, sort: form.sort, page: "1" });
+    if (form.type) next.set("type", form.type);
+    if (form.taxonomyId) next.set("taxonomyId", form.taxonomyId);
+    setSearchParams(next);
+  }
+
+  function moveToPage(page) {
+    const next = new URLSearchParams(searchParams);
+    next.set("page", String(page));
+    setSearchParams(next);
   }
 
   const items = result?.items ?? [];
+  const totalPages = result ? Math.max(1, Math.ceil(result.total / result.limit)) : 1;
 
   return (
     <section className="page-section">
       <p className="section-kicker">Descoberta</p>
       <h1>Pesquisa</h1>
-      <SearchFilters filters={filters} onChange={setFilters} onSubmit={submitSearch} />
+      <form onSubmit={submitSearch} role="search">
+        <label htmlFor="search-query">Pesquisar conteúdos e temas</label>
+        <input
+          id="search-query"
+          value={form.q}
+          minLength={2}
+          maxLength={80}
+          onChange={(event) => setForm((current) => ({ ...current, q: event.target.value }))}
+        />
+        <SearchFilters value={form} onChange={setForm} />
+        <button type="submit">Pesquisar</button>
+      </form>
 
-      {loading ? <p role="status">A pesquisar...</p> : null}
-      {error ? <EmptyState title="Não foi possível pesquisar" description={error} tone="error" /> : null}
+      {requestStatus === "idle" ? <p>Escreve pelo menos 2 caracteres para pesquisar.</p> : null}
+      {requestStatus === "loading" ? <p role="status">A pesquisar...</p> : null}
+      {requestStatus === "error" ? (
+        <EmptyState title="Não foi possível pesquisar" description={error} tone="error">
+          <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+            Tentar novamente
+          </button>
+        </EmptyState>
+      ) : null}
       {result ? (
         <p className="status-message">
           {result.total} resultado{result.total === 1 ? "" : "s"} para "{result.query}".
@@ -491,10 +630,30 @@ export function SearchPage() {
             imageUrl={content.posterUrl}
             imageAlt={`Cartaz de ${content.title}`}
             meta={content.taxonomyNames?.join(", ")}
-            to={`/catalogo/${content.slug}`}
+            to={`/catalogo/${encodeURIComponent(content.slug ?? content.id)}`}
           />
         ))}
       </section>
+
+      {result && result.total > 0 ? (
+        <nav aria-label="Páginas dos resultados">
+          <button
+            type="button"
+            disabled={result.page <= 1 || requestStatus === "loading"}
+            onClick={() => moveToPage(result.page - 1)}
+          >
+            Anterior
+          </button>
+          <span>Página {result.page} de {totalPages}</span>
+          <button
+            type="button"
+            disabled={result.page >= totalPages || requestStatus === "loading"}
+            onClick={() => moveToPage(result.page + 1)}
+          >
+            Seguinte
+          </button>
+        </nav>
+      ) : null}
     </section>
   );
 }
@@ -502,9 +661,17 @@ export function SearchPage() {
 
 5. Explicação do código.
 
-`CatalogPage` preserva o contrato de `BK-MF2-03`: o backend decide que conteúdos estão publicados e o frontend mostra apenas o que `catalogApi.listPublished()` devolve. O loading usa `role="status"`, o erro usa `EmptyState` com tom de erro e a lista usa `ContentCard`. O dado de entrada é a resposta da API; o dado de saída é a grelha visível com imagem, tipo, título, descrição e ação. A flag `active` evita atualização de estado depois de sair da página, um erro comum em páginas React com pedidos assíncronos.
+`CatalogPage` preserva integralmente o contrato de `BK-MF2-03`: filtro e página
+ficam na URL, o total vem do backend, `Anterior`/`Seguinte` alcançam todas as
+páginas e cada mudança aborta a leitura anterior. `ContentCard` altera apenas a
+apresentação; não reduz a listagem aos primeiros 24 resultados. O retry repete a
+mesma página/filtro e o link codifica o identificador num único segmento.
 
-`SearchPage` preserva o contrato de `BK-MF3-03`: o formulário continua em `SearchFilters` e a pesquisa continua em `searchApi.search()`. A UI não inventa motor de pesquisa nem expõe detalhe técnico do erro. O aluno pode alterar textos de orientação, mas não deve remover o envio dos filtros nem o limite de resultados sem atualizar a evidência.
+`SearchPage` preserva o contrato de `BK-MF3-03`: query, filtros e página ficam na
+URL, `total` determina a paginação e `AbortController` mais uma versão impedem
+respostas antigas. `SearchFilters` recebe as props que realmente exporta
+(`value`/`onChange`); a pesquisa envia `q`, não um alias `query`. A UI não inventa
+motor de pesquisa nem expõe detalhe técnico do erro.
 
 6. Validação do passo.
 
@@ -521,15 +688,30 @@ Simula uma falha de API. Resultado esperado: a página mostra `Não foi possíve
 Uniformizar a página "Para si" e a biblioteca pessoal sem alterar recomendação baseline, favoritos, watchlist ou histórico.
 
 2. Ficheiros envolvidos:
+    - EDITAR: `frontend/src/services/api/recommendationsApi.js`
     - EDITAR: `frontend/src/pages/ForYouPage.jsx`
     - EDITAR: `frontend/src/pages/MyLibraryPage.jsx`
     - LOCALIZAÇÃO: ficheiros completos.
 
 3. Instruções do que fazer.
 
-Substitui os ficheiros pelas versões completas abaixo. Mantém `recommendationsApi.mine()`, `libraryApi.listFavorites()`, `libraryApi.listWatchlist()` e `libraryApi.listHistory()`.
+Atualiza `recommendationsApi` para propagar cancelamento e substitui os ficheiros
+pelas versões completas abaixo. Mantém `recommendationsApi.getMine()`,
+`libraryApi.listFavorites()`,
+`libraryApi.listWatchlist()` e `libraryApi.listHistory()`.
 
 4. Código completo, correto e integrado com a app final.
+
+```js
+// frontend/src/services/api/recommendationsApi.js
+import { apiClient } from "./apiClient.js";
+
+export const recommendationsApi = {
+  getMine(options = {}) {
+    return apiClient.get("/api/recommendations/me", options);
+  },
+};
+```
 
 ```jsx
 // frontend/src/pages/ForYouPage.jsx
@@ -538,7 +720,7 @@ Substitui os ficheiros pelas versões completas abaixo. Mantém `recommendations
  */
 
 import { useEffect, useState } from "react";
-import { DiscoveryCarousel } from "../components/discovery/DiscoveryCarousel.jsx";
+import { ContentCarousel } from "../components/discovery/ContentCarousel.jsx";
 import { RecommendationExplanation } from "../components/recommendations/RecommendationExplanation.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { recommendationsApi } from "../services/api/recommendationsApi.js";
@@ -553,9 +735,14 @@ export function ForYouPage() {
   const [recommendations, setRecommendations] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reloadVersion, setReloadVersion] = useState(0);
 
   useEffect(() => {
+    const controller = new AbortController();
     let active = true;
+    setLoading(true);
+    setError("");
+    setRecommendations(null);
 
     /**
      * Carrega recomendações mantendo a explicabilidade definida em MF3.
@@ -564,13 +751,15 @@ export function ForYouPage() {
      */
     async function loadRecommendations() {
       try {
-        const response = await recommendationsApi.mine();
+        const response = await recommendationsApi.getMine({
+          signal: controller.signal,
+        });
 
-        if (active) {
+        if (active && !controller.signal.aborted) {
           setRecommendations(response);
         }
       } catch (requestError) {
-        if (active) {
+        if (active && requestError?.code !== "REQUEST_ABORTED") {
           setError(toUserMessage(requestError));
         }
       } finally {
@@ -584,10 +773,15 @@ export function ForYouPage() {
 
     return () => {
       active = false;
+      controller.abort();
     };
-  }, []);
+  }, [reloadVersion]);
 
-  const groups = recommendations?.groups ?? [];
+  const groups = Array.isArray(recommendations?.groups)
+    ? recommendations.groups.filter(
+        (group) => Array.isArray(group?.items) && group.items.length > 0,
+      )
+    : [];
 
   return (
     <section className="page-section">
@@ -595,7 +789,13 @@ export function ForYouPage() {
       <h1>Para si</h1>
 
       {loading ? <p role="status">A preparar recomendações...</p> : null}
-      {error ? <EmptyState title="Não foi possível carregar recomendações" description={error} tone="error" /> : null}
+      {error ? (
+        <EmptyState title="Não foi possível carregar recomendações" description={error} tone="error">
+          <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+            Tentar novamente
+          </button>
+        </EmptyState>
+      ) : null}
       {recommendations ? (
         <p className="status-message">
           {recommendations.coldStart
@@ -613,7 +813,7 @@ export function ForYouPage() {
       {groups.map((group) => (
         <section className="recommendation-group" key={group.id}>
           <RecommendationExplanation explanation={group.explanation} />
-          <DiscoveryCarousel title={group.title} items={group.items} />
+          <ContentCarousel title={group.title} items={group.items} />
         </section>
       ))}
     </section>
@@ -633,35 +833,101 @@ import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { libraryApi } from "../services/api/libraryApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
+const LIBRARY_PAGE_LIMIT = 12;
+
 /**
- * Mostra uma lista de conteúdos da biblioteca pessoal.
+ * Mostra uma lista paginada da biblioteca sem bloquear as restantes secções.
  *
- * @param {{ title: string, items: Array<{ id: string, title: string, slug: string, posterUrl?: string }> }} props Propriedades da lista.
+ * @param {{ id: string, title: string, loadItems: Function }} props Propriedades da lista.
  * @returns {JSX.Element} Secção de biblioteca.
  */
-function LibrarySection({ title, items }) {
+function PaginatedLibrarySection({ id, title, loadItems }) {
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ page: 1, total: 0, totalPages: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reloadVersion, setReloadVersion] = useState(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+    setLoading(true);
+    setError("");
+
+    loadItems(
+      { page, limit: LIBRARY_PAGE_LIMIT },
+      { signal: controller.signal },
+    ).then((response) => {
+      if (!active || controller.signal.aborted) return;
+      setItems(Array.isArray(response.items) ? response.items : []);
+      setPagination({
+        page: Number.isSafeInteger(response.page) ? response.page : page,
+        total: Number.isSafeInteger(response.total) ? response.total : 0,
+        totalPages: Number.isSafeInteger(response.totalPages) ? response.totalPages : 0,
+      });
+    }).catch((requestError) => {
+      if (!active || requestError?.code === "REQUEST_ABORTED") return;
+      setError(toUserMessage(requestError));
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [loadItems, page, reloadVersion]);
+
   return (
-    <section>
-      <h2>{title}</h2>
-      {items.length === 0 ? (
+    <section aria-labelledby={`${id}-title`}>
+      <h2 id={`${id}-title`}>{title}</h2>
+      {loading ? <p role="status">A carregar {title.toLowerCase()}...</p> : null}
+      {error ? (
+        <EmptyState title={`Não foi possível carregar ${title.toLowerCase()}`} description={error} tone="error">
+          <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+            Tentar novamente
+          </button>
+        </EmptyState>
+      ) : null}
+      {!loading && !error && items.length === 0 ? (
         <EmptyState
           title={`${title} sem conteúdos`}
           description="Usa o catálogo para adicionar conteúdos a esta secção."
         />
-      ) : (
-        // Cada item vem das rotas autenticadas da biblioteca; a UI não aceita userId vindo do browser.
+      ) : null}
+      {!loading && !error && items.length > 0 ? (
         <div className="content-grid">
           {items.map((item) => (
             <ContentCard
-              key={`${title}-${item.id}`}
+              key={`${id}-${item.id}`}
               title={item.title}
               imageUrl={item.posterUrl}
               imageAlt={`Cartaz de ${item.title}`}
-              to={`/catalogo/${item.slug}`}
+              to={`/catalogo/${encodeURIComponent(item.slug ?? item.id)}`}
             />
           ))}
         </div>
-      )}
+      ) : null}
+      {!loading && !error && pagination.totalPages > 1 ? (
+        <nav aria-label={`Paginação de ${title}`}>
+          <button
+            type="button"
+            disabled={page <= 1}
+            onClick={() => setPage((value) => Math.max(1, value - 1))}
+          >
+            Anterior
+          </button>
+          <span>Página {pagination.page} de {pagination.totalPages} ({pagination.total})</span>
+          <button
+            type="button"
+            disabled={page >= pagination.totalPages}
+            onClick={() => setPage((value) => Math.min(pagination.totalPages, value + 1))}
+          >
+            Seguinte
+          </button>
+        </nav>
+      ) : null}
     </section>
   );
 }
@@ -672,66 +938,25 @@ function LibrarySection({ title, items }) {
  * @returns {JSX.Element} Página da minha biblioteca.
  */
 export function MyLibraryPage() {
-  const [favorites, setFavorites] = useState([]);
-  const [watchlist, setWatchlist] = useState([]);
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-
-    /**
-     * Carrega as três listas autenticadas da biblioteca pessoal.
-     *
-     * @returns {Promise<void>} Termina quando todos os pedidos terminarem.
-     */
-    async function loadLibrary() {
-      try {
-        const [favoriteResponse, watchlistResponse, historyResponse] = await Promise.all([
-          libraryApi.listFavorites(),
-          libraryApi.listWatchlist(),
-          libraryApi.listHistory(),
-        ]);
-
-        if (active) {
-          setFavorites(favoriteResponse.items);
-          setWatchlist(watchlistResponse.items);
-          setHistory(historyResponse.items);
-        }
-      } catch (requestError) {
-        if (active) {
-          setError(toUserMessage(requestError));
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadLibrary();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
   return (
     <section className="page-section" data-testid="my-library">
       <p className="section-kicker">Biblioteca</p>
       <h1>Biblioteca</h1>
-
-      {loading ? <p role="status">A carregar biblioteca...</p> : null}
-      {error ? <EmptyState title="Não foi possível carregar a biblioteca" description={error} tone="error" /> : null}
-
-      {!loading && !error ? (
-        <>
-          <LibrarySection title="Favoritos" items={favorites} />
-          <LibrarySection title="Watchlist" items={watchlist} />
-          <LibrarySection title="Histórico" items={history} />
-        </>
-      ) : null}
+      <PaginatedLibrarySection
+        id="favorites"
+        title="Favoritos"
+        loadItems={libraryApi.listFavorites}
+      />
+      <PaginatedLibrarySection
+        id="watchlist"
+        title="Para ver mais tarde"
+        loadItems={libraryApi.listWatchlist}
+      />
+      <PaginatedLibrarySection
+        id="history"
+        title="Histórico"
+        loadItems={libraryApi.listHistory}
+      />
     </section>
   );
 }
@@ -739,9 +964,18 @@ export function MyLibraryPage() {
 
 5. Explicação do código.
 
-`ForYouPage` mantém a recomendação baseline criada na MF3. O texto de cold start é honesto: não promete modelo avançado nem personalização opaca. Os dados entram por `recommendationsApi.mine()` e saem como grupos com explicação e carrossel. A regra de segurança continua no backend e na sessão; a página apenas mostra a resposta.
+`ForYouPage` mantém a recomendação baseline criada na MF3. O texto de cold
+start é honesto: não promete modelo avançado nem personalização opaca. Os dados
+entram por `recommendationsApi.getMine()` e saem como grupos com explicação e com
+o `ContentCarousel` já criado em `BK-MF3-04`; não existe um helper paralelo por
+adivinhar. A regra de segurança continua no backend e na sessão; a página apenas
+mostra a resposta.
 
-`MyLibraryPage` usa `Promise.all` para carregar favoritos, watchlist e histórico em paralelo. Estes endpoints pertencem ao utilizador autenticado e não recebem `userId` no frontend. `LibrarySection` evita repetir marcação e deixa vazios claros em cada lista. O aluno pode adaptar títulos e descrições, mas não deve transformar estas listas em dados públicos.
+`MyLibraryPage` mantém paginação independente para favoritos, watchlist e
+histórico. Cada `PaginatedLibrarySection` usa o envelope
+`{ items, page, limit, total, totalPages }`, cancela a leitura anterior e oferece
+retry sem bloquear as outras secções. Estes endpoints pertencem ao utilizador
+autenticado e nunca recebem `userId` do browser.
 
 6. Validação do passo.
 
@@ -758,15 +992,35 @@ Entra sem sessão e abre a biblioteca. Resultado esperado: a API devolve erro au
 Uniformizar subscrição, trial, pagamento simulado e associações públicas sem criar gateway real nem novas regras da pool solidária.
 
 2. Ficheiros envolvidos:
+    - EDITAR: `frontend/src/services/api/subscriptionsApi.js`
     - EDITAR: `frontend/src/pages/SubscriptionPage.jsx`
     - EDITAR: `frontend/src/pages/PublicCharitiesPage.jsx`
     - LOCALIZAÇÃO: ficheiros completos.
 
 3. Instruções do que fazer.
 
-Substitui as páginas pelas versões completas abaixo. Mantém `paymentsApi`, `subscriptionsApi` e `charitiesApi` como clientes existentes.
+Atualiza primeiro o cliente de subscrições para propagar `AbortSignal` sem perder
+métodos. Depois substitui as páginas pelas versões completas abaixo. Mantém
+`paymentsApi` e `charitiesApi` como clientes existentes.
 
 4. Código completo, correto e integrado com a app final.
+
+```js
+// frontend/src/services/api/subscriptionsApi.js
+import { apiClient } from "./apiClient.js";
+
+export const subscriptionsApi = {
+  listPlans(options = {}) {
+    return apiClient.get("/api/subscriptions/plans", options);
+  },
+  getMine(options = {}) {
+    return apiClient.get("/api/subscriptions/me", options);
+  },
+  cancelRenewal(options = {}) {
+    return apiClient.post("/api/subscriptions/me/cancel-renewal", undefined, options);
+  },
+};
+```
 
 ```jsx
 // frontend/src/pages/SubscriptionPage.jsx
@@ -774,8 +1028,9 @@ Substitui as páginas pelas versões completas abaixo. Mantém `paymentsApi`, `s
  * @file Página de subscrição, trial e pagamento simulado.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
+import { useSession } from "../context/SessionContext.jsx";
 import { paymentsApi } from "../services/api/paymentsApi.js";
 import { subscriptionsApi } from "../services/api/subscriptionsApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
@@ -811,39 +1066,88 @@ function formatPrice(cents) {
  * @returns {JSX.Element} Página de subscrição.
  */
 export function SubscriptionPage() {
+  const session = useSession();
   const [plans, setPlans] = useState([]);
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [subscriptionError, setSubscriptionError] = useState("");
   const [status, setStatus] = useState("");
+  const activeOperationRef = useRef(null);
+  const intentionKeysRef = useRef(new Map());
+  const mountedRef = useRef(true);
+
+  function idempotencyKeyFor(intention) {
+    if (!intentionKeysRef.current.has(intention)) {
+      intentionKeysRef.current.set(intention, crypto.randomUUID());
+    }
+    return intentionKeysRef.current.get(intention);
+  }
+
+  function reserveOperation(name) {
+    if (activeOperationRef.current) return null;
+    const controller = new AbortController();
+    activeOperationRef.current = { name, controller };
+    setSubmitting(true);
+    return controller;
+  }
+
+  function releaseOperation(controller) {
+    if (activeOperationRef.current?.controller !== controller) return;
+    activeOperationRef.current = null;
+    if (mountedRef.current) setSubmitting(false);
+  }
 
   /**
    * Carrega planos públicos e subscrição autenticada.
    *
    * @returns {Promise<void>} Termina depois de atualizar a página.
    */
-  async function loadData() {
+  async function loadData(signal, sessionStatus) {
     setLoading(true);
     setError("");
+    setSubscriptionError("");
 
     try {
-      const [plansResponse, subscriptionResponse] = await Promise.all([
-        subscriptionsApi.listPlans(),
-        subscriptionsApi.getMine(),
-      ]);
+      const plansResponse = await subscriptionsApi.listPlans({ signal });
+      if (signal.aborted) return;
       setPlans(plansResponse.plans);
-      setSubscription(subscriptionResponse.subscription);
     } catch (apiError) {
+      if (signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
       setError(toUserMessage(apiError));
-    } finally {
-      setLoading(false);
+      if (!signal.aborted) setLoading(false);
+      return;
     }
+
+    if (sessionStatus === "authenticated") {
+      try {
+        const subscriptionResponse = await subscriptionsApi.getMine({ signal });
+        if (signal.aborted) return;
+        setSubscription(subscriptionResponse.subscription);
+      } catch (apiError) {
+        if (signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
+        setSubscriptionError(toUserMessage(apiError));
+      }
+    } else {
+      // Anonymous/unavailable não dispara leitura privada nem é convertido em logout.
+      setSubscription(null);
+    }
+
+    if (!signal.aborted) setLoading(false);
   }
 
   useEffect(() => {
-    loadData();
-  }, []);
+    const controller = new AbortController();
+    mountedRef.current = true;
+    void loadData(controller.signal, session.status);
+    return () => {
+      mountedRef.current = false;
+      controller.abort();
+      activeOperationRef.current?.controller.abort();
+      activeOperationRef.current = null;
+    };
+  }, [session.status]);
 
   /**
    * Executa checkout aprovado com método de teste documentado.
@@ -852,9 +1156,12 @@ export function SubscriptionPage() {
    * @returns {Promise<void>} Termina quando o checkout simulado responder.
    */
   async function handleSimulatedCheckout(planCode) {
+    const intention = `checkout:${planCode}`;
+    const controller = reserveOperation(intention);
+    if (!controller) return;
+    const idempotencyKey = idempotencyKeyFor(intention);
     setStatus("");
     setError("");
-    setSubmitting(true);
 
     try {
       // O pagamento é simulado; não recolhe cartão nem chama gateway externo.
@@ -862,13 +1169,16 @@ export function SubscriptionPage() {
         planCode,
         paymentMethod: "card_test",
         simulateOutcome: "approved",
-      });
+      }, idempotencyKey, { signal: controller.signal });
+      if (controller.signal.aborted) return;
       setSubscription(response.subscription);
       setStatus("Pagamento simulado aprovado.");
+      intentionKeysRef.current.delete(intention);
     } catch (apiError) {
+      if (controller.signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
       setError(toUserMessage(apiError));
     } finally {
-      setSubmitting(false);
+      releaseOperation(controller);
     }
   }
 
@@ -878,18 +1188,25 @@ export function SubscriptionPage() {
    * @returns {Promise<void>} Termina quando o backend confirmar o trial.
    */
   async function handleStartTrial() {
+    const controller = reserveOperation("trial");
+    if (!controller) return;
+    const idempotencyKey = idempotencyKeyFor("trial");
     setStatus("");
     setError("");
-    setSubmitting(true);
 
     try {
-      const response = await paymentsApi.startTrial();
+      const response = await paymentsApi.startTrial(idempotencyKey, {
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted) return;
       setSubscription(response.subscription);
       setStatus(`Trial ativo até ${formatDate(response.trial.endsAt)}.`);
+      intentionKeysRef.current.delete("trial");
     } catch (apiError) {
+      if (controller.signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
       setError(toUserMessage(apiError));
     } finally {
-      setSubmitting(false);
+      releaseOperation(controller);
     }
   }
 
@@ -899,18 +1216,27 @@ export function SubscriptionPage() {
    * @returns {Promise<void>} Termina quando a subscrição for atualizada.
    */
   async function handleCancelRenewal() {
+    const controller = reserveOperation("cancel-renewal");
+    if (!controller) return;
+    if (!window.confirm("Cancelar a renovação no fim do ciclo atual?")) {
+      releaseOperation(controller);
+      return;
+    }
     setStatus("");
     setError("");
-    setSubmitting(true);
 
     try {
-      const response = await subscriptionsApi.cancelRenewal();
+      const response = await subscriptionsApi.cancelRenewal({
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted) return;
       setSubscription(response.subscription);
       setStatus("Renovação cancelada no fim do ciclo atual.");
     } catch (apiError) {
+      if (controller.signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
       setError(toUserMessage(apiError));
     } finally {
-      setSubmitting(false);
+      releaseOperation(controller);
     }
   }
 
@@ -927,13 +1253,35 @@ export function SubscriptionPage() {
       <p className="section-kicker">Planos</p>
       <h1>Subscrição</h1>
       {error ? <EmptyState title="Não foi possível atualizar a subscrição" description={error} tone="error" /> : null}
+      {subscriptionError ? (
+        <EmptyState
+          title="Não foi possível consultar a subscrição"
+          description={subscriptionError}
+          tone="error"
+        />
+      ) : null}
       {status ? <EmptyState title="Operação concluída" description={status} tone="success" /> : null}
 
       <section>
         <h2>Estado atual</h2>
-        <p>{subscription?.status === "none" ? "Sem subscrição ativa." : subscription?.status}</p>
-        {subscription?.currentPeriodEnd ? <p>Fim do ciclo: {formatDate(subscription.currentPeriodEnd)}</p> : null}
-        {subscription?.hasPremiumAccess && !subscription.cancelAtPeriodEnd ? (
+        {session.status === "loading" ? <p role="status">A confirmar sessão...</p> : null}
+        {session.status === "anonymous" ? <p>Inicia sessão para consultar ou alterar a tua subscrição.</p> : null}
+        {session.status === "unavailable" ? (
+          <EmptyState
+            title="Sessão temporariamente indisponível"
+            description="Não assumimos que terminaste sessão. Tenta novamente antes de alterar o plano."
+            tone="error"
+          >
+            <button type="button" onClick={() => session.refreshSession()}>
+              Tentar novamente
+            </button>
+          </EmptyState>
+        ) : null}
+        {session.status === "authenticated" ? (
+          <p>{subscription?.status === "none" ? "Sem subscrição ativa." : subscription?.status}</p>
+        ) : null}
+        {session.status === "authenticated" && subscription?.currentPeriodEnd ? <p>Fim do ciclo: {formatDate(subscription.currentPeriodEnd)}</p> : null}
+        {session.status === "authenticated" && subscription?.hasPremiumAccess && !subscription.cancelAtPeriodEnd ? (
           <button type="button" disabled={submitting} onClick={handleCancelRenewal}>
             Cancelar renovação
           </button>
@@ -943,7 +1291,7 @@ export function SubscriptionPage() {
       <section>
         <h2>Trial</h2>
         <p>Experimenta o FaithFlix durante 14 dias sem dados de cartão.</p>
-        <button type="button" disabled={submitting} onClick={handleStartTrial}>
+        <button type="button" disabled={submitting || session.status !== "authenticated"} onClick={handleStartTrial}>
           Iniciar trial
         </button>
       </section>
@@ -960,7 +1308,7 @@ export function SubscriptionPage() {
               <h3>{plan.name}</h3>
               <p className="content-card-meta">{formatPrice(plan.priceCents)}</p>
               <p>{plan.solidaritySharePercent}% para a pool solidária.</p>
-              <button type="button" disabled={submitting} onClick={() => handleSimulatedCheckout(plan.code)}>
+              <button type="button" disabled={submitting || session.status !== "authenticated"} onClick={() => handleSimulatedCheckout(plan.code)}>
                 Pagar com método simulado
               </button>
             </article>
@@ -994,9 +1342,13 @@ export function PublicCharitiesPage() {
   const [charities, setCharities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reloadVersion, setReloadVersion] = useState(0);
 
   useEffect(() => {
+    const controller = new AbortController();
     let active = true;
+    setLoading(true);
+    setError("");
 
     /**
      * Carrega apenas associações públicas elegíveis.
@@ -1005,13 +1357,15 @@ export function PublicCharitiesPage() {
      */
     async function loadCharities() {
       try {
-        const response = await charitiesApi.listPublicCharities();
+        const response = await charitiesApi.listPublicCharities({
+          signal: controller.signal,
+        });
 
-        if (active) {
+        if (active && !controller.signal.aborted) {
           setCharities(response.charities);
         }
       } catch (requestError) {
-        if (active) {
+        if (active && requestError?.code !== "REQUEST_ABORTED") {
           setError(toUserMessage(requestError));
         }
       } finally {
@@ -1025,8 +1379,9 @@ export function PublicCharitiesPage() {
 
     return () => {
       active = false;
+      controller.abort();
     };
-  }, []);
+  }, [reloadVersion]);
 
   return (
     <section className="page-section">
@@ -1039,7 +1394,13 @@ export function PublicCharitiesPage() {
       </div>
 
       {loading ? <p role="status">A carregar associações...</p> : null}
-      {error ? <EmptyState title="Não foi possível carregar associações" description={error} tone="error" /> : null}
+      {error ? (
+        <EmptyState title="Não foi possível carregar associações" description={error} tone="error">
+          <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+            Tentar novamente
+          </button>
+        </EmptyState>
+      ) : null}
       {!loading && !error && charities.length === 0 ? (
         <EmptyState
           title="Ainda não existem associações públicas"
@@ -1055,7 +1416,7 @@ export function PublicCharitiesPage() {
             title={charity.name}
             description={charity.mission}
             meta={charity.websiteUrl}
-            to={`/associacoes/${charity.id}/historico`}
+            to={`/associacoes/${encodeURIComponent(charity.id)}/historico`}
             actionLabel="Ver histórico"
           />
         ))}
@@ -1067,9 +1428,16 @@ export function PublicCharitiesPage() {
 
 5. Explicação do código.
 
-`SubscriptionPage` preserva a simulação criada em MF4: usa `paymentsApi.simulatedCheckout()` e `paymentsApi.startTrial()`, mas não recolhe cartões nem promete gateways reais. `Intl.NumberFormat("pt-PT")` e `toLocaleDateString("pt-PT")` fecham `RNF40`. Os dados entram por planos e subscrição autenticada; saem como estado atual, trial, planos e mensagens de sucesso ou erro.
+`SubscriptionPage` preserva a implementação autoritativa de `BK-MF4-02`: cada
+intenção de checkout/trial recebe uma `crypto.randomUUID()` guardada em `ref` e
+reutilizada num retry da mesma intenção. A chave só é removida depois de sucesso;
+nunca é `undefined` nem constante. As APIs canónicas recebem a chave e o
+`AbortSignal`, sem recolher cartões ou prometer gateway real.
 
-`PublicCharitiesPage` mostra apenas associações públicas devolvidas pela API. A candidatura continua no fluxo já criado e a página não assume acesso administrativo. O link de histórico depende da rota e das permissões definidas em BKs anteriores; o backend continua a proteger dados privados de cada associação.
+`PublicCharitiesPage` mostra apenas associações públicas devolvidas pela API,
+cancela a leitura no unmount, permite retry e codifica o ID no link. A
+candidatura continua no fluxo já criado e a página não assume acesso
+administrativo; o backend continua a proteger o histórico privado.
 
 6. Validação do passo.
 
@@ -1104,13 +1472,26 @@ Substitui `AccountPage.jsx` pela versão completa abaixo. Revê os três painéi
  * @file Página de conta autenticada com perfil, controlo parental e privacidade.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PrivacyConsentsPanel } from "../components/privacy/PrivacyConsentsPanel.jsx";
 import { PrivacyDangerZone } from "../components/privacy/PrivacyDangerZone.jsx";
 import { PrivacyExportPanel } from "../components/privacy/PrivacyExportPanel.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { userApi } from "../services/api/userApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
+
+const ROLE_LABELS = {
+  user: "Utilizador",
+  moderator: "Moderador",
+  admin: "Administrador",
+};
+
+function parseParentalInput(value) {
+  if (typeof value !== "string" || !/^(?:[0-9]|1[0-8])$/.test(value)) {
+    return null;
+  }
+  return Number(value);
+}
 
 /**
  * Mostra e atualiza dados da conta autenticada.
@@ -1119,86 +1500,109 @@ import { toUserMessage } from "../services/api/apiErrors.js";
  */
 export function AccountPage() {
   const [name, setName] = useState("");
-  const [parentalMaxAgeRating, setParentalMaxAgeRating] = useState(18);
+  const [parentalInput, setParentalInput] = useState("");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mutating, setMutating] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const mutationRef = useRef(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     let active = true;
+    setLoading(true);
+    setError("");
 
-    /**
-     * Carrega a conta do utilizador autenticado.
-     *
-     * @returns {Promise<void>} Termina depois de preencher formulário e resumo.
-     */
-    async function loadAccount() {
-      try {
-        const response = await userApi.getMe();
-
-        if (active) {
-          setUser(response.user);
-          setName(response.user.name);
-          setParentalMaxAgeRating(response.user.parentalMaxAgeRating);
-        }
-      } catch (requestError) {
-        if (active) {
-          setError(toUserMessage(requestError));
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
+    userApi.getMe({ signal: controller.signal }).then((response) => {
+      if (!active || controller.signal.aborted) return;
+      setUser(response.user);
+      setName(response.user.name);
+      setParentalInput(`${response.user.parentalMaxAgeRating}`);
+    }).catch((requestError) => {
+      if (active && requestError?.code !== "REQUEST_ABORTED") {
+        setError(toUserMessage(requestError));
       }
-    }
-
-    loadAccount();
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
 
     return () => {
       active = false;
+      controller.abort();
+    };
+  }, [reloadVersion]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      mutationRef.current?.abort();
+      mutationRef.current = null;
     };
   }, []);
+
+  function applyConfirmedUser(confirmedUser) {
+    setUser(confirmedUser);
+    setName(confirmedUser.name);
+    setParentalInput(`${confirmedUser.parentalMaxAgeRating}`);
+  }
+
+  async function runMutation(request, successMessage) {
+    if (mutationRef.current) return;
+    const controller = new AbortController();
+    mutationRef.current = controller;
+    setMutating(true);
+    setStatus("");
+    setError("");
+
+    try {
+      const response = await request(controller.signal);
+      if (controller.signal.aborted || !mountedRef.current) return;
+      applyConfirmedUser(response.user);
+      setStatus(successMessage);
+    } catch (requestError) {
+      if (controller.signal.aborted || requestError?.code === "REQUEST_ABORTED") return;
+      if (mountedRef.current) setError(toUserMessage(requestError));
+    } finally {
+      if (mutationRef.current === controller) mutationRef.current = null;
+      if (mountedRef.current) setMutating(false);
+    }
+  }
 
   /**
    * Guarda nome público do utilizador autenticado.
    *
    * @param {React.FormEvent<HTMLFormElement>} event Evento do formulário.
-   * @returns {Promise<void>} Termina quando a API responde.
+   * @returns {void} Agenda a mutation protegida.
    */
-  async function handleProfileSubmit(event) {
+  function handleProfileSubmit(event) {
     event.preventDefault();
-    setStatus("");
-    setError("");
-
-    try {
-      // A rota usa a sessão atual; a UI não envia userId nem tenta alterar outra conta.
-      const response = await userApi.updateMe({ name });
-      setUser(response.user);
-      setStatus("Perfil atualizado.");
-    } catch (requestError) {
-      setError(toUserMessage(requestError));
-    }
+    void runMutation(
+      (signal) => userApi.updateMe({ name }, { signal }),
+      "Perfil atualizado.",
+    );
   }
 
   /**
    * Guarda limite parental da conta autenticada.
    *
    * @param {React.FormEvent<HTMLFormElement>} event Evento do formulário.
-   * @returns {Promise<void>} Termina quando a API responde.
+   * @returns {void} Valida e agenda a mutation protegida.
    */
-  async function handleParentalSubmit(event) {
+  function handleParentalSubmit(event) {
     event.preventDefault();
-    setStatus("");
-    setError("");
-
-    try {
-      const response = await userApi.updateParental(Number(parentalMaxAgeRating));
-      setUser(response.user);
-      setStatus("Controlo parental atualizado.");
-    } catch (requestError) {
-      setError(toUserMessage(requestError));
+    const parentalMaxAgeRating = parseParentalInput(parentalInput);
+    if (parentalMaxAgeRating === null) {
+      setError("Escolhe um limite parental inteiro entre 0 e 18.");
+      return;
     }
+    void runMutation(
+      (signal) => userApi.updateParental(parentalMaxAgeRating, { signal }),
+      "Controlo parental atualizado.",
+    );
   }
 
   if (loading) {
@@ -1214,7 +1618,13 @@ export function AccountPage() {
       <section className="page-section narrow-section">
         <p className="section-kicker">Conta</p>
         <h1>A minha conta</h1>
-        {error ? <EmptyState title="Conta indisponível" description={error} tone="error" /> : null}
+        {error ? (
+          <EmptyState title="Conta indisponível" description={error} tone="error">
+            <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+              Tentar novamente
+            </button>
+          </EmptyState>
+        ) : null}
       </section>
     );
   }
@@ -1226,35 +1636,34 @@ export function AccountPage() {
       {error ? <EmptyState title="Não foi possível atualizar a conta" description={error} tone="error" /> : null}
       {status ? <EmptyState title="Alteração guardada" description={status} tone="success" /> : null}
 
-      <form className="form-panel" onSubmit={handleProfileSubmit}>
+      <form className="form-panel" onSubmit={handleProfileSubmit} aria-busy={mutating}>
         <h2>Perfil</h2>
         <label>
           Nome
-          <input value={name} onChange={(event) => setName(event.target.value)} />
+          <input value={name} disabled={mutating} onChange={(event) => setName(event.target.value)} />
         </label>
-        <button type="submit">Guardar perfil</button>
+        <button type="submit" disabled={mutating}>Guardar perfil</button>
       </form>
 
-      <form className="form-panel" onSubmit={handleParentalSubmit}>
+      <form className="form-panel" onSubmit={handleParentalSubmit} aria-busy={mutating}>
         <h2>Controlo parental</h2>
         <label>
           Limite parental
           <input
-            min="0"
-            max="18"
-            type="number"
-            value={parentalMaxAgeRating}
-            onChange={(event) => setParentalMaxAgeRating(event.target.value)}
+            inputMode="numeric"
+            value={parentalInput}
+            disabled={mutating}
+            onChange={(event) => setParentalInput(event.target.value)}
           />
         </label>
-        <button type="submit">Guardar limite</button>
+        <button type="submit" disabled={mutating}>Guardar limite</button>
       </form>
 
       <dl className="meta-list">
         <dt>Email</dt>
         <dd>{user.email}</dd>
         <dt>Papel</dt>
-        <dd>{user.role}</dd>
+        <dd>{ROLE_LABELS[user.role] ?? "Utilizador"}</dd>
       </dl>
 
       <PrivacyExportPanel />
@@ -1267,7 +1676,12 @@ export function AccountPage() {
 
 5. Explicação do código.
 
-`AccountPage` mantém a conta ligada à sessão autenticada. A página nunca envia `userId`; chama `userApi.getMe()`, `userApi.updateMe()` e `userApi.updateParental()`, que pertencem ao próprio utilizador. Isto preserva ownership e evita acesso cruzado. `EmptyState` torna conta indisponível, erro e sucesso visualmente consistentes.
+`AccountPage` mantém a conta ligada à sessão autenticada. Leitura e mutations
+propagam `AbortSignal`; `mutationRef` bloqueia submissões sobrepostas antes do
+render e a resposta do backend repõe o formulário canónico. O limite parental
+permanece string até `parseParentalInput` aceitar um inteiro `0..18`, por isso o
+input vazio nunca vira `0`. A página não envia `userId` e traduz o papel para
+PT-PT.
 
 Os painéis `PrivacyExportPanel`, `PrivacyConsentsPanel` e `PrivacyDangerZone` continuam a existir porque foram criados na MF5. Este BK apenas garante que a página os integra numa UI coerente. O aluno pode ajustar textos visíveis para português de Portugal, mas não deve alterar a lógica de exportação, consentimentos ou eliminação sem voltar aos BKs de privacidade.
 
@@ -1277,7 +1691,10 @@ Valida conta autenticada, erro de sessão e atualização de nome. Resultado esp
 
 7. Cenário negativo/erro esperado.
 
-Abre `/conta` sem sessão válida. Resultado esperado: a página mostra `Conta indisponível` ou mensagem de sessão segura, sem crash e sem expor dados pessoais.
+Abre `/conta` sem sessão válida. Resultado esperado: a página mostra `Conta
+indisponível` ou mensagem de sessão segura, sem crash e sem expor dados pessoais.
+Apaga o limite parental e submete: a UI deve recusar o valor vazio, nunca enviá-lo
+como zero.
 
 ### Passo 6 - Criar evidence de usabilidade responsiva
 
@@ -1297,6 +1714,12 @@ Cria a evidence abaixo e preenche resultados observados depois de executar a bui
 
 ```md
 # Validação de usabilidade responsiva - MF7
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF7/BK-MF7-04-refinamento-paginas-principais-estados-ux.md`
+- `proof_scope`: estados e viewports observados pelos alunos; não prova compatibilidade integral em browsers/dispositivos reais
 
 ## Metadados
 
@@ -1352,11 +1775,18 @@ Se uma página só for validada no desktop, a MF7 não deve seguir para gate lim
 - `global.css` contém estilos para imagem do card, metadados, tons de empty state e mensagem de estado.
 - Catálogo usa componentes comuns e estados claros.
 - Pesquisa mostra resultados, ausência de resultados e erro com mensagens em português de Portugal.
-- Recomendações mantêm cold start honesto e explicabilidade baseline.
+- Recomendações mantêm cold start honesto e explicabilidade baseline; grupos
+  sem `items` ou com array vazio não renderizam heading, explicação ou carousel.
 - Biblioteca mostra favoritos, watchlist e histórico sem aceitar `userId` do frontend.
 - Planos mostram valores em formato europeu e pagamento sempre como simulado.
+- A lista pública de planos carrega independentemente da sessão. `getMine` só é
+  chamado em `authenticated`; `anonymous` continua a ver planos e
+  `unavailable` mantém retry sem ser convertido em logout.
 - Associações públicas usam card comum sem alterar regras da pool solidária.
 - Conta preserva perfil, controlo parental e painéis de privacidade.
+- Conta cancela/serializa mutações e rejeita limite parental vazio sem o transformar em zero.
+- Catálogo, pesquisa, detalhe e passagens têm cancelamento, anti-stale, retry e segmentos internos codificados.
+- Sessão indisponível não é apresentada como logout nem como convite para login.
 - Evidence tem validação por página, estado e viewport.
 
 #### Validação final
@@ -1366,6 +1796,9 @@ Se uma página só for validada no desktop, a MF7 não deve seguir para gate lim
 - Executar `git diff --check`.
 - Confirmar `docs/evidence/MF7/USABILIDADE-UX.md`.
 - Pesquisar termos internos, storage de sessão, casts inseguros e claims indevidos nos BKs MF7.
+- Testar grupo de recomendações vazio: o respetivo heading não existe no DOM.
+- Testar planos anónimos com `getMine` a devolver `401`: `listPlans` continua
+  visível e a leitura privada nem chega a ser chamada.
 
 #### Evidence para PR/defesa
 
@@ -1380,8 +1813,42 @@ Se uma página só for validada no desktop, a MF7 não deve seguir para gate lim
 - `BK-MF7-05` deve bloquear gate se existir link indevido, erro sem mensagem segura, mobile com sobreposição ou evidence incompleta.
 - Se alguma página ficar com ressalva visual, o gate deve decidir `GO_COM_RESSALVAS` ou `NO_GO`.
 
+##### Critérios complementares de responsividade e estados robustos
+
+Este contrato complementa a matriz pedagógica sem promover o BK dos alunos:
+
+- Testar cada página nos viewports `390x844`, `768x900`, `1280x720` e
+  `1440x900`, sempre sem overflow horizontal da página.
+- Validar reflow equivalente a zoom de `200%` com viewport `720x450`, mantendo
+  título, navegação e ação principal alcançáveis.
+- Uniformizar `loading`, `error`, `empty` e `retry`; erros devem ser seguros e
+  as ações em curso devem expor busy state sem permitir duplo submit.
+- Catálogo, pesquisa, detalhe, passagens e conta devem abortar leituras no
+  unmount/mudança de contexto e ignorar respostas antigas; cada falha
+  recuperável tem retry que preserva o filtro ou conteúdo atual.
+- Segmentos construídos com IDs/slugs vindos da API usam
+  `encodeURIComponent`; uma `/`, espaço ou `?` nunca cria outra rota.
+- `sessionStatus="unavailable"` é um estado operacional próprio: bloqueia CTAs
+  privados, permite voltar a confirmar a sessão e nunca mostra login como se
+  tivesse ocorrido logout.
+- Perfil e controlo parental partilham busy state e não são enviados em
+  paralelo. O valor parental vazio é inválido antes de qualquer conversão para
+  número; a resposta da API volta a ser a fonte autoritativa do formulário.
+- Imagens abaixo da dobra devem usar lazy loading, mantendo dimensões ou
+  contentor estável para evitar saltos de layout.
+- Conteúdo publicado com media pendente continua visível, mas o CTA de
+  reprodução fica desativado e explica “Vídeo ainda não disponível”.
+- A prova deve registar rota, viewport, perfil, estado observado e negativo;
+  uma captura isolada sem estes campos não fecha o critério.
+
 #### Changelog
 
+- `2026-07-10`: reutilizado `ContentCarousel` de `BK-MF3-04`; removido o import
+  do componente inexistente e integrado o bloco complementar no contrato
+  tutorial.
 - `2026-06-22`: guia criado/reestruturado na reorganização documental MF7/MF8.
 - `2026-06-23`: guia atualizado com componentes reutilizáveis, página exemplo, matriz de páginas e evidence responsiva.
 - `2026-06-23`: guia corrigido com código completo para as páginas principais, CSS dos estados, comentários didáticos e validação de usabilidade.
+- `2026-07-10`: matriz responsiva fechada em quatro viewports, reflow a 200%,
+  estados com retry, lazy images e media pendente documentados.
+- `2026-07-10`: adendo F5 sincroniza cancelamento/anti-stale, retry, encoding de rotas, sessão indisponível e conta sem coerção de vazio.

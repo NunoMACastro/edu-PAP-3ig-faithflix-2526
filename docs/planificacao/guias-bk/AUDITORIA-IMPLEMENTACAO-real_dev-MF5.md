@@ -1,13 +1,57 @@
-# Auditoria de implementacao - referencia_privada_docente - MF5
+# Auditoria de implementacao - real_dev - MF5
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: adendos de privacidade/admin locais de 2026-07-10 e snapshot MF5 delimitado
+
+## Adendo pós-correção Fase 5 - privacidade e administração (2026-07-10)
+
+Este adendo preserva o corpo histórico e não promove o estado dos BKs dos
+alunos. Na referência privada atual, exportação e consentimentos cancelam pedidos
+no unmount, impedem dupla submissão e ignoram respostas antigas; consentimentos
+revertem integralmente para o último snapshot confirmado quando a escrita falha.
+`AccountPage` não converte limite parental vazio em zero e valida um inteiro real
+0-18 antes do backend repetir a validação sem coerções.
+
+Utilizadores e candidaturas devolvem metadata paginada, `limit <= 50` e ordem
+estável. A UI de utilizadores confirma papel/estado, repõe o select ao cancelar,
+bloqueia apenas a linha ativa e traduz papéis/estados para PT-PT. Métricas e
+dashboard da pool têm leituras canceláveis/retry; integrações confirmam alterações,
+usam busy por linha e mantêm `publicConfig` sem segredos.
+
+Prova local acumulada atual: backend `191/191`; frontend `45` ficheiros/`164`
+testes, lint/build verdes; Axe `13/13` incluiu `/conta`, `/notificacoes` e
+`/admin/utilizadores`. Isto não substitui E2E administrativo completo, DB real ou
+o snapshot histórico abaixo.
+
+## Adendo pos-correcao Fase 3 administrativa - 2026-07-10
+
+O corpo abaixo preserva a auditoria de 2026-06-18. O contrato atual de
+`PATCH /api/users/:id/admin` é mais forte: update, revogação de todas as sessões
+no bloqueio e `user.admin_update` fazem commit/rollback juntos; o controller
+propaga `requestId`; snapshots do audit são sanitizados. Auto-bloqueio e
+autodespromoção continuam recusados e a remoção do último admin ativo devolve
+`409 LAST_ACTIVE_ADMIN`, incluindo sob duas remoções concorrentes.
+
+`node --test tests/unit/f3-admin-transactions.test.js tests/unit/mf5-validation.test.js`
+em `real_dev/backend` passou `14/14` em 2026-07-10, sem DB/rede. A topologia
+transacional MongoDB real continua por validar separadamente.
+
+## Snapshot histórico — auditoria MF5 observada em 2026-06-18
+
+A partir desta fronteira, ficam preservados os resultados e comandos da
+auditoria original; não constituem prova atual.
 
 ## Header
 
 - Data local: `2026-06-18` (`Europe/Lisbon`)
 - Projeto: `FaithFlix`
 - Modo executado: `auditar_implementacao`
-- Implementacao auditada: `referencia_privada_docente`
-- Backend auditado: `referencia_privada_docente/backend`
-- Frontend auditado: `referencia_privada_docente/frontend`
+- Implementacao auditada: `real_dev`
+- Backend auditado: `real_dev/backend`
+- Frontend auditado: `real_dev/frontend`
 - MF alvo: `MF5 - Operacao e privacidade`
 - BKs auditados: `BK-MF5-01`, `BK-MF5-02`, `BK-MF5-03`, `BK-MF5-04`, `BK-MF5-05`, `BK-MF5-06`
 - Estado geral da MF: `PASS`
@@ -36,9 +80,9 @@ Foram consultados:
 - guias `docs/planificacao/guias-bk/MF5/*.md`;
 - BKs de fronteira MF4 e MF6 conforme necessario;
 - relatorios `IMPLEMENTACAO-REAL_DEV-MF5.md`, auditoria anterior e correcao MF5;
-- codigo real em `referencia_privada_docente/backend` e `referencia_privada_docente/frontend`.
+- codigo real em `real_dev/backend` e `real_dev/frontend`.
 
-Pasta auditada: `referencia_privada_docente`, porque contem `backend/package.json`, `frontend/package.json`, codigo `src`, testes e scripts reais. Pastas `backend/`, `frontend/`, `apps/`, `server/` e `client/` da raiz foram tratadas apenas como referencia auxiliar. `mockup/` nao foi usado como contrato tecnico.
+Pasta auditada: `real_dev`, porque contem `backend/package.json`, `frontend/package.json`, codigo `src`, testes e scripts reais. Pastas `backend/`, `frontend/`, `apps/`, `server/` e `client/` da raiz foram tratadas apenas como referencia auxiliar. `mockup/` nao foi usado como contrato tecnico.
 
 ## Estado por BK
 
@@ -132,7 +176,7 @@ Sem findings `P3` acionaveis. A ausencia de E2E/browser especifico para MF5 fica
 - `PASS`: exportacao remove chaves sensiveis recursivamente (`privacy.service.js:41-49`, `privacy.service.js:72-94`).
 - `PASS`: contas `blocked`/`deleted` nao entram por login e sessoes antigas sao removidas.
 - `PASS`: operacoes admin criticas escrevem `admin_audit_logs`.
-- `PASS_COM_NOTA`: existem `.env` locais em `referencia_privada_docente/backend` e `referencia_privada_docente/frontend`; apenas os caminhos foram detetados, sem imprimir conteudo.
+- `PASS_COM_NOTA`: existem `.env` locais em `real_dev/backend` e `real_dev/frontend`; apenas os caminhos foram detetados, sem imprimir conteudo.
 - `PASS_COM_NOTA`: pesquisa de `secret/apiKey/stripe` devolveu falsos positivos defensivos: lista de redacao, minimizacao e teste negativo.
 
 ## Comandos executados
@@ -140,45 +184,45 @@ Sem findings `P3` acionaveis. A ausencia de E2E/browser especifico para MF5 fica
 | Comando | Resultado | Observacao |
 | --- | --- | --- |
 | `git status --short --untracked-files=all` | `PASS_COM_NOTA` | Relatorios tecnicos MF5 apareciam como `??`; isso nao foi tratado como falha, conforme regra da prompt. |
-| Pesquisa estatica de seguranca em `referencia_privada_docente/backend/src`, `tests`, `scripts`, `referencia_privada_docente/frontend/src` | `PASS_COM_NOTA` | Apenas falsos positivos defensivos: `stripe_real` como negativo, `secret` em listas de redacao/minimizacao. |
-| Pesquisa de drift OPSA/Orelle/StudyFlow/etc. em `referencia_privada_docente` | `PASS` | Sem ocorrencias. |
-| Deteccao de `.env` local | `PASS_COM_NOTA` | Encontrados `referencia_privada_docente/backend/.env`, `referencia_privada_docente/backend/.env.example`, `referencia_privada_docente/frontend/.env`, `referencia_privada_docente/frontend/.env.example`; conteudo nao impresso. |
-| `npm --prefix pasta_privada_do_professor/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | 27 testes passaram, 16 HTTP falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
-| `npm --prefix pasta_privada_do_professor/backend test` fora do sandbox | `PASS` | `43/43` testes passaram. |
-| `npm --prefix pasta_privada_do_professor/frontend run build` | `PASS` | Vite build passou; 100 modulos transformados. |
+| Pesquisa estatica de seguranca em `real_dev/backend/src`, `tests`, `scripts`, `real_dev/frontend/src` | `PASS_COM_NOTA` | Apenas falsos positivos defensivos: `stripe_real` como negativo, `secret` em listas de redacao/minimizacao. |
+| Pesquisa de drift OPSA/Orelle/StudyFlow/etc. em `real_dev` | `PASS` | Sem ocorrencias. |
+| Deteccao de `.env` local | `PASS_COM_NOTA` | Encontrados `real_dev/backend/.env`, `real_dev/backend/.env.example`, `real_dev/frontend/.env`, `real_dev/frontend/.env.example`; conteudo nao impresso. |
+| `npm --prefix real_dev/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | 27 testes passaram, 16 HTTP falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
+| `npm --prefix real_dev/backend test` fora do sandbox | `PASS` | `43/43` testes passaram. |
+| `npm --prefix real_dev/frontend run build` | `PASS` | Vite build passou; 100 modulos transformados. |
 | `npm run smoke` fora do sandbox | `PASS` | Backend smoke `8/8` e frontend build passaram. |
 | `bash scripts/validate-planificacao.sh` | `PASS` | `checked_bks: 55`, `checked_guides: 55`, `errors: []`. |
 | `git diff --check` | `PASS` | Sem erros de whitespace em diffs rastreados; os relatorios tecnicos MF5 continuam untracked. |
 
 ## Ficheiros auditados principais
 
-- `referencia_privada_docente/backend/src/app.js`
-- `referencia_privada_docente/backend/src/modules/privacy/*`
-- `referencia_privada_docente/backend/src/modules/users/*`
-- `referencia_privada_docente/backend/src/modules/admin-metrics/*`
-- `referencia_privada_docente/backend/src/modules/integrations/*`
-- `referencia_privada_docente/backend/src/modules/auth/*`
-- `referencia_privada_docente/backend/src/modules/subscriptions/*`
-- `referencia_privada_docente/backend/src/modules/payments/*`
-- `referencia_privada_docente/backend/src/modules/charities/*`
-- `referencia_privada_docente/backend/tests/unit/mf5-validation.test.js`
-- `referencia_privada_docente/backend/tests/integration/mf4-http.test.js`
-- `referencia_privada_docente/frontend/src/services/api/apiClient.js`
-- `referencia_privada_docente/frontend/src/services/api/privacyApi.js`
-- `referencia_privada_docente/frontend/src/services/api/userApi.js`
-- `referencia_privada_docente/frontend/src/services/api/metricsApi.js`
-- `referencia_privada_docente/frontend/src/services/api/integrationsApi.js`
-- `referencia_privada_docente/frontend/src/services/api/subscriptionsApi.js`
-- `referencia_privada_docente/frontend/src/components/privacy/*`
-- `referencia_privada_docente/frontend/src/pages/AccountPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminUsersPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminMetricsPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminIntegrationsPage.jsx`
-- `referencia_privada_docente/frontend/src/routes/AppRoutes.jsx`
+- `real_dev/backend/src/app.js`
+- `real_dev/backend/src/modules/privacy/*`
+- `real_dev/backend/src/modules/users/*`
+- `real_dev/backend/src/modules/admin-metrics/*`
+- `real_dev/backend/src/modules/integrations/*`
+- `real_dev/backend/src/modules/auth/*`
+- `real_dev/backend/src/modules/subscriptions/*`
+- `real_dev/backend/src/modules/payments/*`
+- `real_dev/backend/src/modules/charities/*`
+- `real_dev/backend/tests/unit/mf5-validation.test.js`
+- `real_dev/backend/tests/integration/mf4-http.test.js`
+- `real_dev/frontend/src/services/api/apiClient.js`
+- `real_dev/frontend/src/services/api/privacyApi.js`
+- `real_dev/frontend/src/services/api/userApi.js`
+- `real_dev/frontend/src/services/api/metricsApi.js`
+- `real_dev/frontend/src/services/api/integrationsApi.js`
+- `real_dev/frontend/src/services/api/subscriptionsApi.js`
+- `real_dev/frontend/src/components/privacy/*`
+- `real_dev/frontend/src/pages/AccountPage.jsx`
+- `real_dev/frontend/src/pages/AdminUsersPage.jsx`
+- `real_dev/frontend/src/pages/AdminMetricsPage.jsx`
+- `real_dev/frontend/src/pages/AdminIntegrationsPage.jsx`
+- `real_dev/frontend/src/routes/AppRoutes.jsx`
 
 ## Ficheiros alterados nesta execucao
 
-- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-referencia_privada_docente-MF5.md`
+- `docs/planificacao/guias-bk/AUDITORIA-IMPLEMENTACAO-real_dev-MF5.md`
 
 Nao foram alterados codigo, BKs canonicos, backlog, matriz, prompts, commits ou PRs.
 

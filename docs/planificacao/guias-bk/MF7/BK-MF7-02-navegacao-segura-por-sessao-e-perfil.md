@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF7-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-02-navegacao-segura-por-sessao-e-perfil.md`
-- `last_updated`: `2026-06-23`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -52,7 +52,8 @@ Este BK fecha o risco visual mais crítico da MF7: uma interface que mostra link
 - Estado antes: `authApi.me()` chama `GET /api/session/me`.
 - Estado antes: o backend expõe `req.user`, `requireAuth` e `requireRole`.
 - Estado antes: o header pode apresentar links administrativos sem contexto de perfil.
-- Estado depois: o frontend conhece `anonymous`, `authenticated` e `admin`.
+- Estado depois: o frontend conhece `loading`, `anonymous`, `authenticated` e
+  `unavailable`; `admin` é uma role derivada do utilizador autenticado.
 - Estado depois: rotas admin têm guarda visual e o backend continua a ser a autoridade final.
 
 #### Pré-requisitos
@@ -77,16 +78,33 @@ Este BK fecha o risco visual mais crítico da MF7: uma interface que mostra link
 - `CANONICO`: `RF02` define autenticação e sessão segura.
 - `CANONICO`: `RF04` define papéis de utilizador.
 - `CANONICO`: `RNF15` exige sessão autenticada por cookie com flags de segurança.
-- `DERIVADO`: o frontend usa `status: "anonymous" | "authenticated" | "loading"` para apresentar a UI sem adivinhar permissões.
+- `DERIVADO`: o frontend usa `status: "loading" | "anonymous" | "authenticated" | "unavailable"` para apresentar a UI sem adivinhar permissões.
 - A guarda visual melhora UX, mas não é uma barreira de segurança suficiente. O backend continua a validar `requireAuth` e `requireRole`.
 - Não se deve confiar em `role` escrito manualmente pelo utilizador. O papel vem sempre da resposta de sessão.
+
+##### Contrato de indisponibilidade de sessão
+
+- `GET /api/session/me` com `200 { user: null }` é o único caso que estabelece
+  `anonymous`. Uma falha de rede, timeout ou `5xx` estabelece `unavailable` e
+  preserva a diferença entre ausência de sessão e estado operacional incerto.
+- `unavailable` não redireciona para login nem mostra CTAs de visitante. Rotas e
+  ações privadas permanecem bloqueadas, apresentam mensagem segura e permitem
+  chamar `refreshSession()` novamente.
+- Apenas um `401` recebido numa chamada autenticada limpa a sessão e o token
+  CSRF em memória como logout efetivo.
+- Páginas públicas que dependem da sessão, como detalhe e home, tratam
+  `loading` e `unavailable` explicitamente: não iniciam playback direto nem
+  apresentam `Entrar para reproduzir` enquanto o estado for incerto.
+
+O Passo 2 implementa diretamente este contrato. Não existe uma versão alternativa
+em que uma falha operacional seja convertida em logout ou em sessão anónima.
 
 #### Arquitetura do BK
 
 | Camada | Artefacto | Responsabilidade |
 | --- | --- | --- |
 | Backend | `backend/src/modules/auth/session.routes.js` | Devolve `{ user: ... }` ou `{ user: null }`. |
-| Backend | `backend/src/modules/auth/auth.middleware.js` | Mantém `401` e `403` nas rotas protegidas. |
+| Backend | `backend/src/middlewares/auth.middleware.js` | Mantém `401` e `403` nas rotas protegidas. |
 | Frontend | `frontend/src/context/SessionContext.jsx` | Carrega e partilha sessão atual. |
 | Frontend | `frontend/src/components/auth/AdminRoute.jsx` | Bloqueia visualmente páginas admin. |
 | Frontend | `frontend/src/components/layout/AppHeader.jsx` | Filtra links por perfil. |
@@ -102,7 +120,7 @@ Este BK fecha o risco visual mais crítico da MF7: uma interface que mostra link
 - EDITAR: `frontend/src/routes/AppRoutes.jsx`
 - REVER: `frontend/src/services/api/authApi.js`
 - REVER: `frontend/src/services/api/apiClient.js`
-- REVER: `backend/src/modules/auth/auth.middleware.js`
+- REVER: `backend/src/middlewares/auth.middleware.js`
 - CRIAR: `docs/evidence/MF7/NAVEGACAO-SEGURA-POR-PERFIL.md`
 
 #### Tutorial técnico linear
@@ -113,11 +131,12 @@ Este BK fecha o risco visual mais crítico da MF7: uma interface que mostra link
 
 Confirmar que o frontend já tem uma chamada oficial para ler a sessão atual.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - REVER: `frontend/src/services/api/authApi.js`
     - REVER: `frontend/src/services/api/apiClient.js`
     - REVER: `backend/src/modules/auth/session.routes.js`
-    - LOCALIZAÇÃO: métodos `authApi.me()`, `apiClient.request()` e rota `GET /me`.
+    - LOCALIZAÇÃO: métodos públicos `authApi.me()`, `apiClient.get()` e rota
+      montada `GET /api/session/me`.
 
 3. Instruções do que fazer.
 
@@ -130,7 +149,9 @@ Confirma estes pontos:
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo confirma contratos já criados em BKs anteriores.
+Sem código neste passo.
+
+Este passo confirma contratos já criados em BKs anteriores.
 
 5. Explicação do código.
 
@@ -150,7 +171,7 @@ Se `apiClient` não enviar cookies, `authApi.me()` pode devolver visitante mesmo
 
 Partilhar a sessão atual com header, rotas e páginas sem repetir chamadas HTTP em cada componente.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - CRIAR: `frontend/src/context/SessionContext.jsx`
     - EDITAR: `frontend/src/main.jsx`
     - LOCALIZAÇÃO: ficheiros completos.
@@ -167,22 +188,62 @@ Cria a pasta `frontend/src/context/`. Depois cria `SessionContext.jsx` e envolve
  * @file Contexto de sessão usado pela navegação segura da MF7.
  */
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { authApi } from "../services/api/authApi.js";
+import { toUserMessage } from "../services/api/apiErrors.js";
+import {
+  clearCsrfToken,
+  setUnauthorizedHandler,
+} from "../services/api/apiClient.js";
 
 const SessionContext = createContext(null);
+
+function isUnauthorizedError(error) {
+  return error !== null && typeof error === "object" && error.status === 401;
+}
+
+/** Valida a allowlist mínima do utilizador público devolvido por `/session/me`. */
+function isPublicUser(value) {
+  return value !== null
+    && typeof value === "object"
+    && typeof value.id === "string"
+    && typeof value.email === "string"
+    && typeof value.name === "string"
+    && typeof value.role === "string";
+}
 
 /**
  * Disponibiliza estado de sessão para toda a aplicação.
  *
  * @param {{ children: React.ReactNode }} props Propriedades do provider.
  * @param {React.ReactNode} props.children Árvore React que precisa da sessão.
- * @returns {JSX.Element} Provider com estado `loading`, `anonymous` ou `authenticated`.
+ * @returns {JSX.Element} Provider com estado `loading`, `anonymous`, `authenticated` ou `unavailable`.
  */
 export function SessionProvider({ children }) {
   const [status, setStatus] = useState("loading");
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
+  const refreshVersion = useRef(0);
+
+  /**
+   * Limpa a sessão apenas quando o backend confirmou logout ou devolveu 401.
+   * Incrementar a versão impede que um pedido antigo volte a autenticar a UI.
+   */
+  const clearSession = useCallback(() => {
+    refreshVersion.current += 1;
+    clearCsrfToken();
+    setUser(null);
+    setStatus("anonymous");
+    setError("");
+  }, []);
 
   /**
    * Recarrega a sessão a partir do backend.
@@ -190,26 +251,83 @@ export function SessionProvider({ children }) {
    * @returns {Promise<void>} Termina depois de atualizar o estado local.
    */
   const refreshSession = useCallback(async () => {
+    const currentVersion = refreshVersion.current + 1;
+    refreshVersion.current = currentVersion;
     setStatus("loading");
     setError("");
 
     try {
       const response = await authApi.me();
-      const currentUser = response?.user ?? null;
 
-      // O perfil vem do backend para evitar que a UI aceite permissões inventadas no browser.
-      setUser(currentUser);
-      setStatus(currentUser ? "authenticated" : "anonymous");
+      if (refreshVersion.current !== currentVersion) {
+        return null;
+      }
+
+      if (response?.user === null) {
+        // Só `200 { user: null }` confirma anonimato; ausência do campo é resposta inválida.
+        setUser(null);
+        setStatus("anonymous");
+        return null;
+      }
+
+      if (!isPublicUser(response?.user)) {
+        throw new Error("Resposta de sessão inválida.");
+      }
+
+      // O perfil validado vem do backend; a UI não aceita permissões inventadas no browser.
+      setUser(response.user);
+      setStatus("authenticated");
+      return response.user;
     } catch (requestError) {
-      setUser(null);
-      setStatus("anonymous");
-      setError(requestError.message);
+      if (refreshVersion.current !== currentVersion) {
+        return null;
+      }
+
+      if (isUnauthorizedError(requestError)) {
+        clearSession();
+        return null;
+      }
+
+      // Uma falha operacional não invalida o cookie nem a identidade já confirmada.
+      setStatus("unavailable");
+      setError(toUserMessage(requestError));
+      throw requestError;
     }
-  }, []);
+  }, [clearSession]);
+
+  /**
+   * Só limpa o contexto depois de o backend terminar a sessão. Um erro de rede
+   * preserva o estado porque o cookie HttpOnly pode continuar válido.
+   */
+  const logout = useCallback(async () => {
+    try {
+      await authApi.logout();
+    } catch (requestError) {
+      if (!isUnauthorizedError(requestError)) {
+        throw requestError;
+      }
+    }
+
+    clearSession();
+  }, [clearSession]);
 
   useEffect(() => {
-    refreshSession();
-  }, [refreshSession]);
+    let active = true;
+    const removeUnauthorizedHandler = setUnauthorizedHandler(() => {
+      if (active) {
+        clearSession();
+      }
+    });
+
+    // `unavailable` fica no estado do provider; não cria uma rejection global.
+    refreshSession().catch(() => {});
+
+    return () => {
+      active = false;
+      refreshVersion.current += 1;
+      removeUnauthorizedHandler();
+    };
+  }, [clearSession, refreshSession]);
 
   const value = useMemo(
     () => ({
@@ -217,9 +335,12 @@ export function SessionProvider({ children }) {
       user,
       error,
       isAdmin: user?.role === "admin",
+      isModerator: user?.role === "moderator",
       refreshSession,
+      logout,
+      clearSession,
     }),
-    [error, refreshSession, status, user],
+    [clearSession, error, logout, refreshSession, status, user],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
@@ -228,7 +349,7 @@ export function SessionProvider({ children }) {
 /**
  * Lê o contexto de sessão no componente atual.
  *
- * @returns {{ status: string, user: unknown, error: string, isAdmin: boolean, refreshSession: () => Promise<void> }} Estado de sessão.
+ * @returns {{ status: "loading" | "anonymous" | "authenticated" | "unavailable", user: unknown, error: string, isAdmin: boolean, isModerator: boolean, refreshSession: () => Promise<unknown>, logout: () => Promise<void>, clearSession: () => void }} Estado de sessão.
  * @throws {Error} Quando usado fora de `SessionProvider`.
  */
 export function useSession() {
@@ -270,7 +391,12 @@ createRoot(document.getElementById("root")).render(
 
 5. Explicação do código.
 
-`SessionProvider` centraliza a leitura de `/api/session/me`. O estado começa em `loading`, passa para `authenticated` se o backend devolver `user` e passa para `anonymous` se não houver sessão. A propriedade `isAdmin` deriva de `user.role` para o header e para as rotas admin. O provider não guarda tokens nem permissões manuais; apenas reflete a sessão do servidor.
+`SessionProvider` centraliza a leitura de `/api/session/me`. O estado começa em
+`loading`, passa para `authenticated` quando existe utilizador e só passa para
+`anonymous` perante `200 { user: null }` ou um `401` explícito. Timeout, falha de
+rede e `5xx` passam para `unavailable`, mostram uma mensagem segura e permitem
+repetir `refreshSession()`. O provider não guarda tokens nem permissões manuais;
+o token CSRF fica no cliente API e é limpo apenas com logout confirmado ou `401`.
 
 6. Validação do passo.
 
@@ -278,25 +404,71 @@ Executa o frontend e confirma que a aplicação arranca sem erro de import. Resu
 
 7. Cenário negativo/erro esperado.
 
-Se `useSession` for usado fora de `SessionProvider`, a mensagem `useSession deve ser usado dentro de SessionProvider.` indica uma integração incompleta.
+Se o backend ficar indisponível, o estado esperado é `unavailable`, não
+`anonymous`; a UI deve bloquear ações privadas e apresentar um botão que chama
+`refreshSession()`. Se `useSession` for usado fora de `SessionProvider`, a
+mensagem `useSession deve ser usado dentro de SessionProvider.` indica uma
+integração incompleta.
 
 ### Passo 3 - Filtrar header e proteger rotas admin
 
 1. Objetivo funcional do passo no contexto da app.
 
-Esconder links admin para visitantes e utilizadores comuns, e bloquear visualmente as rotas admin.
+Esconder links privilegiados para visitantes/utilizadores comuns, permitir ao
+`moderator` apenas a gestão de catálogo e manter as restantes áreas exclusivas
+de `admin`.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
+    - CRIAR: `frontend/src/components/auth/AuthenticatedRoute.jsx`
     - CRIAR: `frontend/src/components/auth/AdminRoute.jsx`
     - EDITAR: `frontend/src/components/layout/AppHeader.jsx`
     - EDITAR: `frontend/src/routes/AppRoutes.jsx`
-    - LOCALIZAÇÃO: ficheiros completos ou substituição completa das funções exportadas.
+    - LOCALIZAÇÃO: criar os dois componentes completos e fazer apenas a composição
+      indicada na tabela de rotas já existente.
 
 3. Instruções do que fazer.
 
-Cria `AdminRoute.jsx`, substitui a lista de links do header por links com `roles` e envolve todas as páginas `/admin/...` com `<AdminRoute>`.
+Cria `AuthenticatedRoute.jsx` e `AdminRoute.jsx`, substitui a lista de links do
+header por links com `visibility`, envolve as páginas pessoais com a primeira
+guarda e todas as páginas `/admin/...` com a segunda. Em
+`AppRoutes.jsx` não substituas o router nem os imports lazy construídos em
+`BK-MF1-02`: a alteração deste BK é apenas o import da guarda e a composição do
+valor `element` das rotas administrativas.
 
 4. Código completo, correto e integrado com a app final.
+
+```jsx
+// frontend/src/components/auth/AuthenticatedRoute.jsx
+/**
+ * @file Guarda de sessão para páginas e pedidos exclusivamente pessoais.
+ */
+import { Navigate } from "react-router-dom";
+import { useSession } from "../../context/SessionContext.jsx";
+
+export function AuthenticatedRoute({ children }) {
+  const { status, error, refreshSession } = useSession();
+
+  if (status === "loading") {
+    return <p role="status">A confirmar sessão...</p>;
+  }
+  if (status === "anonymous") {
+    // Destino constante: nunca copia uma URL externa para `next`.
+    return <Navigate to="/login" replace />;
+  }
+  if (status === "unavailable") {
+    return (
+      <section role="alert">
+        <p>{error || "Não foi possível confirmar a sessão."}</p>
+        <button type="button" onClick={() => refreshSession().catch(() => {})}>
+          Tentar novamente
+        </button>
+      </section>
+    );
+  }
+
+  return children;
+}
+```
 
 ```jsx
 // frontend/src/components/auth/AdminRoute.jsx
@@ -308,14 +480,14 @@ import { Navigate } from "react-router-dom";
 import { useSession } from "../../context/SessionContext.jsx";
 
 /**
- * Impede que visitantes e utilizadores comuns vejam o conteúdo admin no frontend.
+ * Impede que um perfil fora da allowlist veja o conteúdo privilegiado.
  *
- * @param {{ children: React.ReactNode }} props Propriedades do componente.
+ * @param {{ children: React.ReactNode, allowedRoles?: string[] }} props Propriedades do componente.
  * @param {React.ReactNode} props.children Página admin protegida visualmente.
  * @returns {JSX.Element} Página protegida, redirecionamento ou aviso de permissão.
  */
-export function AdminRoute({ children }) {
-  const { status, isAdmin } = useSession();
+export function AdminRoute({ children, allowedRoles = ["admin"] }) {
+  const { status, user, error, refreshSession } = useSession();
 
   if (status === "loading") {
     return <p role="status">A confirmar sessão...</p>;
@@ -326,7 +498,18 @@ export function AdminRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!isAdmin) {
+  if (status === "unavailable") {
+    return (
+      <section role="alert">
+        <p>{error || "Não foi possível confirmar a sessão."}</p>
+        <button type="button" onClick={() => refreshSession().catch(() => {})}>
+          Tentar novamente
+        </button>
+      </section>
+    );
+  }
+
+  if (!allowedRoles.includes(user?.role)) {
     // Esta guarda melhora a UX; o backend mantém a decisão final com 403.
     return <p role="alert">Não tem permissão para aceder a esta área.</p>;
   }
@@ -341,8 +524,10 @@ export function AdminRoute({ children }) {
  * @file Cabeçalho principal com navegação FaithFlix filtrada por sessão.
  */
 
-import { NavLink } from "react-router-dom";
+import { useEffect, useId, useRef, useState } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useSession } from "../../context/SessionContext.jsx";
+import { toUserMessage } from "../../services/api/apiErrors.js";
 
 const navItems = [
   { to: "/", label: "Início", visibility: "public" },
@@ -350,13 +535,18 @@ const navItems = [
   { to: "/pesquisa", label: "Pesquisa", visibility: "public" },
   { to: "/para-si", label: "Para si", visibility: "authenticated" },
   { to: "/biblioteca", label: "Biblioteca", visibility: "authenticated" },
+  { to: "/notificacoes", label: "Notificações", visibility: "authenticated" },
   { to: "/associacoes", label: "Associações", visibility: "public" },
   { to: "/planos", label: "Planos", visibility: "public" },
   { to: "/conta", label: "Conta", visibility: "authenticated" },
-  { to: "/admin/catalogo", label: "Admin catálogo", visibility: "admin" },
+  { to: "/admin/catalogo", label: "Admin catálogo", visibility: "catalog-manager" },
   { to: "/admin/utilizadores", label: "Admin utilizadores", visibility: "admin" },
   { to: "/admin/metricas", label: "Métricas", visibility: "admin" },
   { to: "/admin/integracoes", label: "Integrações", visibility: "admin" },
+  { to: "/admin/charity-applications", label: "Candidaturas", visibility: "admin" },
+  { to: "/admin/pool/distribution", label: "Distribuição", visibility: "admin" },
+  { to: "/admin/pool/dashboard", label: "Pool solidária", visibility: "admin" },
+  { to: "/admin/charity-members", label: "Membros", visibility: "admin" },
 ];
 
 /**
@@ -373,13 +563,19 @@ function getNavLinkClassName({ isActive }) {
  * Decide se um item pode aparecer para o perfil atual.
  *
  * @param {{ visibility: string }} item Item de navegação.
- * @param {{ status: string, isAdmin: boolean }} session Estado de sessão.
+ * @param {{ status: string, isAdmin: boolean, isModerator: boolean }} session Estado de sessão.
  * @returns {boolean} Verdadeiro quando o link deve ser visível.
  */
 function canShowNavItem(item, session) {
   if (item.visibility === "public") return true;
   if (item.visibility === "authenticated") return session.status === "authenticated";
-  if (item.visibility === "admin") return session.isAdmin;
+  if (item.visibility === "catalog-manager") {
+    return session.status === "authenticated"
+      && (session.isAdmin || session.isModerator);
+  }
+  if (item.visibility === "admin") {
+    return session.status === "authenticated" && session.isAdmin;
+  }
   return false;
 }
 
@@ -390,7 +586,52 @@ function canShowNavItem(item, session) {
  */
 export function AppHeader() {
   const session = useSession();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const loggingOutRef = useRef(false);
+  const [logoutError, setLogoutError] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const toggleRef = useRef(null);
+  const menuId = useId();
   const visibleItems = navItems.filter((item) => canShowNavItem(item, session));
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+
+    function handleEscape(event) {
+      if (event.key !== "Escape") return;
+      setMenuOpen(false);
+      toggleRef.current?.focus();
+    }
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [menuOpen]);
+
+  async function handleLogout() {
+    if (loggingOutRef.current) return;
+    loggingOutRef.current = true;
+    setLoggingOut(true);
+    setLogoutError("");
+
+    try {
+      // Só terminamos a navegação depois de a sessão ter sido revogada no servidor.
+      await session.logout();
+      setMenuOpen(false);
+      navigate("/", { replace: true });
+    } catch (requestError) {
+      // Uma falha operacional mantém a identidade local e permite repetir a ação.
+      setLogoutError(toUserMessage(requestError));
+    } finally {
+      loggingOutRef.current = false;
+      setLoggingOut(false);
+    }
+  }
 
   return (
     <header className="app-header">
@@ -399,13 +640,57 @@ export function AppHeader() {
         <span className="brand-name">FaithFlix</span>
       </NavLink>
 
-      <nav className="main-nav" aria-label="Navegação principal">
+      <button
+        ref={toggleRef}
+        className="menu-toggle"
+        type="button"
+        aria-expanded={menuOpen}
+        aria-controls={menuId}
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        {menuOpen ? "Fechar menu" : "Abrir menu"}
+      </button>
+
+      <nav
+        id={menuId}
+        className="main-nav"
+        data-open={menuOpen ? "true" : "false"}
+        aria-label="Navegação principal"
+      >
         {visibleItems.map((item) => (
-          <NavLink key={item.to} className={getNavLinkClassName} to={item.to}>
+          <NavLink
+            key={item.to}
+            className={getNavLinkClassName}
+            to={item.to}
+            onClick={() => setMenuOpen(false)}
+          >
             {item.label}
           </NavLink>
         ))}
+        {session.status === "anonymous" ? (
+          <NavLink
+            className={getNavLinkClassName}
+            to="/login"
+            onClick={() => setMenuOpen(false)}
+          >
+            Entrar
+          </NavLink>
+        ) : null}
+        {session.status === "authenticated" ? (
+          <button type="button" disabled={loggingOut} onClick={handleLogout}>
+            {loggingOut ? "A sair..." : "Sair"}
+          </button>
+        ) : null}
       </nav>
+      {session.status === "unavailable" ? (
+        <div role="alert">
+          <p>{session.error || "Não foi possível confirmar a sessão."}</p>
+          <button type="button" onClick={() => session.refreshSession().catch(() => {})}>
+            Tentar confirmar sessão
+          </button>
+        </div>
+      ) : null}
+      {logoutError ? <p role="alert">{logoutError}</p> : null}
     </header>
   );
 }
@@ -413,15 +698,28 @@ export function AppHeader() {
 
 5. Explicação do código.
 
-`AdminRoute` dá feedback claro nos três estados: carregamento, visitante e utilizador sem permissão. `AppHeader` passa a ter `visibility` por link, por isso a UI não mostra opções admin a quem não é admin. A regra de segurança essencial mantém-se no backend; este BK apenas impede que a navegação induza o utilizador em erro.
+`AdminRoute` distingue os quatro estados: loading, visitante, indisponibilidade
+com retry e sessão confirmada sem permissão. `unavailable` nunca redireciona para
+login nem se apresenta como `403`. `AppHeader` usa `visibility` por link e não
+mostra CTAs privados enquanto a sessão está incerta. O login continua
+alcançável para visitantes, `/notificacoes` e todas as áreas admin ficam na
+navegação autorizada, e `handleLogout` só navega/limpa depois de sucesso ou
+`401`; uma falha operacional mantém a sessão e mostra retry. A barreira de
+segurança essencial continua no backend. Em ecrã estreito, o botão semântico
+expõe `aria-expanded`/`aria-controls`; mudar de rota fecha o menu e `Escape`
+fecha-o devolvendo o foco ao botão.
 
 6. Validação do passo.
 
-Valida manualmente três perfis:
+Valida manualmente três perfis e uma falha operacional:
 
 - visitante: não vê links de conta privada nem admin;
 - utilizador comum: vê áreas autenticadas, mas não vê admin;
 - admin: vê os links admin.
+- backend indisponível: não vê links privados/login automático, recebe mensagem
+  segura e consegue repetir a leitura da sessão.
+- logout com sucesso: mostra `Sair`, termina a sessão e navega para `/`;
+- logout com falha de rede: mantém a sessão, não navega e apresenta o erro.
 
 7. Cenário negativo/erro esperado.
 
@@ -433,100 +731,96 @@ Um utilizador comum que escreva `/admin/metricas` no URL deve ver `Não tem perm
 
 Garantir que todas as rotas admin usam a guarda visual e deixar prova objetiva para o gate da MF7.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - EDITAR: `frontend/src/routes/AppRoutes.jsx`
     - CRIAR: `docs/evidence/MF7/NAVEGACAO-SEGURA-POR-PERFIL.md`
     - LOCALIZAÇÃO: rotas `/admin/...` e ficheiro de evidence completo.
 
 3. Instruções do que fazer.
 
-Importa `AdminRoute` em `AppRoutes.jsx` e envolve todas as rotas administrativas. Depois cria a evidence com a matriz abaixo.
+Importa `AuthenticatedRoute` e `AdminRoute` em `AppRoutes.jsx`. Envolve todas as
+rotas pessoais e administrativas na tabela que já existe. Mantém sem alterações `lazy`, `Suspense`,
+`ErrorBoundary`, `RouteLifecycle`, `AppLayout`, todas as rotas públicas e todos
+os componentes de página já declarados. Depois cria a evidence com a matriz
+abaixo.
+
+Antes de editar os `element`, confirma que cada binding já foi declarado por
+`lazyNamedPage` no BK proprietário. Não voltes a declarar nenhum destes nomes
+em MF7:
+
+| Binding lazy já existente | BK proprietário |
+| --- | --- |
+| `AdminCatalogPage` | `BK-MF2-03` |
+| `AdminUsersPage` | `BK-MF2-02` |
+| `AdminMetricsPage` | `BK-MF5-05` |
+| `AdminIntegrationsPage` | `BK-MF5-06` |
+| `AdminCharityApplicationsPage` | `BK-MF4-04` |
+| `AdminPoolDistributionPage` | `BK-MF4-05` |
+| `AdminPoolDashboardPage` | `BK-MF4-06` |
+| `AdminCharityMembersPage` | `BK-MF4-06` |
+
+Se faltar um binding, regressa ao BK indicado e aplica a declaração lazy desse
+guia. Não compenses a falta com um `import ...Page from` eager.
 
 4. Código completo, correto e integrado com a app final.
 
 ```jsx
 // frontend/src/routes/AppRoutes.jsx
-/**
- * @file Tabela de rotas do frontend FaithFlix.
- */
-
-import { Route, Routes } from "react-router-dom";
+// ADICIONAR junto dos imports existentes; não substituir os imports lazy.
 import { AdminRoute } from "../components/auth/AdminRoute.jsx";
-import { AppLayout } from "../layouts/AppLayout.jsx";
-import { AccountPage } from "../pages/AccountPage.jsx";
-import { AdminCatalogPage } from "../pages/AdminCatalogPage.jsx";
-import { AdminCharityApplicationsPage } from "../pages/AdminCharityApplicationsPage.jsx";
-import { AdminCharityMembersPage } from "../pages/AdminCharityMembersPage.jsx";
-import { AdminIntegrationsPage } from "../pages/AdminIntegrationsPage.jsx";
-import { AdminMetricsPage } from "../pages/AdminMetricsPage.jsx";
-import { AdminPoolDashboardPage } from "../pages/AdminPoolDashboardPage.jsx";
-import { AdminPoolDistributionPage } from "../pages/AdminPoolDistributionPage.jsx";
-import { AdminUsersPage } from "../pages/AdminUsersPage.jsx";
-import { CatalogPage } from "../pages/CatalogPage.jsx";
-import { CharityApplicationPage } from "../pages/CharityApplicationPage.jsx";
-import { CharityHistoryPage } from "../pages/CharityHistoryPage.jsx";
-import { ContentDetailPage } from "../pages/ContentDetailPage.jsx";
-import { DiscoveryHomePage } from "../pages/DiscoveryHomePage.jsx";
-import { ForYouPage } from "../pages/ForYouPage.jsx";
-import { LoginPage } from "../pages/LoginPage.jsx";
-import { MyLibraryPage } from "../pages/MyLibraryPage.jsx";
-import { NotificationsPage } from "../pages/NotificationsPage.jsx";
-import { PlaybackPage } from "../pages/PlaybackPage.jsx";
-import { PublicCharitiesPage } from "../pages/PublicCharitiesPage.jsx";
-import { SearchPage } from "../pages/SearchPage.jsx";
-import { SubscriptionPage } from "../pages/SubscriptionPage.jsx";
-import { NotFoundPage } from "../pages/pages.jsx";
+import { AuthenticatedRoute } from "../components/auth/AuthenticatedRoute.jsx";
+
+function withAuthenticatedRoute(page) {
+  return <AuthenticatedRoute>{page}</AuthenticatedRoute>;
+}
 
 /**
- * Envolve páginas administrativas na guarda visual.
+ * Compõe uma página lazy já existente com a guarda visual.
  *
  * @param {React.ReactNode} page Página administrativa.
  * @returns {JSX.Element} Rota protegida pela sessão.
  */
-function withAdminRoute(page) {
-  return <AdminRoute>{page}</AdminRoute>;
+function withAdminRoute(page, allowedRoles = ["admin"]) {
+  // A composição não altera como a página é importada nem o lifecycle da rota.
+  return <AdminRoute allowedRoles={allowedRoles}>{page}</AdminRoute>;
 }
+```
 
-/**
- * Declara a árvore de rotas renderizada dentro do layout partilhado.
- *
- * @returns {JSX.Element} Rotas da aplicação.
- */
-export function AppRoutes() {
-  return (
-    <AppLayout>
-      <Routes>
-        <Route path="/" element={<DiscoveryHomePage />} />
-        <Route path="/catalogo" element={<CatalogPage />} />
-        <Route path="/catalogo/:idOrSlug" element={<ContentDetailPage />} />
-        <Route path="/ver/:contentId" element={<PlaybackPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/para-si" element={<ForYouPage />} />
-        <Route path="/associacoes" element={<PublicCharitiesPage />} />
-        <Route path="/associacoes/candidatura" element={<CharityApplicationPage />} />
-        <Route path="/associacoes/:charityId/historico" element={<CharityHistoryPage />} />
-        <Route path="/planos" element={<SubscriptionPage />} />
-        <Route path="/conta" element={<AccountPage />} />
-        <Route path="/biblioteca" element={<MyLibraryPage />} />
-        <Route path="/notificacoes" element={<NotificationsPage />} />
-        <Route path="/pesquisa" element={<SearchPage />} />
-        <Route path="/admin/catalogo" element={withAdminRoute(<AdminCatalogPage />)} />
-        <Route path="/admin/utilizadores" element={withAdminRoute(<AdminUsersPage />)} />
-        <Route path="/admin/metricas" element={withAdminRoute(<AdminMetricsPage />)} />
-        <Route path="/admin/integracoes" element={withAdminRoute(<AdminIntegrationsPage />)} />
-        <Route path="/admin/charity-applications" element={withAdminRoute(<AdminCharityApplicationsPage />)} />
-        <Route path="/admin/pool/distribution" element={withAdminRoute(<AdminPoolDistributionPage />)} />
-        <Route path="/admin/pool/dashboard" element={withAdminRoute(<AdminPoolDashboardPage />)} />
-        <Route path="/admin/charity-members" element={withAdminRoute(<AdminCharityMembersPage />)} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </AppLayout>
-  );
-}
+```jsx
+// frontend/src/routes/AppRoutes.jsx
+// EDITAR apenas o valor `element` destas rotas na tabela existente.
+<>
+<Route path="/para-si" element={withAuthenticatedRoute(<ForYouPage />)} />
+<Route path="/biblioteca" element={withAuthenticatedRoute(<MyLibraryPage />)} />
+<Route path="/notificacoes" element={withAuthenticatedRoute(<NotificationsPage />)} />
+<Route path="/conta" element={withAuthenticatedRoute(<AccountPage />)} />
+<Route path="/ver/:contentId" element={withAuthenticatedRoute(<PlaybackPage />)} />
+<Route
+  path="/associacoes/:charityId/historico"
+  element={withAuthenticatedRoute(<CharityHistoryPage />)}
+/>
+<Route
+  path="/admin/catalogo"
+  element={withAdminRoute(<AdminCatalogPage />, ["admin", "moderator"])}
+/>
+<Route path="/admin/utilizadores" element={withAdminRoute(<AdminUsersPage />)} />
+<Route path="/admin/metricas" element={withAdminRoute(<AdminMetricsPage />)} />
+<Route path="/admin/integracoes" element={withAdminRoute(<AdminIntegrationsPage />)} />
+<Route path="/admin/charity-applications" element={withAdminRoute(<AdminCharityApplicationsPage />)} />
+<Route path="/admin/pool/distribution" element={withAdminRoute(<AdminPoolDistributionPage />)} />
+<Route path="/admin/pool/dashboard" element={withAdminRoute(<AdminPoolDashboardPage />)} />
+<Route path="/admin/charity-members" element={withAdminRoute(<AdminCharityMembersPage />)} />
+</>
 ```
 
 ```md
 # Navegação segura por sessão e perfil - MF7
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF7/BK-MF7-02-navegacao-segura-por-sessao-e-perfil.md`
+- `proof_scope`: matriz de sessão/RBAC observada pelos alunos; não prova autorização backend sem os negativos executados
 
 ## Metadados
 
@@ -543,6 +837,9 @@ export function AppRoutes() {
 | Visitante | Abrir /admin/metricas | Redireciona para /login | A preencher | A preencher |
 | Utilizador comum | Abrir header | Não vê links admin | A preencher | A preencher |
 | Utilizador comum | Abrir /admin/metricas | Mostra aviso de permissão | A preencher | A preencher |
+| Moderador | Abrir header | Vê apenas Admin catálogo | A preencher | A preencher |
+| Moderador | Abrir /admin/catalogo | Vê gestão editorial | A preencher | A preencher |
+| Moderador | Abrir /admin/metricas | Mostra aviso de permissão | A preencher | A preencher |
 | Admin | Abrir header | Vê links admin | A preencher | A preencher |
 | Admin | Abrir /admin/metricas | Vê página de métricas | A preencher | A preencher |
 | Backend | Chamar rota admin sem sessão | 401 | A preencher | A preencher |
@@ -558,7 +855,14 @@ export function AppRoutes() {
 
 5. Explicação do código.
 
-`withAdminRoute` evita repetir `<AdminRoute>` em cada rota. A evidence separa visitante, user, admin e backend para provar que a UI não está a esconder um problema de autorização. O próximo BK pode focar layout e tokens porque este BK fecha a navegação segura.
+`withAdminRoute` evita repetir `<AdminRoute>` em cada rota sem reconstruir o
+router. A allowlist explícita `admin | moderator` aplica-se apenas ao catálogo,
+em paridade com o backend; as restantes rotas conservam o default `admin`. A
+tabela continua lazy e conserva `ErrorBoundary`, `Suspense`,
+`RouteLifecycle` e todas as rotas recebidas dos BK anteriores. A evidence
+separa visitante, user, admin e backend para provar que a UI não está a esconder
+um problema de autorização. O próximo BK pode focar layout e tokens porque este
+BK fecha a navegação segura.
 
 6. Validação do passo.
 
@@ -572,11 +876,23 @@ Se uma rota `/admin/...` não estiver envolvida por `AdminRoute`, o BK fica inco
 
 - `authApi.me()` é a única fonte de sessão do frontend.
 - `SessionProvider` envolve a aplicação.
+- `SessionProvider` distingue `200 { user: null }` de falha operacional: apenas o primeiro caso fica `anonymous`; o segundo fica `unavailable`.
+- `unavailable` bloqueia conteúdo/CTAs privados e permite retry sem redirecionar para login.
+- `AuthenticatedRoute` protege `/para-si`, `/biblioteca`, `/notificacoes`,
+  `/conta`, `/ver/:contentId` e o histórico privado de associações: loading não
+  monta children, anonymous redireciona para `/login`, unavailable mostra retry
+  sem pedidos filhos e authenticated renderiza a página.
 - Visitantes não veem links admin.
 - Utilizadores comuns não veem links admin.
+- Moderadores veem apenas `Admin catálogo` e entram em `/admin/catalogo`.
+- Moderadores não entram nas restantes rotas administrativas.
 - Rotas `/admin/...` usam `AdminRoute`.
+- O ref síncrono de logout impede dois POST mesmo quando há duplo clique antes
+  do render que aplica `disabled`.
+- `AppRoutes.jsx` mantém imports lazy, `Suspense`, `ErrorBoundary`,
+  `RouteLifecycle` e todas as rotas públicas anteriores.
 - Backend continua a devolver `401` e `403` nas rotas protegidas.
-- Evidence contém pelo menos oito verificações de perfil e permissão.
+- Evidence contém pelo menos onze verificações de perfil e permissão.
 
 #### Validação final
 
@@ -584,12 +900,17 @@ Se uma rota `/admin/...` não estiver envolvida por `AdminRoute`, o BK fica inco
 - Executar `bash scripts/validate-planificacao.sh`.
 - Executar `git diff --check`.
 - Confirmar a evidence `docs/evidence/MF7/NAVEGACAO-SEGURA-POR-PERFIL.md`.
+- Testar cada estado de `AuthenticatedRoute` e confirmar zero chamadas de API
+  da página filha em `loading|anonymous|unavailable`; testar duplo clique em
+  `Sair` e confirmar uma única chamada a `authApi.logout`.
 
 #### Evidence para PR/defesa
 
 - `pr`: referência da entrega deste BK.
 - `proof`: `docs/evidence/MF7/NAVEGACAO-SEGURA-POR-PERFIL.md`.
 - `neg`: visitante em `/admin/metricas`, user comum em `/admin/metricas`, chamada backend sem sessão e chamada backend sem role admin.
+- `neg`: falha de rede/`5xx` em `GET /api/session/me` mantém
+  `unavailable`, não apresenta login e permite repetir a confirmação.
 - `fonte`: `RF02`, `RF04`, `RNF13`, `RNF15`, `RNF16`, `RNF19`.
 
 #### Handoff
@@ -600,5 +921,9 @@ Se uma rota `/admin/...` não estiver envolvida por `AdminRoute`, o BK fica inco
 
 #### Changelog
 
+- `2026-07-10`: router corrigido como composição aditiva sobre a tabela lazy;
+  preservados ErrorBoundary, lifecycle e rotas anteriores.
+- `2026-07-10`: normalizado para tutorial v2 e marker sem código autónomo.
 - `2026-06-22`: guia criado/reestruturado na reorganização documental MF7/MF8.
 - `2026-06-23`: guia atualizado com contexto de sessão, guarda admin, header filtrado, rotas protegidas e evidence verificável.
+- `2026-07-10`: contrato separa `unavailable` de logout/`anonymous`, bloqueia CTAs privados e exige retry de sessão sem redirecionamento indevido.

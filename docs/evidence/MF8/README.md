@@ -1,6 +1,26 @@
 # Evidence MF8 - alinhamento, testes, readiness e scope freeze
 
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/evidence/README.md`
+- `proof_scope`: índice de evidence MF8 e limites dos adendos atuais; não contém prova adicional
+
 A MF8 consolida a aplicação FaithFlix depois da validação MF7, focando alinhamento visual, testes finais, readiness operacional, auditoria administrativa, matriz final, riscos, correção de erros e scope freeze.
+
+## Refinamento de produto posterior
+
+| Data | Evidence | Âmbito |
+| --- | --- | --- |
+| 2026-07-11 | `PAGINA-LOGIN-REGISTO.md` | Redesign end-to-end de login, registo e recuperação progressiva, com segurança, testes e quatro viewports na lane `REFERENCE`. |
+| 2026-07-11 | `PAGINA-PUBLICA-ASSOCIACOES.md` | Redesign da página pública e candidatura, impacto agregado e entrada segura para o histórico da própria associação na lane `REFERENCE`. |
+
+Os adendos docentes de 2026-07-10 em `ALINHAMENTO-VISUAL-PARTE-I.md`,
+`ALINHAMENTO-VISUAL-PARTE-II.md`, `TESTES-FINAIS-CRIADOS.md`,
+`PAINEL-READINESS-OPERACIONAL.md` e `EXECUCAO-TESTES-REPORT-ERROS.md` registam
+a prova F5 atual: Axe preview-only `14/14`, incluindo `/admin/catalogo`, quatro viewports, reflow, teclado e
+budgets. Esses adendos preservam os snapshots anteriores, não promovem BK dos
+alunos e não alegam full E2E, streaming real ou readiness de produção.
 
 ## Sequência de evidence
 

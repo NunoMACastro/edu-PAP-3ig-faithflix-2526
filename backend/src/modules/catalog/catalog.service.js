@@ -8,8 +8,14 @@ import { HttpError } from "../../utils/http-error.js";
 import {
     assertCatalogPayload,
     assertStatus,
-    parseCatalogPagination,
+    parseCatalogQuery,
 } from "./catalog.validation.js";
+import {
+    PUBLIC_CATALOG_TYPES,
+    episodeCanonicalPath,
+    getEpisodeSeries,
+    publicSeriesSummary,
+} from "./catalog-hierarchy.js";
 
 /**
  * Converte um id de conteúdo num ObjectId MongoDB.
@@ -46,21 +52,101 @@ function asRevisionObjectId(id) {
  * @returns {Record<string, unknown>} Conteúdo público.
  */
 function publicContent(content) {
-    return {
+    const result = {
         id: String(content._id),
         title: content.title,
         slug: content.slug,
         synopsis: content.synopsis,
         type: content.type,
-        durationSeconds: content.durationSeconds,
         ageRating: content.ageRating,
         taxonomyIds: (content.taxonomyIds ?? []).map(String),
         assets: content.assets ?? { posterUrl: "", backdropUrl: "" },
+        publishedAt: content.publishedAt ?? null,
+        ratingAverage: Number((content.ratingAverage ?? 0).toFixed?.(2) ?? 0),
+    };
+
+    if (content.type === "series") {
+        return { ...result, isPlayable: false };
+    }
+
+    return {
+        ...result,
+        durationSeconds: content.durationSeconds,
         media: content.media,
         tracks: content.tracks ?? { subtitles: [], audio: [] },
         qualityOptions: content.qualityOptions ?? [],
-        publishedAt: content.publishedAt ?? null,
+        ...(content.type === "episode"
+            ? {
+                  seriesId: String(content.seriesId),
+                  seasonNumber: content.seasonNumber,
+                  episodeNumber: content.episodeNumber,
+              }
+            : {}),
     };
+}
+
+/**
+ * Converte um episódio num resumo público sem expor localizações de media.
+ *
+ * @param {Record<string, unknown>} episode Documento do episódio.
+ * @returns {Record<string, unknown>} Resumo usado dentro da página da série.
+ */
+function publicEpisodeSummary(episode) {
+    return {
+        id: String(episode._id),
+        title: episode.title,
+        slug: episode.slug,
+        synopsis: episode.synopsis,
+        type: "episode",
+        seriesId: String(episode.seriesId),
+        seasonNumber: episode.seasonNumber,
+        episodeNumber: episode.episodeNumber,
+        durationSeconds: episode.durationSeconds,
+        ageRating: episode.ageRating,
+        assets: episode.assets ?? { posterUrl: "", backdropUrl: "" },
+        publishedAt: episode.publishedAt ?? null,
+    };
+}
+
+/**
+ * Constrói o filtro público do catálogo a partir da query validada.
+ *
+ * @param {{ type: string | null, taxonomyId: string | null }} filters Filtros públicos normalizados.
+ * @returns {Record<string, unknown>} Filtro MongoDB para conteúdos publicados.
+ */
+function buildPublishedCatalogFilter(filters) {
+    const filter = {
+        status: "published",
+        type: { $in: PUBLIC_CATALOG_TYPES },
+    };
+
+    if (filters.type) {
+        filter.type = filters.type;
+    }
+
+    if (filters.taxonomyId) {
+        filter.taxonomyIds = ObjectId.createFromHexString(filters.taxonomyId);
+    }
+
+    return filter;
+}
+
+/**
+ * Converte a ordenação pública do catálogo num sort MongoDB estável.
+ *
+ * @param {string} sort Opção pública validada.
+ * @returns {Record<string, 1 | -1>} Ordenação MongoDB.
+ */
+function buildCatalogSort(sort) {
+    if (sort === "title") {
+        return { title: 1, publishedAt: -1 };
+    }
+
+    if (sort === "rating") {
+        return { ratingAverage: -1, publishedAt: -1, title: 1 };
+    }
+
+    return { publishedAt: -1, title: 1 };
 }
 
 /**
@@ -125,19 +211,119 @@ async function assertExistingTaxonomies(db, taxonomyIds) {
 }
 
 /**
+ * Impede o arranque sobre dados legados ambíguos que exigem mapping explícito.
+ *
+ * @param {import("mongodb").Db} db Base de dados MongoDB.
+ * @returns {Promise<void>} Termina quando a hierarquia persistida está pronta.
+ */
+export async function assertCatalogHierarchyReady(db) {
+    const [series, publishedEpisodes] = await Promise.all([
+        db.collection("contents").find({ type: "series" }).toArray(),
+        db
+            .collection("contents")
+            .find({ type: "episode", status: "published" })
+            .toArray(),
+    ]);
+    const publishedSeriesIds = new Set(
+        series
+            .filter((content) => content.status === "published")
+            .map((content) => String(content._id)),
+    );
+    const invalidEpisode = publishedEpisodes.find(
+        (episode) =>
+            !publishedSeriesIds.has(String(episode.seriesId)) ||
+            !Number.isInteger(episode.seasonNumber) ||
+            episode.seasonNumber <= 0 ||
+            !Number.isInteger(episode.episodeNumber) ||
+            episode.episodeNumber <= 0,
+    );
+
+    if (invalidEpisode) {
+        throw new Error(
+            `Catalogo bloqueado: episodio publicado ${invalidEpisode._id} sem serie publicada/posicao valida. Executa migrate:series-episodes.`,
+        );
+    }
+
+    if (series.length === 0) {
+        return;
+    }
+
+    const legacyProgress = await db.collection("playback_progress").findOne({
+        contentId: { $in: series.map((content) => content._id) },
+    });
+
+    if (legacyProgress) {
+        throw new Error(
+            "Catalogo bloqueado: existe progresso diretamente numa serie. Executa migrate:series-episodes com seriesProgress explicito.",
+        );
+    }
+}
+
+/**
  * Garante que existem os índices usados por catálogo e revisões.
  *
  * @returns {Promise<void>} Termina depois da criação de índices.
  */
 export async function ensureCatalogIndexes() {
     const db = await getDb();
+    await assertCatalogHierarchyReady(db);
     await db.collection("contents").createIndex({ slug: 1 }, { unique: true });
     await db
         .collection("contents")
         .createIndex({ status: 1, publishedAt: -1 });
+    await db.collection("contents").createIndex(
+        { seriesId: 1, seasonNumber: 1, episodeNumber: 1 },
+        {
+            unique: true,
+            partialFilterExpression: { type: "episode" },
+        },
+    );
+    await db.collection("contents").createIndex({
+        seriesId: 1,
+        status: 1,
+        seasonNumber: 1,
+        episodeNumber: 1,
+    });
     await db
         .collection("content_revisions")
         .createIndex({ contentId: 1, createdAt: -1 });
+}
+
+/**
+ * Valida as referências condicionais do payload editorial.
+ *
+ * @param {import("mongodb").Db} db Base de dados MongoDB.
+ * @param {Record<string, unknown>} payload Payload já normalizado.
+ * @returns {Promise<void>} Termina quando a hierarquia é válida.
+ */
+async function assertCatalogHierarchy(db, payload) {
+    if (payload.type === "episode") {
+        await getEpisodeSeries(db, payload.seriesId);
+    }
+}
+
+/**
+ * Traduz conflitos de índices do catálogo para uma resposta editorial clara.
+ *
+ * @param {unknown} error Erro devolvido pelo MongoDB.
+ * @returns {never} Nunca devolve; relança erro HTTP ou original.
+ */
+function throwCatalogWriteError(error) {
+    if (error?.code === 11000) {
+        const duplicatedEpisodePosition =
+            error?.keyPattern?.seriesId ||
+            error?.keyPattern?.seasonNumber ||
+            error?.keyPattern?.episodeNumber;
+
+        throw new HttpError(
+            409,
+            duplicatedEpisodePosition
+                ? "Ja existe um episodio nessa posicao da serie."
+                : "Slug de conteudo ja existe.",
+        );
+    }
+
+    throw error;
 }
 
 /**
@@ -147,26 +333,65 @@ export async function ensureCatalogIndexes() {
  * @returns {Promise<{ page: number, limit: number, total: number, items: Record<string, unknown>[] }>} Pagina publica do catalogo.
  */
 export async function listPublishedCatalog(queryParams = {}) {
-    const { page, limit } = parseCatalogPagination(queryParams);
+    const query = parseCatalogQuery(queryParams);
     const db = await getDb();
-    const filter = { status: "published" };
+    const filter = buildPublishedCatalogFilter(query);
+    const sort = buildCatalogSort(query.sort);
+    const skip = (query.page - 1) * query.limit;
+
+    if (query.sort === "rating") {
+        const [result] = await db
+            .collection("contents")
+            .aggregate([
+                { $match: filter },
+                {
+                    $lookup: {
+                        from: "content_ratings",
+                        localField: "_id",
+                        foreignField: "contentId",
+                        as: "ratings",
+                    },
+                },
+                {
+                    $addFields: {
+                        ratingAverage: { $ifNull: [{ $avg: "$ratings.value" }, 0] },
+                    },
+                },
+                { $sort: sort },
+                {
+                    $facet: {
+                        metadata: [{ $count: "total" }],
+                        items: [{ $skip: skip }, { $limit: query.limit }],
+                    },
+                },
+            ])
+            .toArray();
+        const items = result?.items ?? [];
+
+        return {
+            page: query.page,
+            limit: query.limit,
+            total: result?.metadata?.[0]?.total ?? 0,
+            items: items.map(publicContent),
+        };
+    }
 
     const [contents, total] = await Promise.all([
         db
             .collection("contents")
             .find(filter)
-            .sort({ publishedAt: -1, title: 1 })
+            .sort(sort)
             // A pagina fica no MongoDB para evitar carregar todo o catalogo publico em memoria.
-            .skip((page - 1) * limit)
-            .limit(limit)
+            .skip(skip)
+            .limit(query.limit)
             .toArray(),
         // O total em paralelo permite UI/evidence sem duplicar a listagem completa.
         db.collection("contents").countDocuments(filter),
     ]);
 
     return {
-        page,
-        limit,
+        page: query.page,
+        limit: query.limit,
         total,
         items: contents.map(publicContent),
     };
@@ -206,6 +431,7 @@ export async function createContent(input, userId) {
     const payload = assertCatalogPayload(input);
 
     await assertExistingTaxonomies(db, payload.taxonomyIds);
+    await assertCatalogHierarchy(db, payload);
 
     const document = {
         ...payload,
@@ -224,11 +450,7 @@ export async function createContent(input, userId) {
             status: document.status,
         };
     } catch (error) {
-        if (error.code === 11000) {
-            throw new HttpError(409, "Slug de conteudo ja existe.");
-        }
-
-        throw error;
+        throwCatalogWriteError(error);
     }
 }
 
@@ -250,7 +472,13 @@ export async function updateContent(contentId, input, userId) {
     }
 
     const payload = assertCatalogPayload(input);
+
+    if (payload.type !== existing.type) {
+        throw new HttpError(409, "O tipo de conteudo nao pode ser alterado.");
+    }
+
     await assertExistingTaxonomies(db, payload.taxonomyIds);
+    await assertCatalogHierarchy(db, payload);
     await saveRevision(db, existing, userId, "update");
 
     try {
@@ -268,11 +496,7 @@ export async function updateContent(contentId, input, userId) {
 
         return { ...publicContent(updated), status: updated.status };
     } catch (error) {
-        if (error.code === 11000) {
-            throw new HttpError(409, "Slug de conteudo ja existe.");
-        }
-
-        throw error;
+        throwCatalogWriteError(error);
     }
 }
 
@@ -295,6 +519,21 @@ export async function changeContentStatus(contentId, status, userId) {
 
     const nextStatus = assertStatus(status);
     const now = new Date();
+
+    if (existing.type === "episode" && nextStatus === "published") {
+        await getEpisodeSeries(db, existing.seriesId, {
+            requirePublished: true,
+        }).catch((error) => {
+            if (error.statusCode === 404) {
+                throw new HttpError(
+                    409,
+                    "Publica primeiro a serie deste episodio.",
+                );
+            }
+
+            throw error;
+        });
+    }
 
     await saveRevision(db, existing, userId, nextStatus);
 
@@ -366,22 +605,36 @@ export async function revertContentRevision(contentId, revisionId, userId) {
     await saveRevision(db, existing, userId, "revert");
 
     const snapshot = revision.snapshot;
+    const payload = assertCatalogPayload(snapshot);
+
+    if (payload.type !== existing.type) {
+        throw new HttpError(409, "A revisao altera o tipo de conteudo.");
+    }
+
+    await assertExistingTaxonomies(db, payload.taxonomyIds);
+    await assertCatalogHierarchy(db, payload);
+
+    if (payload.type === "episode" && snapshot.status === "published") {
+        await getEpisodeSeries(db, payload.seriesId, {
+            requirePublished: true,
+        }).catch((error) => {
+            if (error.statusCode === 404) {
+                throw new HttpError(
+                    409,
+                    "A revisao publicaria um episodio sem serie publicada.",
+                );
+            }
+
+            throw error;
+        });
+    }
+
     const updated = await db.collection("contents").findOneAndUpdate(
         { _id: contentObjectId },
         {
             $set: {
-                title: snapshot.title,
-                slug: snapshot.slug,
-                synopsis: snapshot.synopsis,
-                type: snapshot.type,
-                durationSeconds: snapshot.durationSeconds,
-                ageRating: snapshot.ageRating,
+                ...payload,
                 status: snapshot.status,
-                taxonomyIds: snapshot.taxonomyIds ?? [],
-                assets: snapshot.assets,
-                media: snapshot.media,
-                tracks: snapshot.tracks ?? { subtitles: [], audio: [] },
-                qualityOptions: snapshot.qualityOptions ?? [],
                 publishedAt: snapshot.publishedAt ?? null,
                 updatedBy: new ObjectId(userId),
                 updatedAt: new Date(),
@@ -425,5 +678,53 @@ export async function getPublishedContentDetail(idOrSlug) {
         throw new HttpError(404, "Conteudo nao encontrado.");
     }
 
-    return publicContent(content);
+    if (content.type === "series") {
+        const episodes = await db
+            .collection("contents")
+            .find({
+                type: "episode",
+                seriesId: content._id,
+                status: "published",
+            })
+            .sort({ seasonNumber: 1, episodeNumber: 1, title: 1 })
+            .toArray();
+        const seasonsByNumber = new Map();
+
+        for (const episode of episodes) {
+            const seasonNumber = episode.seasonNumber;
+            const season = seasonsByNumber.get(seasonNumber) ?? {
+                seasonNumber,
+                episodes: [],
+            };
+            season.episodes.push(publicEpisodeSummary(episode));
+            seasonsByNumber.set(seasonNumber, season);
+        }
+
+        return {
+            content: {
+                ...publicContent(content),
+                seasonCount: seasonsByNumber.size,
+                episodeCount: episodes.length,
+                totalDurationSeconds: episodes.reduce(
+                    (total, episode) => total + Number(episode.durationSeconds ?? 0),
+                    0,
+                ),
+            },
+            seasons: [...seasonsByNumber.values()],
+        };
+    }
+
+    if (content.type === "episode") {
+        const series = await getEpisodeSeries(db, content.seriesId, {
+            requirePublished: true,
+        });
+
+        return {
+            content: publicContent(content),
+            series: publicSeriesSummary(series),
+            canonicalPath: episodeCanonicalPath(series, content),
+        };
+    }
+
+    return { content: publicContent(content) };
 }

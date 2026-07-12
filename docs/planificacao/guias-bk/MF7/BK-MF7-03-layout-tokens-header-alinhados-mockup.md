@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF7-04`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-03-layout-tokens-header-alinhados-mockup.md`
-- `last_updated`: `2026-06-23`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -177,12 +177,18 @@ Se uma página usar muitas cores diretas em vez de tokens, a UI volta a ficar di
 Aplicar tokens ao layout, header, navegação, botões, foco e responsividade.
 
 2. Ficheiros envolvidos:
+    - REVER: `frontend/src/components/layout/AppHeader.jsx`
     - EDITAR: `frontend/src/styles/global.css`
-    - LOCALIZAÇÃO: regras globais, `.app-header`, `.main-nav`, `.nav-link`, `.button-link`, `.hero-section` e media query.
+    - LOCALIZAÇÃO: preservar o botão/menu semântico de `BK-MF7-02`; regras globais,
+      `.app-header`, `.menu-toggle`, `.main-nav`, `.nav-link`, `.button-link`,
+      `.hero-section` e media queries.
 
 3. Instruções do que fazer.
 
-Mantém as regras já existentes e substitui as zonas equivalentes pelas regras abaixo. Se uma classe já existir, atualiza a regra em vez de duplicar.
+Mantém as regras já existentes e substitui as zonas equivalentes pelas regras
+abaixo. Se uma classe já existir, atualiza a regra em vez de duplicar. Não
+removas do `AppHeader` o botão com `aria-expanded`/`aria-controls`, o fecho por
+`Escape`, o fecho por mudança de `pathname` ou a restituição de foco.
 
 4. Código completo, correto e integrado com a app final.
 
@@ -237,15 +243,21 @@ body {
 .main-nav {
   display: flex;
   flex-wrap: wrap;
-  /* O wrap impede scroll horizontal quando há muitos links visíveis no perfil admin. */
   gap: 0.4rem;
   justify-content: flex-end;
 }
 
+.menu-toggle {
+  display: none;
+}
+
 .nav-link,
 .button-link,
-.base-button {
-  min-height: 2.5rem;
+.base-button,
+.menu-toggle,
+.main-nav button {
+  min-inline-size: 44px;
+  min-block-size: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -328,12 +340,40 @@ button:disabled {
 
 @media (max-width: 720px) {
   .app-header {
-    /* Em mobile, a coluna evita sobreposição entre marca e navegação. */
-    align-items: flex-start;
-    flex-direction: column;
+    block-size: 72px;
+    max-block-size: 72px;
+    padding-block: 0.5rem;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .main-nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    max-height: calc(100vh - 4.5rem);
+    overflow-y: auto;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.75rem var(--space-page) 1rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .main-nav[data-open="true"] {
+    display: flex;
+  }
+
+  .main-nav .nav-link,
+  .main-nav button {
+    width: 100%;
     justify-content: flex-start;
   }
 
@@ -341,19 +381,40 @@ button:disabled {
     min-height: 340px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
 ```
 
 5. Explicação do código.
 
-Estas regras dão estabilidade visual à aplicação. O header fica fixo e legível, o foco por teclado fica visível, os botões têm feedback e o hero ganha presença sem depender de imagens externas. A media query evita sobreposição em ecrãs estreitos.
+Estas regras dão estabilidade visual à aplicação. O header fica fixo e legível,
+o foco por teclado fica visível e todos os alvos interativos têm pelo menos
+44x44 px. Em mobile, a navegação fica fechada fora do layout até o botão
+semântico a abrir; não depende de dezenas de links em wrap. A media query de
+movimento reduzido neutraliza animações não essenciais.
 
 6. Validação do passo.
 
-Testa 390px, 768px e desktop. Resultado esperado: header não tapa conteúdo, navegação quebra linha sem overflow e foco é visível com Tab.
+Testa 390px, 768px e desktop. Resultado esperado: o header fechado mede no
+máximo 72 px, o menu abre por botão, fecha com `Escape`, restitui foco, não cria
+overflow e todos os controlos têm alvo mínimo 44x44 px.
 
 7. Cenário negativo/erro esperado.
 
-Se a navegação criar scroll horizontal em mobile, a regra `.main-nav` ou o espaçamento dos links deve ser ajustado antes de fechar o BK.
+Se a navegação ficar focável quando fechada, não devolver foco após `Escape` ou
+criar scroll horizontal em mobile, o BK não pode fechar.
 
 ### Passo 3 - Refinar hero da página inicial
 
@@ -377,10 +438,11 @@ Mantém a chamada a `discoveryApi.home()`, mas melhora a copy, CTAs e estados de
  * @file Página inicial de descoberta FaithFlix.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { DiscoveryCarousel } from "../components/discovery/DiscoveryCarousel.jsx";
-import { ApiStatusBadge } from "../components/system/ApiStatusBadge.jsx";
+import { ContentCarousel } from "../components/discovery/ContentCarousel.jsx";
+import { useSession } from "../context/SessionContext.jsx";
+import { toUserMessage } from "../services/api/apiErrors.js";
 import { discoveryApi } from "../services/api/discoveryApi.js";
 
 /**
@@ -389,37 +451,43 @@ import { discoveryApi } from "../services/api/discoveryApi.js";
  * @returns {JSX.Element} Página inicial da aplicação.
  */
 export function DiscoveryHomePage() {
+  const session = useSession();
   const [carousels, setCarousels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const requestEpochRef = useRef(0);
 
   useEffect(() => {
-    let ignore = false;
+    const controller = new AbortController();
+    const requestEpoch = requestEpochRef.current + 1;
+    requestEpochRef.current = requestEpoch;
 
     async function loadDiscovery() {
       try {
-        const response = await discoveryApi.home();
+        const response = await discoveryApi.home({ signal: controller.signal });
 
-        if (!ignore) {
+        if (!controller.signal.aborted && requestEpochRef.current === requestEpoch) {
           setCarousels(response.carousels);
         }
       } catch (requestError) {
-        if (!ignore) {
-          setError(requestError.message);
+        if (
+          !controller.signal.aborted &&
+          requestEpochRef.current === requestEpoch &&
+          requestError?.code !== "REQUEST_ABORTED"
+        ) {
+          setError(toUserMessage(requestError));
         }
       } finally {
-        // A flag evita atualizar estado se o componente sair do ecrã durante o pedido.
-        if (!ignore) {
+        // Epoch + abort impedem que uma resposta antiga vença uma rota nova.
+        if (!controller.signal.aborted && requestEpochRef.current === requestEpoch) {
           setLoading(false);
         }
       }
     }
 
-    loadDiscovery();
+    void loadDiscovery();
 
-    return () => {
-      ignore = true;
-    };
+    return () => controller.abort();
   }, []);
 
   return (
@@ -434,18 +502,33 @@ export function DiscoveryHomePage() {
           </p>
           <div className="button-row">
             <Link className="button-link" to="/catalogo">Explorar catálogo</Link>
-            <Link className="button-link" to="/planos">Ver planos</Link>
+            {session.status === "anonymous" ? (
+              <>
+                <Link className="button-link" to="/login">Entrar</Link>
+                <Link className="button-link" to="/planos">Ver planos</Link>
+              </>
+            ) : null}
+            {session.status === "authenticated" ? (
+              <Link className="button-link" to="/para-si">Ver recomendações</Link>
+            ) : null}
           </div>
         </div>
-        {/* O badge confirma saúde da API sem interromper o fluxo visual do hero. */}
-        <ApiStatusBadge />
       </section>
 
       {loading ? <p role="status">A carregar descoberta...</p> : null}
       {error ? <p role="alert">{error}</p> : null}
+      {session.status === "loading" ? <p role="status">A confirmar sessão...</p> : null}
+      {session.status === "unavailable" ? (
+        <section role="alert">
+          <p>{session.error || "Não foi possível confirmar a sessão."}</p>
+          <button type="button" onClick={() => session.refreshSession().catch(() => {})}>
+            Tentar novamente
+          </button>
+        </section>
+      ) : null}
 
       {carousels.map((carousel) => (
-        <DiscoveryCarousel
+        <ContentCarousel
           key={carousel.id}
           title={carousel.title}
           items={carousel.items}
@@ -458,11 +541,20 @@ export function DiscoveryHomePage() {
 
 5. Explicação do código.
 
-O componente continua a consumir `discoveryApi.home()`, por isso não altera o contrato backend. A chamada assíncrona usa `async/await` dentro do `useEffect`, mantendo o padrão didático da PAP e evitando promise chains. A flag `ignore` evita atualizar estado se a página desmontar durante o pedido. A mudança visual apresenta a marca, CTAs claros e uma descrição honesta do produto. `role="status"` e `role="alert"` ajudam acessibilidade e feedback.
+O componente continua a consumir `discoveryApi.home()`, por isso não altera o
+contrato backend. Reutiliza `ContentCarousel`, criado e exportado em
+`BK-MF3-04`, em vez de inventar um segundo componente com API desconhecida. A
+chamada assíncrona usa `async/await` dentro do `useEffect`, mantendo o padrão
+didático da PAP e evitando promise chains. A flag `ignore` evita atualizar
+estado se a página desmontar durante o pedido. A mudança visual apresenta a
+marca, CTAs claros e uma descrição honesta do produto. `role="status"` e
+`role="alert"` ajudam acessibilidade e feedback.
+
+Nota de alinhamento final: a home de produto não deve renderizar `ApiStatusBadge` nem o texto "Estado API". Esse badge foi útil na MF1 como prova técnica/dev-only, mas não pertence à experiência final. Na home atual, os CTAs dependem da sessão: anónimo vê `Ver detalhe`, `Entrar para reproduzir` e `Ver planos`; autenticado vê `Ver detalhe` e `Reproduzir`; enquanto a sessão está em loading, a UI mantém CTA seguro sem expor reprodução direta.
 
 6. Validação do passo.
 
-Abre a home e confirma que aparecem badge, H1, descrição, dois CTAs, loading e erro controlado.
+Abre a home e confirma que aparecem hero com H1, descrição, discovery curta, CTAs seguros por sessão, loading e erro controlado, sem `Estado API`.
 
 7. Cenário negativo/erro esperado.
 
@@ -486,6 +578,12 @@ Cria a evidence abaixo e preenche resultados observados.
 
 ```md
 # Refinamento visual e mockup - MF7
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF7/BK-MF7-03-layout-tokens-header-alinhados-mockup.md`
+- `proof_scope`: comparação visual observada pelos alunos; não prova todos os browsers, viewports ou produção
 
 ## Metadados
 
@@ -532,6 +630,10 @@ Se o header mobile ainda tiver overflow horizontal, a decisão da evidence deve 
 - Tokens CSS refletem a paleta do mockup.
 - Header mantém filtro por perfil criado em `BK-MF7-02`.
 - Hero tem marca, descrição e CTAs claros.
+- A leitura da home usa `AbortController` e epoch; unmount/resposta antiga não
+  atualiza estado e erros passam por `toUserMessage`, nunca por `.message` cru.
+- Loading/unavailable não mostram CTAs privados; anonymous vê login/planos e
+  authenticated vê a ação privada `Ver recomendações`.
 - Estados de foco, hover, active e disabled são visíveis.
 - Mobile não tem sobreposição nem overflow horizontal.
 - Evidence visual preenchida.
@@ -542,6 +644,8 @@ Se o header mobile ainda tiver overflow horizontal, a decisão da evidence deve 
 - Executar `bash scripts/validate-planificacao.sh`.
 - Executar `git diff --check`.
 - Confirmar `docs/evidence/MF7/REFINAMENTO-VISUAL-MOCKUP.md`.
+- Testar unmount/rota rápida com pedido pendente, erro técnico sanitizado e os
+  quatro estados da sessão na matriz de CTAs.
 
 #### Evidence para PR/defesa
 
@@ -555,8 +659,32 @@ Se o header mobile ainda tiver overflow horizontal, a decisão da evidence deve 
 - `BK-MF7-04` deve reutilizar tokens, `.content-grid`, `.content-card`, `.empty-state`, `.button-row` e estados de feedback.
 - Qualquer problema de links admin volta para `BK-MF7-02` antes do gate.
 
+##### Critérios mensuráveis complementares de UI
+
+Este adendo torna os critérios visuais reproduzíveis; não altera o estado
+`TODO` deste BK nem constitui prova de execução dos alunos.
+
+- Cada botão, link com aparência de botão e controlo móvel deve ter área
+  interativa mínima de `44x44 px`.
+- Texto e componentes devem cumprir contraste WCAG AA; o estado de foco tem de
+  permanecer visível em navegação por teclado.
+- Animações não essenciais devem ser removidas ou reduzidas em
+  `prefers-reduced-motion: reduce`.
+- O header móvel fechado deve medir no máximo `72 px`; o menu abre por botão
+  semântico, fecha com `Escape` e restitui foco ao botão que o abriu.
+- A página não pode criar overflow horizontal em `390x844`, `768x900`,
+  `1280x720` ou `1440x900`.
+- Orçamento local de referência: JavaScript inicial até `90 kB` gzip, CSS até
+  `25 kB` gzip e logo até `30 kB`. Adapters HLS/DASH devem permanecer fora do
+  chunk inicial por carregamento lazy.
+
 #### Changelog
 
+- `2026-07-10`: reutilizado `ContentCarousel` de `BK-MF3-04`; removido o import
+  de um componente paralelo inexistente e integrado o bloco complementar no
+  contrato tutorial.
 - `2026-06-22`: guia criado/reestruturado na reorganização documental MF7/MF8.
 - `2026-06-23`: guia atualizado com tokens, CSS, hero, evidence e validações visuais.
 - `2026-06-23`: tokens preservados para impedir variáveis CSS em falta entre `tokens.css` e `global.css`.
+- `2026-07-10`: critérios de contraste, foco, movimento reduzido, targets,
+  header móvel, viewports e orçamento inicial tornados mensuráveis.

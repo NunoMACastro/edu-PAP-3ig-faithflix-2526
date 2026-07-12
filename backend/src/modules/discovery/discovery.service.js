@@ -5,6 +5,10 @@
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
 import { asObjectId } from "./discovery.validation.js";
+import {
+    PUBLIC_CATALOG_TYPES,
+    getEpisodeSeries,
+} from "../catalog/catalog-hierarchy.js";
 
 /**
  * Converte um documento de conteúdo num cartão de descoberta.
@@ -37,7 +41,13 @@ async function loadCards(db, match, sort, limit = 10) {
     const rows = await db
         .collection("contents")
         .aggregate([
-            { $match: { status: "published", ...match } },
+            {
+                $match: {
+                    status: "published",
+                    type: { $in: PUBLIC_CATALOG_TYPES },
+                    ...match,
+                },
+            },
             {
                 $lookup: {
                     from: "content_ratings",
@@ -111,17 +121,24 @@ export async function getRelatedContent(contentId) {
         throw new HttpError(404, "Conteudo nao encontrado.");
     }
 
-    const taxonomyIds = content.taxonomyIds ?? [];
+    const relatedBase =
+        content.type === "episode"
+            ? await getEpisodeSeries(db, content.seriesId, {
+                  requirePublished: true,
+              })
+            : content;
+    const taxonomyIds = relatedBase.taxonomyIds ?? [];
     const rows = await db
         .collection("contents")
         .aggregate([
             {
                 $match: {
-                    _id: { $ne: contentObjectId },
+                    _id: { $ne: relatedBase._id },
                     status: "published",
+                    type: { $in: PUBLIC_CATALOG_TYPES },
                     $or: [
                         { taxonomyIds: { $in: taxonomyIds } },
-                        { type: content.type },
+                        { type: relatedBase.type },
                     ],
                 },
             },
@@ -138,7 +155,7 @@ export async function getRelatedContent(contentId) {
                                 },
                             },
                             {
-                                $cond: [{ $eq: ["$type", content.type] }, 1, 0],
+                                $cond: [{ $eq: ["$type", relatedBase.type] }, 1, 0],
                             },
                         ],
                     },

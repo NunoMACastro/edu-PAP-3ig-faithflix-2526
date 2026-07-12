@@ -7,7 +7,11 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-30`
+- `last_updated`: `2026-07-10`
+- `document_status`: `CURRENT`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- `proof_scope`: vista derivada de 66 BK, 66 guias, 94 requisitos e 13 sprints; não representa o estado executado da referência
 
 ## Objetivo
 
@@ -18,6 +22,10 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 - Estado oficial: `docs/planificacao/backlogs/BACKLOG-MVP.md`.
 - Ordem canonica de execucao: `docs/planificacao/sprints/PLANO-SPRINTS.md`.
 - Esta view e derivada da ordem por sprint e nao pode divergir.
+- Baseline ativa: `66 BK`, `66 guias`, `94 requisitos` e `13 sprints`.
+- Os critérios e estados abaixo pertencem aos alunos. Evidence em `real_dev`
+  pode demonstrar a referência docente, mas não altera automaticamente esta
+  lane nem promove um BK.
 
 ---
 
@@ -51,7 +59,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. Equipa fecha sprint 1.
 5. Equipa confirma handoff para `BK-MF1-01` e `BK-MF1-02`, sem implementar funcionalidades em `MF0`.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
 - Todos os BKs MF0 em `DONE`.
 
@@ -86,7 +94,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 5. Fechar health-check/logs.
 6. Rodar smoke tests.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
 - FE/BE estaveis.
 - Sessao base valida.
@@ -127,7 +135,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 5. Executar E2E principal.
 6. Corrigir regressao e fechar.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
 - Fluxo principal estavel com evidencia.
 
@@ -161,7 +169,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. Fechar explicabilidade.
 5. Consolidar descoberta e preparar handoff para monetizacao.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
 - Descoberta e comunidade funcionais sem quebrar core.
 
@@ -198,7 +206,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 5. Fechar relatorios/notificacoes.
 6. Fechar evidencias da pool solidaria para gate.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
 - Subscricoes e pool auditaveis.
 
@@ -208,10 +216,10 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 ### Sequencia
 
-1. `BK-MF5-01`
-2. `BK-MF5-02`
-3. `BK-MF5-03`
-4. `BK-MF5-04`
+1. `BK-MF5-04`
+2. `BK-MF5-01`
+3. `BK-MF5-02`
+4. `BK-MF5-03`
 5. `BK-MF5-05`
 6. `BK-MF5-06`
 
@@ -226,12 +234,12 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 
 ### Step-by-step
 
-1. Fechar RGPD.
-2. Fechar operacao admin.
-3. Fechar metricas/integracoes.
+1. Fechar a base administrativa de `BK-MF5-04` na Sprint 8.
+2. Fechar RGPD na Sprint 9.
+3. Fechar metricas/integracoes depois da base administrativa.
 4. Consolidar handoff para regressao e hardening.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
 - RGPD e operacao admin completos.
 
@@ -266,7 +274,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 5. Acessibilidade e UX final.
 6. Gate tecnico do Nuno.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
 - Sem falhas criticas e gate aprovado.
 
@@ -298,7 +306,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 4. Refinamento das paginas principais e estados de UX.
 5. Gate visual, responsividade e navegacao segura.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
 - UI defensavel, responsiva e com navegacao segura por perfil.
 
@@ -345,7 +353,7 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 9. Correcao de erros do report anterior.
 10. Scope Freeze.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
 - Frontend real alinhado ao mockup, testes finais preparados e executados, readiness e auditoria administrativa fechados, matriz final colocada depois do trabalho tecnico, riscos totais registados, erros tratados e scope congelado.
 
@@ -380,9 +388,14 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 5. Integrar privacidade, operacao e metricas com familia.
 6. Executar gate MF9, regressao e evidencia final.
 
-### Pronto da macro
+### Critérios de conclusão da macro — alunos
 
-- Planos Pro/Familia funcionam end-to-end, partilha familiar e real entre contas, qualidade e limitada pelo backend, RGPD/metrica refletem familia e gate S13 fica validado.
+- Objetivo dos alunos: demonstrar planos Pro/Familia, partilha entre contas,
+  qualidade limitada pelo backend e reflexo em RGPD/metricas, com evidence
+  própria suficiente para decisão no gate S13.
+- Estado da referência docente em 2026-07-10: contratos locais e media
+  sintética parcialmente validados, mas full E2E MF9, 4K real, streaming real e
+  gate S13 atual continuam não revalidados.
 
 ## Changelog
 
@@ -395,3 +408,4 @@ Fornecer guias praticos por macro fase para executar os BKs com ordem recomendad
 - `2026-06-22`: atualizadas MF7/MF8 para nova cadeia.
 - `2026-06-27`: MF8 condensada para 10 BKs finais, com alinhamento visual, testes, readiness, auditoria, matriz final, riscos totais, report, correcao e freeze.
 - `2026-06-30`: adicionada MF9 com 6 BKs para Pro/Familia, partilha familiar real, qualidade por plano e gate S13.
+- `2026-07-10`: explicitada a baseline ativa 66/66/94/13 e separada a lane dos alunos da evidence da referência docente.

@@ -17,21 +17,19 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF3-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-02-comentarios-curtos-moderados.md`
-- `last_updated`: `2026-06-12`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagogico (obrigatorio)
-
-### Objetivo pedagogico
+#### Objetivo
 
 Neste BK vais implementar comentarios curtos em conteudos publicados (`RF20`), com validacao de tamanho, ownership e moderacao minima.
 
 No fim, deves conseguir explicar porque comentarios precisam de validacao no backend, porque apenas comentarios visiveis aparecem ao publico e porque um utilizador so pode apagar os seus proprios comentarios, salvo permissao de moderacao.
 
-### Importancia funcional
+#### Importância
 
 Comentarios curtos criam uma camada simples de comunidade sem transformar a PAP num produto social complexo. A funcionalidade complementa ratings e prepara a descoberta, porque utilizadores passam a ter mais sinais de relevancia no detalhe de conteudo.
 
-### Scope-in
+#### Scope-in
 
 - Criar colecao `content_comments`.
 - Criar validacao de corpo curto.
@@ -42,7 +40,7 @@ Comentarios curtos criam uma camada simples de comunidade sem transformar a PAP 
 - Criar cliente frontend `commentsApi`.
 - Criar componente `CommentsPanel`.
 
-### Scope-out
+#### Scope-out
 
 - Respostas encadeadas.
 - Likes em comentarios.
@@ -50,7 +48,21 @@ Comentarios curtos criam uma camada simples de comunidade sem transformar a PAP 
 - Notificacoes.
 - Analise automatica avancada de linguagem.
 
-### Glossario rapido
+#### Estado antes e depois
+
+- Estado antes: aplicam-se os BKs declarados em `dependencias`, os RF/RNF do Header e os artefactos já entregues pelas fases anteriores.
+- Estado depois: ficam implementáveis e verificáveis apenas os resultados listados em `Scope-in`, sem antecipar o `Scope-out`.
+
+#### Pré-requisitos
+
+- `BK-MF3-01` concluido.
+- Conteudos publicados existem na colecao `contents`.
+- `req.user.id`, `requireAuth` e `requireRole` estao disponiveis.
+- `runInTransaction` está disponível numa topologia MongoDB com transações e
+  `writeAdminAudit` recusa chamadas fora da callback transacional ativa.
+- `apiClient` ja envia cookies de sessao.
+
+#### Glossário
 
 - `Comentario curto`: texto breve associado a um conteudo.
 - `Moderacao minima`: regras simples para impedir conteudo claramente invalido ou spam basico.
@@ -58,12 +70,22 @@ Comentarios curtos criam uma camada simples de comunidade sem transformar a PAP 
 - `pending_review`: comentario guardado, mas ainda nao apresentado ao publico.
 - `rejected`: comentario rejeitado por moderacao.
 
-### Conceitos essenciais
+#### Conceitos teóricos essenciais
 
 - `CANONICO`: `RF20` define comentarios curtos como parte de classificacoes e feedback.
 - `CANONICO`: comentarios pertencem a utilizadores autenticados.
 - `DERIVADO`: comentarios com links ficam em `pending_review` para reduzir spam basico.
 - `DERIVADO`: comentarios rejeitados nao sao apagados automaticamente, para manter rastro minimo de moderacao.
+- `DERIVADO`: a listagem pública devolve no máximo os 50 comentários `visible`
+  mais recentes e nunca inclui `userId`; esta baseline não promete paginação.
+- `DERIVADO`: `status` é a enum fechada
+  `visible|pending_review|rejected`, e o motivo opcional não pode exceder 500
+  caracteres.
+- `DERIVADO`: mudar de conteúdo ou sessão aborta pedidos pendentes; uma versão
+  de contexto recusa respostas tardias e as escritas são serializadas, com busy
+  state localizado e reload autoritativo.
+- `DERIVADO`: moderação e remoção de terceiros juntam domínio e audit na mesma
+  transação/sessão. A remoção pelo próprio autor não cria audit administrativo.
 
 ### Tempo estimado
 
@@ -85,16 +107,7 @@ Comentarios curtos criam uma camada simples de comunidade sem transformar a PAP 
 - [ ] Sei porque o corpo e tratado como texto simples.
 - [ ] Sei testar criacao sem login, texto demasiado longo e remocao sem ownership.
 
-## Bloco operacional (obrigatorio)
-
-### Pre-condicoes
-
-- `BK-MF3-01` concluido.
-- Conteudos publicados existem na colecao `contents`.
-- `req.user.id`, `requireAuth` e `requireRole` estao disponiveis.
-- `apiClient` ja envia cookies de sessao.
-
-### Contrato tecnico deste BK
+#### Arquitetura do BK
 
 | Area | Contrato |
 | --- | --- |
@@ -103,14 +116,21 @@ Comentarios curtos criam uma camada simples de comunidade sem transformar a PAP 
 | Tamanho | `3..280` caracteres |
 | Listagem publica | `GET /api/comments/:contentId` |
 | Criacao autenticada | `POST /api/comments/:contentId` |
-| Remocao pelo autor | `DELETE /api/comments/:commentId` |
+| Remoção autorizada | `DELETE /api/comments/:commentId` pelo autor, `admin` ou `moderator` |
 | Moderacao | `PATCH /api/comments/:commentId/moderation` |
+| Limite público atual | até 50 comentários `visible`; sem paginação nesta baseline |
+| DTO público | sem `userId`; inclui `canDelete` calculado pelo backend |
+| Motivo de moderação | texto opcional até 500 caracteres |
+| Operações privilegiadas | domínio + audit na mesma transação/sessão; ator e `requestId` obrigatórios |
+| Snapshot de audit | apenas estado anterior/seguinte; sem corpo, motivo livre ou PII |
+| Robustez frontend | abort/anti-stale, fila serial, busy state por formulário/linha e reload |
 | Frontend | `commentsApi`, `CommentsPanel` |
 | Handoff | `BK-MF3-03` foca pesquisa sem depender de comentarios |
 
 ### Modelo `content_comments`
 
 ```js
+// O estado e o motivo registam a decisão de moderação sem apagar o comentário original.
 {
   _id,
   userId,
@@ -123,7 +143,19 @@ Comentarios curtos criam uma camada simples de comunidade sem transformar a PAP 
 }
 ```
 
-### Guia de execucao (passo-a-passo)
+#### Ficheiros a criar/editar/rever
+
+- CRIAR: `backend/src/modules/comments/comments.validation.js`
+- CRIAR: `backend/src/modules/comments/comments.service.js`
+- CRIAR: `backend/src/modules/comments/comments.controller.js`
+- CRIAR: `backend/src/modules/comments/comments.routes.js`
+- EDITAR: `backend/src/app.js`
+- EDITAR: `backend/src/server.js`
+- CRIAR: `frontend/src/services/api/commentsApi.js`
+- CRIAR: `frontend/src/components/comments/CommentsPanel.jsx`
+- EDITAR: `frontend/src/pages/ContentDetailPage.jsx`
+
+#### Tutorial técnico linear
 
 ### Passo 1 - Criar validacao de comentarios
 
@@ -139,30 +171,32 @@ Normalizar texto, limitar tamanho e decidir o estado inicial de moderacao.
 
 Cria a pasta `backend/src/modules/comments/` e adiciona a validacao.
 
-4. Codigo completo.
+4. Codigo completo da validacao deste passo.
 
 ```js
 import { ObjectId } from "mongodb";
+import { HttpError } from "../../utils/http-error.js";
 
 export const COMMENT_STATUS = ["visible", "pending_review", "rejected"];
 
 export function asObjectId(id, label) {
-  if (!ObjectId.isValid(id)) {
-    const error = new Error(`${label} invalido.`);
-    error.statusCode = 400;
-    throw error;
+  if (typeof id !== "string" || !/^[a-f\d]{24}$/i.test(id)) {
+    throw new HttpError(400, `${label} invalido.`);
   }
 
-  return new ObjectId(id);
+  return ObjectId.createFromHexString(id);
 }
 
 export function assertCommentBody(value) {
-  const body = String(value ?? "").replace(/\s+/g, " ").trim();
+  if (typeof value !== "string") {
+    throw new HttpError(400, "O comentario deve ser texto.");
+  }
+
+  // Normaliza espaços antes de aplicar o limite para evitar contagens inconsistentes.
+  const body = value.replace(/\s+/g, " ").trim();
 
   if (body.length < 3 || body.length > 280) {
-    const error = new Error("O comentario deve ter entre 3 e 280 caracteres.");
-    error.statusCode = 400;
-    throw error;
+    throw new HttpError(400, "O comentario deve ter entre 3 e 280 caracteres.");
   }
 
   return body;
@@ -172,6 +206,7 @@ export function initialModerationFor(body) {
   const lower = body.toLowerCase();
   const hasLink = lower.includes("http://") || lower.includes("https://") || lower.includes("www.");
 
+  // Links seguem para revisão humana; esta regra simples não tenta decidir se são seguros.
   if (hasLink) {
     return {
       status: "pending_review",
@@ -186,15 +221,28 @@ export function initialModerationFor(body) {
 }
 
 export function assertModerationStatus(value) {
-  const status = String(value ?? "").trim();
-
-  if (!COMMENT_STATUS.includes(status)) {
-    const error = new Error("Estado de moderacao invalido.");
-    error.statusCode = 400;
-    throw error;
+  if (typeof value !== "string" || !COMMENT_STATUS.includes(value)) {
+    throw new HttpError(400, "Estado de moderacao invalido.");
   }
 
-  return status;
+  return value;
+}
+
+export function assertModerationReason(value) {
+  if (value !== undefined && value !== null && typeof value !== "string") {
+    throw new HttpError(400, "Motivo de moderacao invalido.");
+  }
+
+  const reason = typeof value === "string" ? value.trim() : "";
+
+  if (reason.length > 500) {
+    throw new HttpError(
+      400,
+      "O motivo de moderacao nao pode exceder 500 caracteres.",
+    );
+  }
+
+  return reason || null;
 }
 ```
 
@@ -228,13 +276,16 @@ Gerir comentarios com conteudo publicado, ownership e moderacao minima.
 
 Cria o service abaixo. Ele nunca devolve comentarios rejeitados na listagem publica.
 
-4. Codigo completo.
+4. Codigo canonico aplicavel ao estado final deste BK.
 
 ```js
-import { getDb } from "../../config/database.js";
+import { getDb, runInTransaction } from "../../config/database.js";
+import { HttpError } from "../../utils/http-error.js";
+import { writeAdminAudit } from "../audit/audit.service.js";
 import {
   asObjectId,
   assertCommentBody,
+  assertModerationReason,
   assertModerationStatus,
   initialModerationFor,
 } from "./comments.validation.js";
@@ -246,21 +297,30 @@ async function assertPublishedContent(db, contentId) {
   });
 
   if (!content) {
-    const error = new Error("Conteudo nao encontrado.");
-    error.statusCode = 404;
-    throw error;
+    throw new HttpError(404, "Conteudo nao encontrado.");
   }
 
   return content;
 }
 
-function publicComment(comment) {
+function canDeleteComment(comment, viewer) {
+  if (!viewer) return false;
+
+  const viewerId = asObjectId(viewer.id, "Utilizador");
+  return comment.userId.equals(viewerId)
+    || ["admin", "moderator"].includes(viewer.role);
+}
+
+function publicComment(comment, viewer = null) {
+  // A allowlist pública nunca copia motivos de moderação nem campos internos.
   return {
-    id: String(comment._id),
-    contentId: String(comment.contentId),
-    userId: String(comment.userId),
+    id: comment._id.toHexString(),
+    contentId: comment.contentId.toHexString(),
     body: comment.body,
+    status: comment.status,
     createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    canDelete: canDeleteComment(comment, viewer),
   };
 }
 
@@ -270,7 +330,7 @@ export async function ensureCommentIndexes() {
   await db.collection("content_comments").createIndex({ userId: 1, createdAt: -1 });
 }
 
-export async function listVisibleComments(contentId) {
+export async function listVisibleComments(contentId, viewer = null) {
   const db = await getDb();
   const contentObjectId = asObjectId(contentId, "Conteudo");
 
@@ -282,20 +342,20 @@ export async function listVisibleComments(contentId) {
     .limit(50)
     .toArray();
 
-  return comments.map(publicComment);
+  return comments.map((comment) => publicComment(comment, viewer));
 }
 
-export async function createComment(userId, contentId, input) {
+export async function createComment(user, contentId, bodyValue) {
   const db = await getDb();
   const contentObjectId = asObjectId(contentId, "Conteudo");
-  const userObjectId = asObjectId(userId, "Utilizador");
-  const body = assertCommentBody(input.body);
+  const userObjectId = asObjectId(user.id, "Utilizador");
+  const body = assertCommentBody(bodyValue);
   const moderation = initialModerationFor(body);
   const now = new Date();
 
   await assertPublishedContent(db, contentObjectId);
 
-  const result = await db.collection("content_comments").insertOne({
+  const document = {
     userId: userObjectId,
     contentId: contentObjectId,
     body,
@@ -303,59 +363,129 @@ export async function createComment(userId, contentId, input) {
     moderationReason: moderation.moderationReason,
     createdAt: now,
     updatedAt: now,
-  });
-
-  return {
-    id: String(result.insertedId),
-    status: moderation.status,
-    moderationReason: moderation.moderationReason,
   };
+  const result = await db.collection("content_comments").insertOne(document);
+
+  return publicComment({ ...document, _id: result.insertedId }, user);
 }
 
-export async function deleteOwnComment(userId, commentId) {
+/**
+ * Separa a remoção normal pelo autor da remoção administrativa auditada.
+ */
+export async function deleteComment(userId, role, commentId, context = {}) {
+  const actorObjectId = asObjectId(userId, "Utilizador");
+  const commentObjectId = asObjectId(commentId, "Comentario");
+  const canModerate = ["admin", "moderator"].includes(role);
   const db = await getDb();
-  const result = await db.collection("content_comments").deleteOne({
-    _id: asObjectId(commentId, "Comentario"),
-    userId: asObjectId(userId, "Utilizador"),
+  const ownedDeletion = await db.collection("content_comments").deleteOne({
+    _id: commentObjectId,
+    userId: actorObjectId,
   });
 
-  if (result.deletedCount === 0) {
-    const error = new Error("Comentario nao encontrado para este utilizador.");
-    error.statusCode = 404;
-    throw error;
+  if (ownedDeletion.deletedCount === 1) {
+    return { id: commentId, deleted: true };
   }
 
-  return { deleted: true };
-}
+  if (canModerate) {
+    return runInTransaction(async ({ db, session }) => {
+      const comments = db.collection("content_comments");
+      const comment = await comments.findOne(
+        { _id: commentObjectId },
+        { session },
+      );
 
-export async function moderateComment(commentId, input) {
-  const db = await getDb();
-  const status = assertModerationStatus(input.status);
-  const moderationReason = String(input.reason ?? "").trim() || null;
+      if (!comment) {
+        throw new HttpError(404, "Comentario nao encontrado.");
+      }
 
-  const result = await db.collection("content_comments").findOneAndUpdate(
-    { _id: asObjectId(commentId, "Comentario") },
-    { $set: { status, moderationReason, updatedAt: new Date() } },
-    { returnDocument: "after" },
+      const deletion = await comments.deleteOne(
+        { _id: commentObjectId },
+        { session },
+      );
+
+      if (deletion.deletedCount !== 1) {
+        throw new HttpError(409, "O comentario foi alterado em concorrencia.");
+      }
+
+      await writeAdminAudit({
+        db,
+        session,
+        actorUserId: userId,
+        action: "comment.privileged_delete",
+        targetType: "comment",
+        targetId: commentObjectId,
+        before: { status: comment.status },
+        after: null,
+        requestId: context.requestId,
+      });
+
+      return { id: commentId, deleted: true };
+    });
+  }
+
+  const exists = await db.collection("content_comments").findOne(
+    { _id: commentObjectId },
+    { projection: { _id: 1 } },
   );
+  if (!exists) throw new HttpError(404, "Comentario nao encontrado.");
+  throw new HttpError(403, "Permissao insuficiente.");
+}
 
-  if (!result) {
-    const error = new Error("Comentario nao encontrado.");
-    error.statusCode = 404;
-    throw error;
-  }
+/**
+ * Modera e audita na mesma transação, sem guardar corpo, motivo ou PII no audit.
+ */
+export async function moderateComment(
+  actorUserId,
+  commentId,
+  statusValue,
+  reasonValue,
+  context = {},
+) {
+  const actorObjectId = asObjectId(actorUserId, "Moderador");
+  const commentObjectId = asObjectId(commentId, "Comentario");
+  const status = assertModerationStatus(statusValue);
+  const moderationReason = assertModerationReason(reasonValue);
 
-  return {
-    id: String(result._id),
-    status: result.status,
-    moderationReason: result.moderationReason,
-  };
+  return runInTransaction(async ({ db, session }) => {
+    const updatedAt = new Date();
+    const before = await db.collection("content_comments").findOneAndUpdate(
+      { _id: commentObjectId },
+      { $set: { status, moderationReason, updatedAt } },
+      { returnDocument: "before", session },
+    );
+
+    if (!before) {
+      throw new HttpError(404, "Comentario nao encontrado.");
+    }
+
+    const updated = { ...before, status, moderationReason, updatedAt };
+    await writeAdminAudit({
+      db,
+      session,
+      actorUserId: actorObjectId,
+      action: "comment.moderated",
+      targetType: "comment",
+      targetId: commentObjectId,
+      before: { status: before.status },
+      after: { status },
+      requestId: context.requestId,
+    });
+
+    return publicComment(updated);
+  });
 }
 ```
 
 5. Explicacao do codigo ou da decisao.
 
-`listVisibleComments` so apresenta `visible`. `deleteOwnComment` exige `userId`, impedindo que um utilizador remova comentarios de outro.
+`listVisibleComments` só apresenta `visible`. `publicComment` constrói uma
+allowlist e nunca revela `moderationReason`, `userId`, identidade do moderador,
+audit metadata ou qualquer outro campo interno, inclusive nas respostas de
+criação e moderação.
+`deleteComment` mantém o fluxo normal do autor separado do fluxo privilegiado:
+apenas o segundo abre transação e escreve `comment.privileged_delete`. A
+moderação escreve `comment.moderated`; em ambos, uma falha de audit reverte a
+mutação e o snapshot contém apenas o estado anterior/seguinte.
 
 6. Validacao do passo.
 
@@ -384,32 +514,57 @@ Expor os endpoints de comentarios com regras de autenticacao e roles.
 
 Cria controller e router. A rota de moderacao deve ficar protegida por role.
 
-4. Codigo completo.
+4. Codigo canonico dos controllers e das rotas.
 
 `backend/src/modules/comments/comments.controller.js`
 
 ```js
 import {
   createComment,
-  deleteOwnComment,
+  deleteComment,
   listVisibleComments,
   moderateComment,
 } from "./comments.service.js";
 
 export async function getCommentsByContent(req, res) {
-  res.status(200).json({ items: await listVisibleComments(req.params.contentId) });
+  res.status(200).json({
+    items: await listVisibleComments(req.params.contentId, req.user),
+  });
 }
 
 export async function postCommentByContent(req, res) {
-  res.status(201).json(await createComment(req.user.id, req.params.contentId, req.body));
+  // O serviço recebe o utilizador autenticado para associar autoria e permissões.
+  res.status(201).json({
+    comment: await createComment(
+      req.user,
+      req.params.contentId,
+      req.body?.body,
+    ),
+  });
 }
 
-export async function deleteComment(req, res) {
-  res.status(200).json(await deleteOwnComment(req.user.id, req.params.commentId));
+export async function deleteCommentController(req, res) {
+  res.status(200).json({
+    comment: await deleteComment(
+      req.user.id,
+      req.user.role,
+      req.params.commentId,
+      { requestId: req.id },
+    ),
+  });
 }
 
 export async function patchCommentModeration(req, res) {
-  res.status(200).json(await moderateComment(req.params.commentId, req.body));
+  // O requestId permite correlacionar a decisão privilegiada com o respetivo audit log.
+  res.status(200).json({
+    comment: await moderateComment(
+      req.user.id,
+      req.params.commentId,
+      req.body?.status,
+      req.body?.moderationReason,
+      { requestId: req.id },
+    ),
+  });
 }
 ```
 
@@ -417,10 +572,10 @@ export async function patchCommentModeration(req, res) {
 
 ```js
 import { Router } from "express";
-import { requireAuth, requireRole } from "../auth/auth.middleware.js";
+import { requireAuth, requireRole } from "../../middlewares/auth.middleware.js";
 import { asyncHandler } from "../../utils/async-handler.js";
 import {
-  deleteComment,
+  deleteCommentController,
   getCommentsByContent,
   patchCommentModeration,
   postCommentByContent,
@@ -428,12 +583,12 @@ import {
 
 export const commentsRouter = Router();
 
+// Criar/remover exige sessão; moderar exige ainda um papel privilegiado.
 commentsRouter.get("/:contentId", asyncHandler(getCommentsByContent));
 commentsRouter.post("/:contentId", requireAuth, asyncHandler(postCommentByContent));
-commentsRouter.delete("/:commentId", requireAuth, asyncHandler(deleteComment));
+commentsRouter.delete("/:commentId", requireAuth, asyncHandler(deleteCommentController));
 commentsRouter.patch(
   "/:commentId/moderation",
-  requireAuth,
   requireRole(["admin", "moderator"]),
   asyncHandler(patchCommentModeration),
 );
@@ -441,7 +596,11 @@ commentsRouter.patch(
 
 5. Explicacao do codigo ou da decisao.
 
-Leitura publica e escrita autenticada ficam separadas. Moderacao usa role porque altera visibilidade de comentarios de outras pessoas.
+Leitura pública e escrita autenticada ficam separadas. O controller entrega
+ator, role e `req.id` ao service; nunca inventa identidade administrativa. A
+rota de moderação usa `requireRole`, que já inclui a exigência de autenticação
+do middleware deste projeto. Se a implementação local separar essas duas
+responsabilidades, mantém também `requireAuth` antes de `requireRole`.
 
 6. Validacao do passo.
 
@@ -528,14 +687,23 @@ Cria o cliente e componente. Depois adiciona `<CommentsPanel contentId={content.
 import { apiClient } from "./apiClient.js";
 
 export const commentsApi = {
-  list(contentId) {
-    return apiClient.get(`/api/comments/${encodeURIComponent(contentId)}`);
+  list(contentId, options = {}) {
+    // Todos os IDs são codificados para não poderem introduzir novos segmentos no URL.
+    return apiClient.get(`/api/comments/${encodeURIComponent(contentId)}`, options);
   },
-  create(contentId, body) {
-    return apiClient.post(`/api/comments/${encodeURIComponent(contentId)}`, { body });
+  create(contentId, body, options = {}) {
+    return apiClient.post(`/api/comments/${encodeURIComponent(contentId)}`, { body }, options);
   },
-  remove(commentId) {
-    return apiClient.del(`/api/comments/${encodeURIComponent(commentId)}`);
+  remove(commentId, options = {}) {
+    return apiClient.del(`/api/comments/${encodeURIComponent(commentId)}`, options);
+  },
+  moderate(commentId, input, options = {}) {
+    // A mutação reutiliza o cliente autenticado, incluindo CSRF e envelope de erro seguro.
+    return apiClient.patch(
+      `/api/comments/${encodeURIComponent(commentId)}/moderation`,
+      input,
+      options,
+    );
   },
 };
 ```
@@ -543,64 +711,132 @@ export const commentsApi = {
 `frontend/src/components/comments/CommentsPanel.jsx`
 
 ```jsx
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSession } from "../../context/SessionContext.jsx";
 import { commentsApi } from "../../services/api/commentsApi.js";
 
 export function CommentsPanel({ contentId }) {
+  const { status: sessionStatus, user } = useSession();
   const [items, setItems] = useState([]);
   const [body, setBody] = useState("");
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(null);
+  const contextVersionRef = useRef(0);
+  const mutationControllerRef = useRef(null);
+  const queueRef = useRef(Promise.resolve());
+  // A versão invalida respostas do conteúdo ou da sessão anteriores.
+  const sessionKey = `${sessionStatus}:${user?.id ?? ""}`;
+
+  async function loadItems(version, signal) {
+    const response = await commentsApi.list(contentId, { signal });
+    if (signal.aborted || version !== contextVersionRef.current) return false;
+    setItems(response.items);
+    return true;
+  }
+
+  function enqueue(task) {
+    // A fila serializa criações e remoções para preservar a ordem observada pelo utilizador.
+    const next = queueRef.current.then(task, task);
+    queueRef.current = next.catch(() => undefined);
+    return next;
+  }
 
   useEffect(() => {
-    let active = true;
+    const version = ++contextVersionRef.current;
+    const controller = new AbortController();
+    mutationControllerRef.current?.abort();
+    mutationControllerRef.current = null;
+    queueRef.current = Promise.resolve();
+    setBusy(null);
+    setMessage("");
     setStatus("loading");
 
-    commentsApi.list(contentId)
-      .then((response) => {
-        if (!active) return;
-        setItems(response.items);
+    loadItems(version, controller.signal)
+      .then((applied) => {
+        if (!applied) return;
         setStatus("success");
       })
-      .catch(() => {
-        if (!active) return;
+      .catch((requestError) => {
+        if (controller.signal.aborted || requestError?.name === "AbortError") return;
+        if (version !== contextVersionRef.current) return;
         setMessage("Nao foi possivel carregar comentarios.");
         setStatus("error");
       });
 
-    return () => {
-      active = false;
-    };
-  }, [contentId]);
+    return () => controller.abort();
+  }, [contentId, sessionKey]);
 
-  async function submit(event) {
+  function submit(event) {
     event.preventDefault();
-    setMessage("");
-    setStatus("saving");
+    const submittedBody = body;
+    const version = contextVersionRef.current;
 
-    try {
-      const response = await commentsApi.create(contentId, body);
-      setBody("");
-      setStatus("success");
+    void enqueue(async () => {
+      if (version !== contextVersionRef.current) return;
+      const controller = new AbortController();
+      mutationControllerRef.current = controller;
+      setBusy({ kind: "create", id: "form" });
+      setMessage("");
 
-      if (response.status === "visible") {
-        const refreshed = await commentsApi.list(contentId);
-        setItems(refreshed.items);
-        setMessage("Comentario publicado.");
-      } else {
-        setMessage("Comentario recebido e em revisao.");
+      try {
+        const response = await commentsApi.create(contentId, submittedBody, {
+          signal: controller.signal,
+        });
+        const applied = await loadItems(version, controller.signal);
+        if (!applied) return;
+        setBody("");
+        setStatus("success");
+        setMessage(
+          response.comment.status === "visible"
+            ? "Comentario publicado."
+            : "Comentario recebido e em revisao.",
+        );
+      } catch (requestError) {
+        if (controller.signal.aborted || requestError?.name === "AbortError") return;
+        if (version !== contextVersionRef.current) return;
+        setStatus("error");
+        setMessage("Confirma o texto e tenta novamente com sessao iniciada.");
+      } finally {
+        if (version === contextVersionRef.current) setBusy(null);
+        if (mutationControllerRef.current === controller) mutationControllerRef.current = null;
       }
-    } catch {
-      setStatus("error");
-      setMessage("Confirma o texto e tenta novamente com sessao iniciada.");
-    }
+    });
+  }
+
+  function remove(commentId) {
+    const version = contextVersionRef.current;
+
+    void enqueue(async () => {
+      if (version !== contextVersionRef.current) return;
+      const controller = new AbortController();
+      mutationControllerRef.current = controller;
+      setBusy({ kind: "remove", id: commentId });
+      setMessage("");
+
+      try {
+        await commentsApi.remove(commentId, { signal: controller.signal });
+        const applied = await loadItems(version, controller.signal);
+        if (!applied) return;
+        setStatus("success");
+        setMessage("Comentario removido.");
+      } catch (requestError) {
+        if (controller.signal.aborted || requestError?.name === "AbortError") return;
+        if (version !== contextVersionRef.current) return;
+        setStatus("error");
+        setMessage("Nao foi possivel remover o comentario.");
+      } finally {
+        if (version === contextVersionRef.current) setBusy(null);
+        if (mutationControllerRef.current === controller) mutationControllerRef.current = null;
+      }
+    });
   }
 
   return (
     <section className="comments-panel" aria-label="Comentarios">
       <h2>Comentarios</h2>
 
-      <form onSubmit={submit}>
+      <form onSubmit={submit} aria-busy={busy?.id === "form"}>
         <label htmlFor="comment-body">Comentario curto</label>
         <textarea
           id="comment-body"
@@ -609,8 +845,11 @@ export function CommentsPanel({ contentId }) {
           value={body}
           onChange={(event) => setBody(event.target.value)}
         />
-        <button type="submit" disabled={status === "saving" || body.trim().length < 3}>
-          Publicar
+        <button
+          type="submit"
+          disabled={busy !== null || sessionStatus !== "authenticated" || body.trim().length < 3}
+        >
+          {busy?.id === "form" ? "A publicar..." : "Publicar"}
         </button>
       </form>
 
@@ -623,6 +862,16 @@ export function CommentsPanel({ contentId }) {
           <li key={comment.id}>
             <p>{comment.body}</p>
             <small>{new Date(comment.createdAt).toLocaleDateString("pt-PT")}</small>
+            {comment.canDelete && (
+              <button
+                type="button"
+                aria-busy={busy?.id === comment.id}
+                disabled={busy !== null}
+                onClick={() => remove(comment.id)}
+              >
+                {busy?.id === comment.id ? "A remover..." : "Remover"}
+              </button>
+            )}
           </li>
         ))}
       </ul>
@@ -647,16 +896,26 @@ Resultado esperado: build sem erros.
 
 Confiar apenas em `maxLength` do browser nao chega, porque qualquer pessoa pode chamar a API fora da UI.
 
-## Criterios de aceite (mensuraveis)
+#### Critérios de aceite
 
 - `GET /api/comments/:contentId` devolve apenas comentarios `visible`.
 - `POST /api/comments/:contentId` sem sessao devolve `401`.
 - Comentario com menos de 3 ou mais de 280 caracteres devolve `400`.
 - Comentario com link fica em `pending_review`.
-- `DELETE /api/comments/:commentId` so remove comentario do proprio utilizador.
+- `DELETE /api/comments/:commentId` só remove quando `canDelete` seria verdadeiro: autor, `admin` ou `moderator`.
 - `PATCH /api/comments/:commentId/moderation` exige role `admin` ou `moderator`.
+- Moderação e remoção privilegiada fazem rollback integral quando a escrita do
+  audit falha; o evento usa o mesmo `session`, ator autenticado e `requestId`.
+- Remoção pelo autor não cria audit administrativo; um utilizador comum nunca
+  consegue remover um comentário de outra pessoa.
+- O snapshot administrativo nunca inclui corpo, motivo de moderação ou PII.
+- Qualquer resposta construída por `publicComment` nunca expõe
+  `moderationReason`, `userId`, campos de auditoria ou outros internos; a
+  listagem limita-se a 50 itens visíveis.
+- Motivo de moderação acima de 500 caracteres devolve `400`.
+- Trocar de conteúdo/sessão aborta pedidos anteriores; duas remoções são serializadas e mantêm busy state por linha.
 
-## Validacao final
+#### Validação final
 
 ```bash
 npm --prefix backend test
@@ -666,14 +925,18 @@ curl -i http://localhost:3000/api/comments/CONTENT_ID
 
 Resultado esperado: testes e build passam; listagem publica devolve `items`.
 
-## Evidence para PR/defesa
+#### Evidence para PR/defesa
 
 - `pr`: referencia do PR/commit com modulo `comments`.
 - `proof`: captura do detalhe com comentario visivel.
 - `proof`: resposta `201` ao criar comentario autenticado.
+- `proof`: DTO público sem `userId` e teste de cancelamento/anti-stale, fila serial e busy state localizado.
 - `neg`: `401` sem sessao, `400` por texto invalido, `403` ao moderar sem role.
+- `neg`: motivo com mais de 500 caracteres e resposta tardia do conteúdo anterior ignorada.
+- `neg`: fault injection no audit deixa comentário/estado inalterado; chamada
+  privilegiada sem role devolve `403` e não cria domínio nem audit.
 
-## Handoff
+#### Handoff
 
 O `BK-MF3-03` pode avancar para pesquisa unificada sem depender dos comentarios. O detalhe fica enriquecido com ratings e comentarios, mas a pesquisa deve continuar baseada no catalogo publicado e nas taxonomias.
 
@@ -692,7 +955,9 @@ commentsRouter.patch(
 
 Este trecho separa utilizadores comuns de moderadores.
 
-## Changelog
+#### Changelog
 
 - `2026-04-13`: retrofit para contrato pedagogico v3.
 - `2026-06-07`: guia reescrito com contratos, moderacao minima, backend, frontend, validacao e evidence.
+- `2026-07-10`: contrato canónico atualizado com inputs estritos, DTO sem `userId`, motivo até 500, cancelamento/anti-stale, fila serial, busy state localizado e limite público de 50 sem alegar paginação.
+- `2026-07-10`: remoção do autor separada da remoção privilegiada; moderação e ação administrativa usam transação, sessão, ator, `requestId`, rollback e snapshot mínimo de audit.

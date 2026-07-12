@@ -10,6 +10,7 @@ import {
     parsePagination,
     parseSearchFilters,
 } from "./search.validation.js";
+import { PUBLIC_CATALOG_TYPES } from "../catalog/catalog-hierarchy.js";
 
 /**
  * Converte um documento de conteúdo num cartão público de pesquisa.
@@ -105,6 +106,7 @@ export async function searchContents(queryParams) {
     const taxonomyIds = matchingTaxonomies.map((taxonomy) => taxonomy._id);
     const filter = {
         status: "published",
+        type: { $in: PUBLIC_CATALOG_TYPES },
         $or: [
             { title: regex },
             { slug: regex },

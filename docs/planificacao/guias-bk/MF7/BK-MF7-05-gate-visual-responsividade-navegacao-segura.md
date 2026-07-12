@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF8-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-05-gate-visual-responsividade-navegacao-segura.md`
-- `last_updated`: `2026-06-23`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -122,9 +122,11 @@ Confirma que cada evidence tem estado final. Se faltar uma, marca o gate como `N
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo consolida evidence.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo consolida evidence.
 
 O gate não deve criar uma verdade nova. Ele lê as provas já criadas e decide se a macrofase pode avançar.
 
@@ -154,6 +156,12 @@ Cria o ficheiro abaixo e preenche os campos `Resultado observado`, `Estado` e `P
 
 ```md
 # Gate UI, responsividade e navegação segura - MF7
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF7/BK-MF7-05-gate-visual-responsividade-navegacao-segura.md`
+- `proof_scope`: gate visual baseado em evidence dos alunos; não herda resultados browser, Axe ou media da referência privada
 
 ## Metadados
 
@@ -272,9 +280,11 @@ Preenche:
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo fecha a decisão documental.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo fecha a decisão documental.
 
 O handoff garante que a MF8 começa com provas visuais organizadas, sem repetir validação visual da MF7.
 
@@ -314,7 +324,27 @@ Se a decisão for `GO` com riscos P0 em aberto, a decisão está errada e deve s
 - Se a decisão for `GO_COM_RESSALVAS`, os riscos aceites devem entrar na matriz de riscos da MF8.
 - Se a decisão for `NO_GO`, `BK-MF8-01` não deve iniciar até fechar blockers.
 
+##### Adendo do gate visual mensurável
+
+O gate dos alunos só pode fechar quando a evidence própria demonstrar:
+
+- zero violação Axe `serious` ou `critical` nas rotas efetivamente cobertas;
+- contraste WCAG AA, foco visível, targets mínimos `44x44 px` e respeito por
+  `prefers-reduced-motion`;
+- header móvel fechado até `72 px`, menu operável por teclado, fecho com
+  `Escape` e restituição do foco;
+- ausência de overflow horizontal em `390x844`, `768x900`, `1280x720` e
+  `1440x900`, além de reflow utilizável equivalente a `200%`;
+- JavaScript inicial até `90 kB` gzip, CSS até `25 kB` gzip, logo até `30 kB`
+  e adapters media lazy fora do chunk inicial.
+
+Um preview com API sintética pode provar DOM, ARIA e layout, mas não prova full
+E2E, backend, base de dados, streaming, compatibilidade cross-browser completa
+ou comportamento com dados reais. Esses limites devem ficar no gate.
+
 #### Changelog
 
 - `2026-06-22`: guia criado/reestruturado na reorganização documental MF7/MF8.
 - `2026-06-23`: guia atualizado com matriz de gate, regras de decisão, comandos de validação e handoff para MF8.
+- `2026-07-10`: gate visual passou a exigir Axe, quatro viewports, reflow,
+  teclado, targets e budgets com limites probatórios explícitos.

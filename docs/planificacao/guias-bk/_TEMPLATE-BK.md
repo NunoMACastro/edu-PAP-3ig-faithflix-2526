@@ -1,8 +1,9 @@
 # BK-MF*-** - Titulo claro do BK
 
-> Template obrigatorio para guias BK FaithFlix.
+> Template obrigatório para guias BK FaithFlix — contrato `tutorial-v2`.
 > Usa como modelo estrutural BKs hidratados completos, especialmente o padrao de tutorial tecnico linear com codigo, explicacao, validacao, negativos, evidence e handoff.
 > Nao removas secoes. Se uma seccao nao se aplicar, escreve "Nao aplicavel" e justifica.
+> Este template é `STUDENT`: usa apenas `backend/` e `frontend/`, nunca `real_dev/`.
 
 ## Header
 
@@ -27,7 +28,7 @@
 
 Explica, em 2 a 4 paragrafos, o que o aluno vai construir neste BK e que resultado observavel fica na app.
 
-#### Importancia
+#### Importância
 
 Explica porque este BK existe no produto FaithFlix, que RF/RNF cumpre, que problema resolve e que BKs seguintes ficam desbloqueados.
 
@@ -46,19 +47,19 @@ Explica porque este BK existe no produto FaithFlix, que RF/RNF cumpre, que probl
 - Estado antes: que contratos, ficheiros ou funcionalidades ja existem.
 - Estado depois: que novo contrato fica implementavel e validavel.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - RF/RNF aplicaveis.
 - BKs anteriores obrigatorios.
 - Documentos canonicos a consultar.
 - Ficheiros de aluno em `backend` e `frontend`, se existirem.
 
-#### Glossario
+#### Glossário
 
 - Termos de dominio FaithFlix usados no BK.
 - Termos tecnicos que o aluno precisa de compreender antes de copiar codigo.
 
-#### Conceitos teoricos essenciais
+#### Conceitos teóricos essenciais
 
 Explica a teoria minima para o aluno perceber o raciocinio: ownership por utilizador/perfil, catalogo, historico, favoritos, watchlist, subscricoes, pool solidaria, recomendacao baseline, validacao, cookies/sessao, ou outro conceito aplicavel.
 
@@ -82,7 +83,7 @@ Explica a teoria minima para o aluno perceber o raciocinio: ownership por utiliz
 - EDITAR: `frontend/...`
 - REVER: `docs/planificacao/guias-bk/MF*/BK-...md`
 
-#### Tutorial tecnico linear
+#### Tutorial técnico linear
 
 Cada passo deve ser executavel por ordem. O aluno nao deve precisar de adivinhar imports, helpers, DTOs, services, componentes, rotas, testes ou comandos.
 
@@ -110,10 +111,16 @@ Texto especifico: o que este passo entrega no FaithFlix.
 
 Explica a ordem de trabalho e as decisoes `CANONICO`, `DERIVADO` ou `TODO (BLOCKER)`.
 
-4. Codigo completo, correto e integrado com a app final.
+4. Código completo, correto e integrado com a app final.
+
+Se o passo não tiver código, escreve exatamente:
+
+`Sem código neste passo.`
+
+Se tiver código, publica um bloco completo e copiável:
 
 ```ts
-// Codigo real ou "Sem codigo neste passo."
+// Código real, integrado e explicado no ponto seguinte.
 ```
 
 5. Explicacao do codigo.
@@ -145,12 +152,12 @@ Deve cobrir:
 
 Repetir exatamente a estrutura do Passo 1.
 
-#### Criterios de aceite
+#### Critérios de aceite
 
 - Criterios mensuraveis, ligados a RF/RNF e aos passos.
 - Incluir negativos obrigatorios quando houver backend, dados, auth, privacidade, pagamentos/subscricoes, IA ou pool solidaria.
 
-#### Validacao final
+#### Validação final
 
 - Comandos reais do package aplicavel.
 - Smoke principal.

@@ -1,9 +1,17 @@
 # Evidence MF1 - Fundacao tecnica
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-07-09`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: smoke MF1 preservado antes da Fase 2; não constitui prova atual
+
+> **Aviso de validade — Fase 2 (2026-07-09):** este documento é um snapshot histórico anterior à Fase 2 de 2026-07-09. Os resultados e decisões preservados abaixo não provam CP2 nem o estado atual da aplicação.
+
 ## Comandos executados
 
-- `npm --prefix backend run smoke`
-- `npm --prefix frontend run smoke`
+- `npm --prefix real_dev/backend run smoke`
+- `npm --prefix real_dev/frontend run smoke`
 - `npm run smoke`
 
 ## Resultado esperado
@@ -25,8 +33,9 @@
 ## Negativos
 
 - Rota inexistente devolve 404 JSON.
-- Sessao sem cookie devolve 401.
-- Cookie falso devolve 401.
+- Sessao sem cookie devolve `200 { "user": null }`.
+- Cookie falso devolve `200 { "user": null }`.
+- Logout devolve `204` e limpa o cookie sem expor sessão ou token.
 
 ## Handoff para MF2
 

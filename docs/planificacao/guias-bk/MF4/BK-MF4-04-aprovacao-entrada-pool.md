@@ -17,26 +17,25 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF4-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-04-aprovacao-entrada-pool.md`
-- `last_updated`: `2026-06-13`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagógico (obrigatório)
+#### Objetivo
 
 Neste BK vais criar a revisão administrativa das candidaturas e transformar candidaturas aprovadas em associações elegíveis para a pool solidária.
 
-### Objetivo pedagógico
 
 - Implementar aprovação e rejeição com role `admin`.
 - Criar a entidade `charities` apenas quando a candidatura é aprovada.
 - Guardar motivo e auditoria mínima da decisão.
 - Preparar o `BK-MF4-05`, que distribui valor apenas por associações elegíveis.
 
-### Importância funcional
+#### Importância
 
 - A pool solidária precisa de uma decisão controlada antes de qualquer associação receber valor.
 - Este BK separa pedido recebido, decisão administrativa e entrada efetiva na pool.
 - A auditoria mínima protege a equipa: é possível explicar quem decidiu, quando decidiu e porquê.
 
-### Scope-in
+#### Scope-in
 
 - Validar decisão `approved` ou `rejected`.
 - Permitir aprovação/rejeição apenas a administradores.
@@ -44,7 +43,7 @@ Neste BK vais criar a revisão administrativa das candidaturas e transformar can
 - Criar `charities` apenas quando a candidatura é aprovada.
 - Criar painel admin simples para decidir candidaturas pendentes.
 
-### Scope-out
+#### Scope-out
 
 - Não executar distribuição mensal; isso entra no `BK-MF4-05`.
 - Não editar dados públicos da associação depois de aprovada.
@@ -56,14 +55,25 @@ Neste BK vais criar a revisão administrativa das candidaturas e transformar can
 - 2 blocos de 90 minutos.
 - Se a equipa não conseguir explicar quem aprovou e quando aprovou, a auditoria ainda não está pronta.
 
-### Glossário rápido
+#### Estado antes e depois
+
+- Estado antes: aplicam-se os BKs declarados em `dependencias`, os RF/RNF do Header e os artefactos já entregues pelas fases anteriores.
+- Estado depois: ficam implementáveis e verificáveis apenas os resultados listados em `Scope-in`, sem antecipar o `Scope-out`.
+
+#### Pré-requisitos
+
+- `BK-MF4-03` executado com candidaturas `pending`.
+- `requireRole(["admin"])` disponível.
+- `charitiesRouter` montado em `/api/charities`.
+
+#### Glossário
 
 - Revisão administrativa: decisão feita por alguém com role `admin`.
 - Rejeição: decisão negativa com motivo mínimo.
 - Associação elegível: associação aprovada e apta a participar na pool.
 - Rastreabilidade: capacidade de provar a origem e a decisão de cada registo.
 
-### Conceitos teóricos essenciais
+#### Conceitos teóricos essenciais
 
 - Domínio FaithFlix: aprovação transforma um pedido em entidade operacional da pool solidária.
 - Backend: o service garante que uma candidatura só é decidida uma vez.
@@ -86,26 +96,42 @@ Neste BK vais criar a revisão administrativa das candidaturas e transformar can
 - [ ] Sei provar que só admin decide.
 - [ ] Sei indicar que dados ficam para auditoria.
 
-## Bloco operacional (obrigatório)
-
-### Pré-condições
-
-- `BK-MF4-03` executado com candidaturas `pending`.
-- `requireRole(["admin"])` disponível.
-- `charitiesRouter` montado em `/api/charities`.
-
-### Arquitetura do BK
+#### Arquitetura do BK
 
 - Backend: validação de decisão, service de revisão, controller e rota protegida.
+- Transversal: `runInTransaction` controla a unidade de commit e
+  `writeAdminAudit` sanitiza/correlaciona o evento na mesma sessão.
 - Persistência: a candidatura mantém histórico; a associação aprovada nasce em `charities`.
 - Frontend: `AdminCharityApplicationsPage` permite aprovar/rejeitar sem mexer diretamente na base de dados.
 - Segurança: rota de decisão exige `requireRole(["admin"])`.
 - Integração: `BK-MF4-05` consome apenas associações `active` e `eligible`.
 
-### Ficheiros a criar, editar e rever
+### Contrato vinculativo da interface administrativa (Fase 5 - 2026-07-10)
+
+- A página pede confirmação explícita antes de aprovar ou rejeitar, incluindo o
+  nome da associação e o efeito irreversível da decisão.
+- Cada candidatura tem busy state próprio (`aria-busy`); enquanto a decisão
+  está em curso, os dois botões da linha ficam desativados. Um `ref` de reservas
+  impede duplo clique antes do render seguinte.
+- Leitura e mutações usam `AbortController`. No unmount, todos os pedidos ativos
+  são cancelados; `REQUEST_ABORTED` não é apresentado como erro e uma resposta
+  antiga nunca altera a candidatura atualmente visível.
+- A página consome `{ applications, page, limit, total, totalPages }`, usa
+  `limit: 20` e apresenta Anterior/Seguinte e o total real. O backend continua a
+  impor o máximo de 50.
+- Depois de sucesso, a linha é removida e a página autoritativa é recarregada.
+  Em falha, a linha permanece e a mensagem passa por `toUserMessage`.
+- Todos os estados visíveis usam PT-PT: `A processar...`, `Candidatura aprovada`,
+  `Candidatura rejeitada`, `Tentar novamente`. O exemplo simples do Passo 4 deve
+  ser completado com este contrato e não é autorização para omitir estas guardas.
+
+#### Ficheiros a criar/editar/rever
 
 - CRIAR: `backend/src/modules/charities/charity-review.validation.js`
 - CRIAR: `backend/src/modules/charities/charity-review.service.js`
+- CRIAR/REVER: `backend/src/modules/audit/audit.service.js`
+- EDITAR/REVER: `backend/src/config/database.js`
+- CRIAR/EDITAR: `backend/tests/unit/f3-admin-transactions.test.js`
 - CRIAR: `frontend/src/pages/AdminCharityApplicationsPage.jsx`
 - EDITAR: `backend/src/modules/charities/charities.routes.js`
 - EDITAR: `backend/src/modules/charities/charity-applications.controller.js`
@@ -114,7 +140,7 @@ Neste BK vais criar a revisão administrativa das candidaturas e transformar can
 - EDITAR: `frontend/src/routes/AppRoutes.jsx`
 - REVER: `BK-MF4-03`, `RF42`, `RF43`, `RNF19`
 
-### Guia de execução (passo-a-passo)
+#### Tutorial técnico linear
 
 ### Passo 1 - Criar validação de decisão
 
@@ -124,6 +150,7 @@ Validar decisão administrativa e motivo.
 
 2. Ficheiros envolvidos.
     - CRIAR: `backend/src/modules/charities/charity-review.validation.js`
+    - CRIAR: `backend/tests/unit/mf4-charity-review.validation.test.js`
     - LOCALIZACAO: ficheiro completo
 
 3. Instrucoes concretas.
@@ -133,24 +160,13 @@ Adiciona este ficheiro ao módulo `charities`.
 4. Código completo.
 
 ```js
+import { HttpError } from "../../utils/http-error.js";
+
 /**
  * Decisões aceites no processo de revisão de candidaturas.
  * Qualquer outro estado e controlado por outros fluxos do módulo.
  */
 export const REVIEW_DECISIONS = ["approved", "rejected"];
-
-/**
- * Cria um erro HTTP previsivel para validação de revisão.
- *
- * @param {string} message Mensagem segura para devolver ao cliente.
- * @param {number} [statusCode=400] Código HTTP associado.
- * @returns {Error} Erro com `statusCode`.
- */
-function httpError(message, statusCode = 400) {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
-}
 
 /**
  * Valida a decisão administrativa sobre uma candidatura.
@@ -162,15 +178,61 @@ function httpError(message, statusCode = 400) {
  * @throws {Error} Quando a decisão e inválida ou a rejeição não tem motivo suficiente.
  */
 export function assertReviewPayload(input) {
-  const decision = String(input.decision ?? "").trim();
-  const reason = String(input.reason ?? "").trim();
+  if (input === null || typeof input !== "object" || Array.isArray(input)) {
+    throw new HttpError(
+      400,
+      "O body da revisão tem de ser um objeto JSON.",
+      undefined,
+      "INVALID_REVIEW_PAYLOAD",
+    );
+  }
+
+  if (typeof input.decision !== "string") {
+    throw new HttpError(
+      400,
+      "A decisão tem de ser texto.",
+      undefined,
+      "INVALID_REVIEW_DECISION",
+    );
+  }
+
+  if (input.reason !== undefined && typeof input.reason !== "string") {
+    throw new HttpError(
+      400,
+      "O motivo tem de ser texto.",
+      undefined,
+      "INVALID_REVIEW_REASON",
+    );
+  }
+
+  const decision = input.decision.trim();
+  const reason = input.reason?.trim() ?? "";
 
   if (!REVIEW_DECISIONS.includes(decision)) {
-    throw httpError("Decisão inválida.");
+    throw new HttpError(
+      400,
+      "Decisão inválida.",
+      undefined,
+      "INVALID_REVIEW_DECISION",
+    );
+  }
+
+  if (reason.length > 500) {
+    throw new HttpError(
+      400,
+      "O motivo não pode exceder 500 caracteres.",
+      undefined,
+      "INVALID_REVIEW_REASON",
+    );
   }
 
   if (decision === "rejected" && reason.length < 10) {
-    throw httpError("Motivo de rejeição obrigatório.");
+    throw new HttpError(
+      400,
+      "Motivo de rejeição obrigatório.",
+      undefined,
+      "INVALID_REVIEW_REASON",
+    );
   }
 
   return { decision, reason };
@@ -179,7 +241,10 @@ export function assertReviewPayload(input) {
 
 5. Explicação do código ou da decisão.
 
-A rejeição exige motivo porque uma associação precisa de feedback mínimo e a equipa precisa de evidencia para defesa.
+A rejeição exige motivo porque uma associação precisa de feedback mínimo e a
+equipa precisa de evidencia para defesa. O validator não usa `String(...)`:
+`null`, arrays, objetos e números são recusados em vez de serem convertidos.
+Qualquer motivo, incluindo aprovação, fica limitado a 500 caracteres.
 
 6. Validação do passo.
 
@@ -187,9 +252,33 @@ A rejeição exige motivo porque uma associação precisa de feedback mínimo e 
 node -e "import('./src/modules/charities/charity-review.validation.js').then(({ assertReviewPayload }) => console.log(assertReviewPayload({ decision: 'approved' }).decision))"
 ```
 
+`backend/tests/unit/mf4-charity-review.validation.test.js`
+
+```js
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { assertReviewPayload } from "../../src/modules/charities/charity-review.validation.js";
+
+test("MF4 recusa body e campos não escalares", () => {
+  // Nenhum valor hostil pode ser convertido implicitamente para texto.
+  for (const input of [null, [], { decision: {} }, { decision: "approved", reason: {} }]) {
+    assert.throws(() => assertReviewPayload(input), (error) => error.statusCode === 400);
+  }
+});
+
+test("MF4 limita o motivo a 500 caracteres", () => {
+  assert.throws(
+    () => assertReviewPayload({ decision: "rejected", reason: "x".repeat(501) }),
+    /500/,
+  );
+});
+```
+
 7. Caso negativo, erro comum ou risco que este passo evita.
 
 Sem motivo de rejeição, a decisão fica opaca e dificil de defender.
+Body `null`/array, `decision` não textual, `reason` objeto ou motivo com 501
+caracteres devolvem `400` com código estável no envelope do error handler.
 
 ### Passo 2 - Criar service de aprovação e entrada na pool
 
@@ -203,7 +292,10 @@ Atualizar candidatura e criar associação elegível quando aprovada.
 
 3. Instrucoes concretas.
 
-Cria o service abaixo.
+Cria o service abaixo. O helper `runInTransaction` deve rejeitar transações
+aninhadas e só repetir erros transientes; `writeAdminAudit` recebe `db` e
+`session`, remove campos sensíveis recursivamente e nunca abre uma segunda
+transação.
 
 4. Código completo.
 
@@ -215,7 +307,9 @@ Cria o service abaixo.
  * fluxo e cria a associação elegível apenas quando a candidatura é aprovada.
  */
 import { ObjectId } from "mongodb";
-import { getDb } from "../../config/database.js";
+import { getDb, runInTransaction } from "../../config/database.js";
+import { HttpError } from "../../utils/http-error.js";
+import { writeAdminAudit } from "../audit/audit.service.js";
 import { assertReviewPayload } from "./charity-review.validation.js";
 
 /**
@@ -270,58 +364,111 @@ export async function ensureCharityIndexes() {
  * @param {string} applicationId Identificador da candidatura.
  * @param {string} reviewerUserId Identificador do admin que decide.
  * @param {object} input Decisão recebida da UI.
+ * @param {{ requestId?: string }} [context] Metadados seguros do pedido HTTP.
  * @returns {Promise<object>} Resultado da rejeição ou associação criada.
  * @throws {Error} Quando a candidatura não existe, já foi decidida ou o payload e inválido.
  */
-export async function reviewCharityApplication(applicationId, reviewerUserId, input) {
-  const db = await getDb();
+export async function reviewCharityApplication(
+  applicationId,
+  reviewerUserId,
+  input,
+  context = {},
+) {
   const payload = assertReviewPayload(input);
-  const now = new Date();
   const _id = asObjectId(applicationId, "Candidatura");
+  const reviewerObjectId = asObjectId(reviewerUserId, "Revisor");
 
-  // Apenas candidaturas pendentes podem mudar de estado; isto evita decisões duplicadas.
-  const application = await db.collection("charity_applications").findOne({ _id, status: "pending" });
-  if (!application) {
-    const error = new Error("Candidatura pendente não encontrada.");
-    error.statusCode = 404;
-    throw error;
-  }
+  return runInTransaction(async ({ db, session }) => {
+    const now = new Date();
 
-  await db.collection("charity_applications").updateOne(
-    { _id },
-    {
-      $set: {
-        status: payload.decision,
-        reviewedAt: now,
-        reviewedBy: asObjectId(reviewerUserId, "Revisor"),
-        reviewReason: payload.reason,
-        updatedAt: now,
+    // O filtro reclama a decisão uma única vez, mesmo com dois admins concorrentes.
+    const application = await db.collection("charity_applications").findOneAndUpdate(
+      { _id, status: "pending" },
+      {
+        $set: {
+          status: payload.decision,
+          reviewedAt: now,
+          reviewedBy: reviewerObjectId,
+          reviewReason: payload.reason,
+          updatedAt: now,
+        },
       },
-    },
-  );
+      { returnDocument: "before", session },
+    );
 
-  if (payload.decision === "rejected") {
-    // Rejeição fecha a candidatura e não cria entrada na pool.
-    return { application: { id: applicationId, status: "rejected", reviewReason: payload.reason } };
-  }
+    if (!application) {
+      throw new HttpError(
+        409,
+        "A candidatura já foi decidida ou deixou de estar pendente.",
+        undefined,
+        "APPLICATION_ALREADY_REVIEWED",
+      );
+    }
 
-  // A associação nasce a partir da candidatura existente para manter rastreabilidade.
-  const charity = {
-    applicationId: _id,
-    name: application.name,
-    mission: application.mission,
-    websiteUrl: application.websiteUrl,
-    contactEmail: application.email,
-    status: "active",
-    poolStatus: "eligible",
-    approvedAt: now,
-    approvedBy: asObjectId(reviewerUserId, "Revisor"),
-    createdAt: now,
-    updatedAt: now,
-  };
+    const reviewedApplication = {
+      ...application,
+      status: payload.decision,
+      reviewedAt: now,
+      reviewedBy: reviewerObjectId,
+      reviewReason: payload.reason,
+      updatedAt: now,
+    };
 
-  const result = await db.collection("charities").insertOne(charity);
-  return { charity: publicCharity({ ...charity, _id: result.insertedId }) };
+    if (payload.decision === "rejected") {
+      await writeAdminAudit({
+        db,
+        session,
+        actorUserId: reviewerObjectId,
+        action: "charity.application_review",
+        targetType: "charity_application",
+        targetId: _id,
+        before: application,
+        after: reviewedApplication,
+        requestId: context.requestId,
+        metadata: { decision: payload.decision },
+      });
+
+      return {
+        application: {
+          id: applicationId,
+          status: "rejected",
+          reviewReason: payload.reason,
+        },
+      };
+    }
+
+    const charity = {
+      applicationId: _id,
+      name: application.name,
+      mission: application.mission,
+      websiteUrl: application.websiteUrl,
+      contactEmail: application.email,
+      status: "active",
+      poolStatus: "eligible",
+      approvedAt: now,
+      approvedBy: reviewerObjectId,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const result = await db.collection("charities").insertOne(charity, { session });
+    const persistedCharity = { ...charity, _id: result.insertedId };
+
+    await writeAdminAudit({
+      db,
+      session,
+      actorUserId: reviewerObjectId,
+      action: "charity.application_review",
+      targetType: "charity_application",
+      targetId: _id,
+      before: application,
+      after: { ...reviewedApplication, charityId: result.insertedId },
+      requestId: context.requestId,
+      metadata: { decision: payload.decision },
+    });
+
+    return { charity: publicCharity(persistedCharity) };
+  });
 }
 
 /**
@@ -338,7 +485,11 @@ export async function listEligibleCharities() {
 
 5. Explicação do código ou da decisão.
 
-O service só procura candidaturas `pending`. Isto torna a aprovação idempotente na pratica: a segunda tentativa já não encontra candidatura pendente.
+O `findOneAndUpdate` condicionado por `status: "pending"` reclama a decisão uma
+única vez. A candidatura, a eventual associação e o evento
+`charity.application_review` partilham a mesma transação e a mesma sessão: uma
+falha tardia reverte tudo. Uma segunda decisão não é tratada como sucesso
+idempotente; devolve conflito explícito porque os payloads podem divergir.
 
 6. Validação do passo.
 
@@ -348,7 +499,8 @@ node -e "import('./src/modules/charities/charity-review.service.js').then((m) =>
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Sem `applicationId` único em `charities`, a mesma candidatura podia entrar duas vezes na pool.
+Sem transação e sem `applicationId` único em `charities`, uma falha podia deixar
+a candidatura aprovada sem associação, ou criar duas entradas na pool.
 
 ### Passo 3 - Adicionar rotas de revisão
 
@@ -380,7 +532,11 @@ import { reviewCharityApplication } from "./charity-review.service.js";
  * @returns {Promise<void>}
  */
 export async function patchCharityApplicationReview(req, res) {
-  res.status(200).json(await reviewCharityApplication(req.params.id, req.user.id, req.body));
+  res.status(200).json(
+    await reviewCharityApplication(req.params.id, req.user.id, req.body, {
+      requestId: req.id,
+    }),
+  );
 }
 ```
 
@@ -436,21 +592,27 @@ Permitir ao admin ver candidaturas pendentes e decidir.
 
 Acrescenta `reviewApplication` ao cliente API e cria rota admin.
 
-4. Código completo.
+4. Código completo da página e patch contextual do cliente.
 
-Adicionar a `charitiesApi`:
+O recorte seguinte é para inserir no objeto `charitiesApi` já exportado pelo
+ficheiro; não é um módulo JavaScript autónomo e não substitui os métodos atuais:
 
-```js
+```text
 /**
  * Envia decisão administrativa para uma candidatura.
  *
  * @param {string} id Identificador da candidatura.
  * @param {object} input Decisão e motivo opcional.
+ * @param {object} [options] Opções do cliente, incluindo `signal`.
  * @returns {Promise<object>} Resultado da revisão.
  */
-reviewApplication(id, input) {
-  return apiClient.patch(`/api/charities/applications/${encodeURIComponent(id)}/review`, input);
-}
+reviewApplication(id, input, options = {}) {
+  return apiClient.patch(
+    `/api/charities/applications/${encodeURIComponent(id)}/review`,
+    input,
+    options,
+  );
+},
 ```
 
 `frontend/src/pages/AdminCharityApplicationsPage.jsx`
@@ -462,7 +624,7 @@ reviewApplication(id, input) {
  * Lista candidaturas pendentes e envia decisões para o backend, onde a role
  * `admin` e a regra de decisão única são aplicadas.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
@@ -473,29 +635,57 @@ import { toUserMessage } from "../services/api/apiErrors.js";
  */
 export function AdminCharityApplicationsPage() {
   const [applications, setApplications] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ page: 1, total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  /**
-   * Carrega candidaturas pendentes para revisão.
-   *
-   * @returns {Promise<void>}
-   */
-  async function loadApplications() {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await charitiesApi.listApplications("pending");
-      setApplications(response.applications);
-    } catch (apiError) {
-      setError(toUserMessage(apiError));
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [status, setStatus] = useState("");
+  const [busyIds, setBusyIds] = useState(() => new Set());
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const contextVersionRef = useRef(0);
+  const reservationsRef = useRef(new Set());
+  const mutationControllersRef = useRef(new Map());
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    loadApplications();
+    const contextVersion = ++contextVersionRef.current;
+    const controller = new AbortController();
+    setLoading(true);
+    setError("");
+
+    charitiesApi.listApplications(
+      { status: "pending", page, limit: 20 },
+      { signal: controller.signal },
+    ).then((response) => {
+      if (controller.signal.aborted || contextVersion !== contextVersionRef.current) return;
+      setApplications(response.applications);
+      setPagination({
+        page: response.page,
+        total: response.total,
+        totalPages: response.totalPages,
+      });
+    }).catch((apiError) => {
+      if (controller.signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
+      if (contextVersion !== contextVersionRef.current) return;
+      setError(toUserMessage(apiError));
+    }).finally(() => {
+      if (!controller.signal.aborted && contextVersion === contextVersionRef.current) {
+        setLoading(false);
+      }
+    });
+
+    return () => controller.abort();
+  }, [page, reloadVersion]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      contextVersionRef.current += 1;
+      for (const controller of mutationControllersRef.current.values()) controller.abort();
+      mutationControllersRef.current.clear();
+      reservationsRef.current.clear();
+    };
   }, []);
 
   /**
@@ -505,42 +695,120 @@ export function AdminCharityApplicationsPage() {
    * @param {"approved" | "rejected"} decision Decisão escolhida.
    * @returns {Promise<void>}
    */
-  async function decide(id, decision) {
+  async function decide(application, decision) {
+    const id = application.id;
+    if (reservationsRef.current.has(id)) return;
+    const actionLabel = decision === "approved" ? "aprovar" : "rejeitar";
+    if (!window.confirm(
+      `Confirmas ${actionLabel} ${application.name}? A decisão fica registada e não pode ser repetida.`,
+    )) return;
+
+    const contextVersion = contextVersionRef.current;
+    const controller = new AbortController();
+    reservationsRef.current.add(id);
+    mutationControllersRef.current.set(id, controller);
+    setBusyIds((current) => new Set(current).add(id));
     setError("");
+    setStatus("");
     try {
       await charitiesApi.reviewApplication(id, {
         decision,
-        reason: decision === "rejected" ? "Não cumpre os criterios minimos da pool." : "",
-      });
-      await loadApplications();
+        reason: decision === "rejected" ? "Não cumpre os critérios mínimos da pool." : "",
+      }, { signal: controller.signal });
+      if (controller.signal.aborted || contextVersion !== contextVersionRef.current) return;
+      setApplications((current) => current.filter((item) => item.id !== id));
+      setStatus(decision === "approved" ? "Candidatura aprovada." : "Candidatura rejeitada.");
+      setReloadVersion((value) => value + 1);
     } catch (apiError) {
+      if (controller.signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
+      if (contextVersion !== contextVersionRef.current) return;
       setError(toUserMessage(apiError));
+    } finally {
+      if (mutationControllersRef.current.get(id) === controller) {
+        mutationControllersRef.current.delete(id);
+        reservationsRef.current.delete(id);
+      }
+      if (mountedRef.current) {
+        setBusyIds((current) => {
+          const next = new Set(current);
+          next.delete(id);
+          return next;
+        });
+      }
     }
   }
-
-  if (loading) return <main><p>A carregar candidaturas...</p></main>;
 
   return (
     <main>
       <h1>Candidaturas</h1>
       {error && <p role="alert">{error}</p>}
-      {applications.length === 0 && <p>Não existem candidaturas pendentes.</p>}
+      {status && <p role="status">{status}</p>}
+      {loading && <p role="status">A carregar candidaturas...</p>}
+      {error && (
+        <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+          Tentar novamente
+        </button>
+      )}
+      {!loading && !error && applications.length === 0 && <p>Não existem candidaturas pendentes.</p>}
       {applications.map((application) => (
-        <article key={application.id}>
+        <article key={application.id} aria-busy={busyIds.has(application.id)}>
           <h2>{application.name}</h2>
           <p>{application.mission}</p>
-          <button type="button" onClick={() => decide(application.id, "approved")}>Aprovar</button>
-          <button type="button" onClick={() => decide(application.id, "rejected")}>Rejeitar</button>
+          <button
+            type="button"
+            disabled={busyIds.has(application.id)}
+            onClick={() => decide(application, "approved")}
+          >
+            {busyIds.has(application.id) ? "A processar..." : "Aprovar"}
+          </button>
+          <button
+            type="button"
+            disabled={busyIds.has(application.id)}
+            onClick={() => decide(application, "rejected")}
+          >
+            {busyIds.has(application.id) ? "A processar..." : "Rejeitar"}
+          </button>
         </article>
       ))}
+      {!loading && !error && pagination.totalPages > 1 ? (
+        <nav aria-label="Paginação de candidaturas">
+          <button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>
+            Anterior
+          </button>
+          <span>Página {pagination.page} de {pagination.totalPages} ({pagination.total})</span>
+          <button
+            type="button"
+            disabled={page >= pagination.totalPages}
+            onClick={() => setPage((value) => value + 1)}
+          >
+            Seguinte
+          </button>
+        </nav>
+      ) : null}
     </main>
   );
 }
 ```
 
+Em `frontend/src/routes/AppRoutes.jsx`:
+
+```jsx
+// ADICIONAR uma única vez; a guarda visual é composta depois em BK-MF7-02.
+const AdminCharityApplicationsPage = lazyNamedPage(
+  () => import("../pages/AdminCharityApplicationsPage.jsx"),
+  "AdminCharityApplicationsPage",
+);
+
+<Route path="/admin/charity-applications" element={<AdminCharityApplicationsPage />} />
+```
+
 5. Explicação do código ou da decisão.
 
-Esta página e simples, mas suficiente para o admin fechar RF42 e RF43 sem mexer diretamente na base de dados.
+O formulário consome o envelope paginado real, pede confirmação com o nome da
+associação e reserva cada ID num `ref` antes do render. Leitura e mutations têm
+`AbortController`; uma resposta de outro contexto não altera a página atual.
+Depois de sucesso, a linha sai e a listagem autoritativa é recarregada. A
+declaração lazy existe antes de a rota ser usada e não reintroduz imports eager.
 
 6. Validação do passo.
 
@@ -550,39 +818,65 @@ Entrar como admin, aprovar candidatura e confirmar que desaparece da lista pende
 
 Sem reload apos decisão, o admin pode tentar decidir duas vezes.
 
-## Critérios de aceite (mensuráveis)
+#### Critérios de aceite
 
 - Admin aprova candidatura pendente e a API cria uma associação `active` e `eligible`.
 - Admin rejeita candidatura pendente com motivo e não cria associação.
+- O validator exige body objeto não-null/não-array, `decision` string no enum e
+  `reason` string até 500 caracteres; não existe coerção por `String(...)`.
 - Utilizador sem admin não consegue decidir candidaturas.
-- A mesma candidatura não pode ser aprovada duas vezes.
+- A mesma candidatura não pode receber duas decisões: a perdedora devolve `409`
+  com `code: "APPLICATION_ALREADY_REVIEWED"`.
+- A decisão, a eventual associação e o audit log fazem commit ou rollback em
+  conjunto; o audit inclui o `requestId` quando existe.
+- A UI exige confirmação, bloqueia apenas a linha ativa, cancela pedidos no
+  unmount e não aplica respostas antigas.
+- A paginação mostra o total da API e permite chegar a candidaturas para além da
+  primeira página sem exceder `limit: 50`.
 
-## Validação final
+#### Validação final
 
 ```bash
 cd backend
 npm test
 ```
 
-Executar fluxo: submeter candidatura, aprovar como admin, listar elegíveis.
+Executar fluxo: submeter candidatura, aprovar como admin, listar elegíveis;
+depois injetar falha no audit e confirmar que candidatura e associação não
+ficaram parcialmente persistidas.
 
-## Evidence para PR/defesa
+#### Evidence para PR/defesa
 
 - `pr`: commit/PR com service de decisão e página admin.
 - `proof`: candidatura aprovada e associação criada.
-- `neg`: decisão sem admin, rejeição sem motivo e segunda aprovação.
+- `neg`: decisão sem admin, rejeição sem motivo, decisões concorrentes e falha
+  tardia do audit com rollback total.
 
-## Handoff
+#### Handoff
 
 O `BK-MF4-05` deve distribuir apenas por `charities` com `status: "active"` e `poolStatus: "eligible"`.
 
 ## Snippet técnico aplicável
 
-```js
-// Só candidaturas pending podem mudar de estado; isto evita decisão duplicada.
-const application = await db.collection("charity_applications").findOne({ _id, status: "pending" });
+Este recorte destaca a unidade transacional dentro da função completa criada no
+Passo 2. Não é JavaScript autónomo: `_id` e `update` pertencem aos argumentos e
+estado local dessa função.
+
+```text
+// Claim, entidade operacional e auditoria pertencem à mesma unidade de commit.
+return runInTransaction(async ({ db, session }) => {
+  const application = await db.collection("charity_applications").findOneAndUpdate(
+    { _id, status: "pending" },
+    update,
+    { returnDocument: "before", session },
+  );
+});
 ```
 
-## Changelog
+#### Changelog
 
 - `2026-06-13`: guia reescrito com aprovação, rejeição, entrada na pool, admin UI e negativos.
+- `2026-07-10`: revisão tornada concorrente e transacional, com audit sanitizado,
+  `requestId`, conflito estável e rollback por falha tardia.
+- `2026-07-10`: painel admin sincronizado com confirmação, busy state por linha,
+  cancelamento/anti-stale, paginação com metadata e mensagens PT-PT.

@@ -1,182 +1,194 @@
-# Arranque local da MF9
+# Arranque local e validação da MF9 — implementações dos alunos
 
-Este ficheiro explica como arrancar o FaithFlix localmente antes de trabalhar nos BKs da `MF9`.
+- `last_updated`: `2026-07-10`
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF9/BK-MF9-06-gate-mf9-regressao-evidencia-final.md`
+- `proof_scope`: comandos que existem nos manifests públicos `backend/` e `frontend/`; não valida a referência privada
 
-A `MF9` depende de backend e frontend em simultâneo: planos Pro/Família, qualidade por plano, partilha familiar, privacidade operacional e validação final precisam da API ligada e da interface web a comunicar com ela.
+## Objetivo e fronteira
+
+Este runbook serve exclusivamente as implementações dos alunos em `backend/` e
+`frontend/`. Os quatro documentos em `docs/runbooks/` são a autoridade
+operacional separada da lane `REFERENCE`; os respetivos scripts de worker,
+backup, restore, migração, health avançado e harness E2E não devem ser
+apresentados aqui como comandos já existentes nos projetos dos alunos.
+
+O `package.json` da raiz orquestra a referência privada. Por isso, um aluno não
+deve usar scripts root para arrancar, semear ou validar a sua implementação.
 
 ## Pré-requisitos
 
-Antes de começar, confirma:
+- Node.js 20 ou superior.
+- Dependências instaladas separadamente em `backend/` e `frontend/`.
+- MongoDB local/efémero reservado à implementação dos alunos.
+- Nunca usar uma base normal, partilhada ou de produção para testes destrutivos.
+- Nunca copiar `.env`, URI, cookies, tokens ou passwords para evidence.
 
-- Node.js `20` ou superior instalado.
-- npm disponível no terminal.
-- MongoDB disponível localmente ou uma ligação MongoDB Atlas configurada.
-- Repositório aberto na raiz do projeto FaithFlix.
-
-Para confirmar a versão do Node.js:
-
-```bash
-node --version
-```
-
-Se a versão for inferior a `20`, atualiza o Node.js antes de continuar.
-
-## 1. Preparar variáveis de ambiente
-
-O backend e o frontend têm ficheiros de exemplo. Cria os ficheiros locais apenas se ainda não existirem.
-
-Em macOS, Linux ou Git Bash:
+Confirma os scripts públicos antes de começar:
 
 ```bash
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
+npm --prefix backend pkg get scripts
+npm --prefix frontend pkg get scripts
 ```
 
-Em Windows PowerShell:
+Se um comando documentado não aparecer no manifest correspondente, para e
+regista drift documental; não copies um script da referência privada.
 
-```powershell
-Copy-Item backend/.env.example backend/.env
-Copy-Item frontend/.env.example frontend/.env
-```
+## Preparação do ambiente
 
-Não publiques credenciais reais no repositório, em screenshots ou em relatórios. O ficheiro `backend/.env` pode conter dados sensíveis, como a ligação à base de dados.
-
-Valores locais esperados:
-
-- `backend/.env`
-  - `PORT=3000`
-  - `FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173`
-  - `MONGODB_URI=mongodb://127.0.0.1:27017` ou a ligação Atlas fornecida pelo professor.
-  - `MONGODB_DB_NAME=faithflix`
-- `frontend/.env`
-  - `VITE_API_BASE_URL=http://localhost:3000`
-
-Se alterares a porta do backend, atualiza também `VITE_API_BASE_URL` no frontend.
-
-## 2. Instalar dependências
-
-Executa estes comandos a partir da raiz do projeto:
+Cria os ficheiros locais apenas quando ainda não existem:
 
 ```bash
-npm --prefix backend install
-npm --prefix frontend install
+cp -n backend/.env.example backend/.env
+cp -n frontend/.env.example frontend/.env
 ```
 
-Este passo instala as dependências da API Express e da app React/Vite.
+O exemplo público usa, por defeito:
 
-## 3. Arrancar o backend
+- API em `http://127.0.0.1:3000` ou `http://localhost:3000`;
+- frontend Vite em `http://127.0.0.1:5173` ou `http://localhost:5173`;
+- `VITE_API_BASE_URL=http://localhost:3000`;
+- `FRONTEND_ORIGIN` limitado às origens locais do frontend.
 
-Abre um terminal na raiz do projeto e executa:
+Altera valores apenas no `.env` local. Não os registes no terminal partilhado,
+no Git ou em screenshots.
+
+## Arranque em desenvolvimento
+
+Em dois terminais:
 
 ```bash
 npm --prefix backend run dev
 ```
 
-O backend deve ficar disponível em:
-
-```text
-http://localhost:3000
-```
-
-Para confirmar que a API arrancou, abre no browser:
-
-```text
-http://localhost:3000/health
-```
-
-Se aparecer uma resposta JSON, o backend está a responder.
-
-## 4. Arrancar o frontend
-
-Mantém o terminal do backend aberto. Abre um segundo terminal na raiz do projeto e executa:
-
 ```bash
-npm --prefix frontend run dev
+npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173
 ```
 
-O frontend deve ficar disponível em:
+Valida:
 
-```text
-http://localhost:5173
-```
+1. `GET http://127.0.0.1:3000/health` responde sem expor URI ou erro interno;
+2. `http://127.0.0.1:5173` abre o FaithFlix;
+3. o frontend comunica com a API sem erro CORS;
+4. uma sessão anónima não recebe privilégios administrativos.
 
-Abre esse endereço no browser e confirma que a aplicação carrega.
+O endpoint `/health` acima é o único atualmente presente no root dos alunos. O
+contrato final de `/health/live`, `/health/ready` e alias de readiness é ensinado
+no BK MF1 correspondente, mas só deve ser marcado como executável nesta lane
+depois de o código dos alunos o implementar e testar.
 
-Se o Vite escolher outra porta, por exemplo `5174`, a comunicação com o backend pode falhar por CORS. Neste projeto, o caminho mais simples é libertar a porta `5173` e voltar a arrancar o frontend.
+## Validação disponível nos manifests dos alunos
 
-## 5. Validação rápida antes de começar um BK
-
-Antes de iniciar qualquer BK da `MF9`, confirma:
-
-- O backend está ligado no terminal.
-- O frontend está ligado noutro terminal.
-- `http://localhost:3000/health` responde.
-- `http://localhost:5173` abre a app.
-- O ficheiro `frontend/.env` aponta para `http://localhost:3000`.
-- O ficheiro `backend/.env` autoriza `http://localhost:5173` em `FRONTEND_ORIGIN`.
-- A base de dados configurada em `MONGODB_URI` está acessível.
-
-## 6. Validações úteis durante a MF9
-
-Para validar o backend:
+Backend:
 
 ```bash
 npm --prefix backend test
+npm --prefix backend run smoke
 ```
 
-Para validar o frontend:
+Frontend:
 
 ```bash
+npm --prefix frontend run smoke
 npm --prefix frontend run build
 ```
 
-Estes comandos não substituem os testes manuais pedidos em cada BK, mas ajudam a detetar erros de código antes da validação final.
+O `smoke` frontend atual é um build técnico. Não substitui teste funcional em
+browser, acessibilidade, Firefox/WebKit/Safari ou integração com MongoDB.
 
-## 7. Problemas comuns
+## Media e player
 
-### Porta ocupada
+Ainda não existem vídeos reais fornecidos pelos alunos. Conteúdo publicado sem
+media continua no catálogo com `mediaStatus: "pending"`, `isPlayable: false` e
+CTA desativado.
 
-Se o backend não arrancar porque a porta `3000` está ocupada, fecha o processo antigo ou muda a porta no `backend/.env`.
+Fixtures MP4/HLS/DASH sintéticas da referência não são assets dos alunos e não
+devem ser copiadas para apresentar reprodução real. Mesmo quando uma fixture
+chega a `canplay`, isso não prova 4K, CDN, ABR, DRM, carga ou streaming real:
 
-Se mudares para `PORT=3001`, atualiza também:
+- `RNF08`: `NAO_PROVADO`;
+- `RNF10`: `NAO_PROVADO`;
+- `RNF23`: no máximo `PARCIAL_VALIDADO` na referência.
 
-```text
-VITE_API_BASE_URL=http://localhost:3001
-```
+## Pagamentos, família e pool
 
-### Frontend não comunica com backend
+- O checkout e as renovações permanecem simulados; não existe gateway real.
+- Uma membership familiar não representa pagamento nem receita para a pool.
+- `Idempotency-Key`, transações, leases e ledger v2 só podem ser considerados
+  implementados pelos alunos quando existirem no seu código e tiverem evidence
+  própria.
+- Não ativar subscrições diretamente para fazer uma demonstração passar.
+- Não executar migrações, worker ou fecho financeiro por comandos improvisados.
 
-Confirma:
+## E2E, seeds e Playwright
 
-- backend ligado;
-- `frontend/.env` com `VITE_API_BASE_URL=http://localhost:3000`;
-- `backend/.env` com `FRONTEND_ORIGIN=http://localhost:5173,http://127.0.0.1:5173`;
-- frontend aberto em `http://localhost:5173`.
+Este runbook não publica um comando E2E dos alunos porque os manifests públicos
+atuais não possuem um harness student-owned completo e isolado. Os scripts E2E
+da raiz pertencem à lane `REFERENCE`; executá-los não valida a entrega dos
+alunos.
 
-Depois de alterar ficheiros `.env`, para e volta a arrancar o servidor afetado.
+Quando um BK criar um harness dos alunos, o contrato mínimo será:
 
-### Erro de MongoDB
+- seed e browser em comandos separados;
+- `NODE_ENV=test` e opt-in explícito de seed;
+- URI loopback sem credenciais e com `replicaSet`;
+- DB exclusiva terminada em `_e2e`, diferente da DB normal;
+- `reuseExistingServer: false` em validação formal;
+- rede não-loopback bloqueada;
+- artefactos em `test-results/` ou `playwright-report/` antes de publicação;
+- execução direta, fora de scripts npm, através de
+  `npm exec playwright -- test`.
 
-Confirma:
+Até esse contrato existir na lane dos alunos, classifica o E2E como
+`BLOQUEADO_PRODUTO` ou `NAO_EXECUTADO`; nunca reutilizes o `PASS` da referência.
 
-- MongoDB local ligado, se usares `mongodb://127.0.0.1:27017`;
-- ligação Atlas correta, se usares MongoDB Atlas;
-- nome da base de dados em `MONGODB_DB_NAME=faithflix`;
-- rede disponível, se a base de dados estiver na cloud.
+## Comandos deliberadamente fora desta lane
 
-### Alterações não aparecem no browser
+Os seguintes comandos não existem no manifest público atual e não podem ser
+inventados neste runbook:
 
-Confirma que editaste ficheiros dentro de `frontend/` ou `backend/` e que o servidor correspondente está ligado. Se necessário, reinicia o servidor afetado.
+- `worker`;
+- `backup:db`;
+- `restore:verify`;
+- `migrate:payment-attempts:v2`;
+- suites root de media, acessibilidade ou E2E da referência.
 
-## Checklist final de arranque
+Para a operação da referência privada consulta, sem transpor os comandos para a
+entrega dos alunos:
 
-- [ ] Node.js `20+` confirmado.
-- [ ] `backend/.env` criado e revisto.
-- [ ] `frontend/.env` criado e revisto.
-- [ ] Dependências instaladas no backend.
-- [ ] Dependências instaladas no frontend.
-- [ ] Backend ligado com `npm --prefix backend run dev`.
-- [ ] Frontend ligado com `npm --prefix frontend run dev`.
-- [ ] Health-check aberto em `http://localhost:3000/health`.
-- [ ] App aberta em `http://localhost:5173`.
-- [ ] Pronto para começar o BK da `MF9`.
+- `docs/runbooks/ARRANQUE-E-SHUTDOWN-LOCAL.md`;
+- `docs/runbooks/WORKER-LOCAL.md`;
+- `docs/runbooks/BACKUP-RESTORE-LOCAL.md`;
+- `docs/runbooks/ROLLBACK-MANUAL-LOCAL.md`.
+
+## Evidence e gate MF9
+
+Para cada comando realmente executado, regista:
+
+- data e cwd;
+- comando sem valores secretos;
+- exit code;
+- contagem real e primeira falha útil;
+- implementação observada (`STUDENT`);
+- limitações e testes não executados.
+
+Um screenshot deve identificar rota, browser real, viewport, perfil e data. A
+evidence segue `docs/evidence/README.md` e não pode transformar um snapshot ou
+uma prova da referência em estado dos alunos.
+
+Checklist final:
+
+- [ ] Apenas `backend/` e `frontend/` foram arrancados.
+- [ ] Os comandos usados existem nos manifests públicos.
+- [ ] Nenhum seed, migração ou comando destrutivo foi executado sem isolamento e autorização.
+- [ ] Conteúdo sem media ficou não reproduzível.
+- [ ] Pagamento foi apresentado como simulado.
+- [ ] Nenhum resultado sintético foi apresentado como vídeo/4K/carga real.
+- [ ] Bloqueios e testes não executados ficaram explícitos.
+- [ ] O estado dos BK dos alunos não foi promovido pela referência.
+
+O gate técnico máximo conhecido da referência continua
+`GO_LOCAL_COM_RESSALVAS`; produção permanece `NO_GO_PRODUCAO`. Estes estados não
+fecham automaticamente o gate S13 dos alunos.

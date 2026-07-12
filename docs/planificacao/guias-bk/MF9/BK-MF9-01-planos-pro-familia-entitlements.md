@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF9-02`
 - `guia_path`: `docs/planificacao/guias-bk/MF9/BK-MF9-01-planos-pro-familia-entitlements.md`
-- `last_updated`: `2026-06-30`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -36,6 +36,7 @@ Este BK também preserva `RF35` e `RF38`: os fluxos de subscrição e checkout s
 - Atualizar o seed interno de planos para incluir Pro mensal, Pro anual, Família mensal e Família anual.
 - Expor entitlements públicos em `GET /api/subscriptions/plans`.
 - Garantir que o checkout simulado aceita os novos códigos Família quando o plano está ativo.
+- Preservar o contrato transacional/idempotente de checkout ao acrescentar os planos Família.
 - Atualizar a zona de planos da página de subscrição para mostrar tier, qualidade máxima, lugares familiares e funcionalidades.
 - Criar testes unitários para planos Pro/Família, compatibilidade e negativo de plano inexistente.
 
@@ -53,7 +54,7 @@ Este BK também preserva `RF35` e `RF38`: os fluxos de subscrição e checkout s
 - Antes: `BK-MF4-01` e `BK-MF4-02` entregam planos pagos e checkout simulado, mas a app só sabe se existe subscrição ativa.
 - Depois: a app passa a conhecer capacidades do plano, sem alterar a semântica dos códigos Pro históricos.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - Ler `BK-MF4-01` e `BK-MF4-02` antes de editar subscrições ou pagamentos.
 - Confirmar em `docs/RF.md` os critérios de `RF61`.
@@ -91,6 +92,32 @@ Este BK também preserva `RF35` e `RF38`: os fluxos de subscrição e checkout s
 | Testes | `backend/tests/unit/mf9-subscriptions.test.js` | Prova plano público, compatibilidade e negativos. |
 | Handoff | `BK-MF9-02`, `BK-MF9-03` | Usam `maxQuality`, `qualityRank`, `familySharing` e `maxFamilyMembers`. |
 
+##### Contrato vinculativo de checkout após a auditoria (2026-07-10)
+
+- Os planos Família entram no mesmo checkout simulado seguro; não criam uma rota alternativa de ativação.
+- `POST /api/payments/simulated-checkout` exige `Idempotency-Key` e calcula `requestHash` sobre operação/payload normalizados.
+- Replay da mesma chave/hash devolve a resposta original; a mesma chave com payload diferente devolve `409 IDEMPOTENCY_KEY_REUSED`.
+- Tentativa v2, subscrição, notificação e resposta fazem commit/rollback na mesma transação e capturam o snapshot do plano no momento da compra.
+- `paymentsApi` envia a chave no header `Idempotency-Key`, nunca no payload.
+  `SubscriptionPage` gera uma chave por `checkout:<planCode>`, preserva-a após
+  timeout/abort/falha ambígua da mesma intenção e só a elimina depois de sucesso.
+- Leituras e checkout usam `AbortSignal`; o unmount cancela pedidos, duplo clique
+  fica bloqueado antes do render e `REQUEST_ABORTED` não é apresentado como erro.
+- `maxFamilyMembers` inclui o owner; um plano com valor `5` disponibiliza quatro lugares além do owner.
+- Entitlements são fail-closed: subscrição `active` exige plano existente,
+  `active:true`, tier `pro|family` e qualidade suportada dentro do máximo do
+  tier. `trialing` só vale com `planCode: "trial"`; qualquer incoerência devolve
+  tier `none` e zero acesso premium.
+- `maxQuality` é uma string obrigatória e fechada. Um plano Família exige ainda
+  `familySharing: true` e `maxFamilyMembers` numérico inteiro entre 2 e 5; campos
+  ausentes, strings numéricas ou valores fora do limite nunca recebem defaults.
+- Planos ativos incompletos são omitidos de `GET /api/subscriptions/plans` e
+  recusados antes de checkout ou renovação, sem criar tentativa financeira.
+- O Passo 4 não redefine pagamentos: reutiliza integralmente o checkout/trial
+  transacional e idempotente do `BK-MF4-02` e acrescenta apenas os cenários
+  Família. Uma segunda implementação neste guia é proibida.
+- O provider permanece `faithflix-simulated`; não existe gateway real, webhook ou prova de faturação externa.
+
 #### Ficheiros a criar/editar/rever
 
 - EDITAR: `backend/src/modules/subscriptions/subscriptions.service.js`
@@ -121,9 +148,11 @@ Regista numa nota de trabalho que `faithflix-monthly` e `faithflix-yearly` ficam
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é de leitura técnica e evita que o aluno comece por inventar campos sem fonte documental.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é de leitura técnica e evita que o aluno comece por inventar campos sem fonte documental.
 
 Não há código porque o objetivo é alinhar requisitos. A decisão importante é perceber que `tier`, `maxQuality`, `qualityRank`, `familySharing` e `maxFamilyMembers` não são texto livre: são o contrato que os próximos services vão consumir. Este passo protege compatibilidade com MF4 e impede que o BK avance com nomes de planos incoerentes.
 
@@ -296,12 +325,14 @@ Adiciona `qualityRankForValue`, `entitlementsForPlan`, `publicPlan`, `ensureSubs
  */
 export function qualityRankForValue(value) {
   const normalized = String(value ?? "").trim().toLowerCase();
-  if (QUALITY_RANKS[normalized]) {
-    return QUALITY_RANKS[normalized];
-  }
+  return Object.hasOwn(QUALITY_RANKS, normalized)
+    ? QUALITY_RANKS[normalized]
+    : 0;
+}
 
-  const [match] = normalized.match(/\d+/) ?? [];
-  return match ? Number(match) : 0;
+export function isSupportedQualityValue(value) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  return Object.hasOwn(QUALITY_RANKS, normalized);
 }
 
 /**
@@ -310,19 +341,73 @@ export function qualityRankForValue(value) {
  * @param {object | null | undefined} plan Plano MongoDB.
  * @returns {object} Entitlements normalizados.
  */
-function entitlementsForPlan(plan) {
-  const tier = String(plan?.tier ?? "pro").trim().toLowerCase();
-  const defaults = ENTITLEMENTS[tier] ?? ENTITLEMENTS.pro;
-  const maxQuality = String(plan?.maxQuality ?? defaults.maxQuality);
+export function entitlementsForPlan(plan) {
+  const tier = String(plan?.tier ?? "").trim().toLowerCase();
+
+  if (!plan || plan.active !== true || !["pro", "family"].includes(tier)) {
+    return { ...ENTITLEMENTS.none };
+  }
+
+  const defaults = ENTITLEMENTS[tier];
+  const maxQuality = typeof plan.maxQuality === "string"
+    ? plan.maxQuality.trim().toLowerCase()
+    : "";
+
+  if (
+    !isSupportedQualityValue(maxQuality) ||
+    qualityRankForValue(maxQuality) > defaults.qualityRank
+  ) {
+    return { ...ENTITLEMENTS.none };
+  }
+
+  const familySharing = tier === "family";
+  const configuredFamilyMembers = plan.maxFamilyMembers;
+
+  if (
+    familySharing &&
+    (plan.familySharing !== true ||
+      !Number.isInteger(configuredFamilyMembers) ||
+      configuredFamilyMembers < 2 ||
+      configuredFamilyMembers > defaults.maxFamilyMembers)
+  ) {
+    return { ...ENTITLEMENTS.none };
+  }
 
   return {
     ...defaults,
     tier: defaults.tier,
     maxQuality,
-    qualityRank: qualityRankForValue(maxQuality) || defaults.qualityRank,
-    familySharing: Boolean(plan?.familySharing ?? defaults.familySharing),
-    maxFamilyMembers: Number(plan?.maxFamilyMembers ?? defaults.maxFamilyMembers),
+    qualityRank: qualityRankForValue(maxQuality),
+    familySharing,
+    maxFamilyMembers: familySharing ? configuredFamilyMembers : 1,
   };
+}
+
+/**
+ * Falha antes de billing quando o plano não produz entitlements válidos.
+ *
+ * @param {object | null | undefined} plan Plano lido na mesma transação.
+ * @returns {object} O mesmo plano, já validado para compra/ativação/renovação.
+ */
+export function assertPurchasablePlan(plan) {
+  if (entitlementsForPlan(plan).tier === "none") {
+    const error = new Error("Plano não encontrado.");
+    error.statusCode = 404;
+    error.code = "PLAN_NOT_FOUND";
+    throw error;
+  }
+
+  return plan;
+}
+
+export async function findPurchasablePlan(db, planCode, { session = null } = {}) {
+  const plan = await db.collection("subscription_plans").findOne(
+    { code: planCode, active: true },
+    { session },
+  );
+
+  // A validação ocorre antes de qualquer payment_attempt ou subscrição.
+  return assertPurchasablePlan(plan);
 }
 
 /**
@@ -383,13 +468,17 @@ export async function listPlans() {
     .sort({ priceCents: 1 })
     .toArray();
 
-  return { plans: plans.map(publicPlan) };
+  return {
+    plans: plans
+      .filter((plan) => entitlementsForPlan(plan).tier !== "none")
+      .map(publicPlan),
+  };
 }
 ```
 
 5. Explicação do código.
 
-`qualityRankForValue` converte texto de qualidade num número comparável e prepara o filtro do player. `entitlementsForPlan` aplica valores seguros quando o documento não traz todos os campos. `publicPlan` remove detalhes de persistência e devolve apenas o contrato que a UI pode mostrar. `ensureSubscriptionIndexes` garante unicidade por `code` e cria os planos base sem duplicar documentos. `listPlans` é a fronteira pública do endpoint. Este passo evita três erros comuns: regras diferentes por módulo, exposição de campos internos e quebra dos planos antigos.
+`qualityRankForValue` converte texto de qualidade num número comparável e `isSupportedQualityValue` fecha o vocabulário. `entitlementsForPlan` não completa dados em falta: qualquer plano incompleto recebe `none`. `publicPlan` remove detalhes de persistência e `listPlans` exclui planos inelegíveis. `ensureSubscriptionIndexes` garante unicidade por `code` e cria os planos base sem duplicar documentos. O mesmo helper é aplicado antes de checkout, ativação e renovação, impedindo cobrar um plano que depois não concederia acesso.
 
 6. Validação do passo.
 
@@ -397,7 +486,10 @@ Arranca o backend e executa `GET /api/subscriptions/plans`. A resposta deve cont
 
 7. Cenário negativo/erro esperado.
 
-Se um plano ativo não tiver `tier`, `entitlementsForPlan` deve cair em `pro` e não devolver `undefined` ao frontend.
+Se um plano ativo não tiver `tier`, `maxQuality` ou, no tier Família,
+`familySharing: true` e `maxFamilyMembers` inteiro, fica fora da resposta pública.
+Checkout e renovação desse código falham antes de qualquer ledger; nunca se faz
+fallback para Pro, 4K ou cinco lugares.
 
 ### Passo 4 - Manter checkout simulado compatível
 
@@ -413,66 +505,57 @@ Permitir que qualquer plano ativo, incluindo Família, possa ser comprado no flu
 
 3. Instruções do que fazer.
 
-Mantém a validação do payload, procura o plano por `planCode` ativo e chama `activateSubscription` apenas quando o resultado simulado for aprovado.
+Mantém a validação do payload e a chave idempotente. Importa
+`findPurchasablePlan` do service de subscrições e usa-o dentro da transação,
+antes de criar `payment_attempts`. `activateSubscription` recebe
+`{ db, session, plan, now }` e chama também `assertPurchasablePlan(plan)` como
+defesa em profundidade. O worker de renovação aplica o mesmo assert ao plano
+antes de criar a tentativa do novo ciclo.
 
 4. Código completo, correto e integrado com a app final.
 
 ```js
 // backend/src/modules/payments/payments.service.js
-/**
- * Regista checkout simulado e ativa a subscrição quando o pagamento é aprovado.
- *
- * @param {string} userId Identificador do utilizador autenticado.
- * @param {object} input Dados do checkout simulado.
- * @returns {Promise<object>} Resultado da tentativa e estado da subscrição.
- */
-export async function createSimulatedCheckout(userId, input) {
-  const db = await getDb();
-  const payload = assertCheckoutPayload(input);
-  const now = new Date();
-  // O plano é lido da base de dados para impedir compras de códigos inventados pelo browser.
-  const plan = await db.collection("subscription_plans").findOne({
-    code: payload.planCode,
-    active: true,
-  });
+import {
+  activateSubscription,
+  findPurchasablePlan,
+} from "../subscriptions/subscriptions.service.js";
 
-  if (!plan) {
-    const error = new Error("Plano não encontrado.");
-    error.statusCode = 404;
-    throw error;
-  }
-
-  const attempt = {
-    userId: userObjectId(userId),
-    planCode: payload.planCode,
-    paymentMethod: payload.paymentMethod,
-    provider: "faithflix-simulated",
-    status: payload.simulateOutcome === "approved" ? "approved" : "failed",
-    failureReason: payload.simulateOutcome === "failed" ? "Pagamento simulado recusado." : null,
-    createdAt: now,
-  };
-
-  const result = await db.collection("payment_attempts").insertOne(attempt);
-  if (attempt.status === "failed") {
-    // A tentativa recusada fica registada, mas nunca cria subscrição premium.
-    await createNotification(userId, {
-      type: "payment_failed",
-      title: "Pagamento recusado",
-      message: "O pagamento simulado foi recusado. Podes tentar novamente com outro método de teste.",
-    });
-
-    return { paymentAttemptId: String(result.insertedId), status: "failed", message: attempt.failureReason };
-  }
-
-  // `activateSubscription` concentra datas, estado e entitlements do plano escolhido.
-  const subscription = await activateSubscription(userId, payload.planCode);
-  return { paymentAttemptId: String(result.insertedId), status: "approved", ...subscription };
+async function loadCheckoutPlan(db, planCode, session) {
+  // A leitura usa a mesma sessão e falha antes da criação do ledger v2.
+  return findPurchasablePlan(db, planCode, { session });
 }
+```
+
+No início da callback transacional de `createSimulatedCheckout`, depois do
+replay idempotente e antes de calcular `now`, `attemptId` ou `status`, substitui
+a query direta por:
+
+```js
+const plan = await loadCheckoutPlan(db, payload.planCode, session);
+```
+
+Em `activateSubscription` e no caminho de renovação que já leu o plano, aplica
+o mesmo contrato antes da primeira escrita:
+
+```js
+assertPurchasablePlan(plan);
 ```
 
 5. Explicação do código.
 
-O input vem do frontend, mas a decisão nasce da base de dados: só planos ativos podem ser comprados. O `userId` vem da sessão autenticada, por isso o frontend não consegue comprar em nome de outra conta. O pagamento recusado devolve estado controlado e cria notificação, mas não ativa subscrição. O pagamento aprovado chama `activateSubscription`, que já conhece o plano pelo `planCode`. Assim, Família entra no fluxo sem duplicar lógica de pagamento.
+O checkout e o trial são implementados uma única
+vez no `BK-MF4-02`. Este BK reutiliza obrigatoriamente
+`createSimulatedCheckout(userId, input, idempotencyKey, context)` e limita-se a
+garantir que os planos Família completos passam pela mesma validação de
+entitlements, transação, ledger v2, notificação e audit. Não copies nem redefinas
+o service de pagamentos neste guia.
+
+O input vem do frontend, mas a decisão continua no service autoritativo do
+`BK-MF4-02`: só planos ativos e semanticamente completos chegam à criação do
+ledger, o `userId` vem da sessão e a chave vem do header. Família entra no fluxo
+sem uma segunda implementação de pagamentos e sem criar um percurso não
+transacional.
 
 6. Validação do passo.
 
@@ -480,7 +563,11 @@ Executa checkout simulado com `faithflix-family-monthly` e `simulateOutcome: "ap
 
 7. Cenário negativo/erro esperado.
 
-Com `planCode: "faithflix-family-inexistente"`, o backend deve devolver HTTP `404` com mensagem de plano não encontrado.
+Com `planCode: "faithflix-family-inexistente"`, o backend deve devolver HTTP
+`404` com mensagem de plano não encontrado. Repete o negativo com um plano
+`active: true` e finanças válidas, mas sem `tier`/`maxQuality` ou com campos
+Família incoerentes: deve devolver `404 PLAN_NOT_FOUND` e persistir zero
+`payment_attempts`, subscrições, notificações e audit logs.
 
 ### Passo 5 - Mostrar Pro/Família na página de subscrição
 
@@ -503,6 +590,8 @@ Adiciona os helpers `formatPrice`, `formatQuality` e `intervalLabels` se ainda n
 
 ```jsx
 // frontend/src/pages/SubscriptionPage.jsx
+import { EmptyState } from "../components/ui/EmptyState.jsx";
+
 const moneyFormatter = new Intl.NumberFormat("pt-PT", {
   currency: "EUR",
   style: "currency",
@@ -762,9 +851,11 @@ Regista no PR a resposta de planos, um checkout aprovado com Família e um negat
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. O trabalho aqui é validar e documentar a prova da entrega.
+Sem código neste passo.
 
 5. Explicação do código.
+
+O trabalho aqui é validar e documentar a prova da entrega.
 
 O código dos passos anteriores já criou o contrato. Este passo confirma que `maxQuality` existe para `BK-MF9-02` e que `familySharing` e `maxFamilyMembers` existem para `BK-MF9-03`. Se esta prova falhar, a MF9 não deve avançar, porque os BKs seguintes ficariam dependentes de campos inexistentes.
 
@@ -794,8 +885,17 @@ Se a resposta de planos não tiver `faithflix-family-monthly`, a MF9 não pode a
 - `faithflix-monthly` e `faithflix-yearly` continuam ativos.
 - Cada plano público inclui `tier`, `maxQuality`, `qualityRank`, `familySharing`, `maxFamilyMembers` e `features`.
 - Checkout simulado aceita `faithflix-family-monthly` e `faithflix-family-yearly`.
+- Checkout sem `Idempotency-Key` devolve `400 IDEMPOTENCY_KEY_REQUIRED`; replay não duplica tentativas, subscrições ou notificações.
+- Reutilização da mesma chave com outro plano/payload devolve `409 IDEMPOTENCY_KEY_REUSED`.
 - Plano inexistente devolve erro controlado e não cria subscrição.
+- Plano ativo com `maxQuality` ausente/inválido ou Família sem
+  `familySharing: true`/`maxFamilyMembers` inteiro fica fora da listagem e é
+  recusado em checkout e renovação sem criar ledger.
+- `qualityRankForValue` aceita apenas a allowlist `480p|720p|1080p|2160p|4k`;
+  `999p` e qualquer valor desconhecido devolvem rank `0`.
 - A página de subscrição mostra preço em EUR, qualidade máxima e lugares familiares.
+- Checkout Família envia a chave idempotente, reutiliza-a num retry ambíguo da
+  mesma intenção/payload e cancela pedidos no unmount.
 - Teste MF9 cobre Pro e Família.
 
 #### Validação final
@@ -804,7 +904,7 @@ Se a resposta de planos não tiver `faithflix-family-monthly`, a MF9 não pode a
 - `cd frontend && npm run build`
 - `bash scripts/validate-planificacao.sh`
 - Pedido manual ou automatizado: `GET /api/subscriptions/plans`
-- Negativos: plano inexistente, pagamento simulado recusado e payload inválido.
+- Negativos: plano inexistente/incompleto, pagamento simulado recusado, payload inválido, chave ausente e chave reutilizada com outro payload.
 
 #### Evidence para PR/defesa
 
@@ -820,3 +920,9 @@ Este BK entrega `tier`, `maxQuality`, `qualityRank`, `familySharing` e `maxFamil
 #### Changelog
 
 - `2026-06-30`: guia corrigido em modo `corrigir_apenas`, com texto PT-PT acentuado, componente de planos autocontido, teste MF9 completo para o contexto do BK e validações/negativos de `RF61`.
+- `2026-07-10`: checkout Família alinhado com `Idempotency-Key`, `requestHash`, ledger v2, transação única e limite familiar que inclui o owner.
+- `2026-07-10`: cliente/UI alinhados com header idempotente por plano,
+  reutilização em falha ambígua, abort/anti-stale e busy state.
+- `2026-07-10`: entitlements passam a exigir campos completos e tipos reais;
+  planos malformados deixam de receber defaults e são recusados antes de
+  listagem, checkout ou renovação.

@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF8-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF8/BK-MF8-02-alinhamento-visual-parte-ii.md`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -48,7 +48,7 @@ A parte II impede que a home fique polida enquanto os fluxos principais mantêm 
 - Antes: `BK-MF8-01` fechou tokens, header, navegação e home.
 - Depois: os ecrãs principais têm decisão visual final e entrada para testes finais.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - Ler `BK-MF8-01` antes de iniciar este BK.
 - Confirmar que a MF8 ativa tem exatamente `10` guias formais, de `BK-MF8-01` a `BK-MF8-10`.
@@ -110,9 +110,11 @@ Revê `frontend/src/pages/` e componentes de cards. Regista exemplos de estado n
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -142,9 +144,11 @@ Compara textos e hierarquia com documentação de MF4, sem inventar pagamentos r
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -174,9 +178,11 @@ Revê páginas com pedidos ao backend. Regista a mensagem visível para vazio, e
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -206,9 +212,11 @@ Usa screenshots por viewport e regista problemas por rota.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -238,9 +246,11 @@ Revê elementos interativos e estados de foco. Liga cada observação a RNF do h
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -270,9 +280,11 @@ Classifica diferenças como corrigida, aceite com ressalva ou bloqueante.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -302,9 +314,11 @@ Escreve handoff com rotas, estados, comandos e riscos visuais restantes.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -349,6 +363,24 @@ Resultado esperado: a validação documental fica em `PASS`; se existir falha t�
 - O handoff deve indicar decisões fechadas, ressalvas, riscos, blockers e owner da próxima ação.
 - Se houver `FAIL`, o próximo BK só pode avançar com decisão explícita do orientador ou com correção registada.
 
+##### Adendo de matriz responsiva e acessível
+
+A parte II deve entregar ao BK de testes uma matriz explícita com:
+
+- `390x844`, `768x900`, `1280x720` e `1440x900` sem overflow horizontal;
+- reflow equivalente a `200%` em `720x450`;
+- foco por teclado, contraste AA, targets `44x44 px`, labels e estados
+  semânticos;
+- header móvel fechado até `72 px`, menu com `Escape` e restituição do foco;
+- estados loading/error/empty/retry e CTA de media pendente não reproduzível;
+- rota, perfil, viewport, expected result, observed result e screenshot quando
+  aplicável.
+
+Uma validação preview-only é aceitável para DOM/ARIA/layout quando o limite é
+registado; não pode ser apresentada como full E2E ou prova de streaming real.
+
 #### Changelog
 
 - `2026-06-27`: guia corrigido para a MF8 final de 10 BKs, com estrutura obrigatória, conceitos específicos, passos sem código declarados e critérios de evidence mais concretos.
+- `2026-07-10`: parte II alinhada com quatro viewports, reflow, Axe, media
+  pendente e distinção entre preview e full E2E.

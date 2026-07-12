@@ -1,5 +1,13 @@
 # Evidence BK-MF6-01 - Regressão backend
 
+- `document_status`: `SUPERSEDED`
+- `snapshot_date`: `2026-07-10`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: template MF6 legado arquivado com placeholders preservados; não constitui procedimento atual, execução ou evidence de regressão
+
+> Arquivado em 2026-07-10: template duplicado com placeholders; não é evidence.
+
 - Owner: Kaue
 - Apoio: Matheus
 - Data da execução: PREENCHER_COM_DATA_REAL

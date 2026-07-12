@@ -1,5 +1,11 @@
 # Auditoria da auditoria de implementacao real_dev - MF7
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-26`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: reauditoria MF7 e evidence browser observadas nessa data; as contagens 60/60 e os PASS abaixo não são prova atual
+
 ## Resultado geral
 
 - Projeto: FaithFlix
@@ -118,7 +124,7 @@ A cadeia ativa e:
 | `BK-MF7-02` | `RF02`, `RF04`, `RNF13`, `RNF15`, `RNF16`, `RNF19` | `SessionContext.jsx`, `AdminRoute.jsx`, `AppHeader.jsx`, `AppRoutes.jsx`, `apiClient.js`, `auth.middleware.js` | Build frontend, regressao frontend, backend tests 49/49 fora da sandbox, browser JSON e inspecao estatica. |
 | `BK-MF7-03` | `RNF01`, `RNF02`, `RNF03`, `RNF04`, `RNF28`, `RNF38` | `tokens.css`, `global.css`, `AppLayout.jsx`, `SkipLink.jsx`, `REFINAMENTO-VISUAL-MOCKUP.md` | Build frontend, regressao frontend, browser JSON 5/5, pesquisa PT-PT com falsos positivos documentais. |
 | `BK-MF7-04` | `RNF01`, `RNF02`, `RNF03`, `RNF05`, `RNF38`, `RNF40` | `EmptyState.jsx`, `ContentCard.jsx`, paginas principais, `USABILIDADE-UX.md` | Build frontend, formatos `pt-PT`/EUR, estados de UI e pesquisa textual proporcional. |
-| `BK-MF7-05` | `RNF21`, `RNF22`, `RNF38`, `RNF40` | `GATE-UI-NAVEGACAO-SEGURA.md`, screenshots, browser JSON, `SkipLink.jsx` | Browser evidence 5/5, skip link por teclado, planificacao 60/60, backend 49/49 fora da sandbox e `git diff --check`. |
+| `BK-MF7-05` | `RNF21`, `RNF22`, `RNF38`, `RNF40` | `GATE-UI-NAVEGACAO-SEGURA.md`, screenshots, browser JSON, `SkipLink.jsx` | No snapshot: browser evidence 5/5, skip link por teclado, planificação 60/60, backend 49/49 fora da sandbox e `git diff --check`. |
 
 ## Implementacao encontrada
 
@@ -159,7 +165,7 @@ A cadeia ativa e:
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `AUD-AUD-MF7-P2-01` | `P2` | `CORRIGIDO` | `MF7`, `BK_IDS=[]` | A auditoria deve cobrir os cinco BKs oficiais da MF7. | O relatorio fonte estava centrado em `BK-MF7-05` e declarava `BK abrangido nesta execucao: BK-MF7-05`. | MF8 poderia receber uma leitura incompleta da MF7, apesar de a implementacao/evidence existirem. | Este relatorio foi reescrito para cobrir `BK-MF7-01..05`, rastreabilidade, fronteiras MF6/MF8 e validacoes atuais. | Nao. |
 
-## Findings de implementacao herdados e estado atual
+## Findings de implementacao herdados e estado observado no snapshot
 
 | Area | Findings anteriores | Estado atual |
 | --- | --- | --- |

@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF5-02`
 - `guia_path`: `docs/planificacao/guias-bk/MF5/BK-MF5-01-exportacao-dados-utilizador.md`
-- `last_updated`: `2026-06-16`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -57,7 +57,7 @@ Antes deste BK, a aplicação tem autenticação, sessão, conta, catálogo, his
 
 Depois deste BK, o utilizador autenticado consegue abrir a conta e descarregar um JSON com dados próprios. O backend filtra todas as consultas por `req.user.id` e nunca devolve `passwordHash`, tokens de sessão ou dados de outros utilizadores.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - `BK-MF1-01` criou a base Express modular.
 - `BK-MF1-03` criou `apiClient` no frontend.
@@ -97,20 +97,37 @@ Nos testes, validas pelo menos dois pontos: utilizador sem sessão recebe `401`,
 | Service | `buildUserDataExport(userId)` |
 | Fonte da identidade | `req.user.id` |
 | Resposta | `{ export: { generatedAt, user, sections } }` |
-| Frontend API | `privacyApi.exportMyData()` |
+| Minimização | allowlist recursiva por secção; campos desconhecidos são omitidos |
+| Frontend API | `privacyApi.exportMyData(options)` |
 | UI | `PrivacyExportPanel` dentro de `AccountPage` |
-| Teste | `apps/backend/tests/unit/mf5-privacy-export.test.js` |
+| Teste | `backend/tests/unit/mf5-privacy-export.test.js` |
+
+##### Contrato vinculativo da interface de exportação (Fase 5 - 2026-07-10)
+
+- `PrivacyExportPanel` cria um `AbortController` por exportação e cancela-o no
+  unmount. Uma resposta tardia não deve iniciar download nem alterar o estado de
+  uma página que já deixou de estar montada.
+- Um `ref` de operação ativa impede duplo clique antes do render seguinte. O
+  botão fica desativado e o painel expõe `aria-busy` enquanto prepara o JSON.
+- `REQUEST_ABORTED` não é apresentado como falha. Outros erros passam por
+  `toUserMessage`, sem reproduzir corpo bruto, stack ou detalhes internos.
+- O download só ocorre após resposta autoritativa e usa um `Blob` local
+  `application/json`; o cliente nunca envia `userId` nem persiste a exportação
+  em storage do browser.
+- Loading, erro, retry implícito por novo clique e sucesso usam PT-PT:
+  `A preparar...`, `Descarregar JSON` e `Exportação preparada`.
+- O Passo 4 é a implementação autoritativa deste contrato.
 
 #### Ficheiros a criar/editar/rever
 
-- CRIAR: `apps/backend/src/modules/privacy/privacy.service.js`
-- CRIAR: `apps/backend/src/modules/privacy/privacy.controller.js`
-- CRIAR: `apps/backend/src/modules/privacy/privacy.routes.js`
-- EDITAR: `apps/backend/src/app.js`
-- CRIAR: `apps/frontend/src/services/api/privacyApi.js`
-- CRIAR: `apps/frontend/src/components/privacy/PrivacyExportPanel.jsx`
-- EDITAR: `apps/frontend/src/pages/AccountPage.jsx`
-- CRIAR: `apps/backend/tests/unit/mf5-privacy-export.test.js`
+- CRIAR: `backend/src/modules/privacy/privacy.service.js`
+- CRIAR: `backend/src/modules/privacy/privacy.controller.js`
+- CRIAR: `backend/src/modules/privacy/privacy.routes.js`
+- EDITAR: `backend/src/app.js`
+- CRIAR: `frontend/src/services/api/privacyApi.js`
+- CRIAR: `frontend/src/components/privacy/PrivacyExportPanel.jsx`
+- EDITAR: `frontend/src/pages/AccountPage.jsx`
+- CRIAR: `backend/tests/unit/mf5-privacy-export.test.js`
 - REVER: `BK-MF2-01`, `BK-MF2-07`, `BK-MF3-01`, `BK-MF3-02`, `BK-MF4-01`, `BK-MF4-08`, `RF55`, `RNF15`, `RNF17`, `RNF19`, `RNF37`
 
 #### Tutorial técnico linear
@@ -122,33 +139,134 @@ Nos testes, validas pelo menos dois pontos: utilizador sem sessão recebe `401`,
 Criar a função que reúne dados do utilizador autenticado e remove campos que não devem sair da aplicação.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `apps/backend/src/modules/privacy/privacy.service.js`
+    - CRIAR: `backend/src/modules/privacy/privacy.service.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
 
-Cria a pasta `apps/backend/src/modules/privacy/`. Dentro dela, cria `privacy.service.js` com o código abaixo.
+Cria a pasta `backend/src/modules/privacy/`. Dentro dela, cria `privacy.service.js` com o código abaixo.
 
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// apps/backend/src/modules/privacy/privacy.service.js
+// backend/src/modules/privacy/privacy.service.js
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
 
-const USER_EXPORT_COLLECTIONS = [
-    "playback_progress",
-    "media_preferences",
-    "user_content_lists",
-    "content_ratings",
-    "content_comments",
-    "subscriptions",
-    "payment_attempts",
-    "trials",
-    "notification_preferences",
-    "notifications",
-];
+const EXPORT_SCALAR = Symbol("export-scalar");
+const OMIT_EXPORT_VALUE = Symbol("omit-export-value");
+const OWNED_DOCUMENT_FIELDS = {
+    _id: EXPORT_SCALAR,
+    userId: EXPORT_SCALAR,
+    createdAt: EXPORT_SCALAR,
+    updatedAt: EXPORT_SCALAR,
+};
+
+// Cada secção declara os únicos campos exportáveis, incluindo objetos nested.
+const USER_EXPORT_SECTIONS = Object.freeze({
+    playback_progress: {
+        ...OWNED_DOCUMENT_FIELDS,
+        contentId: EXPORT_SCALAR,
+        currentTimeSeconds: EXPORT_SCALAR,
+        durationSeconds: EXPORT_SCALAR,
+        completed: EXPORT_SCALAR,
+        lastWatchedAt: EXPORT_SCALAR,
+    },
+    media_preferences: {
+        ...OWNED_DOCUMENT_FIELDS,
+        values: {
+            subtitleLanguage: EXPORT_SCALAR,
+            audioLanguage: EXPORT_SCALAR,
+            quality: EXPORT_SCALAR,
+        },
+    },
+    user_content_lists: {
+        ...OWNED_DOCUMENT_FIELDS,
+        contentId: EXPORT_SCALAR,
+        type: EXPORT_SCALAR,
+    },
+    content_ratings: {
+        ...OWNED_DOCUMENT_FIELDS,
+        contentId: EXPORT_SCALAR,
+        value: EXPORT_SCALAR,
+    },
+    content_comments: {
+        ...OWNED_DOCUMENT_FIELDS,
+        contentId: EXPORT_SCALAR,
+        body: EXPORT_SCALAR,
+        status: EXPORT_SCALAR,
+        moderationReason: EXPORT_SCALAR,
+        deletedByUser: EXPORT_SCALAR,
+    },
+    charity_memberships: {
+        ...OWNED_DOCUMENT_FIELDS,
+        charityId: EXPORT_SCALAR,
+    },
+    subscriptions: {
+        ...OWNED_DOCUMENT_FIELDS,
+        planCode: EXPORT_SCALAR,
+        status: EXPORT_SCALAR,
+        currentPeriodStart: EXPORT_SCALAR,
+        currentPeriodEnd: EXPORT_SCALAR,
+        billingAnchorDay: EXPORT_SCALAR,
+        billingAnchorEndOfMonth: EXPORT_SCALAR,
+        cancelAtPeriodEnd: EXPORT_SCALAR,
+    },
+    payment_attempts: {
+        ...OWNED_DOCUMENT_FIELDS,
+        schemaVersion: EXPORT_SCALAR,
+        operation: EXPORT_SCALAR,
+        planCode: EXPORT_SCALAR,
+        paymentMethod: EXPORT_SCALAR,
+        provider: EXPORT_SCALAR,
+        status: EXPORT_SCALAR,
+        failureReason: EXPORT_SCALAR,
+        amountCents: EXPORT_SCALAR,
+        currency: EXPORT_SCALAR,
+        solidaritySharePercent: EXPORT_SCALAR,
+        interval: EXPORT_SCALAR,
+        approvedAt: EXPORT_SCALAR,
+        cycle: {
+            startsAt: EXPORT_SCALAR,
+            endsAt: EXPORT_SCALAR,
+        },
+        accountingEstimate: EXPORT_SCALAR,
+    },
+    trials: {
+        ...OWNED_DOCUMENT_FIELDS,
+        operation: EXPORT_SCALAR,
+        status: EXPORT_SCALAR,
+        startedAt: EXPORT_SCALAR,
+        endsAt: EXPORT_SCALAR,
+    },
+    notification_preferences: {
+        ...OWNED_DOCUMENT_FIELDS,
+        settings: {
+            inApp: EXPORT_SCALAR,
+            email: EXPORT_SCALAR,
+            continueWatching: EXPORT_SCALAR,
+        },
+    },
+    notifications: {
+        ...OWNED_DOCUMENT_FIELDS,
+        type: EXPORT_SCALAR,
+        title: EXPORT_SCALAR,
+        message: EXPORT_SCALAR,
+        readAt: EXPORT_SCALAR,
+    },
+});
+
+const USER_EXPORT_SCHEMA = {
+    id: EXPORT_SCALAR,
+    name: EXPORT_SCALAR,
+    email: EXPORT_SCALAR,
+    role: EXPORT_SCALAR,
+    accountStatus: EXPORT_SCALAR,
+    parentalMaxAgeRating: EXPORT_SCALAR,
+    createdAt: EXPORT_SCALAR,
+    updatedAt: EXPORT_SCALAR,
+};
 
 /**
  * Converte o id vindo da sessão para `ObjectId`.
@@ -166,34 +284,42 @@ function asUserObjectId(userId) {
 }
 
 /**
- * Converte valores MongoDB para JSON legível e estável.
+ * Projeta recursivamente um valor segundo um schema fechado.
  *
  * @param {unknown} value Valor vindo da base de dados.
+ * @param {unknown} schema Schema allowlist da posição atual.
  * @returns {unknown} Valor seguro para serialização.
  */
-function toExportValue(value) {
-    if (value instanceof ObjectId) {
-        return String(value);
+function sanitizeExportValue(value, schema) {
+    if (schema === EXPORT_SCALAR) {
+        if (value instanceof ObjectId) return String(value);
+        if (value instanceof Date) return value.toISOString();
+        if (
+            value === null
+            || ["string", "number", "boolean"].includes(typeof value)
+        ) return value;
+
+        // Um objeto inesperado nunca é percorrido por uma posição scalar.
+        return OMIT_EXPORT_VALUE;
     }
 
-    if (value instanceof Date) {
-        return value.toISOString();
+    if (
+        !schema
+        || typeof schema !== "object"
+        || Array.isArray(schema)
+        || !value
+        || typeof value !== "object"
+        || Array.isArray(value)
+    ) return OMIT_EXPORT_VALUE;
+
+    const entries = [];
+    for (const [key, nestedSchema] of Object.entries(schema)) {
+        if (!Object.hasOwn(value, key)) continue;
+        const sanitized = sanitizeExportValue(value[key], nestedSchema);
+        if (sanitized !== OMIT_EXPORT_VALUE) entries.push([key, sanitized]);
     }
 
-    if (Array.isArray(value)) {
-        return value.map(toExportValue);
-    }
-
-    if (value && typeof value === "object") {
-        return Object.fromEntries(
-            Object.entries(value).map(([key, nested]) => [
-                key,
-                toExportValue(nested),
-            ]),
-        );
-    }
-
-    return value;
+    return Object.fromEntries(entries);
 }
 
 /**
@@ -203,26 +329,27 @@ function toExportValue(value) {
  * @returns {Record<string, unknown>} Dados públicos da conta para exportação.
  */
 function toExportableUser(user) {
-    return toExportValue({
+    return sanitizeExportValue({
         id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        accountStatus: user.accountStatus ?? "active",
         parentalMaxAgeRating: user.parentalMaxAgeRating ?? 18,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-    });
+    }, USER_EXPORT_SCHEMA);
 }
 
 /**
  * Remove campos técnicos que não acrescentam transparência ao utilizador.
  *
  * @param {Record<string, unknown>} row Documento de uma coleção associada ao utilizador.
+ * @param {Record<string, unknown>} schema Allowlist da secção.
  * @returns {Record<string, unknown>} Documento serializável sem campos internos perigosos.
  */
-function toExportableRow(row) {
-    const { passwordHash, tokenHash, sessionToken, cookie, ...safeRow } = row;
-    return toExportValue(safeRow);
+function toExportableRow(row, schema) {
+    return sanitizeExportValue(row, schema);
 }
 
 /**
@@ -231,16 +358,17 @@ function toExportableRow(row) {
  * @param {import("mongodb").Db} db Ligação MongoDB.
  * @param {string} collectionName Nome da coleção a exportar.
  * @param {ObjectId} userObjectId Id do utilizador autenticado.
+ * @param {Record<string, unknown>} schema Allowlist da secção.
  * @returns {Promise<Record<string, unknown>[]>} Documentos exportáveis.
  */
-async function exportOwnedCollection(db, collectionName, userObjectId) {
+async function exportOwnedCollection(db, collectionName, userObjectId, schema) {
     const rows = await db
         .collection(collectionName)
         .find({ userId: userObjectId })
         .sort({ createdAt: -1 })
         .toArray();
 
-    return rows.map(toExportableRow);
+    return rows.map((row) => toExportableRow(row, schema));
 }
 
 /**
@@ -260,9 +388,14 @@ export async function buildUserDataExport(userId) {
     }
 
     const sectionEntries = await Promise.all(
-        USER_EXPORT_COLLECTIONS.map(async (collectionName) => [
+        Object.entries(USER_EXPORT_SECTIONS).map(async ([collectionName, schema]) => [
             collectionName,
-            await exportOwnedCollection(db, collectionName, userObjectId),
+            await exportOwnedCollection(
+                db,
+                collectionName,
+                userObjectId,
+                schema,
+            ),
         ]),
     );
 
@@ -276,16 +409,25 @@ export async function buildUserDataExport(userId) {
 
 5. Explicação do código.
 
-`USER_EXPORT_COLLECTIONS` enumera as coleções que pertencem ao utilizador e que já foram introduzidas por BKs anteriores. A lista usa `content_comments`, que é a coleção real criada pelo módulo de comentários, e inclui `media_preferences`, criada pelo fluxo de legendas, áudio e qualidade. A função `buildUserDataExport` começa por converter `req.user.id` para `ObjectId`, procura a conta e depois consulta cada coleção com `{ userId: userObjectId }`.
+`USER_EXPORT_SECTIONS` é simultaneamente a lista de coleções próprias e a
+allowlist recursiva de cada DTO. `content_comments`, `media_preferences` e
+`charity_memberships` usam apenas os campos declarados; payment attempts não
+exportam `idempotencyKey`, `requestHash`, `response` ou metadata técnica. A
+função começa por converter `req.user.id`, procura a conta e consulta cada
+coleção sempre com `{ userId: userObjectId }`.
 
-O código remove `passwordHash`, `tokenHash`, `sessionToken` e `cookie`. Isto evita que a exportação revele segredos ou material de autenticação. O frontend nunca envia o id do utilizador, logo não consegue alterar o dono da exportação.
+`sanitizeExportValue` só percorre chaves presentes no schema da posição atual.
+Um objeto nested colocado sob um campo scalar também é omitido. Assim, um campo
+novo como `metadata.credentials.private_key` não precisa de constar numa
+denylist para ficar fora: não pertence à allowlist. O frontend nunca envia o id
+do utilizador, logo não consegue alterar o dono da exportação.
 
 6. Validação do passo.
 
 Executa:
 
 ```bash
-cd apps/backend
+cd backend
 node -e "import('./src/modules/privacy/privacy.service.js').then(() => console.log('privacy service ok'))"
 ```
 
@@ -302,8 +444,8 @@ Se chamares `buildUserDataExport("id-invalido")`, o service deve lançar `Utiliz
 Expor a exportação através de uma rota HTTP protegida por sessão.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `apps/backend/src/modules/privacy/privacy.controller.js`
-    - CRIAR: `apps/backend/src/modules/privacy/privacy.routes.js`
+    - CRIAR: `backend/src/modules/privacy/privacy.controller.js`
+    - CRIAR: `backend/src/modules/privacy/privacy.routes.js`
     - LOCALIZAÇÃO: ficheiros completos
 
 3. Instruções do que fazer.
@@ -313,7 +455,7 @@ Cria o controller e a rota. A rota deve usar `requireAuth` antes do controller.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// apps/backend/src/modules/privacy/privacy.controller.js
+// backend/src/modules/privacy/privacy.controller.js
 import { buildUserDataExport } from "./privacy.service.js";
 
 /**
@@ -331,10 +473,10 @@ export async function getMyDataExport(req, res) {
 ```
 
 ```js
-// apps/backend/src/modules/privacy/privacy.routes.js
+// backend/src/modules/privacy/privacy.routes.js
 import { Router } from "express";
 import { asyncHandler } from "../../utils/async-handler.js";
-import { requireAuth } from "../auth/auth.middleware.js";
+import { requireAuth } from "../../middlewares/auth.middleware.js";
 import { getMyDataExport } from "./privacy.controller.js";
 
 export const privacyRouter = Router();
@@ -351,7 +493,7 @@ O controller não recebe `userId` de `req.params`, `req.query` ou `req.body`. A 
 Executa:
 
 ```bash
-cd apps/backend
+cd backend
 node -e "import('./src/modules/privacy/privacy.routes.js').then(({ privacyRouter }) => console.log(typeof privacyRouter))"
 ```
 
@@ -368,7 +510,7 @@ Um pedido sem cookie de sessão para `GET /api/privacy/export` deve devolver `40
 Registar a rota de privacidade na aplicação real.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `apps/backend/src/app.js`
+    - EDITAR: `backend/src/app.js`
     - LOCALIZAÇÃO: imports do topo e zona de montagem das rotas dentro de `createApp`
 
 3. Instruções do que fazer.
@@ -378,7 +520,7 @@ Adiciona o import de `privacyRouter` e monta-o com prefixo `/api/privacy`.
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// apps/backend/src/app.js
+// backend/src/app.js
 import { privacyRouter } from "./modules/privacy/privacy.routes.js";
 
 // Dentro de createApp(), junto das restantes rotas /api:
@@ -394,7 +536,7 @@ O prefixo `/api/privacy` separa operações de privacidade da rota genérica de 
 Executa:
 
 ```bash
-cd apps/backend
+cd backend
 node -e "import('./src/app.js').then(({ createApp }) => console.log(typeof createApp))"
 ```
 
@@ -411,9 +553,9 @@ Se esqueceres esta montagem, o service e a rota existem, mas `GET /api/privacy/e
 Permitir ao utilizador descarregar a exportação a partir da área da conta.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `apps/frontend/src/services/api/privacyApi.js`
-    - CRIAR: `apps/frontend/src/components/privacy/PrivacyExportPanel.jsx`
-    - EDITAR: `apps/frontend/src/pages/AccountPage.jsx`
+    - CRIAR: `frontend/src/services/api/privacyApi.js`
+    - CRIAR: `frontend/src/components/privacy/PrivacyExportPanel.jsx`
+    - EDITAR: `frontend/src/pages/AccountPage.jsx`
     - LOCALIZAÇÃO: ficheiros completos para os novos ficheiros; import e JSX final em `AccountPage`
 
 3. Instruções do que fazer.
@@ -423,24 +565,26 @@ Cria o cliente `privacyApi`, cria o componente `PrivacyExportPanel` e adiciona `
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// apps/frontend/src/services/api/privacyApi.js
+// frontend/src/services/api/privacyApi.js
 import { apiClient } from "./apiClient.js";
 
 export const privacyApi = {
     /**
      * Pede ao backend a exportação dos dados do utilizador autenticado.
      *
+     * @param {{ signal?: AbortSignal }} options Opções canceláveis do pedido.
      * @returns {Promise<{ export: Record<string, unknown> }>} Exportação em JSON.
      */
-    exportMyData() {
-        return apiClient.get("/api/privacy/export");
+    exportMyData(options = {}) {
+        return apiClient.get("/api/privacy/export", options);
     },
 };
 ```
 
 ```jsx
-// apps/frontend/src/components/privacy/PrivacyExportPanel.jsx
-import { useState } from "react";
+// frontend/src/components/privacy/PrivacyExportPanel.jsx
+import { useEffect, useRef, useState } from "react";
+import { toUserMessage } from "../../services/api/apiErrors.js";
 import { privacyApi } from "../../services/api/privacyApi.js";
 
 /**
@@ -452,6 +596,15 @@ export function PrivacyExportPanel() {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState("");
     const [error, setError] = useState("");
+    const operationRef = useRef(null);
+    const lifecycleEpochRef = useRef(0);
+
+    useEffect(() => () => {
+        // Sair da conta/rota invalida a resposta e cancela o transporte HTTP.
+        lifecycleEpochRef.current += 1;
+        operationRef.current?.controller.abort();
+        operationRef.current = null;
+    }, []);
 
     /**
      * Pede a exportação e cria um ficheiro JSON no browser.
@@ -459,32 +612,64 @@ export function PrivacyExportPanel() {
      * @returns {Promise<void>} Termina quando o ficheiro é preparado.
      */
     async function handleExport() {
+        // A ref reserva a operação no mesmo tick, antes de `loading` provocar render.
+        if (operationRef.current) return;
+        const controller = new AbortController();
+        const epoch = lifecycleEpochRef.current;
+        const operation = { controller, epoch };
+        operationRef.current = operation;
         setLoading(true);
         setStatus("");
         setError("");
 
         try {
-            const response = await privacyApi.exportMyData();
+            const response = await privacyApi.exportMyData({
+                signal: controller.signal,
+            });
+            if (
+                controller.signal.aborted
+                || epoch !== lifecycleEpochRef.current
+            ) return;
+
             const json = JSON.stringify(response.export, null, 2);
             const blob = new Blob([json], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
 
-            link.href = url;
-            link.download = `faithflix-export-${response.export.generatedAt}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
+            try {
+                link.href = url;
+                const timestamp = response.export.generatedAt.replace(/[:.]/gu, "-");
+                link.download = `faithflix-export-${timestamp}.json`;
+                document.body.append(link);
+                // O download só nasce neste ponto, depois da resposta autoritativa atual.
+                link.click();
+            } finally {
+                link.remove();
+                URL.revokeObjectURL(url);
+            }
 
-            setStatus("Exportação preparada com sucesso.");
+            setStatus("Exportação preparada.");
         } catch (requestError) {
-            setError(requestError.message);
+            if (
+                controller.signal.aborted
+                || requestError?.code === "REQUEST_ABORTED"
+            ) return;
+            if (epoch !== lifecycleEpochRef.current) return;
+            setError(toUserMessage(requestError));
         } finally {
-            setLoading(false);
+            if (operationRef.current === operation) {
+                operationRef.current = null;
+                if (epoch === lifecycleEpochRef.current) setLoading(false);
+            }
         }
     }
 
     return (
-        <section className="form-panel" aria-labelledby="privacy-export-title">
+        <section
+            className="form-panel"
+            aria-labelledby="privacy-export-title"
+            aria-busy={loading}
+        >
             <h2 id="privacy-export-title">Exportar dados</h2>
             <p>
                 Descarrega um ficheiro JSON com os dados associados à tua conta
@@ -493,7 +678,7 @@ export function PrivacyExportPanel() {
             {error ? <p role="alert">{error}</p> : null}
             {status ? <p role="status">{status}</p> : null}
             <button type="button" onClick={handleExport} disabled={loading}>
-                {loading ? "A preparar exportação..." : "Exportar dados"}
+                {loading ? "A preparar..." : "Descarregar JSON"}
             </button>
         </section>
     );
@@ -501,7 +686,7 @@ export function PrivacyExportPanel() {
 ```
 
 ```jsx
-// apps/frontend/src/pages/AccountPage.jsx
+// frontend/src/pages/AccountPage.jsx
 import { PrivacyExportPanel } from "../components/privacy/PrivacyExportPanel.jsx";
 
 // Dentro do return principal, depois do bloco de dados da conta:
@@ -510,15 +695,23 @@ import { PrivacyExportPanel } from "../components/privacy/PrivacyExportPanel.jsx
 
 5. Explicação do código.
 
-`privacyApi` reutiliza `apiClient`, que já envia cookies de sessão com os pedidos. O componente mostra loading, erro e sucesso. O ficheiro é criado a partir da resposta JSON, sem guardar dados pessoais em armazenamento persistente do browser.
+`privacyApi.exportMyData(options)` propaga o `AbortSignal` pelo cliente central.
+O painel reserva a operação numa ref síncrona, cancela-a no cleanup e compara o
+epoch do lifecycle antes de criar o Blob, iniciar exatamente um download ou
+alterar a UI. `REQUEST_ABORTED` fica silencioso; outros erros passam por
+`toUserMessage`. O ficheiro só existe em memória durante o download e nunca é
+guardado em storage persistente do browser.
 
 6. Validação do passo.
 
-Arranca backend e frontend, entra com um utilizador e abre `/conta`. Ao clicar em `Exportar dados`, deve ser preparado um ficheiro `faithflix-export-...json`.
+Arranca backend e frontend, entra com um utilizador e abre `/conta`. Ao clicar em
+`Descarregar JSON`, deve ser preparado um único ficheiro
+`faithflix-export-...json`.
 
 7. Cenário negativo/erro esperado.
 
-Se a sessão expirar, o botão deve mostrar a mensagem devolvida pelo backend, normalmente `Autenticação obrigatória.`. O componente não deve tentar corrigir isto com ids manuais.
+Se a sessão expirar, o botão mostra uma mensagem segura. Duplo clique reserva um
+único pedido; sair da rota durante a leitura cancela-a e não inicia download.
 
 ### Passo 5 - Criar teste unitário de minimização
 
@@ -527,7 +720,7 @@ Se a sessão expirar, o botão deve mostrar a mensagem devolvida pelo backend, n
 Provar que a exportação não devolve campos sensíveis nem dados de outro utilizador.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `apps/backend/tests/unit/mf5-privacy-export.test.js`
+    - CRIAR: `backend/tests/unit/mf5-privacy-export.test.js`
     - LOCALIZAÇÃO: ficheiro completo
 
 3. Instruções do que fazer.
@@ -537,7 +730,7 @@ Cria um teste com base de dados em memória, seguindo o padrão dos testes de `M
 4. Código completo, correto e integrado com a app final.
 
 ```js
-// apps/backend/tests/unit/mf5-privacy-export.test.js
+// backend/tests/unit/mf5-privacy-export.test.js
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { ObjectId } from "mongodb";
@@ -584,13 +777,25 @@ test("MF5 exporta apenas dados do utilizador autenticado sem campos sensíveis",
                         email: "ana@example.test",
                         role: "user",
                         passwordHash: "nao-deve-sair",
+                        profile: {
+                            credentials: { private_key: "nested-nao-deve-sair" },
+                        },
                     },
                 ]);
             }
 
             if (name === "notifications") {
                 return collection([
-                    { _id: new ObjectId(), userId, title: "Bem-vinda" },
+                    {
+                        _id: new ObjectId(),
+                        userId,
+                        type: "trial_started",
+                        title: "Bem-vinda",
+                        message: "O período experimental começou.",
+                        metadata: {
+                            authorization: "Bearer nao-deve-sair",
+                        },
+                    },
                     { _id: new ObjectId(), userId: otherUserId, title: "Outra conta" },
                 ]);
             }
@@ -606,7 +811,38 @@ test("MF5 exporta apenas dados do utilizador autenticado sem campos sensíveis",
                     {
                         _id: new ObjectId(),
                         userId,
-                        values: { subtitleLanguage: "pt", quality: "720p" },
+                        values: {
+                            subtitleLanguage: "pt",
+                            quality: "720p",
+                            api_key: "nested-nao-deve-sair",
+                            credentials: { token: "nested-nao-deve-sair" },
+                        },
+                    },
+                ]);
+            }
+
+            if (name === "payment_attempts") {
+                return collection([
+                    {
+                        _id: new ObjectId(),
+                        userId,
+                        status: "approved",
+                        amountCents: 1000,
+                        currency: "EUR",
+                        idempotencyKey: "nao-deve-sair",
+                        requestHash: "nao-deve-sair",
+                        response: { accessToken: "nested-nao-deve-sair" },
+                    },
+                ]);
+            }
+
+            if (name === "charity_memberships") {
+                return collection([
+                    { _id: new ObjectId(), userId, charityId: new ObjectId() },
+                    {
+                        _id: new ObjectId(),
+                        userId: otherUserId,
+                        charityId: new ObjectId(),
                     },
                 ]);
             }
@@ -615,29 +851,60 @@ test("MF5 exporta apenas dados do utilizador autenticado sem campos sensíveis",
         },
     });
 
-    const result = await buildUserDataExport(String(userId));
+    try {
+        const result = await buildUserDataExport(String(userId));
 
-    assert.equal(result.user.email, "ana@example.test");
-    assert.equal("passwordHash" in result.user, false);
-    assert.equal(result.sections.notifications.length, 1);
-    assert.equal(result.sections.notifications[0].title, "Bem-vinda");
-    assert.equal(result.sections.content_comments[0].body, "Comentário visível");
-    assert.equal(result.sections.media_preferences[0].values.quality, "720p");
+        // Ownership conserva apenas documentos cujo userId veio da sessão.
+        assert.equal(result.user.email, "ana@example.test");
+        assert.equal(result.sections.notifications.length, 1);
+        assert.equal(result.sections.charity_memberships.length, 1);
+        assert.equal(result.sections.charity_memberships[0].userId, String(userId));
 
-    setDbForTests(null);
+        // A allowlist mantém campos úteis, mas omite top-level e objetos nested livres.
+        assert.equal(result.sections.notifications[0].title, "Bem-vinda");
+        assert.equal("metadata" in result.sections.notifications[0], false);
+        assert.equal(result.sections.content_comments[0].body, "Comentário visível");
+        assert.deepEqual(result.sections.media_preferences[0].values, {
+            subtitleLanguage: "pt",
+            quality: "720p",
+        });
+        assert.equal(result.sections.payment_attempts[0].amountCents, 1000);
+        assert.equal("idempotencyKey" in result.sections.payment_attempts[0], false);
+
+        const serialized = JSON.stringify(result);
+        for (const forbidden of [
+            "passwordHash",
+            "private_key",
+            "authorization",
+            "api_key",
+            "credentials",
+            "idempotencyKey",
+            "requestHash",
+            "accessToken",
+            "nested-nao-deve-sair",
+            "Bearer nao-deve-sair",
+        ]) {
+            assert.equal(serialized.includes(forbidden), false);
+        }
+    } finally {
+        setDbForTests(null);
+    }
 });
 ```
 
 5. Explicação do código.
 
-O teste cria dois utilizadores em termos de dados: um é o dono da exportação e outro aparece numa notificação que não deve sair. A exportação deve incluir apenas a notificação do dono, deve trazer comentários reais de `content_comments`, deve trazer preferências de media e nunca deve incluir `passwordHash`.
+O teste cria dados do dono e de outra conta. Além do filtro de ownership, injeta
+segredos em campos top-level, metadata livre, preferências nested e resposta
+financeira. A exportação preserva apenas os campos declarados por secção; não
+depende de conhecer previamente cada alias de segredo para o remover.
 
 6. Validação do passo.
 
 Executa:
 
 ```bash
-cd apps/backend
+cd backend
 node --test tests/unit/mf5-privacy-export.test.js
 ```
 
@@ -651,10 +918,17 @@ Se removeres o filtro `{ userId: userObjectId }`, o teste passa a devolver notif
 
 - `GET /api/privacy/export` existe e exige autenticação.
 - A exportação usa `req.user.id`, sem aceitar `userId` enviado pelo frontend.
-- O JSON inclui conta, histórico, biblioteca, preferências de media, ratings, comentários de `content_comments`, subscrições, tentativas de pagamento simuladas, notificações e preferências existentes.
-- O JSON não inclui `passwordHash`, tokens, cookies ou dados de sessão.
-- A página `/conta` mostra botão de exportação com loading, erro e sucesso.
-- O teste unitário confirma minimização e ownership.
+- O JSON inclui conta, histórico, biblioteca, preferências de media, ratings, comentários de `content_comments`, `sections.charity_memberships`, subscrições, tentativas de pagamento simuladas, notificações e preferências existentes.
+- Conta e secções usam allowlists recursivas. Campos top-level ou nested fora do
+  schema, incluindo metadata, credentials, private keys, hashes e resposta
+  idempotente interna, são omitidos mesmo quando o nome do segredo é novo.
+- A página `/conta` mostra `Descarregar JSON`, `A preparar...`, erro seguro e
+  `Exportação preparada.`, com `aria-busy` durante a leitura.
+- `privacyApi.exportMyData(options)` propaga `signal`.
+- Duplo clique produz um único pedido; unmount cancela a leitura e nenhuma
+  resposta antiga inicia download ou mostra erro tardio.
+- O teste unitário confirma minimização por allowlist, segredos nested e ownership.
+- O teste confirma que apenas a `charity_membership` cujo `userId` é o da sessão entra na exportação.
 - Existem pelo menos 3 negativos documentados: sem sessão, id inválido em teste de service e tentativa de fuga de dados de outro utilizador.
 
 #### Validação final
@@ -662,7 +936,7 @@ Se removeres o filtro `{ userId: userObjectId }`, o teste passa a devolver notif
 Executa:
 
 ```bash
-cd apps/backend
+cd backend
 node --test tests/unit/mf5-privacy-export.test.js
 node -e "import('./src/app.js').then(({ createApp }) => console.log(typeof createApp))"
 ```
@@ -670,7 +944,7 @@ node -e "import('./src/app.js').then(({ createApp }) => console.log(typeof creat
 Depois executa no frontend:
 
 ```bash
-cd apps/frontend
+cd frontend
 npm run build
 ```
 
@@ -688,7 +962,7 @@ Resultado esperado:
 - `proof`: captura da página `/conta` com o botão `Exportar dados`.
 - `neg`: pedido sem sessão devolve `401`.
 - `neg`: teste confirma que dados de outro utilizador não entram na exportação.
-- `neg`: exportação não inclui campos sensíveis.
+- `neg`: metadata/credentials nested e campos financeiros internos não entram.
 
 #### Handoff
 
@@ -698,3 +972,8 @@ O próximo BK, `BK-MF5-02`, deve reutilizar o módulo `privacy`, a rota autentic
 
 - `2026-04-13`: criado guia base com contrato pedagógico v3.
 - `2026-06-16`: guia reescrito com módulo `privacy`, exportação autenticada, frontend, teste e critérios de privacidade.
+- `2026-07-10`: exportação RGPD alargada à `charity_membership` da própria conta.
+- `2026-07-10`: painel de exportação sincronizado com abort/anti-stale,
+  anti-duplo-clique, `aria-busy` e erros seguros em PT-PT.
+- `2026-07-10`: sanitização top-level substituída por allowlists recursivas por
+  secção; campos desconhecidos e segredos nested deixam de ser copiáveis.

@@ -1,5 +1,62 @@
 # Auditoria de implementacao real_dev MF9 - FaithFlix
 
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: limites/adendos locais atuais e snapshots MF9 delimitados; 4K/streaming/replica set reais não provados
+
+> **Limite probatório atual (2026-07-10):** os `PASS` e as referências a
+> 2160p/4K nos snapshots abaixo cobrem apenas entitlement, seleção de label e
+> remoção de URLs públicas. Não provam reprodução nem resolução 4K real.
+> `RNF08` e `RNF10` permanecem `NAO_PROVADO`; `RNF23` permanece
+> `PARCIAL_VALIDADO` com adapters e fixtures sintéticas locais.
+
+## Adendo de validade Fase 3 administrativa - 2026-07-10
+
+As execuções abaixo são snapshots de 2026-07-03 a 2026-07-05; contagens e gates
+não são prova atual. Os contratos funcionais RF61-RF63 não foram alterados por
+esta fatia. A baseline administrativa que a MF9 consome foi reforçada:
+`PATCH /api/users/:id/admin` confirma update, revogação de sessões e audit numa
+transação; `requestId` é preservado; `409 LAST_ACTIVE_ADMIN` protege o último
+admin sob concorrência. Review e membership de associações também são
+transacionais e auditadas, sem transferência implícita.
+
+A regressão local atual passou `14/14` em
+`f3-admin-transactions.test.js` + `mf5-validation.test.js`, sem DB/rede. O gate
+MF9 histórico não foi reclassificado por esse resultado e continua sem provar
+replica set real ou nova execução browser.
+
+### Adendo billing/família da mesma correção
+
+O checkout atual exige chave idempotente e persiste tentativa v2, subscrição e
+notificação numa transação. A família conta o owner no limite, serializa convite
+e aceite pela subscrição do owner e mantém membership/notificação atómicas. A
+pool lê somente pagamentos `schemaVersion: 2`, aprovados, não estimados e com
+`approvedAt` no mês UTC fechado; memberships e backfills estimados não são
+receita. Um worker separado com lease trata ciclos vencidos e o mês anterior,
+mas o adapter de renovação continua simulado.
+
+Nenhuma migração foi executada, nenhum worker foi ligado à DB configurada e não
+há nova prova de replica set, gateway, E2E ou produção. Por isso, os `PASS` e
+contagens históricas abaixo não são promovidos por este adendo.
+
+### Fecho final dos contratos ativos - 2026-07-10
+
+O fecho mensal sem associação elegível persiste agora
+`deferred_no_eligible_charities` como resultado terminal, sem retry infinito e
+sem redistribuição retroativa. O catch-up processa até 120 meses pendentes por
+passagem, atravessando lotes históricos já fechados. Membership de associação
+exige conta operacional e participa na exportação/eliminação RGPD; os audits de
+utilizadores e associações guardam apenas estado mínimo, sem email, telefone ou
+snapshots pessoais integrais. Nenhum gate ou resultado histórico abaixo foi
+reclassificado por este adendo.
+
+## Snapshot histórico — execuções MF9 observadas entre 2026-07-03 e 2026-07-05
+
+A partir desta fronteira, ficam preservados os resultados e comandos das
+execuções originais; não constituem prova atual.
+
 ## Execucao 2026-07-05 - MF9 completa
 
 ### Resumo executivo

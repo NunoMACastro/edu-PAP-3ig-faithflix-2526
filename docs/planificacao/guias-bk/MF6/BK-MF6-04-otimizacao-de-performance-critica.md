@@ -13,11 +13,11 @@
 - `dependencias`: `BK-MF6-02`
 - `rf_rnf`: `RNF09, RNF10, RNF11, RNF12`
 - `fase_documental`: `Fase 3`
-- `sprint`: `S11`
+- `sprint`: `S10`
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF6-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-04-otimizacao-de-performance-critica.md`
-- `last_updated`: `2026-06-20`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -55,7 +55,7 @@ Antes deste BK, existem requisitos de performance nos RNF, a pesquisa já tem pa
 
 Depois deste BK, o catálogo passa a responder com `page`, `limit`, `total` e `items`; o medidor local cobre todos os RNF do BK; a evidence deixa de ter valores fictícios; e o `BK-MF6-05` recebe resultados reais para confirmar que acessibilidade e UX não degradam páginas críticas.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - `BK-MF3-03` criou pesquisa unificada com paginação.
 - `BK-MF3-05` criou recomendação baseline em `GET /api/recommendations/me`.
@@ -100,9 +100,9 @@ Depois deste BK, o catálogo passa a responder com `page`, `limit`, `total` e `i
 
 #### Ficheiros a criar/editar/rever
 
-- EDITAR: `backend/src/modules/catalog/catalog.validation.js`
-- EDITAR: `backend/src/modules/catalog/catalog.controller.js`
-- EDITAR: `backend/src/modules/catalog/catalog.service.js`
+- REVER: `backend/src/modules/catalog/catalog.validation.js`
+- REVER: `backend/src/modules/catalog/catalog.controller.js`
+- REVER: `backend/src/modules/catalog/catalog.service.js`
 - CRIAR: `backend/scripts/measure-performance-baseline.mjs`
 - CRIAR: `docs/evidence/MF6/BK-MF6-04-performance.md`
 - REVER: `backend/src/modules/search/search.service.js`
@@ -120,110 +120,33 @@ Depois deste BK, o catálogo passa a responder com `page`, `limit`, `total` e `i
 Garantir que `GET /api/catalog?limit=12` devolve um payload limitado e mensurável para `RNF09`.
 
 2. Ficheiros envolvidos:
-    - EDITAR: `backend/src/modules/catalog/catalog.validation.js`
-    - EDITAR: `backend/src/modules/catalog/catalog.controller.js`
-    - EDITAR: `backend/src/modules/catalog/catalog.service.js`
-    - LOCALIZAÇÃO: função nova `parseCatalogPagination`, função completa `getCatalog` e função completa `listPublishedCatalog`
+    - REVER: `backend/src/modules/catalog/catalog.validation.js`
+    - REVER: `backend/src/modules/catalog/catalog.controller.js`
+    - REVER: `backend/src/modules/catalog/catalog.service.js`
+    - LOCALIZAÇÃO: `parsePublicCatalogFilters`, `getCatalog` e `listPublishedCatalog`
 
 3. Instruções do que fazer.
 
-Adiciona a validação de paginação ao módulo de catálogo, liga o controller aos query params e altera o service para usar `skip`, `limit` e `countDocuments`. Mantém o nome `items` na resposta para o frontend atual continuar a funcionar.
+Não cries outro parser nem substituas o service. Reutiliza a implementação
+canónica do `BK-MF2-03`: `parsePublicCatalogFilters` exige scalars decimais,
+limita `limit <= 50`, preserva filtros `type/taxonomyId`, e
+`listPublishedCatalog` devolve `{ items, page, limit, total, totalPages }` com
+ordenação estável `publishedAt`, `title`, `_id`. Neste passo mede-se o contrato;
+uma alteração só é autorizada se a medição demonstrar um problema e mantiver
+todos esses invariantes.
 
 4. Código completo, correto e integrado com a app final.
 
-```js
-// backend/src/modules/catalog/catalog.validation.js
-/**
- * Valida parâmetros públicos de paginação do catálogo.
- *
- * @param {Record<string, unknown>} input - Parâmetros brutos de query.
- * @returns {{ page: number, limit: number }} Página e limite seguros.
- */
-export function parseCatalogPagination(input = {}) {
-    const page = Number(input.page ?? 1);
-    const limit = Number(input.limit ?? 12);
-
-    // A página nunca pode ser zero ou negativa, porque isso criaria offsets inválidos na query MongoDB.
-    if (!Number.isInteger(page) || page < 1) {
-        throw new HttpError(400, "Pagina invalida.");
-    }
-
-    // O limite máximo protege RNF09 ao impedir que um pedido público descarregue o catálogo inteiro.
-    if (!Number.isInteger(limit) || limit < 1 || limit > 24) {
-        throw new HttpError(400, "Limite invalido.");
-    }
-
-    return { page, limit };
-}
-```
-
-```js
-// backend/src/modules/catalog/catalog.controller.js
-/**
- * Devolve conteúdo publicado com paginação pública.
- *
- * @param {import("express").Request} req Pedido HTTP com query params de paginação.
- * @param {import("express").Response} res Resposta HTTP enviada ao frontend.
- * @returns {Promise<unknown>} Resposta com `items`, `page`, `limit` e `total`.
- */
-export async function getCatalog(req, res) {
-    // A query fica no controller, mas a validação continua no service para proteger a API mesmo sem frontend.
-    return res.status(200).json(await listPublishedCatalog(req.query));
-}
-```
-
-```js
-// backend/src/modules/catalog/catalog.service.js
-import {
-    assertCatalogPayload,
-    assertStatus,
-    parseCatalogPagination,
-} from "./catalog.validation.js";
-```
-
-```js
-// backend/src/modules/catalog/catalog.service.js
-/**
- * Lista conteúdo público publicado com paginação segura.
- *
- * @param {Record<string, unknown>} [queryParams={}] Query params recebidos pela rota pública.
- * @returns {Promise<{ page: number, limit: number, total: number, items: Record<string, unknown>[] }>} Página pública do catálogo.
- */
-export async function listPublishedCatalog(queryParams = {}) {
-    const { page, limit } = parseCatalogPagination(queryParams);
-    const db = await getDb();
-    // O catálogo público nunca deve incluir rascunhos ou conteúdos arquivados.
-    const filter = { status: "published" };
-
-    const [contents, total] = await Promise.all([
-        db
-            .collection("contents")
-            .find(filter)
-            .sort({ publishedAt: -1, title: 1 })
-            // A paginação é feita no MongoDB para evitar carregar o catálogo inteiro em memória.
-            .skip((page - 1) * limit)
-            .limit(limit)
-            .toArray(),
-        // O total é contado em paralelo para manter a resposta útil sem duplicar a query de listagem.
-        db.collection("contents").countDocuments(filter),
-    ]);
-
-    return {
-        page,
-        limit,
-        total,
-        items: contents.map(publicContent),
-    };
-}
-```
+Sem código neste passo.
 
 5. Explicação do código.
 
-`parseCatalogPagination` aplica a mesma ideia que já existe na pesquisa: `page` começa em `1`, `limit` começa em `12` e o limite máximo fica em `24`. Isto protege `RNF09`, porque impede que um pedido público devolva todo o catálogo quando só precisa de uma página.
-
-`getCatalog` deixa de ignorar `req.query` e passa esses parâmetros ao service. O service usa `skip` e `limit` diretamente na query MongoDB, por isso a base de dados devolve apenas a página pedida. `countDocuments` permite ao frontend ou à evidence saber quantos itens publicados existem no total sem descarregar todos.
-
-O formato mantém `items`, por isso `CatalogPage.jsx`, que já faz `setItems(response.items)`, continua compatível. A parte que o aluno pode adaptar com segurança é o limite máximo `24`, desde que o valor continue documentado. O aluno não deve remover o filtro `status: "published"`, porque isso quebraria o contrato de catálogo público criado em `BK-MF2-03`.
+O contrato já pagina no MongoDB, conta o total e mantém a resposta compatível
+com a UI. A medição deve verificar o endpoint real sem reintroduzir coerções
+`Number(...)`, limites concorrentes ou um serializer alternativo. O filtro
+`status: "published"`, a allowlist pública e o desempate `_id` são parte da
+correção de segurança/estabilidade e não podem ser removidos para melhorar uma
+medição.
 
 6. Validação do passo.
 
@@ -236,7 +159,7 @@ Resultado esperado: HTTP `200` com `items`, `page`, `limit` e `total`; `items.le
 7. Cenário negativo/erro esperado.
 
 ```bash
-curl "http://127.0.0.1:3000/api/catalog?limit=100"
+curl -i "http://127.0.0.1:3000/api/catalog?limit=100"
 ```
 
 Resultado esperado: HTTP `400` com mensagem de limite inválido.
@@ -268,7 +191,35 @@ Cria a pasta `backend/scripts/` se ainda não existir e adiciona o ficheiro abai
 
 import { performance } from "node:perf_hooks";
 
-const baseUrl = process.env.FAITHFLIX_API_BASE_URL ?? "http://127.0.0.1:3000";
+const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+const REQUEST_TIMEOUT_MS = 5_000;
+
+function assertLocalBaseUrl(value) {
+    let parsed;
+    try {
+        parsed = new URL(value);
+    } catch {
+        throw new Error("FAITHFLIX_API_BASE_URL invalida.");
+    }
+    if (
+        parsed.protocol !== "http:" ||
+        !LOOPBACK_HOSTS.has(parsed.hostname) ||
+        parsed.username ||
+        parsed.password ||
+        parsed.search ||
+        parsed.hash ||
+        !["", "/"].includes(parsed.pathname)
+    ) {
+        throw new Error(
+            "FAITHFLIX_API_BASE_URL exige origem HTTP loopback sem credenciais, path, query ou fragmento.",
+        );
+    }
+    return parsed.origin;
+}
+
+const baseUrl = assertLocalBaseUrl(
+    process.env.FAITHFLIX_API_BASE_URL ?? "http://127.0.0.1:3000",
+);
 const sessionCookie = process.env.FAITHFLIX_SESSION_COOKIE ?? "";
 
 const publicCases = [
@@ -294,8 +245,10 @@ const authenticatedCases = [
  */
 async function measure(testCase, headers = {}) {
     const startedAt = performance.now();
-    const response = await fetch(`${baseUrl}${testCase.path}`, { headers });
-    await response.arrayBuffer();
+    const response = await fetchBytesWithTimeout(
+        `${baseUrl}${testCase.path}`,
+        { headers },
+    );
 
     return {
         name: testCase.name,
@@ -303,6 +256,28 @@ async function measure(testCase, headers = {}) {
         durationMs: Math.round(performance.now() - startedAt),
         thresholdMs: testCase.thresholdMs,
     };
+}
+
+async function fetchBytesWithTimeout(url, options = {}) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+        });
+        // O deadline abrange também o body; headers rápidos não podem mascarar
+        // uma resposta que nunca termina.
+        await response.arrayBuffer();
+        return response;
+    } catch (error) {
+        if (controller.signal.aborted) {
+            throw new Error("Pedido local excedeu o timeout de medicao.");
+        }
+        throw new Error("Falha segura ao contactar a API local.");
+    } finally {
+        clearTimeout(timeoutId);
+    }
 }
 
 /**
@@ -324,9 +299,12 @@ function percentile(values, ratio) {
  * @returns {void}
  */
 function assertSessionCookie() {
-    if (!sessionCookie) {
+    if (
+        !/^faithflix_session=[A-Za-z0-9._~%+\-/=]{16,512}$/u.test(sessionCookie) ||
+        /[\u0000-\u001F\u007F]/u.test(sessionCookie)
+    ) {
         throw new Error(
-            "Define FAITHFLIX_SESSION_COOKIE=faithflix_session=... para medir recomendacoes autenticadas.",
+            "Define um único cookie faithflix_session válido, sem controlos, para medir recomendacoes autenticadas.",
         );
     }
 }
@@ -356,15 +334,19 @@ const concurrentP95 = percentile(
     concurrentResults.map((result) => result.durationMs),
     0.95,
 );
+const concurrentFailureStatus = concurrentResults.find(
+    (result) => result.status < 200 || result.status >= 300,
+)?.status;
 
 results.push({
     name: "health_concorrente_20_p95",
-    status: 200,
+    // O resumo conserva o primeiro estado não-2xx; nunca fabrica um 200 para a rajada.
+    status: concurrentFailureStatus ?? 200,
     durationMs: concurrentP95,
     thresholdMs: 2000,
 });
 
-const unauthenticatedRecommendations = await fetch(
+const unauthenticatedRecommendations = await fetchBytesWithTimeout(
     `${baseUrl}/api/recommendations/me`,
 );
 
@@ -380,14 +362,17 @@ if (unauthenticatedRecommendations.status !== 401) {
 console.table(results);
 
 const failures = results.filter(
-    (result) => result.status >= 400 || result.durationMs > result.thresholdMs,
+    (result) =>
+        result.status < 200
+        || result.status >= 300
+        || result.durationMs > result.thresholdMs,
 );
 
 if (failures.length > 0) {
     console.error("Performance MF6: FAIL");
     for (const failure of failures) {
         console.error(
-            `${failure.name}: ${failure.durationMs}ms acima do limite ${failure.thresholdMs}ms`,
+            `${failure.name}: HTTP ${failure.status}, ${failure.durationMs}ms, limite ${failure.thresholdMs}ms`,
         );
     }
     process.exitCode = 1;
@@ -398,9 +383,20 @@ if (failures.length > 0) {
 
 5. Explicação do código.
 
-O script mede três endpoints públicos e um endpoint autenticado. `catalog` e `search` fecham `RNF09`; `recommendations` fecha `RNF11`; a rajada de 20 pedidos a `/health` dá um sinal local para `RNF10`; e o uso de módulos separados, sem estado global novo, preserva `RNF12`.
+O script mede três endpoints públicos e um endpoint autenticado. `catalog` e
+`search` fecham `RNF09`; `recommendations` fecha `RNF11`; a rajada de 20 pedidos
+a `/health` dá um sinal local para `RNF10`; e o uso de módulos separados, sem
+estado global novo, preserva `RNF12`. O resumo concorrente usa o primeiro estado
+não-2xx observado, pelo que uma readiness rápida mas indisponível continua a
+falhar.
 
-`measure` lê a resposta completa com `arrayBuffer()`, porque medir apenas o início da resposta podia esconder payloads lentos. `percentile` calcula o P95 da rajada concorrente, evitando que a decisão dependa só do pedido mais rápido. `assertSessionCookie` impede uma falsa medição de recomendações sem sessão real. O cookie entra apenas no header do pedido autenticado e não aparece em `console.table`, `console.error` ou evidence.
+`measure` lê a resposta completa com `arrayBuffer()`, porque medir apenas o
+início da resposta podia esconder payloads lentos. `percentile` calcula o P95 da
+rajada concorrente, evitando que a decisão dependa só do pedido mais rápido. A
+validação exige `2xx`, além do tempo, e nunca substitui os estados individuais
+por `200`. `assertSessionCookie` impede uma falsa medição de recomendações sem
+sessão real. O cookie entra apenas no header do pedido autenticado e não aparece
+em `console.table`, `console.error` ou evidence.
 
 O negativo sem sessão confirma que `/api/recommendations/me` continua protegido por autenticação. Se esse pedido devolver algo diferente de `401`, o script transforma o caso em falha para evitar uma otimização que exponha recomendações de outro utilizador.
 
@@ -435,18 +431,20 @@ Executa os pedidos negativos abaixo com o backend ativo. Não removas validaçõ
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo valida contratos que ficaram implementados nos passos anteriores e em BKs anteriores.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo valida contratos que ficaram implementados nos passos anteriores e em BKs anteriores.
 
 O objetivo aqui é provar que performance não transformou a API num caminho permissivo. Catálogo deve rejeitar limites demasiado altos, pesquisa deve rejeitar queries demasiado curtas e recomendações devem exigir sessão.
 
 6. Validação do passo.
 
 ```bash
-curl "http://127.0.0.1:3000/api/catalog?limit=100"
-curl "http://127.0.0.1:3000/api/search?q=f&limit=12"
-curl "http://127.0.0.1:3000/api/recommendations/me"
+curl -i "http://127.0.0.1:3000/api/catalog?limit=100"
+curl -i "http://127.0.0.1:3000/api/search?q=f&limit=12"
+curl -i "http://127.0.0.1:3000/api/recommendations/me"
 ```
 
 Resultados esperados:
@@ -477,6 +475,12 @@ Cria o ficheiro abaixo e substitui cada `PREENCHER_COM_*` apenas depois de execu
 
 ```md
 # Evidence BK-MF6-04 - Performance crítica
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF6/BK-MF6-04-otimizacao-de-performance-critica.md`
+- `proof_scope`: medições e budgets realmente observados pelos alunos; não prova CDN, carga ou infraestrutura de produção
 
 - Owner: Davi
 - Apoio: Mateus
@@ -547,9 +551,11 @@ Depois de alterar o contrato de catálogo e de medir recomendações, executa o 
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. A validação usa Vite, já existente no frontend.
+Sem código neste passo.
 
 5. Explicação do código.
+
+A validação usa Vite, já existente no frontend.
 
 Otimização frontend pode quebrar imports, estado React ou JSX. O build é a prova mínima antes de abrir o gate de acessibilidade. Este passo também confirma que a resposta de catálogo com `items`, `page`, `limit` e `total` continua a encaixar no consumo atual.
 
@@ -574,6 +580,13 @@ Se o build falhar por import removido ou por alteração de shape da resposta, c
 - `GET /api/search?q=f&limit=12` devolve HTTP `400`.
 - `GET /api/recommendations/me` é medido com cookie de sessão real e fica abaixo de 3000ms.
 - `GET /api/recommendations/me` sem cookie devolve HTTP `401`.
+- O script recusa base URL não HTTP-loopback, credenciais/path/query/fragmento
+  e cookie fora do formato único `faithflix_session=...` ou com controlos; todos
+  os fetch e a leitura integral do body têm o mesmo timeout por
+  `AbortController` e erro sanitizado. Um double que entrega headers mas nunca
+  termina o body tem de abortar no deadline.
+- Os curls negativos imprimem o status HTTP com `-i`; corpo isolado nunca conta
+  como prova de `400`/`401`.
 - A rajada local de 20 pedidos a `/health` regista P95 abaixo de 2000ms.
 - A evidence tem valores reais ou placeholders `PREENCHER_COM_*`, nunca `0ms`/`PASS` fictícios.
 - Nenhuma validação, guard, ownership ou auditoria foi removida para melhorar tempo.

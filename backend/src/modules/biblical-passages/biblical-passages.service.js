@@ -5,6 +5,7 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
+import { getEpisodeSeries } from "../catalog/catalog-hierarchy.js";
 import {
     asObjectId,
     assertBiblicalPassageAssociationPayload,
@@ -340,6 +341,10 @@ export async function listBiblicalPassagesForPublishedContent(idOrSlug) {
 
     if (!content) {
         throw new HttpError(404, "Conteudo nao encontrado.");
+    }
+
+    if (content.type === "episode") {
+        await getEpisodeSeries(db, content.seriesId, { requirePublished: true });
     }
 
     const associations = await db

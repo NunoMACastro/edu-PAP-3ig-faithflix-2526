@@ -7,6 +7,11 @@ import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
 import { createContinueWatchingNotification } from "../notifications/notifications.service.js";
 import {
+    episodeCanonicalPath,
+    getEpisodeSeries,
+    publicSeriesSummary,
+} from "../catalog/catalog-hierarchy.js";
+import {
     filterQualityOptionsByEntitlements,
     getEffectiveSubscriptionAccess,
     qualityRankForValue,
@@ -124,6 +129,7 @@ function publicPlaybackContent(content, preferences, entitlements) {
     return {
         id: String(content._id),
         title: content.title,
+        type: content.type,
         durationSeconds: content.durationSeconds,
         media: resolvePlayableMedia(content, preferences, entitlements),
         tracks: content.tracks ?? { subtitles: [], audio: [] },
@@ -133,7 +139,82 @@ function publicPlaybackContent(content, preferences, entitlements) {
         ),
         preferences,
         entitlements,
+        ...(content.type === "episode"
+            ? {
+                  seriesId: String(content.seriesId),
+                  seasonNumber: content.seasonNumber,
+                  episodeNumber: content.episodeNumber,
+              }
+            : {}),
     };
+}
+
+/**
+ * Constrói navegação contextual entre episódios publicados da mesma série.
+ *
+ * @param {import("mongodb").Db} db Base de dados MongoDB.
+ * @param {Record<string, unknown>} episode Episódio atual.
+ * @param {Record<string, unknown>} series Série publicada.
+ * @returns {Promise<{ previousEpisode: Record<string, unknown> | null, nextEpisode: Record<string, unknown> | null }>} Navegação adjacente.
+ */
+async function loadEpisodeNavigation(db, episode, series) {
+    const episodes = await db
+        .collection("contents")
+        .find({
+            type: "episode",
+            seriesId: series._id,
+            status: "published",
+        })
+        .sort({ seasonNumber: 1, episodeNumber: 1, title: 1 })
+        .toArray();
+    const currentIndex = episodes.findIndex(
+        (candidate) => String(candidate._id) === String(episode._id),
+    );
+
+    /**
+     * Converte um episódio adjacente num link seguro.
+     *
+     * @param {Record<string, unknown> | undefined} candidate Episódio adjacente.
+     * @returns {Record<string, unknown> | null} Link contextual.
+     */
+    function navigationItem(candidate) {
+        if (!candidate) {
+            return null;
+        }
+
+        return {
+            id: String(candidate._id),
+            title: candidate.title,
+            slug: candidate.slug,
+            seasonNumber: candidate.seasonNumber,
+            episodeNumber: candidate.episodeNumber,
+            canonicalPath: episodeCanonicalPath(series, candidate),
+        };
+    }
+
+    return {
+        previousEpisode: navigationItem(episodes[currentIndex - 1]),
+        nextEpisode: navigationItem(episodes[currentIndex + 1]),
+    };
+}
+
+/**
+ * Valida se o conteúdo pode ser reproduzido e carrega a série do episódio.
+ *
+ * @param {import("mongodb").Db} db Base de dados MongoDB.
+ * @param {Record<string, unknown>} content Conteúdo publicado.
+ * @returns {Promise<Record<string, unknown> | null>} Série do episódio ou null.
+ */
+async function assertPlayableHierarchy(db, content) {
+    if (content.type === "series") {
+        throw new HttpError(409, "A serie nao e reproduzivel; escolhe um episodio.");
+    }
+
+    if (content.type !== "episode") {
+        return null;
+    }
+
+    return getEpisodeSeries(db, content.seriesId, { requirePublished: true });
 }
 
 /**
@@ -172,6 +253,8 @@ export async function getPlayback(contentId, userId) {
         throw new HttpError(404, "Conteudo nao encontrado.");
     }
 
+    const series = await assertPlayableHierarchy(db, content);
+
     const user = await db.collection("users").findOne({ _id: userObjectId });
     assertParentalAccess(user, content);
 
@@ -182,9 +265,18 @@ export async function getPlayback(contentId, userId) {
         contentId: contentObjectId,
     });
 
+    const hierarchy = series
+        ? {
+              series: publicSeriesSummary(series),
+              canonicalPath: episodeCanonicalPath(series, content),
+              ...(await loadEpisodeNavigation(db, content, series)),
+          }
+        : {};
+
     return {
         content: publicPlaybackContent(content, preferences, effectiveAccess.entitlements),
         progress: publicProgress(progress, content.durationSeconds),
+        ...hierarchy,
     };
 }
 
@@ -215,6 +307,8 @@ export async function savePlaybackProgress(contentId, userId, input) {
     error.statusCode = 404;
     throw error;
   }
+
+  await assertPlayableHierarchy(db, content);
 
   const progress = assertProgressPayload(input, content.durationSeconds);
   const now = new Date();
@@ -271,13 +365,48 @@ export async function listContinueWatching(userId) {
         ])
         .toArray();
 
-    return rows.map((row) => ({
-        id: String(row.content._id),
-        title: row.content.title,
-        slug: row.content.slug,
-        posterUrl: row.content.assets?.posterUrl ?? "",
-        currentTimeSeconds: row.currentTimeSeconds,
-        durationSeconds: row.durationSeconds,
-        lastWatchedAt: row.lastWatchedAt,
-    }));
+    const items = await Promise.all(
+        rows.map(async (row) => {
+            const item = {
+                id: String(row.content._id),
+                title: row.content.title,
+                slug: row.content.slug,
+                type: row.content.type,
+                posterUrl: row.content.assets?.posterUrl ?? "",
+                currentTimeSeconds: row.currentTimeSeconds,
+                durationSeconds: row.durationSeconds,
+                lastWatchedAt: row.lastWatchedAt,
+            };
+
+            if (row.content.type === "series") {
+                return null;
+            }
+
+            if (row.content.type !== "episode") {
+                return item;
+            }
+
+            try {
+                const series = await getEpisodeSeries(db, row.content.seriesId, {
+                    requirePublished: true,
+                });
+
+                return {
+                    ...item,
+                    series: publicSeriesSummary(series),
+                    seasonNumber: row.content.seasonNumber,
+                    episodeNumber: row.content.episodeNumber,
+                    canonicalPath: episodeCanonicalPath(series, row.content),
+                };
+            } catch (error) {
+                if (error.statusCode === 404) {
+                    return null;
+                }
+
+                throw error;
+            }
+        }),
+    );
+
+    return items.filter(Boolean);
 }

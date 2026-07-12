@@ -31,16 +31,16 @@ Nota de escopo:
 | BK-MF1-02 | Mateus | P0 | BK-MF0-06 | RNF28 |
 | BK-MF1-03 | Mateus | P0 | BK-MF1-02 | RNF05, RNF30 |
 | BK-MF1-04 | Matheus | P0 | BK-MF1-01 | RNF13, RNF15 |
-| BK-MF1-05 | Kaue | P1 | BK-MF1-01 | RNF31 |
-| BK-MF1-06 | Kaue | P1 | BK-MF1-03,BK-MF1-04 | RNF29 |
-| BK-MF2-01 | Matheus | P0 | BK-MF1-04 | RF01, RF02, RF05 |
+| BK-MF1-05 | Kaue | P1 | BK-MF1-01,BK-MF1-04 | RNF31 |
+| BK-MF1-06 | Kaue | P1 | BK-MF1-03,BK-MF1-04,BK-MF1-05 | RNF29 |
+| BK-MF2-01 | Matheus | P0 | BK-MF1-06 | RF01, RF02, RF05 |
 | BK-MF2-02 | Matheus | P0 | BK-MF2-01 | RF03, RF04 |
-| BK-MF2-03 | Davi | P0 | BK-MF1-01 | RF06, RF07, RF09, RF10 |
+| BK-MF2-03 | Davi | P0 | BK-MF2-02 | RF06, RF07, RF09, RF10 |
 | BK-MF2-04 | Mateus | P0 | BK-MF2-03 | RF08 |
 | BK-MF2-05 | Mateus | P0 | BK-MF2-04 | RF11, RF12 |
 | BK-MF2-06 | Mateus | P1 | BK-MF2-05 | RF13, RF14, RF15 |
 | BK-MF2-07 | Davi | P0 | BK-MF2-05 | RF16, RF17, RF18 |
-| BK-MF2-08 | Kaue | P0 | BK-MF2-01,BK-MF2-07 | RNF07, RNF08 |
+| BK-MF2-08 | Kaue | P0 | BK-MF2-06,BK-MF2-07 | RNF07, RNF08 |
 | BK-MF3-01 | Davi | P1 | BK-MF2-07 | RF19, RF21 |
 | BK-MF3-02 | Matheus | P2 | BK-MF3-01 | RF20 |
 | BK-MF3-03 | Davi | P0 | BK-MF2-03 | RF22 |

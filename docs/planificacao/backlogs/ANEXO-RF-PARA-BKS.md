@@ -15,9 +15,9 @@ Mapear RF -> BK com base na matriz canónica, sem alterar conteúdo funcional.
 | requisito | bks | total_bks |
 | --- | --- | --- |
 | RF01 | `BK-MF2-01` | 1 |
-| RF02 | `BK-MF2-01` | 1 |
+| RF02 | `BK-MF2-01`, `BK-MF7-02` | 2 |
 | RF03 | `BK-MF2-02` | 1 |
-| RF04 | `BK-MF2-02` | 1 |
+| RF04 | `BK-MF2-02`, `BK-MF7-02` | 2 |
 | RF05 | `BK-MF2-01` | 1 |
 | RF06 | `BK-MF2-03` | 1 |
 | RF07 | `BK-MF2-03` | 1 |

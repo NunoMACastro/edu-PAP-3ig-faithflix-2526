@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF8-04`
 - `guia_path`: `docs/planificacao/guias-bk/MF8/BK-MF8-03-criacao-testes-finais-aplicacao.md`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -52,7 +52,7 @@ Isto reduz três riscos críticos da defesa: testes sem ligação ao produto, la
 - Antes: `BK-MF8-02` fecha a estabilidade visual final e deixa uma base de riscos visuais a cobrir.
 - Depois: existe uma matriz de testes pronta para execução, com testes existentes, testes em falta, instruções de criação e critérios de decisão para `BK-MF8-08`.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - Ler `BK-MF8-02` antes de iniciar este BK.
 - Confirmar que a MF8 ativa tem exatamente `10` guias formais, de `BK-MF8-01` a `BK-MF8-10`.
@@ -136,18 +136,21 @@ A cobertura mínima esperada neste BK é:
 | `TST-MF8-BE-UNIT-VALIDACAO` | Backend unitário | `backend/tests/unit/*.test.js` | `npm --prefix backend test` | Testes de validação de input, regras de domínio e negativos sem HTTP. |
 | `TST-MF8-BE-INT-HTTP` | Backend integração HTTP | `backend/tests/integration/*.test.js` | `npm --prefix backend test` | Testes de rotas, status codes, payloads, auth e fluxo entre camadas. |
 | `TST-MF8-BE-SMOKE-HEALTH` | Backend smoke | `backend/tests/smoke/app.smoke.test.js` | `npm --prefix backend run smoke` | Health-check, rota base da API, sessão anónima e negativos públicos. |
-| `TST-MF8-BE-REG-HARDENING` | Backend regressão/hardening | `backend/tests/regression/*.test.js`, `backend/scripts/check-security-baseline.mjs` | `npm --prefix backend test`; `node backend/scripts/check-security-baseline.mjs` se existir | Proteção contra regressões, autorização indevida, inputs inválidos e contratos de segurança. |
+| `TST-MF8-BE-REG-HARDENING` | Backend regressão/hardening | `backend/tests/regression/*.test.js`, `backend/scripts/check-security-baseline.mjs` | `npm --prefix backend test`; scanner executado dentro de `backend` | Proteção contra regressões, autorização indevida, inputs inválidos e contratos de segurança. |
+| `TST-MF8-BE-ADMIN-ATOMIC` | Backend unitário/transacional | `backend/tests/unit/f3-admin-transactions.test.js` | `node --test backend/tests/unit/f3-admin-transactions.test.js` | Concorrência, fault injection e rollback total em candidatura/review, membership e gestão de utilizadores. |
 | `TST-MF8-FE-BUILD` | Frontend build | `frontend/` | `npm --prefix frontend run build` | A interface compila sem erros e sem dependências quebradas. |
-| `TST-MF8-FE-SMOKE` | Frontend smoke | `frontend/`, `frontend/tests/`, `tests/` | `npm --prefix frontend run smoke` se existir | Fluxos principais abrem, navegação crítica responde e o estado inicial é utilizável. |
-| `TST-MF8-FE-REG` | Frontend regressão | `frontend/scripts/`, `scripts/` | `node frontend/scripts/check-frontend-regression.mjs` ou comando documentado se existir | Regras visuais, rotas e contratos de UI não regressam. |
+| `TST-MF8-FE-SMOKE` | Frontend smoke | `frontend/`, `tests/` | `npm --prefix frontend run smoke` | Fluxos principais abrem, navegação crítica responde e o estado inicial é utilizável. |
+| `TST-MF8-FE-REG` | Frontend regressão | `frontend/scripts/` | scanner executado dentro de `frontend` | Regras visuais, rotas e contratos de UI não regressam. |
 | `TST-MF8-MANUAL-CRITICO` | Manual funcional | `docs/evidence/MF8/TESTES-FINAIS-CRIADOS.md` | Procedimento manual controlado | Login, catálogo, detalhe, reprodução, subscrição, admin e privacidade têm prova humana quando necessário. |
-| `TST-MF8-VISUAL-RESP` | Visual/responsivo | `docs/evidence/MF8/screenshots/` | Viewports definidos e screenshots | Layouts principais continuam legíveis em desktop e mobile. |
+| `TST-MF8-VISUAL-RESP` | Visual/responsivo | `test-results/`; publicação revista em `docs/evidence/MF8/screenshots/` | Playwright formal sobre `backend/` e `frontend/` | Layouts principais continuam legíveis em desktop e mobile. |
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é de inventário e decisão técnica: o resultado é uma matriz documentada, não uma alteração à aplicação.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é de inventário e decisão técnica: o resultado é uma matriz documentada, não uma alteração à aplicação.
 
 Como não há código neste passo, a explicação incide sobre a razão de cada camada: unitários apanham regras pequenas, integração HTTP apanha contratos reais, smoke apanha quebras de arranque, build/smoke frontend apanha quebras de UI, manuais e visuais cobrem riscos que ainda não têm automatização suficiente.
 
@@ -199,9 +202,11 @@ Modelo de linha preenchida:
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. A matriz é a peça técnica principal: ela obriga cada teste a explicar o que faz, porquê existe e como deve ser tratado quando falha.
+Sem código neste passo.
 
 5. Explicação do código.
+
+A matriz é a peça técnica principal: ela obriga cada teste a explicar o que faz, porquê existe e como deve ser tratado quando falha.
 
 Como não há código neste passo, a explicação incide sobre rastreabilidade: um teste só conta para a defesa se for possível ligar `id`, RF/RNF, comando, expected result, risco e decisão.
 
@@ -251,9 +256,11 @@ Cada lacuna deve ter:
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Ainda estás a decidir o que falta; a criação orientada de testes entra no passo 4.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Ainda estás a decidir o que falta; a criação orientada de testes entra no passo 4.
 
 Como não há código neste passo, a explicação incide sobre priorização: automatiza o que é repetível e crítico; documenta manualmente o que exige julgamento visual; bloqueia apenas quando a equipa não consegue recolher prova sem alterar dependências externas.
 
@@ -284,6 +291,7 @@ Ensinar como criar testes automáticos quando a matriz mostra que falta cobertur
 Cria teste automático quando o comportamento é repetível, tem expected result claro e pode correr por comando local. Usa `node:test` e `node:assert/strict` no backend. O nome do ficheiro deve indicar a camada e o risco, por exemplo:
 
 - `backend/tests/unit/mf8-final-validation.test.js`
+- `backend/tests/unit/f3-admin-transactions.test.js`
 - `backend/tests/integration/mf8-http-final.test.js`
 - `backend/tests/smoke/mf8-critical-smoke.test.js`
 - `backend/tests/regression/mf8-security-regression.test.js`
@@ -295,6 +303,10 @@ Estrutura mínima obrigatória:
 - Preparar setup mínimo, como servidor local ou dados controlados.
 - Escrever pelo menos uma assertion positiva.
 - Escrever pelo menos um cenário negativo.
+- Para operações multi-write, injetar falha depois da primeira escrita e provar
+  que estado de domínio, sessões e audit log regressam juntos ao snapshot.
+- Para invariantes concorrentes, executar duas operações em paralelo e provar
+  que só uma confirma quando ambas não podem ser válidas.
 - Fechar servidor, ligação ou recurso aberto no fim do teste.
 - Executar com o comando registado na matriz.
 
@@ -411,7 +423,8 @@ Se o teste novo só valida o caminho feliz, sem cenário inválido, ainda não c
 Cobrir fluxos que ainda não tenham automatização suficiente, sem fingir que prova manual é teste automático.
 
 2. Ficheiros envolvidos:
-    - CRIAR: `docs/evidence/MF8/screenshots/` se forem recolhidas imagens
+    - GERAR: screenshots normais em `test-results/`
+    - PUBLICAR: em `docs/evidence/MF8/screenshots/` apenas após revisão deliberada
     - EDITAR: `docs/evidence/MF8/TESTES-FINAIS-CRIADOS.md`
     - REVER: `frontend/`, `docs/planificacao/backlogs/MF-VIEWS.md`, `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
     - LOCALIZAÇÃO: secção do passo 5 em `docs/evidence/MF8/TESTES-FINAIS-CRIADOS.md`.
@@ -444,9 +457,11 @@ Fluxos mínimos a avaliar:
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Testes manuais e visuais são procedimentos documentados com evidence, não ficheiros JavaScript.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Testes manuais e visuais são procedimentos documentados com evidence, não ficheiros JavaScript.
 
 Como não há código neste passo, a explicação incide sobre honestidade de cobertura: quando a prova depende do olhar humano, a evidence deve dizer exatamente o perfil, a rota, a viewport e o resultado esperado.
 
@@ -486,14 +501,17 @@ Exemplo de tabela:
 | id | diretório | comando | output seguro | decisão |
 | --- | --- | --- | --- | --- |
 | `TST-MF8-BE-UNIT-VALIDACAO` | raiz | `npm --prefix backend test` | resumo de testes, falha e primeira stack útil sem dados sensíveis | `PASS`, `PASS_COM_RESSALVAS`, `FAIL` ou `BLOQUEADO` |
+| `TST-MF8-BE-ADMIN-ATOMIC` | raiz | `node --test backend/tests/unit/f3-admin-transactions.test.js` | totais, primeiro erro e nome do cenário; nunca snapshots com PII | `PASS` apenas se rollback, concorrência, sessões e audit forem comprovados |
 | `TST-MF8-FE-BUILD` | raiz | `npm --prefix frontend run build` | erro de compilação ou resumo de build | `PASS` quando compila; `FAIL` quando quebra código; `BLOQUEADO` se falta dependência local |
-| `TST-MF8-VISUAL-RESP` | `frontend/` | `npm run dev -- --host 127.0.0.1 --port 4174` | URL local, viewport e screenshot | `PASS` se não houver sobreposição crítica |
+| `TST-MF8-VISUAL-RESP` | raiz | `npm --prefix frontend run build && npm exec playwright -- test tests/e2e/mf8-visual-responsiveness.spec.js` | artefactos em `test-results/`, browser, viewport e decisão | `PASS` se não houver sobreposição crítica; publicação em `docs` é separada |
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. O foco é preparar comandos seguros e repetíveis.
+Sem código neste passo.
 
 5. Explicação do código.
+
+O foco é preparar comandos seguros e repetíveis.
 
 Como não há código neste passo, a explicação incide sobre segurança: evidence deve guardar comandos, estados e primeiros erros relevantes, mas nunca tokens, cookies reais, passwords, `.env` ou dados pessoais.
 
@@ -530,9 +548,11 @@ Antes de fechar, confirma:
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. A entrega é documental e serve de mapa de execução.
+Sem código neste passo.
 
 5. Explicação do código.
+
+A entrega é documental e serve de mapa de execução.
 
 Como não há código neste passo, a explicação incide sobre handoff: o próximo BK não deve voltar a desenhar testes; deve executar a matriz e reportar resultados por `id`.
 
@@ -548,7 +568,12 @@ Se houver `id` crítico sem comando, expected result ou decisão de lacuna, a su
 
 - O artefacto `docs/evidence/MF8/TESTES-FINAIS-CRIADOS.md` existe e referencia `BK-MF8-03`.
 - Cada teste individual tem `id`, camada, ficheiro, comando, RF/RNF, validação, razão, dados, assertions, negativo, expected result, falha e classificação.
-- A secção de testes mínimos cobre backend unitário, integração HTTP, smoke backend, regressão/hardening, build/smoke frontend, testes manuais críticos e testes visuais/responsivos.
+- A secção de testes mínimos cobre backend unitário, integração HTTP, smoke
+  backend, regressão/hardening, atomicidade administrativa, build/smoke
+  frontend, testes manuais críticos e testes visuais/responsivos.
+- A prova administrativa inclui duplicado `pending`, decisão concorrente,
+  membership sem transferência implícita, revogação de sessões, audit com
+  `requestId`, fault injection e proteção do último admin ativo.
 - Cada lacuna tem instrução clara para criar teste automático, criar teste manual, aceitar risco, marcar bloqueio ou excluir por scope.
 - Blocos de código usam apenas caminhos públicos como `backend/`, `frontend/`, `tests/`, `scripts/` e `docs/evidence/`.
 - Cada decisão usa `PASS`, `PASS_COM_RESSALVAS`, `FAIL`, `BLOQUEADO` ou `NAO_APLICAVEL` com justificação.
@@ -582,6 +607,28 @@ Resultado esperado: a validação documental fica em `PASS`; se existir lacuna t
 - Para `BK-MF8-09`, este BK não envia erros diretamente; apenas define como os erros serão classificados depois da execução.
 - Se houver `FAIL`, o próximo BK só pode avançar com decisão explícita do orientador ou com correção registada.
 
+##### Adendo do teste de acessibilidade preview-only
+
+Acrescentar `TST-MF8-A11Y-PREVIEW` à matriz dos alunos com estes contratos:
+
+- Axe falha perante qualquer finding `serious` ou `critical` nas rotas
+  cobertas; findings de menor impacto permanecem visíveis para triagem.
+- A home corre em `390x844`, `768x900`, `1280x720` e `1440x900`; rotas públicas
+  e autenticadas representativas correm em mobile.
+- O teste confirma overflow da página, menu por `Escape`, restituição de foco,
+  header até `72 px` e reflow equivalente a `200%`.
+- A API sintética é intercetada localmente, pedidos externos fazem falhar o
+  teste e nenhum backend, base de dados ou seed é necessário.
+- O build regista JavaScript/CSS inicial, peso do logo e chunks lazy de media.
+
+Este ID não substitui os E2E funcionais, a matriz cross-browser nem testes de
+streaming/carga. O guia continua a usar apenas os caminhos públicos
+`backend/`, `frontend/`, `tests/` e `scripts/`.
+
 #### Changelog
 
 - `2026-06-27`: guia reforçado para explicar cada teste individualmente, definir cobertura mínima, ensinar criação de testes em falta e preparar execução por `id` em `BK-MF8-08`.
+- `2026-07-10`: paths públicos restaurados para `backend/`/`frontend/` e
+  atomicidade/concorrência administrativa adicionadas à bateria mínima.
+- `2026-07-10`: adicionado o contrato `TST-MF8-A11Y-PREVIEW`, com Axe, reflow,
+  rede fail-closed, budgets e limites face ao full E2E.

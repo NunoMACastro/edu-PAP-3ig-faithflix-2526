@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF7-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-06-validacao-tecnica-final-por-gate.md`
-- `last_updated`: `2026-06-20`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -56,7 +56,7 @@ Antes deste BK, cada validação da MF6 existe no seu contexto: regressão backe
 
 Depois deste BK, existe uma matriz final da MF6 com comandos, estados, responsáveis, riscos, negativos e decisão de gate. O ficheiro final continua com placeholders enquanto a equipa não executar as validações.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - `BK-MF6-01` executou regressão backend e criou `docs/evidence/MF6/BK-MF6-01-regressao-backend.md`.
 - `BK-MF6-02` executou regressão frontend e criou `docs/evidence/MF6/BK-MF6-02-regressao-frontend.md`.
@@ -137,9 +137,11 @@ Abre cada evidence e confirma que existe `pr`, `proof` e `neg`. Para `BK-MF6-03`
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. A tarefa é de consolidação documental e validação técnica.
+Sem código neste passo.
 
 5. Explicação do código.
+
+A tarefa é de consolidação documental e validação técnica.
 
 Não há código porque o gate lê provas produzidas pelos BKs anteriores. O valor deste passo está em não aceitar "feito" sem evidence rastreável.
 
@@ -171,9 +173,11 @@ Confirma que os comandos de backend correm em `backend`, os comandos de frontend
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. A tarefa é de verificação operacional dos scripts existentes.
+Sem código neste passo.
 
 5. Explicação do código.
+
+A tarefa é de verificação operacional dos scripts existentes.
 
 O backend e o frontend têm `package.json` próprios. Isto significa que um comando curto como `npm run build` só é correto se for executado dentro de `frontend` ou se usar `npm --prefix frontend run build`.
 
@@ -209,6 +213,12 @@ Cria o ficheiro abaixo e substitui cada `PREENCHER_COM_*` apenas depois de consu
 
 ```md
 # Gate S12 - MF6 Hardening técnico
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF6/BK-MF6-06-validacao-tecnica-final-por-gate.md`
+- `proof_scope`: decisão S12 baseada apenas em evidence executada pelos alunos e bloqueios explícitos; não herda PASS da referência
 
 - Data: PREENCHER_COM_DATA_REAL
 - Owner do gate: Nuno
@@ -305,9 +315,11 @@ Executa os comandos abaixo no diretório indicado. Se um comando não existir po
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. A validação usa scripts oficiais do projeto, Git e comandos criados pelos BKs anteriores de MF6.
+Sem código neste passo.
 
 5. Explicação do código.
+
+A validação usa scripts oficiais do projeto, Git e comandos criados pelos BKs anteriores de MF6.
 
 `git diff --check` apanha espaços finais e conflitos de patch. `validate-planificacao.sh` valida consistência canónica entre backlog, matriz e guias. Os comandos de backend validam regressão, smoke e hardening. Os comandos de frontend validam regressão de rotas e build Vite.
 
@@ -356,9 +368,11 @@ Confirma que `BK-MF5-06` entrega para `BK-MF6-01`, que a MF6 fecha em `BK-MF6-06
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. O passo valida dependências e handoff documental.
+Sem código neste passo.
 
 5. Explicação do código.
+
+O passo valida dependências e handoff documental.
 
 MF6 é ponte entre implementação e evidências PAP. Se o handoff falhar, MF7 vai criar matrizes sem provas técnicas reais.
 

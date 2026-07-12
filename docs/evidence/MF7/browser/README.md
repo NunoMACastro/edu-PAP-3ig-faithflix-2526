@@ -1,5 +1,14 @@
 # Evidencia browser MF7
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-25`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: cinco screenshots e JSON gerados com API mock local; não prova o frontend atual, os browsers atuais nem um fluxo E2E com backend/DB
+
+> Os resultados `PASS` abaixo pertencem exclusivamente ao snapshot indicado por
+> `generatedAt` no JSON. Não são revalidação atual e não promovem BKs dos alunos.
+
 ## Objetivo
 
 Fechar as ressalvas `AUD-MF7-BK05-P2-01` e `AUD-MF7-BK05-P2-02` com prova browser objetiva para mobile, tablet, desktop, perfis `visitante`, `user`, `moderator` e `admin`, e navegação por teclado.
@@ -21,3 +30,4 @@ Fechar as ressalvas `AUD-MF7-BK05-P2-01` e `AUD-MF7-BK05-P2-02` com prova browse
 
 - A fixture local de API foi usada apenas para tornar os perfis reproduzíveis na recolha de screenshots.
 - A validação automatizada de teclado/skip link ficou fechada nesta recolha; a revisão humana final antes da defesa continua recomendada como controlo de qualidade, não como finding aberto.
+- Chromium/WebKit desta recolha não substituem Chrome/Edge branded ou Safari real.

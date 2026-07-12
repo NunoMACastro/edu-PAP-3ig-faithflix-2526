@@ -167,14 +167,14 @@ O backend deve ser a autoridade sobre o estado da subscrição. O frontend pode 
 Este domínio inclui:
 
 - listagem de planos;
-- criação/ativação de subscrição;
+- criação/ativação de subscrição apenas depois de checkout aprovado;
 - ciclo mensal ou anual;
 - renovação;
 - cancelamento de renovação;
 - bloqueio por expiração;
 - estado atual da conta.
 
-As subscrições também alimentam outros módulos, como pool solidária, qualidade de streaming, partilha familiar e notificações.
+As subscrições alimentam autorização, qualidade, partilha familiar e notificações. A pool financeira não usa o estado atual da subscrição: usa snapshots de pagamentos aprovados no mês.
 
 ## Pagamentos Simulados, Trial E Ciclo De Subscrição
 
@@ -190,13 +190,23 @@ O sistema deve simular:
 - cancelamento;
 - falha de renovação.
 
+Checkout e trial são mutações idempotentes: cada gesto leva uma
+`Idempotency-Key`; repetir a mesma chave/payload devolve o resultado anterior e
+reutilizar a chave com outros dados devolve conflito. Tentativa financeira,
+subscrição/trial e notificação fazem commit ou rollback na mesma transação.
+
+A renovação corre num worker separado com lease por subscrição/ciclo. O adapter
+é determinístico e explicitamente simulado; não existe gateway ou webhook real.
+Uma aprovação avança o ciclo, uma recusa passa a `past_due`, um cancelamento
+agendado passa a `canceled` e um trial vencido passa a `expired`.
+
 O trial deve ter regras claras. Por exemplo, cada utilizador só pode usar trial uma vez. Depois de terminar, o sistema deve exigir subscrição ativa para manter acesso premium.
 
-O ciclo de subscrição define o período de validade. Num plano mensal, o acesso fica ativo até ao fim do mês contratado. Num plano anual, até ao fim do período anual. O backend deve guardar datas como `currentPeriodStart` e `currentPeriodEnd`, ou equivalentes.
+O ciclo de subscrição define o período de validade. Num plano mensal, o acesso fica ativo até ao fim do mês contratado. Num plano anual, até ao fim do período anual. O backend guarda `currentPeriodStart` e `currentPeriodEnd` e limita ciclos de fim do mês ao último dia UTC de destino, incluindo 31 de janeiro e anos bissextos.
 
 ## Pool Rotativa De Associações
 
-A pool rotativa é o mecanismo solidário do FaithFlix. Uma percentagem das subscrições ativas é reunida numa pool mensal e distribuída por associações aprovadas.
+A pool rotativa é o mecanismo solidário do FaithFlix. Uma percentagem dos pagamentos v2 efetivamente aprovados no mês UTC é reunida e distribuída por associações aprovadas.
 
 O fluxo tem várias etapas:
 
@@ -208,9 +218,11 @@ O fluxo tem várias etapas:
 6. A ordem de prioridade roda entre meses.
 7. O histórico fica guardado para auditoria.
 
-O cálculo monetário deve ser feito em cêntimos para evitar erros de ponto flutuante. A distribuição deve ser idempotente por mês, ou seja, o mesmo mês não deve ser distribuído duas vezes.
+O cálculo monetário é feito em cêntimos para evitar erros de ponto flutuante. Só entram documentos com `schemaVersion: 2`, `status: "approved"`, `accountingEstimate: false` e `approvedAt` dentro do mês já fechado. Legacy e backfills estimados ficam excluídos. A distribuição guarda snapshots e é idempotente: repetir o mês devolve o registo anterior sem duplicar valores.
 
-A rotação garante justiça. Se uma associação ficar em primeiro lugar num mês, no mês seguinte a ordem muda para dar prioridade a outra associação.
+A elegibilidade das associações é congelada no fecho mensal. Se não existir beneficiária elegível, o sistema guarda um ledger imutável `deferred_no_eligible_charities`, vazio e terminal: não repete indefinidamente nem distribui o mês retroativamente após uma aprovação posterior. O worker recupera atrasos em lotes de, no máximo, 120 meses pendentes por passagem e continua nos ciclos seguintes.
+
+A rotação garante justiça e deriva deterministicamente do próprio mês, por isso não muda conforme a ordem em que jobs antigos sejam executados.
 
 ## Notificações
 
@@ -282,7 +294,9 @@ O painel de métricas ajuda a acompanhar o estado da plataforma. Pode apresentar
 - total distribuído pela pool;
 - eventos de consentimento.
 
-As operações críticas devem exigir role `admin` e gerar evidência/auditoria quando possível.
+As operações críticas devem exigir role `admin` e gerar evidência/auditoria. O audit administrativo retém apenas o estado operacional e os campos alterados: email, telefone, contactos, credenciais e snapshots pessoais integrais não fazem parte do evento.
+
+Uma ligação `charity_memberships` só pode ser criada para uma conta não bloqueada nem eliminada. Como é dado associado ao utilizador, entra na exportação RGPD e é removida na eliminação transacional da própria conta, sem afetar ligações de terceiros.
 
 ## Planos Pro/Família, Partilha Familiar E Qualidade Por Plano
 
@@ -303,6 +317,8 @@ Regras importantes:
 - o owner precisa de plano Família ativo;
 - o membro deve ser uma conta real;
 - uma conta não deve pertencer a várias famílias ativas;
+- o limite de lugares inclui o owner e convites pendentes ocupam lugar;
+- convite e aceite devem ser serializados/transacionais para impedir overbooking concorrente;
 - remover o membro deve retirar acesso familiar;
 - cancelar o plano do owner deve afetar os membros.
 
@@ -540,11 +556,15 @@ Mensagem-chave:
 
 Aqui convém explicar que os pagamentos são simulados por ser uma PAP. Isto permite demonstrar o fluxo completo sem processar cartões reais nem dados financeiros sensíveis.
 
+Convém também dizer explicitamente que a simulação não satisfaz uma integração
+com gateway real. O ponto técnico demonstrável é idempotência, snapshot
+financeiro, transação e worker com lease, não autorização bancária.
+
 Também é uma boa altura para explicar que a qualidade de streaming deve ser controlada no backend. Se um plano não permite determinada qualidade, o frontend não deve receber o URL dessa qualidade.
 
 ### 6. Pool Solidária E Associações
 
-Depois das subscrições, faz sentido apresentar a componente solidária, porque depende da existência de receita/subscrições.
+Depois das subscrições, faz sentido apresentar a componente solidária, porque depende da existência de pagamentos aprovados e auditáveis.
 
 Inclui:
 
@@ -561,6 +581,10 @@ Inclui:
 Mensagem-chave:
 
 > A pool solidária transforma parte da receita das subscrições num mecanismo controlado e auditável de apoio a associações.
+
+Na demonstração, explica que o valor vem do snapshot de pagamentos v2 do mês
+UTC fechado. Não uses memberships familiares, subscrições atualmente ativas ou
+preços atuais para reconstruir o passado.
 
 Esta é uma das partes mais fortes para a defesa, porque mostra que o projeto não é só streaming. Tem uma componente social, com regras de justiça, validação administrativa e histórico.
 

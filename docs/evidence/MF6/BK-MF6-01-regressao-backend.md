@@ -1,20 +1,29 @@
 # Evidence BK-MF6-01 - Regressao backend
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-22`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: regressão backend observada em 2026-06-22; sem reexecução atual
+
 - Owner: Kaue
 - Apoio: Matheus
 - Data da execucao: 2026-06-22 00:09:35 WEST
 - Requisito: RNF29
 - Branch/entrega: entrega local sem commit, conforme `PERMITIR_COMMITS: nao`
-- Raiz validada: `referencia_privada_docente/backend`
+- Raiz validada: `real_dev/backend`
+
+> **Snapshot histórico de 2026-06-22:** resultados preservados sem
+> reexecução; não contam como prova atual da auditoria de 2026-07-10.
 
 ## Proof
 
 | Comando | Resultado real |
 | --- | --- |
 | `node --test tests/regression/mf6-backend-regression.test.js` | `PASS`: 5 testes, 5 pass, 0 fail, `duration_ms 235.486875`. |
-| `npm --prefix pasta_privada_do_professor/backend test` | `PASS` fora da sandbox: 48 testes, 48 pass, 0 fail, `duration_ms 355.840708`. Na sandbox falhou apenas por `listen EPERM: operation not permitted 127.0.0.1` nos testes HTTP/smoke. |
-| `npm --prefix pasta_privada_do_professor/backend run smoke` | `PASS` fora da sandbox: 8 testes, 8 pass, 0 fail, `duration_ms 209.678625`. Na sandbox falhou apenas por `listen EPERM: operation not permitted 127.0.0.1`. |
-| `npm --prefix pasta_privada_do_professor/frontend run build` | `PASS`: Vite build, 100 modules transformed. |
+| `npm --prefix real_dev/backend test` | `PASS` fora da sandbox: 48 testes, 48 pass, 0 fail, `duration_ms 355.840708`. Na sandbox falhou apenas por `listen EPERM: operation not permitted 127.0.0.1` nos testes HTTP/smoke. |
+| `npm --prefix real_dev/backend run smoke` | `PASS` fora da sandbox: 8 testes, 8 pass, 0 fail, `duration_ms 209.678625`. Na sandbox falhou apenas por `listen EPERM: operation not permitted 127.0.0.1`. |
+| `npm --prefix real_dev/frontend run build` | `PASS`: Vite build, 100 modules transformed. |
 | `bash scripts/validate-planificacao.sh` | `PASS`: `checked_bks: 55`, `checked_guides: 55`, `errors: []`. |
 | `git diff --check` | `PASS`: sem erros de whitespace. |
 
@@ -45,4 +54,4 @@
 
 - A suite usa base em memoria via `setDbForTests` e nao grava dados reais em MongoDB.
 - Nao foram usados cartoes reais, gateways de pagamento, servicos externos de video, CDN, DRM, IA generativa, RAG, embeddings ou fornecedores externos.
-- A falha inicial de `npm --prefix pasta_privada_do_professor/backend test` e `npm --prefix pasta_privada_do_professor/backend run smoke` dentro da sandbox foi ambiental: `listen EPERM: operation not permitted 127.0.0.1`. Os mesmos comandos passaram fora da sandbox.
+- A falha inicial de `npm --prefix real_dev/backend test` e `npm --prefix real_dev/backend run smoke` dentro da sandbox foi ambiental: `listen EPERM: operation not permitted 127.0.0.1`. Os mesmos comandos passaram fora da sandbox.

@@ -1,5 +1,11 @@
 # Validação de usabilidade responsiva - MF7
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-25`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: usabilidade observada em 2026-06-25; browsers branded e Safari real continuam pendentes
+
 ## Metadados
 
 - BK: BK-MF7-04
@@ -7,6 +13,9 @@
 - Data: 2026-06-25
 - Fonte: RNF01, RNF02, RNF03, RNF05, RNF38, RNF40
 - Decisão: PASS_COM_RISCOS
+
+> **Snapshot histórico de 2026-06-25:** resultados preservados sem
+> reexecução; Chrome/Edge branded e Safari real continuam não executados.
 
 ## Matriz por página
 
@@ -54,13 +63,42 @@ Validação de teclado: o fluxo `Tab` -> skip link -> `Enter` -> `main#conteudo-
 
 | Comando | Resultado |
 | --- | --- |
-| `npm run build` no package frontend | PASS, 104 módulos transformados. |
-| `node scripts/check-frontend-regression.mjs` no package frontend | PASS. |
+| `npm --prefix real_dev/frontend run build` | PASS, 104 módulos transformados. |
+| `cd real_dev/frontend && node scripts/check-frontend-regression.mjs` | PASS. |
 
 ## Correção de auditoria - BK-MF7-04
 
 - Data: 2026-06-25
 - Finding: `AUD-MF7-BK04-P3-01`
 - Resultado: `CORRIGIDO`
-- Evidência: `frontend/src/components/search/SearchFilters.jsx` corrigido para PT-PT nos filtros de pesquisa.
-- Validação: build no package frontend, pesquisa textual do finding e `git diff --check`.
+- Evidência: `real_dev/frontend/src/components/search/SearchFilters.jsx` corrigido para PT-PT nos filtros de pesquisa.
+- Validação histórica: `npm --prefix real_dev/frontend run build`, pesquisa
+  textual do finding e `git diff --check`.
+
+## Adendo da referência docente - robustez F5 (2026-07-10)
+
+O conteúdo anterior permanece um snapshot da validação de 2026-06-25. A tabela
+seguinte documenta apenas os contratos residuais agora presentes na referência
+docente; não altera o estado dos BKs dos alunos.
+
+| Área | Comportamento atual coberto | Prova local |
+| --- | --- | --- |
+| Catálogo | Leitura e discovery são canceladas no unmount; erro tem retry; slug/ID é codificado no link de detalhe. | `CatalogPage.test.jsx` |
+| Pesquisa | Pedido anterior é abortado/ignorado, retry preserva o URL e resultados codificam o segmento de detalhe. | `SearchPage.test.jsx` |
+| Filtros | Taxonomias têm cancelamento e retry independentes da submissão da pesquisa. | `SearchPage.test.jsx` |
+| Detalhe e passagens | Duas leituras canceláveis, retry independente e resposta antiga impedida de contaminar outro conteúdo. | `ContentDetailPage.test.jsx` |
+| Sessão incerta | `unavailable` bloqueia reprodução, permite nova confirmação e nunca é apresentado como logout/login. | `SessionContext.test.jsx`, `ContentDetailPage.test.jsx` |
+| Conta | Leitura repetível; perfil/parental partilham bloqueio de mutação; unmount aborta escrita; vazio parental não é convertido em zero; resposta da API é autoritativa. | `AccountPage.test.jsx` |
+| Rotas API | IDs/slugs com `/`, espaço e Unicode usam um único segmento percent-encoded. | `catalogCharityApis.test.js` |
+
+Comando atual, executado em `real_dev/frontend`:
+
+```bash
+npm run test:unit -- src/context/SessionContext.test.jsx src/pages/CatalogPage.test.jsx src/pages/SearchPage.test.jsx src/pages/ContentDetailPage.test.jsx src/pages/AccountPage.test.jsx src/services/api/catalogCharityApis.test.js
+```
+
+Resultado real: `6` ficheiros, `25` testes, `25 pass`, exit code `0`.
+
+Limite de prova: Vitest usa doubles das APIs e não valida browser real, backend,
+base de dados, latência ou fluxo E2E persistido. Este adendo também não substitui
+a matriz visual/axe da correção global nem promove os estados dos alunos.

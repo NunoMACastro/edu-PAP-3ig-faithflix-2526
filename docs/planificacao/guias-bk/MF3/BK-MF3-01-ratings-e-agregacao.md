@@ -17,21 +17,19 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF3-02`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-01-ratings-e-agregacao.md`
-- `last_updated`: `2026-06-12`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagogico (obrigatorio)
-
-### Objetivo pedagogico
+#### Objetivo
 
 Neste BK vais implementar ratings de 1 a 5 estrelas para conteudos publicados (`RF19`) e a agregacao publica desses ratings (`RF21`).
 
 No fim, deves conseguir explicar porque cada utilizador so pode ter um rating por conteudo, porque o backend usa `req.user.id` em vez de aceitar `userId` no pedido, e como a media agregada e calculada sem expor dados pessoais.
 
-### Importancia funcional
+#### Importância
 
 Ratings ajudam outros utilizadores a perceber a rececao de um conteudo e geram um sinal simples para recomendacao baseline nos BKs seguintes. Esta entrega prepara `BK-MF3-02` para comentarios e `BK-MF3-05` para recomendacoes baseadas em ratings.
 
-### Scope-in
+#### Scope-in
 
 - Criar colecao `content_ratings`.
 - Criar validacao de `contentId` e `value`.
@@ -41,7 +39,7 @@ Ratings ajudam outros utilizadores a perceber a rececao de um conteudo e geram u
 - Criar cliente frontend `ratingsApi`.
 - Criar componente `RatingBox` para a pagina de detalhe.
 
-### Scope-out
+#### Scope-out
 
 - Reviews longas.
 - Denuncias e workflow avancado de moderacao.
@@ -49,20 +47,41 @@ Ratings ajudam outros utilizadores a perceber a rececao de um conteudo e geram u
 - Alteracao do modelo de catalogo criado na `MF2`.
 - Rating anonimo.
 
-### Glossario rapido
+#### Estado antes e depois
+
+- Estado antes: aplicam-se os BKs declarados em `dependencias`, os RF/RNF do Header e os artefactos já entregues pelas fases anteriores.
+- Estado depois: ficam implementáveis e verificáveis apenas os resultados listados em `Scope-in`, sem antecipar o `Scope-out`.
+
+#### Pré-requisitos
+
+- `BK-MF2-07` concluido.
+- `BK-MF2-03` criou a colecao `contents` com `status: "published"`.
+- `BK-MF2-01` e `BK-MF2-02` disponibilizam `req.user`, `requireAuth` e roles base.
+- `apiClient` da `MF1` envia cookies com `credentials: "include"`.
+- Existe pelo menos um conteudo publicado para testar.
+
+#### Glossário
 
 - `Rating`: classificacao numerica de um conteudo.
 - `Agregacao`: calculo de valores como media, total e distribuicao.
 - `Ownership`: garantia de que o dado pertence ao utilizador autenticado.
 - `Distribuicao`: contagem de quantos ratings existem por estrela.
 
-### Conceitos essenciais
+#### Conceitos teóricos essenciais
 
 - `CANONICO`: `RF19` permite ao utilizador atribuir rating.
 - `CANONICO`: `RF21` exige agregacao de ratings pelo sistema.
 - `CANONICO`: a sessao segura dos BKs anteriores disponibiliza `req.user.id`.
 - `DERIVADO`: a chave unica `userId + contentId` evita ratings duplicados.
 - `DERIVADO`: ratings so sao aceites para conteudos `published`, tal como o catalogo publico.
+- `DERIVADO`: o resumo público usa exatamente
+  `{ contentId, average, total, distribution }`; `total` é a contagem de
+  classificações.
+- `DERIVADO`: leituras e mutações do frontend são canceláveis e protegidas por
+  uma versão de contexto, para uma resposta tardia nunca alterar outro conteúdo
+  ou outra sessão.
+- `DERIVADO`: guardar/remover é uma operação exclusiva e o sucesso só é
+  apresentado depois de recarregar o resumo e o rating pessoal autoritativos.
 
 ### Tempo estimado
 
@@ -85,17 +104,7 @@ Ratings ajudam outros utilizadores a perceber a rececao de um conteudo e geram u
 - [ ] Sei testar valor invalido, conteudo inexistente e pedido sem sessao.
 - [ ] Sei que `BK-MF3-05` vai usar estes ratings como sinal de recomendacao.
 
-## Bloco operacional (obrigatorio)
-
-### Pre-condicoes
-
-- `BK-MF2-07` concluido.
-- `BK-MF2-03` criou a colecao `contents` com `status: "published"`.
-- `BK-MF2-01` e `BK-MF2-02` disponibilizam `req.user`, `requireAuth` e roles base.
-- `apiClient` da `MF1` envia cookies com `credentials: "include"`.
-- Existe pelo menos um conteudo publicado para testar.
-
-### Contrato tecnico deste BK
+#### Arquitetura do BK
 
 | Area | Contrato |
 | --- | --- |
@@ -106,12 +115,15 @@ Ratings ajudam outros utilizadores a perceber a rececao de um conteudo e geram u
 | Ler resumo | `GET /api/ratings/:contentId/summary` |
 | Ler o meu rating | `GET /api/ratings/:contentId/me` |
 | Remover o meu rating | `DELETE /api/ratings/:contentId` |
+| Resumo | `{ contentId, average, total, distribution }` |
+| Robustez frontend | abort/anti-stale, mutação exclusiva, reload autoritativo |
 | Frontend | `ratingsApi`, `RatingBox` |
 | Handoff | `BK-MF3-02` reutiliza conteudo autenticado e detalhe publico |
 
 ### Modelo `content_ratings`
 
 ```js
+// A combinação userId+contentId identifica o único rating do utilizador para o conteúdo.
 {
   _id,
   userId,
@@ -122,7 +134,19 @@ Ratings ajudam outros utilizadores a perceber a rececao de um conteudo e geram u
 }
 ```
 
-### Guia de execucao (passo-a-passo)
+#### Ficheiros a criar/editar/rever
+
+- CRIAR: `backend/src/modules/ratings/ratings.validation.js`
+- CRIAR: `backend/src/modules/ratings/ratings.service.js`
+- CRIAR: `backend/src/modules/ratings/ratings.controller.js`
+- CRIAR: `backend/src/modules/ratings/ratings.routes.js`
+- EDITAR: `backend/src/app.js`
+- EDITAR: `backend/src/server.js`
+- CRIAR: `frontend/src/services/api/ratingsApi.js`
+- CRIAR: `frontend/src/components/ratings/RatingBox.jsx`
+- EDITAR: `frontend/src/pages/ContentDetailPage.jsx`
+
+#### Tutorial técnico linear
 
 ### Passo 1 - Criar validacao de ratings
 
@@ -144,31 +168,41 @@ Cria a pasta `backend/src/modules/ratings/` e adiciona a validacao abaixo.
 import { ObjectId } from "mongodb";
 
 export function asObjectId(id, label) {
-  if (!ObjectId.isValid(id)) {
+  // Rejeita IDs malformados antes de chegarem às queries MongoDB.
+  if (typeof id !== "string" || !/^[a-f\d]{24}$/i.test(id)) {
     const error = new Error(`${label} invalido.`);
     error.statusCode = 400;
     throw error;
   }
 
-  return new ObjectId(id);
+  return ObjectId.createFromHexString(id);
 }
 
 export function assertRatingValue(value) {
-  const rating = Number(value);
-
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+  // O domínio aceita apenas inteiros reais; strings como "5" não são convertidas silenciosamente.
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 5) {
     const error = new Error("O rating deve ser um inteiro entre 1 e 5.");
     error.statusCode = 400;
     throw error;
   }
 
-  return rating;
+  return value;
+}
+
+export function assertRatingBody(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    const error = new Error("Body JSON invalido.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return { value: assertRatingValue(input.value) };
 }
 ```
 
 5. Explicacao do codigo ou da decisao.
 
-`asObjectId` impede consultas com IDs invalidos. `assertRatingValue` garante que a escala do produto e sempre a mesma.
+`asObjectId` impede consultas com IDs invalidos. `assertRatingBody` confirma a fronteira JSON antes de ler `value`, e `assertRatingValue` garante que a escala do produto e sempre a mesma.
 
 6. Validacao do passo.
 
@@ -199,14 +233,14 @@ Cria o service abaixo. Ele usa a colecao `contents` criada em `BK-MF2-03`.
 4. Codigo completo.
 
 ```js
-import { getDb } from "../../config/database.js";
+import { getDb, runInTransaction } from "../../config/database.js";
 import { asObjectId, assertRatingValue } from "./ratings.validation.js";
 
-async function assertPublishedContent(db, contentId) {
-  const content = await db.collection("contents").findOne({
-    _id: contentId,
-    status: "published",
-  });
+async function assertPublishedContent(db, contentId, session = undefined) {
+  const content = await db.collection("contents").findOne(
+    { _id: contentId, status: "published" },
+    { session },
+  );
 
   if (!content) {
     const error = new Error("Conteudo nao encontrado.");
@@ -221,13 +255,49 @@ function emptySummary(contentId) {
   return {
     contentId,
     average: 0,
-    count: 0,
+    total: 0,
     distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+  };
+}
+
+async function buildRatingSummary(
+  db,
+  contentObjectId,
+  contentId,
+  session = undefined,
+) {
+  // A agregação recebe a mesma session da mutation quando integra uma escrita.
+  const rows = await db.collection("content_ratings").aggregate(
+    [
+      { $match: { contentId: contentObjectId } },
+      { $group: { _id: "$value", count: { $sum: 1 } } },
+    ],
+    { session },
+  ).toArray();
+
+  if (rows.length === 0) return emptySummary(contentId);
+
+  const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  let total = 0;
+  let count = 0;
+
+  for (const row of rows) {
+    distribution[row._id] = row.count;
+    total += row._id * row.count;
+    count += row.count;
+  }
+
+  return {
+    contentId,
+    average: Number((total / count).toFixed(2)),
+    total: count,
+    distribution,
   };
 }
 
 export async function ensureRatingIndexes() {
   const db = await getDb();
+  // O índice único também impede dois ratings concorrentes para o mesmo par.
   await db.collection("content_ratings").createIndex(
     { userId: 1, contentId: 1 },
     { unique: true },
@@ -236,27 +306,37 @@ export async function ensureRatingIndexes() {
 }
 
 export async function saveMyRating(userId, contentId, value) {
-  const db = await getDb();
   const userObjectId = asObjectId(userId, "Utilizador");
   const contentObjectId = asObjectId(contentId, "Conteudo");
   const rating = assertRatingValue(value);
   const now = new Date();
 
-  await assertPublishedContent(db, contentObjectId);
+  return runInTransaction(async ({ db, session }) => {
+    await assertPublishedContent(db, contentObjectId, session);
 
-  await db.collection("content_ratings").updateOne(
-    { userId: userObjectId, contentId: contentObjectId },
-    {
-      $set: { value: rating, updatedAt: now },
-      $setOnInsert: { userId: userObjectId, contentId: contentObjectId, createdAt: now },
-    },
-    { upsert: true },
-  );
+    await db.collection("content_ratings").updateOne(
+      { userId: userObjectId, contentId: contentObjectId },
+      {
+        $set: { value: rating, updatedAt: now },
+        $setOnInsert: {
+          userId: userObjectId,
+          contentId: contentObjectId,
+          createdAt: now,
+        },
+      },
+      { upsert: true, session },
+    );
 
-  return {
-    myRating: rating,
-    summary: await getRatingSummary(contentId),
-  };
+    return {
+      myRating: rating,
+      summary: await buildRatingSummary(
+        db,
+        contentObjectId,
+        contentId,
+        session,
+      ),
+    };
+  });
 }
 
 export async function getMyRating(userId, contentId) {
@@ -274,18 +354,28 @@ export async function getMyRating(userId, contentId) {
 }
 
 export async function removeMyRating(userId, contentId) {
-  const db = await getDb();
+  const userObjectId = asObjectId(userId, "Utilizador");
   const contentObjectId = asObjectId(contentId, "Conteudo");
 
-  await db.collection("content_ratings").deleteOne({
-    userId: asObjectId(userId, "Utilizador"),
-    contentId: contentObjectId,
-  });
+  return runInTransaction(async ({ db, session }) => {
+    // Conteúdo draft/archived falha antes de qualquer delete.
+    await assertPublishedContent(db, contentObjectId, session);
 
-  return {
-    myRating: null,
-    summary: await getRatingSummary(contentId),
-  };
+    await db.collection("content_ratings").deleteOne(
+      { userId: userObjectId, contentId: contentObjectId },
+      { session },
+    );
+
+    return {
+      myRating: null,
+      summary: await buildRatingSummary(
+        db,
+        contentObjectId,
+        contentId,
+        session,
+      ),
+    };
+  });
 }
 
 export async function getRatingSummary(contentId) {
@@ -294,40 +384,18 @@ export async function getRatingSummary(contentId) {
 
   await assertPublishedContent(db, contentObjectId);
 
-  const rows = await db.collection("content_ratings").aggregate([
-    { $match: { contentId: contentObjectId } },
-    {
-      $group: {
-        _id: "$value",
-        count: { $sum: 1 },
-      },
-    },
-  ]).toArray();
-
-  if (rows.length === 0) return emptySummary(contentId);
-
-  const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  let total = 0;
-  let count = 0;
-
-  for (const row of rows) {
-    distribution[row._id] = row.count;
-    total += row._id * row.count;
-    count += row.count;
-  }
-
-  return {
-    contentId,
-    average: Number((total / count).toFixed(2)),
-    count,
-    distribution,
-  };
+  // A leitura pública reutiliza o mesmo agregador, sem session de escrita.
+  return buildRatingSummary(db, contentObjectId, contentId);
 }
 ```
 
 5. Explicacao do codigo ou da decisao.
 
-O service valida conteudo publicado antes de aceitar ou apresentar ratings. A chave unica impede duplicacao e o `upsert` permite alterar o rating sem criar novo documento.
+O service valida conteudo publicado antes de aceitar, remover ou apresentar
+ratings. Save/delete e o resumo devolvido usam a mesma `runInTransaction` e a
+mesma `session`: se a escrita, a agregação ou o commit falhar, não existe rating
+parcial nem resposta falso-verde. A chave unica impede duplicacao e o `upsert`
+permite alterar o rating sem criar novo documento.
 
 6. Validacao do passo.
 
@@ -339,7 +407,10 @@ Resultado esperado: `function function`.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
-Se o rating aceitasse conteudos `draft`, utilizadores poderiam avaliar conteudos que ainda nao estao publicados.
+Se o rating aceitasse conteudos `draft`/`archived`, utilizadores poderiam avaliar
+conteudos indisponíveis. Fault injection na agregação posterior à escrita tem de
+fazer rollback do save/delete; executar a escrita fora da transação deixa um
+estado parcial apesar da resposta falhar.
 
 ### Passo 3 - Criar controller e rotas
 
@@ -361,6 +432,7 @@ Cria controller e router. Rotas de escrita usam `requireAuth`; resumo publico na
 `backend/src/modules/ratings/ratings.controller.js`
 
 ```js
+import { assertRatingBody } from "./ratings.validation.js";
 import {
   getMyRating,
   getRatingSummary,
@@ -369,6 +441,7 @@ import {
 } from "./ratings.service.js";
 
 export async function getContentRatingSummary(req, res) {
+  // O resumo é público; os handlers seguintes obtêm o utilizador da sessão autenticada.
   res.status(200).json({ summary: await getRatingSummary(req.params.contentId) });
 }
 
@@ -377,7 +450,9 @@ export async function getMyContentRating(req, res) {
 }
 
 export async function putMyContentRating(req, res) {
-  res.status(200).json(await saveMyRating(req.user.id, req.params.contentId, req.body.value));
+  // O validator fecha a fronteira JSON antes de o controller ler qualquer campo.
+  const { value } = assertRatingBody(req.body);
+  res.status(200).json(await saveMyRating(req.user.id, req.params.contentId, value));
 }
 
 export async function deleteMyContentRating(req, res) {
@@ -389,7 +464,7 @@ export async function deleteMyContentRating(req, res) {
 
 ```js
 import { Router } from "express";
-import { requireAuth } from "../auth/auth.middleware.js";
+import { requireAuth } from "../../middlewares/auth.middleware.js";
 import { asyncHandler } from "../../utils/async-handler.js";
 import {
   deleteMyContentRating,
@@ -400,6 +475,7 @@ import {
 
 export const ratingsRouter = Router();
 
+// Apenas o resumo é público; consultar ou alterar o rating pessoal exige sessão.
 ratingsRouter.get("/:contentId/summary", asyncHandler(getContentRatingSummary));
 ratingsRouter.get("/:contentId/me", requireAuth, asyncHandler(getMyContentRating));
 ratingsRouter.put("/:contentId", requireAuth, asyncHandler(putMyContentRating));
@@ -497,17 +573,18 @@ Cria o cliente e o componente. Depois adiciona `<RatingBox contentId={content.id
 import { apiClient } from "./apiClient.js";
 
 export const ratingsApi = {
-  getSummary(contentId) {
-    return apiClient.get(`/api/ratings/${encodeURIComponent(contentId)}/summary`);
+  getSummary(contentId, options = {}) {
+    // Codificar o ID impede que o valor recebido altere a estrutura do URL.
+    return apiClient.get(`/api/ratings/${encodeURIComponent(contentId)}/summary`, options);
   },
-  getMine(contentId) {
-    return apiClient.get(`/api/ratings/${encodeURIComponent(contentId)}/me`);
+  getMine(contentId, options = {}) {
+    return apiClient.get(`/api/ratings/${encodeURIComponent(contentId)}/me`, options);
   },
-  save(contentId, value) {
-    return apiClient.put(`/api/ratings/${encodeURIComponent(contentId)}`, { value });
+  save(contentId, value, options = {}) {
+    return apiClient.put(`/api/ratings/${encodeURIComponent(contentId)}`, { value }, options);
   },
-  remove(contentId) {
-    return apiClient.del(`/api/ratings/${encodeURIComponent(contentId)}`);
+  remove(contentId, options = {}) {
+    return apiClient.del(`/api/ratings/${encodeURIComponent(contentId)}`, options);
   },
 };
 ```
@@ -515,102 +592,156 @@ export const ratingsApi = {
 `frontend/src/components/ratings/RatingBox.jsx`
 
 ```jsx
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSession } from "../../context/SessionContext.jsx";
 import { ratingsApi } from "../../services/api/ratingsApi.js";
 
 const emptySummary = {
   average: 0,
-  count: 0,
+  total: 0,
   distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
 };
 
 export function RatingBox({ contentId }) {
+  const { status: sessionStatus, user } = useSession();
   const [summary, setSummary] = useState(emptySummary);
   const [myRating, setMyRating] = useState(null);
   const [status, setStatus] = useState("idle");
+  const [operation, setOperation] = useState(null);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const contextVersionRef = useRef(0);
+  const mutationControllerRef = useRef(null);
+  const mutationReservedRef = useRef(false);
+  const confirmedStateRef = useRef({ summary: emptySummary, myRating: null });
+  // A versão e os AbortControllers impedem respostas antigas de contaminar o conteúdo atual.
+  const sessionKey = `${sessionStatus}:${user?.id ?? ""}`;
+
+  async function readAuthoritativeState(signal) {
+    const summaryRequest = ratingsApi.getSummary(contentId, { signal });
+    const mineRequest = sessionStatus === "authenticated"
+      ? ratingsApi.getMine(contentId, { signal })
+      : Promise.resolve({ myRating: null });
+    const [summaryResponse, mineResponse] = await Promise.all([summaryRequest, mineRequest]);
+    return { summary: summaryResponse.summary, myRating: mineResponse.myRating };
+  }
 
   useEffect(() => {
-    let active = true;
+    const version = ++contextVersionRef.current;
+    const controller = new AbortController();
+    mutationControllerRef.current?.abort();
+    mutationControllerRef.current = null;
+    confirmedStateRef.current = { summary: emptySummary, myRating: null };
+    setSummary(emptySummary);
+    setMyRating(null);
+    setOperation(null);
+    setError("");
+    setMessage("");
     setStatus("loading");
 
-    Promise.all([
-      ratingsApi.getSummary(contentId),
-      ratingsApi.getMine(contentId).catch(() => ({ myRating: null })),
-    ])
-      .then(([summaryResponse, mineResponse]) => {
-        if (!active) return;
-        setSummary(summaryResponse.summary);
-        setMyRating(mineResponse.myRating);
+    readAuthoritativeState(controller.signal)
+      .then((nextState) => {
+        if (controller.signal.aborted || version !== contextVersionRef.current) return;
+        confirmedStateRef.current = nextState;
+        setSummary(nextState.summary);
+        setMyRating(nextState.myRating);
         setStatus("success");
       })
-      .catch(() => {
-        if (!active) return;
+      .catch((requestError) => {
+        if (controller.signal.aborted || requestError?.code === "REQUEST_ABORTED") return;
+        if (version !== contextVersionRef.current) return;
         setError("Nao foi possivel carregar os ratings.");
         setStatus("error");
       });
 
     return () => {
-      active = false;
+      controller.abort();
+      mutationControllerRef.current?.abort();
+      mutationControllerRef.current = null;
+      mutationReservedRef.current = false;
     };
-  }, [contentId]);
+  }, [contentId, sessionKey]);
 
-  async function chooseRating(value) {
+  async function mutateRating(kind, value) {
+    // A ref reserva a mutation no mesmo tick, antes de React voltar a renderizar.
+    if (mutationReservedRef.current) return;
+
+    const version = contextVersionRef.current;
+    const controller = new AbortController();
+    const confirmedBeforeMutation = confirmedStateRef.current;
+    mutationReservedRef.current = true;
+    mutationControllerRef.current = controller;
     setError("");
-    setStatus("saving");
+    setMessage("");
+    setOperation(kind);
 
     try {
-      const response = await ratingsApi.save(contentId, value);
-      setMyRating(response.myRating);
-      setSummary(response.summary);
-      setStatus("success");
-    } catch {
-      setError("Entra na tua conta para avaliar este conteudo.");
-      setStatus("error");
-    }
-  }
+      if (kind === "remove") {
+        await ratingsApi.remove(contentId, { signal: controller.signal });
+      } else {
+        await ratingsApi.save(contentId, value, { signal: controller.signal });
+      }
 
-  async function clearRating() {
-    setError("");
-    setStatus("saving");
-
-    try {
-      const response = await ratingsApi.remove(contentId);
-      setMyRating(response.myRating);
-      setSummary(response.summary);
+      // Depois da mutação, relê o estado autoritativo em vez de assumir sucesso otimista.
+      const nextState = await readAuthoritativeState(controller.signal);
+      if (controller.signal.aborted || version !== contextVersionRef.current) return;
+      confirmedStateRef.current = nextState;
+      setSummary(nextState.summary);
+      setMyRating(nextState.myRating);
+      setMessage(kind === "remove" ? "Rating removido." : "Rating guardado.");
       setStatus("success");
-    } catch {
-      setError("Nao foi possivel remover o rating.");
+    } catch (requestError) {
+      if (controller.signal.aborted || requestError?.code === "REQUEST_ABORTED") return;
+      if (version !== contextVersionRef.current) return;
+      // Mesmo sem UI otimista, repor o snapshot explicita a fonte autoritativa.
+      setSummary(confirmedBeforeMutation.summary);
+      setMyRating(confirmedBeforeMutation.myRating);
+      setError("Nao foi possivel atualizar o rating.");
       setStatus("error");
+    } finally {
+      if (mutationControllerRef.current === controller) {
+        mutationControllerRef.current = null;
+        mutationReservedRef.current = false;
+        if (version === contextVersionRef.current) setOperation(null);
+      }
     }
   }
 
   return (
     <section className="rating-box" aria-label="Rating do conteudo">
       <h2>Rating</h2>
-      <p>{summary.count === 0 ? "Ainda sem ratings." : `${summary.average}/5 em ${summary.count} rating(s).`}</p>
+      <p>{summary.total === 0 ? "Ainda sem ratings." : `${summary.average}/5 em ${summary.total} rating(s).`}</p>
 
-      <div className="rating-actions">
+      <div className="rating-actions" aria-busy={operation !== null}>
         {[1, 2, 3, 4, 5].map((value) => (
           <button
             key={value}
             type="button"
             aria-pressed={myRating === value}
-            disabled={status === "saving"}
-            onClick={() => chooseRating(value)}
+            disabled={
+              operation !== null ||
+              status === "loading" ||
+              sessionStatus !== "authenticated"
+            }
+            onClick={() => mutateRating("save", value)}
           >
-            {value}
+            {operation === "save" && myRating === value ? "A guardar..." : value}
           </button>
         ))}
         {myRating !== null && (
-          <button type="button" disabled={status === "saving"} onClick={clearRating}>
-            Remover
+          <button
+            type="button"
+            disabled={operation !== null || status === "loading"}
+            onClick={() => mutateRating("remove")}
+          >
+            {operation === "remove" ? "A remover..." : "Remover"}
           </button>
         )}
       </div>
 
       {myRating !== null && <p>O teu rating: {myRating}/5.</p>}
       {status === "loading" && <p>A carregar ratings...</p>}
+      {message && <p role="status">{message}</p>}
       {error && <p role="alert">{error}</p>}
     </section>
   );
@@ -619,7 +750,11 @@ export function RatingBox({ contentId }) {
 
 5. Explicacao do codigo ou da decisao.
 
-O cliente usa `apiClient`, que ja envia cookies. O componente mostra loading, erro, estado vazio e sucesso. O frontend nunca envia `userId`; envia apenas o valor do rating.
+O cliente usa `apiClient`, que ja envia cookies. O componente mostra loading,
+erro, estado vazio e sucesso. `mutationReservedRef` fecha o duplo clique no
+mesmo tick; o cleanup aborta também a mutation e as verificações de versão
+impedem respostas stale. Em falha, o snapshot confirmado é reposto. O frontend
+nunca envia `userId`; envia apenas o valor do rating.
 
 6. Validacao do passo.
 
@@ -633,16 +768,23 @@ Resultado esperado: build sem erros de import.
 
 Usar `fetch` diretamente nesta pagina duplicaria logica de cookies e mensagens de erro.
 
-## Criterios de aceite (mensuraveis)
+#### Critérios de aceite
 
 - `PUT /api/ratings/:contentId` grava ou atualiza o rating do utilizador autenticado e devolve `200`.
-- `GET /api/ratings/:contentId/summary` devolve `average`, `count` e `distribution`.
+- `GET /api/ratings/:contentId/summary` devolve `contentId`, `average`, `total` e `distribution`.
 - Pedido sem sessao para `PUT` ou `DELETE` devolve `401`.
 - Rating fora de `1..5` devolve `400`.
 - Conteudo inexistente ou nao publicado devolve `404`.
+- Save/remove validam `published` antes da escrita e devolvem o resumo calculado
+  na mesma `runInTransaction`/`session`; draft/archived e fault injection na
+  agregação deixam zero escrita parcial.
 - Dois pedidos do mesmo utilizador para o mesmo conteudo mantem um unico documento.
+- Trocar de conteúdo/sessão aborta pedidos anteriores e nunca aplica respostas stale.
+- Duplo clique não cria duas mutações; sucesso só aparece depois do reload autoritativo.
+- Uma ref síncrona reserva a mutation; cleanup aborta o controller ativo e uma
+  falha repõe o último snapshot confirmado.
 
-## Validacao final
+#### Validação final
 
 ```bash
 npm --prefix backend test
@@ -652,14 +794,18 @@ curl -i http://localhost:3000/api/ratings/CONTENT_ID/summary
 
 Resultado esperado: testes e build passam; o `curl` devolve `200` para conteudo publicado.
 
-## Evidence para PR/defesa
+#### Evidence para PR/defesa
 
 - `pr`: referencia do PR/commit com modulo `ratings`.
 - `proof`: resposta de `GET /api/ratings/:contentId/summary` antes e depois de avaliar.
 - `proof`: captura do `RatingBox` na pagina de detalhe.
+- `proof`: teste comportamental de cancelamento/anti-stale e de busy state durante uma mutação pendente.
 - `neg`: `401` sem cookie, `400` para rating invalido, `404` para conteudo inexistente.
+- `neg`: resposta tardia do conteúdo A não altera o `RatingBox` depois de navegar para o conteúdo B.
+- `neg`: draft/archived, falha de update/delete e falha da agregação dentro da
+  transação deixam o rating anterior intacto e não devolvem sucesso.
 
-## Handoff
+#### Handoff
 
 O `BK-MF3-02` pode assumir que existe feedback autenticado por conteudo, que o detalhe ja consegue apresentar interacao de comunidade e que a colecao `content_ratings` fica disponivel como sinal para recomendacao baseline.
 
@@ -677,7 +823,8 @@ await db.collection("content_ratings").updateOne(
 
 Este trecho garante um rating por utilizador e por conteudo.
 
-## Changelog
+#### Changelog
 
 - `2026-04-13`: retrofit para contrato pedagogico v3.
 - `2026-06-07`: guia reescrito com contrato tecnico, backend, frontend, ownership, validacao e evidence mensuravel.
+- `2026-07-10`: o contrato canónico passa a usar inputs estritos, `total` no resumo e frontend cancelável, anti-stale, exclusivo por mutação e confirmado por reload autoritativo.

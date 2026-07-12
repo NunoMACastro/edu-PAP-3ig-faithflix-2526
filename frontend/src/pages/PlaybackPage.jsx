@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { playbackApi } from "../services/api/playbackApi.js";
 
 const SAVE_INTERVAL_SECONDS = 15;
@@ -55,6 +55,8 @@ export function PlaybackPage() {
     const [error, setError] = useState("");
 
     useEffect(() => {
+        setPlayback(null);
+        setError("");
         playbackApi
             .getPlayback(contentId)
             .then((response) => {
@@ -256,6 +258,16 @@ export function PlaybackPage() {
 
     return (
         <section className="page-section">
+            {playback.series ? (
+                <nav aria-label="Contexto da série">
+                    <Link to={`/catalogo/${encodeURIComponent(playback.series.slug)}`}>
+                        {playback.series.title}
+                    </Link>
+                    <span>
+                        {" "}· T{playback.content.seasonNumber} E{playback.content.episodeNumber}
+                    </span>
+                </nav>
+            ) : null}
             <h1>{playback.content.title}</h1>
             <div
                 className="player-controls"
@@ -336,6 +348,23 @@ export function PlaybackPage() {
                 ))}
                 O teu browser não suporta vídeo HTML5.
             </video>
+            {playback.series ? (
+                <nav className="button-row" aria-label="Navegação entre episódios">
+                    {playback.previousEpisode ? (
+                        <Link className="secondary-button" to={`/ver/${playback.previousEpisode.id}`}>
+                            Episódio anterior
+                        </Link>
+                    ) : null}
+                    <Link className="secondary-button" to={`/catalogo/${encodeURIComponent(playback.series.slug)}`}>
+                        Voltar à série
+                    </Link>
+                    {playback.nextEpisode ? (
+                        <Link className="button-link" to={`/ver/${playback.nextEpisode.id}`}>
+                            Episódio seguinte
+                        </Link>
+                    ) : null}
+                </nav>
+            ) : null}
         </section>
     );
 }

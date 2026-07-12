@@ -12,6 +12,7 @@ import {
     normalizeVector,
 } from "./content-embeddings.service.js";
 import { buildRecommendationExplanation } from "./recommendation-explanations.js";
+import { PUBLIC_CATALOG_TYPES } from "../catalog/catalog-hierarchy.js";
 
 /**
  * Converte um id público num ObjectId MongoDB.
@@ -164,12 +165,72 @@ async function loadUserSignals(db, userObjectId) {
 
     const taxonomyCounts = new Map();
     const typeCounts = new Map();
+    const episodeSeriesIds = [
+        ...new Set(
+            contents
+                .filter(
+                    (content) =>
+                        content.type === "episode" &&
+                        ObjectId.isValid(content.seriesId),
+                )
+                .map((content) => String(content.seriesId)),
+        ),
+    ];
+    const series =
+        episodeSeriesIds.length > 0
+            ? await db
+                  .collection("contents")
+                  .find({
+                      _id: {
+                          $in: episodeSeriesIds.map((id) =>
+                              ObjectId.createFromHexString(id),
+                          ),
+                      },
+                      type: "series",
+                      status: "published",
+                  })
+                  .toArray()
+            : [];
+    const seriesById = new Map(
+        series.map((content) => [String(content._id), content]),
+    );
+    const contentById = new Map(
+        contents.map((content) => [String(content._id), content]),
+    );
 
     for (const content of contents) {
-        addCount(typeCounts, content.type);
-        for (const taxonomyId of content.taxonomyIds ?? []) {
+        const signalContent =
+            content.type === "episode"
+                ? seriesById.get(String(content.seriesId))
+                : content;
+
+        if (!signalContent) {
+            continue;
+        }
+
+        addCount(typeCounts, signalContent.type);
+        for (const taxonomyId of signalContent.taxonomyIds ?? []) {
             addCount(taxonomyCounts, taxonomyId);
         }
+    }
+
+    const contextualWeights = new Map();
+
+    for (const [contentId, weight] of weightedContentIds) {
+        const content = contentById.get(contentId);
+        const contextualId =
+            content?.type === "episode"
+                ? String(seriesById.get(String(content.seriesId))?._id ?? "")
+                : contentId;
+
+        if (!contextualId) {
+            continue;
+        }
+
+        contextualWeights.set(
+            contextualId,
+            (contextualWeights.get(contextualId) ?? 0) + weight,
+        );
     }
 
     const signalsUsed = [];
@@ -183,11 +244,16 @@ async function loadUserSignals(db, userObjectId) {
     if (positiveRatings.length > 0) signalsUsed.push("ratings");
 
     return {
-        contentIds,
+        contentIds: [
+            ...new Set([
+                ...contentIds,
+                ...series.map((content) => String(content._id)),
+            ]),
+        ],
         taxonomyIds: topKeys(taxonomyCounts),
         types: topKeys(typeCounts, 3),
         signalsUsed,
-        weightedContentIds: [...weightedContentIds.entries()].map(
+        weightedContentIds: [...contextualWeights.entries()].map(
             ([contentId, weight]) => ({ contentId, weight }),
         ),
     };
@@ -298,7 +364,11 @@ export async function loadSemanticRecommendationItems(
 
     const contents = await db
         .collection("contents")
-        .find({ _id: { $in: candidateIds }, status: "published" })
+        .find({
+            _id: { $in: candidateIds },
+            status: "published",
+            type: { $in: PUBLIC_CATALOG_TYPES },
+        })
         .toArray();
     const contentById = new Map(contents.map((content) => [String(content._id), content]));
 
@@ -338,6 +408,7 @@ async function loadCandidateCards(db, match, excludedIds, sort, limit = 8) {
             {
                 $match: {
                     status: "published",
+                    type: { $in: PUBLIC_CATALOG_TYPES },
                     _id: {
                         $nin: [...excludedIds]
                             .filter((id) => ObjectId.isValid(id))

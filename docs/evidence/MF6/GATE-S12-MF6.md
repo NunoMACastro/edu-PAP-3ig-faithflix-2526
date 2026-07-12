@@ -1,11 +1,19 @@
 # Gate S12 - MF6 Hardening tecnico
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-22`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: decisão S12 observada em 2026-06-22; não representa o gate atual
+
 - Data: 2026-06-22 10:44:30 WEST
 - Owner do gate: Nuno
 - Apoio: Matheus, Mateus, Davi, Kaue
 - Branch/entrega: entrega local sem commit/PR, conforme `PERMITIR_COMMITS: nao`
 - Decisao tecnica: `GO_COM_RESSALVAS`
 - Justificacao da decisao: todos os comandos tecnicos essenciais têm evidence real em `PASS` e nao ha falhas criticas abertas; ficam ressalvas nao bloqueantes sobre validacao humana final do orientador, dependencia de execucao fora da sandbox para testes HTTP e limites naturais de baseline local.
+
+> **Aviso de validade — Fase 2 (2026-07-09):** este documento é um snapshot histórico anterior à Fase 2 de 2026-07-09. Os resultados e decisões preservados abaixo não provam CP2 nem o estado atual da aplicação.
 
 ## Regra de decisao
 
@@ -29,20 +37,20 @@
 | --- | --- | --- | --- |
 | Raiz do repositorio | `git diff --check` | `PASS` | Sem output de erro. |
 | Raiz do repositorio | `bash scripts/validate-planificacao.sh` | `PASS` | `checked_bks: 55`, `checked_guides: 55`, `errors: []`. |
-| `referencia_privada_docente/backend` | `node --test tests/regression/mf6-backend-regression.test.js` | `PASS` | 6 testes, 6 pass, 0 fail, `duration_ms 394.0315`. |
-| `referencia_privada_docente/backend` | `npm test` | `PASS` | Fora da sandbox: 49 testes, 49 pass, 0 fail, `duration_ms 451.821125`; dentro da sandbox falhou apenas por `listen EPERM` em testes HTTP. |
-| `referencia_privada_docente/backend` | `npm run smoke` | `PASS` | Fora da sandbox: 8 testes, 8 pass, 0 fail, `duration_ms 237.024375`; dentro da sandbox falhou apenas por `listen EPERM`. |
-| `referencia_privada_docente/backend` | `node scripts/check-security-baseline.mjs` | `PASS` | Output: `Hardening MF6: PASS`. |
-| `referencia_privada_docente/backend` | `FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE=*** node scripts/measure-performance-baseline.mjs` | `PASS` | Consolidado de `BK-MF6-04`: `/health` 2ms, catalogo 38ms, pesquisa 159ms, recomendacoes 235ms e P95 concorrente 7ms; o cookie real nao foi registado. Nesta execucao, o script sem cookie falhou controladamente com pedido de `FAITHFLIX_SESSION_COOKIE`. |
-| `referencia_privada_docente/frontend` | `node scripts/check-frontend-regression.mjs` | `PASS` | Output: `Regressao frontend MF6: PASS`. |
-| `referencia_privada_docente/frontend` | `npm run build` | `PASS` | Vite build passou, 101 modulos transformados, bundle gerado em 544ms. |
+| `real_dev/backend` | `node --test tests/regression/mf6-backend-regression.test.js` | `PASS` | 6 testes, 6 pass, 0 fail, `duration_ms 394.0315`. |
+| `real_dev/backend` | `npm test` | `PASS` | Fora da sandbox: 49 testes, 49 pass, 0 fail, `duration_ms 451.821125`; dentro da sandbox falhou apenas por `listen EPERM` em testes HTTP. |
+| `real_dev/backend` | `npm run smoke` | `PASS` | Fora da sandbox: 8 testes, 8 pass, 0 fail, `duration_ms 237.024375`; dentro da sandbox falhou apenas por `listen EPERM`. |
+| `real_dev/backend` | `node scripts/check-security-baseline.mjs` | `PASS` | Output: `Hardening MF6: PASS`. |
+| `real_dev/backend` | `FAITHFLIX_API_BASE_URL=http://127.0.0.1:3000 FAITHFLIX_SESSION_COOKIE=*** node scripts/measure-performance-baseline.mjs` | `PASS` | Consolidado de `BK-MF6-04`: `/health` 2ms, catalogo 38ms, pesquisa 159ms, recomendacoes 235ms e P95 concorrente 7ms; o cookie real nao foi registado. Nesta execucao, o script sem cookie falhou controladamente com pedido de `FAITHFLIX_SESSION_COOKIE`. |
+| `real_dev/frontend` | `node scripts/check-frontend-regression.mjs` | `PASS` | Output: `Regressao frontend MF6: PASS`. |
+| `real_dev/frontend` | `npm run build` | `PASS` | Vite build passou, 101 modulos transformados, bundle gerado em 544ms. |
 
 ## Pesquisa estatica obrigatoria
 
 | Pesquisa | Estado | Resultado |
 | --- | --- | --- |
 | Segredos, storage sensivel, XSS, execucao dinamica, TODOs vagos, pagamentos/IA/CDN/DRM indevidos e `deleteMany({})` | `PASS_COM_NOTA` | Apenas falsos positivos defensivos: regras do proprio scanner, lista de chaves sensiveis para redacao/filtragem, teste negativo `stripe_real` e validacao que rejeita segredos em integracoes. |
-| Drift de outros dominios (`StudyFlow`, `OPSA`, `Orelle`, `companyId`, fiscalidade, biometria, turma, professor, sala, disciplina) | `PASS` | Sem ocorrencias em `referencia_privada_docente/backend/src`, `referencia_privada_docente/backend/scripts`, `referencia_privada_docente/backend/tests`, `referencia_privada_docente/frontend/src` e `referencia_privada_docente/frontend/scripts`. |
+| Drift de outros dominios (`StudyFlow`, `OPSA`, `Orelle`, `companyId`, fiscalidade, biometria, turma, professor, sala, disciplina) | `PASS` | Sem ocorrencias em `real_dev/backend/src`, `real_dev/backend/scripts`, `real_dev/backend/tests`, `real_dev/frontend/src` e `real_dev/frontend/scripts`. |
 | Marcadores de preenchimento pendentes em evidence MF6 e relatorios tecnicos MF6 existentes antes deste gate | `PASS` | Sem ocorrencias. |
 
 ## Negativos consolidados

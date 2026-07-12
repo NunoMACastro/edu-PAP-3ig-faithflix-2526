@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF8-05`
 - `guia_path`: `docs/planificacao/guias-bk/MF8/BK-MF8-04-painel-readiness-operacional.md`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -48,7 +48,7 @@ Readiness evita uma decisão final baseada em sensação. Este BK concentra sina
 - Antes: `BK-MF8-03` deixa a suite final preparada.
 - Depois: existe decisão operacional rastreável para `BK-MF8-05`.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - Ler `BK-MF8-03` antes de iniciar este BK.
 - Confirmar que a MF8 ativa tem exatamente `10` guias formais, de `BK-MF8-01` a `BK-MF8-10`.
@@ -110,9 +110,11 @@ Usa `BK-MF8-03`, evidence MF6/MF7/MF8 e scripts existentes como fontes.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -142,9 +144,11 @@ Regista regras para mudar cada estado e impacto na decisão final.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -174,9 +178,11 @@ Usa regra clara: sem bloqueios críticos para `GO`; riscos controlados para `GO_
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -206,9 +212,11 @@ Não reexecutes tudo neste passo; aponta para comandos e evidence de `BK-MF8-03`
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -238,9 +246,11 @@ Lista nomes de variáveis necessárias e onde são documentadas.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -270,9 +280,11 @@ Cada risco deve ter severidade, owner, mitigação e estado.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -302,9 +314,11 @@ Escreve decisão, provas principais, ressalvas e ações antes de `BK-MF8-05`.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -349,7 +363,23 @@ Resultado esperado: a validação documental fica em `PASS`; se existir falha t�
 - O handoff deve indicar decisões fechadas, ressalvas, riscos, blockers e owner da próxima ação.
 - Se houver `FAIL`, o próximo BK só pode avançar com decisão explícita do orientador ou com correção registada.
 
+##### Adendo do sinal visual de readiness
+
+O painel deve ter uma linha própria para `TST-MF8-A11Y-PREVIEW` e registar:
+
+- número de cenários passados/total, engine, rotas e viewports;
+- Axe `serious`/`critical`, overflow, reflow, teclado e altura do header;
+- JavaScript/CSS inicial, peso do logo e confirmação de chunks media lazy;
+- isolamento: API sintética local, rede externa zero, sem backend, DB ou seed;
+- limite: preview-only não fecha full E2E, streaming real, cross-browser nem
+  readiness de produção.
+
+Um sinal visual verde pode sustentar readiness local com ressalvas, mas nunca
+compensa um blocker de segurança, dados, health, backup ou operação.
+
 #### Changelog
 
 - `2026-06-27`: frase dos passos sem código uniformizada com acentuação portuguesa correta.
 - `2026-06-27`: guia corrigido para a MF8 final de 10 BKs, com estrutura obrigatória, conceitos específicos, passos sem código declarados e critérios de evidence mais concretos.
+- `2026-07-10`: painel passou a separar readiness visual preview-only de full
+  E2E, streaming e readiness operacional global.

@@ -5,6 +5,7 @@
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
 import { asObjectId, assertRatingValue } from "./ratings.validation.js";
+import { assertEngageableContent } from "../catalog/catalog-hierarchy.js";
 
 /**
  * Garante que classificações só podem apontar para conteúdo publicado.
@@ -23,6 +24,7 @@ async function assertPublishedContent(db, contentId) {
         throw new HttpError(404, "Conteudo nao encontrado.");
     }
 
+    assertEngageableContent(content);
     return content;
 }
 

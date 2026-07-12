@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF9-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF9/BK-MF9-05-privacidade-operacao-metricas-familia.md`
-- `last_updated`: `2026-07-01`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -31,16 +31,18 @@ No fim, um utilizador autenticado consegue exportar as partilhas familiares em q
 
 `CANONICO`: `RF59` cobre métricas administrativas. Essas métricas servem para operar a plataforma, não para investigar famílias individualmente. Por isso, o painel admin deve contar memberships ativas e convites pendentes, mas não deve listar emails, nomes ou IDs pessoais.
 
-Este BK também protege a pool solidária. Um membro familiar recebe acesso premium por extensão do plano Família do owner, mas não representa uma nova subscrição paga. A distribuição solidária deve continuar a nascer das subscrições pagas, não das memberships.
+Este BK também protege a pool solidária. Um membro familiar recebe acesso premium por extensão do plano Família do owner, mas não representa um pagamento. A distribuição solidária nasce apenas de tentativas financeiras v2 aprovadas e não estimadas no mês UTC fechado, nunca das memberships nem do estado atual da subscrição.
 
 #### Scope-in
 
 - Exportar memberships em que o utilizador autenticado é owner ou membro.
 - Invalidar memberships `pending` e `active` quando uma conta é eliminada.
+- Preservar o último admin ativo e executar a eliminação numa transação única.
+- Remover outbox de reset e PII facultativa do ledger financeiro retido.
 - Expor `familyMembershipsUpdated` no resultado operacional da eliminação.
 - Acrescentar contagens familiares agregadas ao painel admin.
 - Garantir que métricas não expõem emails, nomes ou IDs pessoais de membros.
-- Rever que a pool solidária continua baseada em subscrições pagas.
+- Rever que a pool solidária continua baseada em pagamentos v2 aprovados, não estimados e pertencentes ao mês fechado.
 - Criar teste unitário para exportação e invalidação familiar.
 
 #### Scope-out
@@ -57,12 +59,15 @@ Este BK também protege a pool solidária. Um membro familiar recebe acesso prem
 - Antes: os fluxos de privacidade e métricas conhecem utilizadores, subscrições, comentários, consentimentos, notificações e pedidos RGPD, mas não incluem memberships familiares.
 - Depois: as memberships familiares entram na exportação RGPD, são invalidadas na eliminação de conta e aparecem em métricas apenas como contagens agregadas.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - `BK-MF9-03` completo, com a coleção `subscription_family_memberships`, estados `pending`, `active`, `declined`, `removed` e `left`, e regras de owner/membro.
 - `BK-MF9-04` completo, com convites familiares criados e alterados pela UI.
+- `BK-MF1-04` completo, com `runInTransaction` fail-closed e propagação de
+  `session` em operações críticas.
 - `BK-MF5-01` completo, com `buildUserDataExport(userId)`.
 - `BK-MF5-02` completo, com `deleteMyAccount(userId, input)`.
+- `BK-MF5-04` revisto, com o invariante do último admin operacional.
 - `BK-MF5-05` completo, com `getAdminMetrics(query)`.
 - Ler `RF55`, `RF56`, `RF59`, `RF62`, `RNF17`, `RNF19` e `RNF30`.
 - Rever `backend/src/modules/privacy/privacy.service.js`.
@@ -88,23 +93,25 @@ Métricas admin não são listagens de pessoas. O admin precisa de perceber se a
 
 `RNF17` protege dados sensíveis e segredos; neste BK, a regra prática é não exportar passwords, tokens, cookies ou secrets. `RNF19` exige rastreabilidade em operações críticas; neste BK, a eliminação de conta regista `privacy_deletion_requests`. `RNF30` exige operação diagnosticável; neste BK, as métricas dão contexto agregado sem expor dados pessoais.
 
-A pool solidária é financeira. Ela deve continuar a usar subscrições ativas e planos pagos como base de cálculo. Uma membership familiar é acesso derivado, não pagamento adicional.
+A pool solidária é financeira. Ela usa snapshots de `payment_attempts` elegíveis: `schemaVersion: 2`, `status: "approved"`, `accountingEstimate: false` e `approvedAt` dentro do mês UTC fechado. Uma membership familiar é acesso derivado, não pagamento adicional. Legacy/backfill estimado fica excluído para não apresentar reconstrução histórica como valor cobrado exato.
 
 #### Arquitetura do BK
 
 | Camada | Artefacto | Responsabilidade |
 | --- | --- | --- |
-| Privacidade | `backend/src/modules/privacy/privacy.service.js` | Exporta memberships familiares e invalida memberships abertas na eliminação de conta. |
+| Privacidade | `backend/src/modules/privacy/privacy.service.js` | Preserva export, invalida memberships, limpa outbox e pseudonimiza o ledger na mesma transação. |
+| Invariante admin | `backend/src/modules/users/admin-invariant.service.js` | Serializa a eliminação de admins e preserva pelo menos um admin ativo. |
 | Privacidade HTTP | `backend/src/modules/privacy/privacy.controller.js` e `backend/src/modules/privacy/privacy.routes.js` | Expõem `GET /api/privacy/export` e `DELETE /api/privacy/account` com sessão autenticada. |
 | Métricas | `backend/src/modules/admin-metrics/admin-metrics.service.js` | Conta memberships ativas e convites pendentes sem dados pessoais. |
 | Métricas HTTP | `backend/src/modules/admin-metrics/admin-metrics.controller.js` e `backend/src/modules/admin-metrics/admin-metrics.routes.js` | Expõem `GET /api/admin/metrics` apenas para admin. |
-| Pool solidária | `backend/src/modules/charities/pool-distribution.service.js` | Confirma que a distribuição usa subscrições pagas, não memberships. |
+| Pool solidária | `backend/src/modules/charities/pool-distribution.service.js` | Confirma que a distribuição usa pagamentos v2 elegíveis, não memberships ou subscrições atuais. |
 | Testes | `backend/tests/unit/mf9-subscriptions.test.js` | Prova exportação e invalidação familiar sem servidor HTTP. |
 | Handoff | `BK-MF9-06` | Usa estes resultados no gate final da MF9. |
 
 #### Ficheiros a criar/editar/rever
 
 - EDITAR: `backend/src/modules/privacy/privacy.service.js`
+- CRIAR/EDITAR: `backend/src/modules/users/admin-invariant.service.js`
 - EDITAR: `backend/src/modules/admin-metrics/admin-metrics.service.js`
 - EDITAR: `backend/tests/unit/mf9-subscriptions.test.js`
 - REVER: `backend/src/modules/privacy/privacy.controller.js`
@@ -122,7 +129,7 @@ A pool solidária é financeira. Ela deve continuar a usar subscrições ativas 
 
 Identificar que campos da membership familiar são dados pessoais e decidir em que fluxo entram.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - EDITAR: nenhum ficheiro neste passo.
     - REVER: `backend/src/modules/subscriptions/subscriptions.service.js`
     - REVER: `backend/src/modules/privacy/privacy.service.js`
@@ -140,7 +147,10 @@ Revê a estrutura de `subscription_family_memberships` e classifica estes campos
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é analítico: evita escrever exportação e eliminação antes de saber que dados são pessoais.
+Sem código neste passo.
+
+Este passo é analítico: evita escrever exportação e eliminação antes de saber
+que dados são pessoais.
 
 5. Explicação do código.
 
@@ -160,7 +170,7 @@ Se `invitedEmail` ficar fora da exportação, o utilizador não consegue ver um 
 
 Incluir na exportação RGPD memberships onde o utilizador autenticado é owner ou membro.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - EDITAR: `backend/src/modules/privacy/privacy.service.js`
     - LOCALIZAÇÃO: função completa `exportFamilyMemberships` e função completa `buildUserDataExport`.
 
@@ -255,32 +265,161 @@ Sem sessão autenticada, o endpoint deve rejeitar antes de chegar ao service. Ex
 
 Impedir que convites ou partilhas continuem abertas depois de uma conta ser eliminada.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - EDITAR: `backend/src/modules/privacy/privacy.service.js`
-    - LOCALIZAÇÃO: função completa `invalidateFamilyMembershipsForDeletedAccount` e função completa `deleteMyAccount`.
+    - CRIAR/EDITAR: `backend/src/modules/users/admin-invariant.service.js`
+    - LOCALIZAÇÃO: import do invariante admin, helpers de cancelamento,
+      memberships e pseudonimização financeira, e função completa
+      `deleteMyAccount`.
 
 3. Instruções do que fazer.
 
-Adiciona `invalidateFamilyMembershipsForDeletedAccount` depois de `cancelSubscriptionsForDeletedAccount`. Depois substitui `deleteMyAccount` pela versão completa abaixo, preservando a validação forte de confirmação criada em `BK-MF5-02`.
+Preserva integralmente `buildUserDataExport`, os helpers de exportação e a
+eliminação base criados em MF5. Acrescenta o import do invariante do último
+admin e cria explicitamente os três helpers abaixo; não assumes que
+`cancelSubscriptionsForDeletedAccount` existe. Depois substitui apenas
+`deleteMyAccount` pela versão completa composta. `runInTransaction` já foi
+criado na fundação `BK-MF1-04`; todas as leituras/escritas que decidem ou alteram
+o estado da eliminação usam a `session` recebida pela callback.
 
 4. Código completo, correto e integrado com a app final.
 
 ```js
+// backend/src/modules/users/admin-invariant.service.js
+import { HttpError } from "../../utils/http-error.js";
+
+/**
+ * Indica se a conta conta como administrador capaz de iniciar sessão.
+ *
+ * @param {{ role?: string, accountStatus?: string, status?: string }} user Utilizador observado.
+ * @returns {boolean} Verdadeiro apenas para um admin operacional.
+ */
+export function isActiveAdmin(user) {
+    const accountStatusAllowsLogin = user?.accountStatus === undefined ||
+        user.accountStatus === "active";
+    const legacyStatusAllowsLogin = user?.status === undefined ||
+        user.status === "active";
+
+    return user?.role === "admin" &&
+        accountStatusAllowsLogin &&
+        legacyStatusAllowsLogin;
+}
+
+/**
+ * Serializa remoções de admins e recusa a transição de um para zero.
+ *
+ * @param {{ db: import("mongodb").Db, session: import("mongodb").ClientSession, user: object, now?: Date }} input Contexto transacional.
+ * @returns {Promise<void>} Termina quando o invariante continua satisfeito.
+ */
+export async function assertAnotherActiveAdminRemains(input) {
+    if (!isActiveAdmin(input.user)) return;
+    const now = input.now instanceof Date ? input.now : new Date();
+
+    // O write-conflict no roster impede duas eliminações concorrentes de
+    // aprovarem a mesma contagem antiga de administradores.
+    await input.db.collection("admin_invariants").updateOne(
+        { _id: "active-admin-roster" },
+        {
+            $inc: { revision: 1 },
+            $set: { updatedAt: now },
+            $setOnInsert: { createdAt: now },
+        },
+        { upsert: true, session: input.session },
+    );
+    const activeAdminCount = await input.db.collection("users").countDocuments(
+        {
+            role: "admin",
+            $and: [
+                {
+                    $or: [
+                        { accountStatus: "active" },
+                        { accountStatus: { $exists: false } },
+                    ],
+                },
+                {
+                    $or: [
+                        { status: "active" },
+                        { status: { $exists: false } },
+                    ],
+                },
+            ],
+        },
+        { session: input.session },
+    );
+
+    if (activeAdminCount <= 1) {
+        throw new HttpError(
+            409,
+            "A operação removeria o último administrador ativo.",
+            undefined,
+            "LAST_ACTIVE_ADMIN",
+        );
+    }
+}
+```
+
+```js
 // backend/src/modules/privacy/privacy.service.js
+// MANTER todos os imports de MF5 (incluindo consentimentos) e ADICIONAR só este:
+import { assertAnotherActiveAdminRemains } from "../users/admin-invariant.service.js";
+
+// Os imports existentes já fornecem ObjectId, getDb, runInTransaction,
+// HttpError, verifyPassword, assertDeleteAccountPayload e helpers de consentimento.
+// MANTER `buildUserDataExport` e todo o código anterior de MF5 neste ficheiro.
+
+/**
+ * Cancela subscrições operacionais sem apagar o histórico financeiro.
+ *
+ * @param {import("mongodb").Db} db Ligação MongoDB.
+ * @param {ObjectId} userObjectId Id do utilizador eliminado.
+ * @param {import("mongodb").ClientSession} session Sessão transacional comum.
+ * @returns {Promise<number>} Número de subscrições canceladas.
+ */
+async function cancelSubscriptionsForDeletedAccount(db, userObjectId, session) {
+    const result = await db.collection("subscriptions").updateMany(
+        { userId: userObjectId },
+        {
+            $set: {
+                status: "canceled",
+                cancelAtPeriodEnd: true,
+                accountDeleted: true,
+                updatedAt: new Date(),
+            },
+            // O ledger permanece; contactos facultativos deixam de identificar a conta.
+            $unset: { contactEmail: "", customerEmail: "" },
+        },
+        { session },
+    );
+
+    return result.modifiedCount ?? 0;
+}
+
 /**
  * Invalida convites e partilhas familiares associados a uma conta eliminada.
  *
  * @param {import("mongodb").Db} db Ligação MongoDB.
  * @param {ObjectId} userObjectId Id do utilizador.
+ * @param {string} userEmail Email observado antes da anonimização.
+ * @param {import("mongodb").ClientSession} session Sessão transacional comum.
  * @returns {Promise<number>} Número de memberships atualizadas.
  */
-async function invalidateFamilyMembershipsForDeletedAccount(db, userObjectId) {
-    const result = await db.collection("subscription_family_memberships").updateMany(
+async function invalidateFamilyMembershipsForDeletedAccount(
+    db,
+    userObjectId,
+    userEmail,
+    session,
+) {
+    const identityFilter = {
+        $or: [
+            { ownerUserId: userObjectId },
+            { memberUserId: userObjectId },
+            { invitedEmail: userEmail },
+        ],
+    };
+    const memberships = db.collection("subscription_family_memberships");
+    const result = await memberships.updateMany(
         {
-            $or: [
-                { ownerUserId: userObjectId },
-                { memberUserId: userObjectId },
-            ],
+            ...identityFilter,
             status: { $in: ["pending", "active"] },
         },
         {
@@ -291,6 +430,43 @@ async function invalidateFamilyMembershipsForDeletedAccount(db, userObjectId) {
                 updatedAt: new Date(),
             },
         },
+        { session },
+    );
+    await memberships.updateMany(
+        identityFilter,
+        {
+            $unset: {
+                invitedEmail: "",
+                contactEmail: "",
+            },
+        },
+        { session },
+    );
+
+    return result.modifiedCount ?? 0;
+}
+
+/**
+ * Mantém o ledger financeiro obrigatório e remove contactos facultativos.
+ *
+ * @param {import("mongodb").Db} db Ligação MongoDB.
+ * @param {ObjectId} userObjectId Id do utilizador eliminado.
+ * @param {import("mongodb").ClientSession} session Sessão transacional comum.
+ * @returns {Promise<number>} Número de registos financeiros pseudonimizados.
+ */
+async function scrubRetainedFinancialRecords(db, userObjectId, session) {
+    const result = await db.collection("payment_attempts").updateMany(
+        { userId: userObjectId },
+        {
+            $set: { accountDeleted: true, updatedAt: new Date() },
+            // Montantes/snapshots ficam imutáveis; só PII facultativa é removida.
+            $unset: {
+                email: "",
+                customerEmail: "",
+                payerEmail: "",
+            },
+        },
+        { session },
     );
 
     return result.modifiedCount ?? 0;
@@ -304,57 +480,142 @@ async function invalidateFamilyMembershipsForDeletedAccount(db, userObjectId) {
  * @returns {Promise<{ deleted: true, removed: Record<string, number>, commentsAnonymized: number, subscriptionsCanceled: number, familyMembershipsUpdated: number }>} Resultado operacional.
  */
 export async function deleteMyAccount(userId, input) {
-    assertDeleteAccountPayload(input);
-
-    const db = await getDb();
+    const { password } = assertDeleteAccountPayload(input);
     const userObjectId = asUserObjectId(userId);
-    const user = await db.collection("users").findOne({ _id: userObjectId });
 
-    if (!user) {
-        throw new HttpError(404, "Utilizador não encontrado.");
-    }
+    return runInTransaction(async ({ db, session }) => {
+        const currentUser = await db.collection("users").findOne(
+            { _id: userObjectId },
+            { session },
+        );
 
-    const now = new Date();
-    const [removed, commentsAnonymized, subscriptionsCanceled, familyMembershipsUpdated] =
-        await Promise.all([
-            deletePersonalCollections(db, userObjectId),
-            anonymizeComments(db, userObjectId),
-            cancelSubscriptionsForDeletedAccount(db, userObjectId),
-            invalidateFamilyMembershipsForDeletedAccount(db, userObjectId),
-            // As sessões são removidas no mesmo fluxo para impedir uso da conta apagada.
-            db.collection("sessions").deleteMany({ userId: userObjectId }),
-        ]);
+        if (!currentUser?.passwordHash) {
+            throw new HttpError(404, "Utilizador não encontrado.");
+        }
 
-    await db.collection("privacy_deletion_requests").insertOne({
-        userId: userObjectId,
-        requestedAt: now,
-        accountStatusBefore: user.accountStatus ?? "active",
+        if (!(await verifyPassword(password, currentUser.passwordHash))) {
+            throw new HttpError(
+                403,
+                "Password atual incorreta.",
+                undefined,
+                "CURRENT_PASSWORD_INVALID",
+            );
+        }
+
+        // A segunda leitura funciona como CAS sobre o hash observado.
+        const user = await db.collection("users").findOne(
+            { _id: userObjectId, passwordHash: currentUser.passwordHash },
+            { session },
+        );
+
+        if (!user || ["blocked", "deleted"].includes(user.accountStatus)) {
+            throw new HttpError(
+                409,
+                "A conta mudou durante o pedido. Tenta novamente.",
+                undefined,
+                "ACCOUNT_STATE_CHANGED",
+            );
+        }
+
+        const now = new Date();
+        await assertAnotherActiveAdminRemains({
+            db,
+            session,
+            user,
+            now,
+        });
+
+        // A outbox PAP referencia apenas ids. Captura os ids antes de eliminar
+        // password_reset_tokens; nunca filtra por email nem pelo token opaco.
+        const resetTokenRows = await db.collection("password_reset_tokens")
+            .find(
+                { userId: userObjectId },
+                { session, projection: { _id: 1 } },
+            )
+            .toArray();
+        const resetTokenIds = resetTokenRows.map((row) => row._id);
+        const outboxIdentity = resetTokenIds.length > 0
+            ? {
+                $or: [
+                    { userId: userObjectId },
+                    { resetTokenId: { $in: resetTokenIds } },
+                ],
+            }
+            : { userId: userObjectId };
+        await db.collection("password_reset_dev_outbox").deleteMany(
+            outboxIdentity,
+            { session },
+        );
+
+        const removed = await deletePersonalCollections(
+            db,
+            userObjectId,
+            session,
+        );
+        const commentsAnonymized = await anonymizeComments(
+            db,
+            userObjectId,
+            session,
+        );
+        const subscriptionsCanceled = await cancelSubscriptionsForDeletedAccount(
+            db,
+            userObjectId,
+            session,
+        );
+        const familyMembershipsUpdated =
+            await invalidateFamilyMembershipsForDeletedAccount(
+                db,
+                userObjectId,
+                user.email,
+                session,
+            );
+
+        await scrubRetainedFinancialRecords(db, userObjectId, session);
+        await db
+            .collection("sessions")
+            .deleteMany({ userId: userObjectId }, { session });
+        await db.collection("privacy_deletion_requests").insertOne(
+            {
+                userId: userObjectId,
+                requestedAt: now,
+                accountStatusBefore: user.accountStatus ?? "active",
+            },
+            { session },
+        );
+
+        const updated = await db.collection("users").updateOne(
+            { _id: userObjectId, passwordHash: currentUser.passwordHash },
+            {
+                $set: {
+                    name: "Conta eliminada",
+                    email: `deleted-${String(userObjectId)}@faithflix.local`,
+                    accountStatus: "deleted",
+                    role: "user",
+                    deletedAt: now,
+                    updatedAt: now,
+                },
+                $unset: { passwordHash: "" },
+            },
+            { session },
+        );
+
+        if (updated.matchedCount !== 1) {
+            throw new HttpError(
+                409,
+                "A conta mudou durante o pedido. Tenta novamente.",
+                undefined,
+                "ACCOUNT_STATE_CHANGED",
+            );
+        }
+
+        return {
+            deleted: true,
+            removed,
+            commentsAnonymized,
+            subscriptionsCanceled,
+            familyMembershipsUpdated,
+        };
     });
-
-    await db.collection("users").updateOne(
-        { _id: userObjectId },
-        {
-            $set: {
-                name: "Conta eliminada",
-                email: `deleted-${String(userObjectId)}@faithflix.local`,
-                accountStatus: "deleted",
-                role: "user",
-                deletedAt: now,
-                updatedAt: now,
-            },
-            $unset: {
-                passwordHash: "",
-            },
-        },
-    );
-
-    return {
-        deleted: true,
-        removed,
-        commentsAnonymized,
-        subscriptionsCanceled,
-        familyMembershipsUpdated,
-    };
 }
 ```
 
@@ -362,17 +623,37 @@ export async function deleteMyAccount(userId, input) {
 
 `invalidateFamilyMembershipsForDeletedAccount` procura o utilizador nos dois lados da relação familiar. Só altera memberships `pending` e `active`, porque são os estados que ainda representam convite aberto ou acesso ativo. Memberships já fechadas, como `declined`, `removed` ou `left`, não precisam de nova alteração.
 
-`deleteMyAccount` mantém a validação de `BK-MF5-02` antes de tocar na base de dados. A limpeza corre em paralelo para remover dados pessoais, anonimizar comentários, cancelar subscrições, invalidar memberships familiares e apagar sessões. O retorno inclui `familyMembershipsUpdated`, para que o PR e o gate consigam provar quantas memberships foram afetadas.
+`deleteMyAccount` mantém a exportação e a validação de `BK-MF5-02`, verifica a
+password atual e abre uma única transação. O invariante do roster recusa apagar
+o último admin operacional com `409 LAST_ACTIVE_ADMIN`. Limpeza pessoal
+(incluindo trials), comentários, subscrições, convites/memberships, scrub do
+ledger financeiro retido, outbox de reset, sessões, pedido RGPD e anonimização
+da conta usam a mesma `session` e são sequenciais. O filtro final inclui o
+`passwordHash` observado; se a conta mudar ou uma escrita falhar, toda a
+operação faz rollback.
 
-A atualização da conta troca o email por um endereço técnico local e remove `passwordHash`. Isto evita manter credenciais ativas numa conta eliminada.
+A atualização da conta troca o email por um endereço técnico local e remove
+`passwordHash`. Os `payment_attempts` conservam montantes e snapshots exigidos
+pela contabilidade, mas perdem emails facultativos e ficam marcados
+`accountDeleted`. Isto evita manter credenciais ou PII dispensável numa conta
+eliminada sem adulterar o ledger.
 
 6. Validação do passo.
 
 Elimina uma conta owner com membership ativa. Expected result: `DELETE /api/privacy/account` devolve `200 OK`, `deleted: true`, `familyMembershipsUpdated: 1`, e a membership passa para `status: "removed"` com `removedReason: "account_deleted"`.
 
+Repete com dois admins ativos e confirma que outbox, sessões e contactos
+financeiros desaparecem na mesma operação. Depois tenta eliminar o único admin
+ativo: expected result `409 LAST_ACTIVE_ADMIN` e zero alterações em qualquer
+coleção.
+
 7. Cenário negativo/erro esperado.
 
-Envia confirmação errada, por exemplo `{ "confirmation": "apagar" }`. Expected result: erro `400`, a conta mantém `accountStatus: "active"` e a membership continua no estado anterior.
+Envia confirmação errada, por exemplo `{ "confirmation": "apagar" }`. Expected
+result: erro `400`, a conta mantém `accountStatus: "active"` e a membership
+continua no estado anterior. Injeta também uma falha depois do scrub financeiro:
+conta, ledger, outbox, sessões e membership têm de regressar integralmente ao
+estado anterior.
 
 ### Passo 4 - Preservar métricas existentes e adicionar contagens familiares
 
@@ -380,7 +661,7 @@ Envia confirmação errada, por exemplo `{ "confirmation": "apagar" }`. Expected
 
 Permitir ao admin medir uso da funcionalidade familiar sem apagar métricas administrativas já criadas em MF5.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - EDITAR: `backend/src/modules/admin-metrics/admin-metrics.service.js`
     - LOCALIZAÇÃO: função completa `getAdminMetrics`; rever helpers `count` e `sumCents`.
 
@@ -439,7 +720,7 @@ export async function getAdminMetrics(query = {}) {
             requestedAt: { $gte: from, $lte: to },
         }),
         count(db, "user_consent_events", {
-            changedAt: { $gte: from, $lte: to },
+            createdAt: { $gte: from, $lte: to },
         }),
         count(db, "charities", { status: "active", poolStatus: "eligible" }),
         sumCents(db, "pool_distributions", createdInRange, "totalPoolCents"),
@@ -503,92 +784,51 @@ Chama `GET /api/admin/metrics` com utilizador comum. Expected result: acesso rec
 
 Confirmar que membros familiares não contam como novas subscrições pagas para distribuição solidária.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - REVER: `backend/src/modules/charities/pool-distribution.service.js`
     - REVER: `backend/src/modules/subscriptions/subscriptions.service.js`
     - LOCALIZAÇÃO: função `runMonthlyDistribution`.
 
 3. Instruções do que fazer.
 
-Revê `runMonthlyDistribution` e confirma que o total da pool nasce de documentos em `subscriptions` com `status: "active"` e `currentPeriodEnd` no futuro. Não adiciones consulta a `subscription_family_memberships` para calcular dinheiro.
+Revê `runMonthlyDistribution` e confirma o filtro cumulativo sobre `payment_attempts`: `schemaVersion: 2`, `status: "approved"`, `accountingEstimate: false` e `approvedAt` em `[start, end)` UTC. Não adiciones `subscription_family_memberships`, `subscriptions` ou preços atuais de planos ao cálculo financeiro.
 
 4. Código completo, correto e integrado com a app final.
 
+Não redefinas esta função em MF9. Reutiliza integralmente a implementação
+autoritativa de `BK-MF4-05`, incluindo a assinatura de três argumentos
+`runMonthlyDistribution(monthInput, createdByUserId, context = {})`, os campos
+`trigger` e `referenceDate`, o audit transacional, o DTO público, a ordenação
+determinística, o replay idempotente e o tratamento de corrida pelo índice
+único. Este BK acrescenta apenas a prova de que memberships não entram no
+ledger e as métricas agregadas do Passo 4.
+
+Num teste de integração, chama a função canónica sem criar wrapper concorrente:
+
 ```js
-// backend/src/modules/charities/pool-distribution.service.js
-/**
- * Executa a distribuição mensal da pool solidária.
- *
- * @param {string} monthInput Mês no formato `YYYY-MM`.
- * @param {string} createdByUserId Identificador do admin que executa a distribuição.
- * @returns {Promise<{ distribution: object }>} Distribuição persistida.
- * @throws {Error} Quando o mês já existe ou não há associações elegíveis.
- */
-export async function runMonthlyDistribution(monthInput, createdByUserId) {
-    const db = await getDb();
-    const month = assertDistributionMonth(monthInput);
-    const now = new Date();
-    const existing = await db.collection("pool_distributions").findOne({ month });
-    if (existing) {
-        const error = new Error("Distribuição deste mês já existe.");
-        error.statusCode = 409;
-        throw error;
-    }
+const result = await runMonthlyDistribution("2026-06", adminUserId, {
+    trigger: "admin",
+    referenceDate: new Date("2026-07-01T00:05:00.000Z"),
+});
 
-    // Só subscrições pagas ativas entram na receita; memberships familiares são acesso derivado.
-    const subscriptions = await db.collection("subscriptions").find({
-        status: "active",
-        currentPeriodEnd: { $gt: now },
-    }).toArray();
-    const plans = await db.collection("subscription_plans").find({ active: true }).toArray();
-    const planByCode = new Map(plans.map((plan) => [plan.code, plan]));
-
-    // O cálculo em cêntimos evita erros de arredondamento em dinheiro.
-    const totalPoolCents = subscriptions.reduce((total, subscription) => {
-        const plan = planByCode.get(subscription.planCode);
-        if (!plan) return total;
-        return total + Math.round((plan.priceCents * plan.solidaritySharePercent) / 100);
-    }, 0);
-
-    const charities = await db.collection("charities").find({
-        status: "active",
-        poolStatus: "eligible",
-    }).sort({ approvedAt: 1 }).toArray();
-
-    if (charities.length === 0) {
-        const error = new Error("Não existem associações elegíveis.");
-        error.statusCode = 409;
-        throw error;
-    }
-
-    const lastRun = await db.collection("pool_distributions").findOne({}, { sort: { month: -1 } });
-    const offset = nextRotationOffset(charities, lastRun);
-    const rotated = [...charities.slice(offset), ...charities.slice(0, offset)];
-    const items = splitCents(totalPoolCents, rotated);
-
-    const run = {
-        month,
-        totalPoolCents,
-        status: "completed",
-        items,
-        createdBy: ObjectId.isValid(createdByUserId) ? new ObjectId(createdByUserId) : null,
-        createdAt: now,
-    };
-
-    const result = await db.collection("pool_distributions").insertOne(run);
-    return { distribution: { ...run, id: String(result.insertedId) } };
-}
+assert.equal(result.distribution.month, "2026-06");
+assert.equal(result.distribution.trigger, "admin");
+assert.equal(result.distribution.financialSnapshot.source, "payment_attempts_v2");
 ```
+
+O teste deve importar `runMonthlyDistribution` de
+`pool-distribution.service.js` e `assert` de `node:assert/strict`. Não edita
+a função de produção neste passo.
 
 5. Explicação do código.
 
-Este passo não pede mudança funcional à pool; pede revisão de contrato. A query lê `subscriptions`, não `subscription_family_memberships`. Isso quer dizer que o owner Família contribui como subscritor pago, mas os membros familiares não multiplicam a receita.
+Este passo confirma o contrato financeiro corrigido. A query lê `payment_attempts` v2 elegíveis, não `subscriptions` nem `subscription_family_memberships`. O pagamento aprovado do owner Família pode contribuir uma vez; os membros não multiplicam receita. Documentos legacy e backfills com `accountingEstimate: true` ficam excluídos.
 
 O cálculo continua em cêntimos para evitar erros de ponto flutuante. A rotação das associações continua igual ao fluxo da MF4, preservando candidatura, elegibilidade, distribuição mensal e histórico.
 
 6. Validação do passo.
 
-Cria uma subscrição Família ativa com dois membros familiares. Executa a distribuição mensal. Expected result: `totalPoolCents` usa o preço do plano do owner uma vez, não três vezes.
+Cria, em doubles locais, um pagamento v2 aprovado do owner Família e dois membros familiares. Executa um mês UTC já fechado. Expected result: `totalPoolCents` usa o snapshot do único pagamento; memberships não alteram o valor. Acrescenta um backfill estimado e confirma que continua excluído.
 
 7. Cenário negativo/erro esperado.
 
@@ -600,7 +840,7 @@ Se a distribuição somar membros familiares como pagamentos adicionais, o valor
 
 Provar que os dados familiares entram no ciclo de privacidade sem depender de servidor HTTP.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - EDITAR: `backend/tests/unit/mf9-subscriptions.test.js`
     - LOCALIZAÇÃO: imports de privacidade e teste MF9 de exportação/eliminação.
 
@@ -616,17 +856,20 @@ import {
   buildUserDataExport,
   deleteMyAccount,
 } from "../../src/modules/privacy/privacy.service.js";
+import { hashPassword } from "../../src/modules/auth/auth.password.js";
 
 test("MF9 exporta e invalida memberships familiares na eliminação de conta", async () => {
   const userId = new ObjectId();
   const memberId = new ObjectId();
   const membershipId = new ObjectId();
+  const resetTokenId = new ObjectId();
   const collections = setCollectionsForTests({
     users: collection([
       {
         _id: userId,
         name: "Owner",
         email: "owner@example.test",
+        passwordHash: await hashPassword("password1234"),
         role: "user",
         accountStatus: "active",
       },
@@ -641,8 +884,24 @@ test("MF9 exporta e invalida memberships familiares na eliminação de conta", a
         createdAt: new Date("2026-01-01T00:00:00.000Z"),
       },
     ]),
-    sessions: collection([]),
+    sessions: collection([{ _id: new ObjectId(), userId }]),
     subscriptions: collection([]),
+    payment_attempts: collection([
+      {
+        _id: new ObjectId(),
+        userId,
+        schemaVersion: 2,
+        amountCents: 999,
+        email: "owner@example.test",
+        payerEmail: "owner@example.test",
+      },
+    ]),
+    password_reset_tokens: collection([
+      { _id: resetTokenId, userId, tokenHash: "hash-nao-reversivel" },
+    ]),
+    password_reset_dev_outbox: collection([
+      { _id: new ObjectId(), userId, resetTokenId },
+    ]),
     content_comments: collection([]),
     privacy_deletion_requests: collection([]),
   });
@@ -653,10 +912,16 @@ test("MF9 exporta e invalida memberships familiares na eliminação de conta", a
   // A confirmação forte impede que a suite ensine eliminação acidental de contas.
   const deleted = await deleteMyAccount(String(userId), {
     confirmation: "ELIMINAR CONTA",
+    password: "password1234",
   });
 
   assert.equal(deleted.familyMembershipsUpdated, 1);
   assert.equal(collections.subscription_family_memberships.rows[0].status, "removed");
+  assert.equal(collections.sessions.rows.length, 0);
+  assert.equal(collections.password_reset_dev_outbox.rows.length, 0);
+  assert.equal(collections.payment_attempts.rows[0].accountDeleted, true);
+  assert.equal("email" in collections.payment_attempts.rows[0], false);
+  assert.equal("payerEmail" in collections.payment_attempts.rows[0], false);
 });
 ```
 
@@ -664,7 +929,13 @@ test("MF9 exporta e invalida memberships familiares na eliminação de conta", a
 
 O teste cria uma membership ativa entre owner e membro. Primeiro, chama `buildUserDataExport` e confirma que a secção `subscription_family_memberships` existe. Depois, chama `deleteMyAccount` com a confirmação forte criada em `BK-MF5-02` e confirma que uma membership foi atualizada.
 
-A assert ao estado `removed` prova que o acesso familiar foi fechado. O teste não precisa de servidor HTTP porque está a validar a regra de service; os controllers e middlewares são revistos nos passos de validação final.
+A assert ao estado `removed` prova que o acesso familiar foi fechado. As asserts
+seguintes provam a revogação de sessões/outbox e que o ledger retém o montante,
+mas já não contém os emails facultativos. A fixture guarda apenas o hash e o
+pedido fornece a password atual. O double transacional da suite deve fazer
+staging e rollback; um teste de fault injection depois da alteração da
+membership tem de deixar membership, ledger, outbox, sessões e conta
+inalterados.
 
 6. Validação do passo.
 
@@ -672,7 +943,12 @@ Executa `cd backend && npm test -- --test-name-pattern=MF9`. Expected result: a 
 
 7. Cenário negativo/erro esperado.
 
-Altera temporariamente a confirmação para `"APAGAR"`. Expected result: `deleteMyAccount` rejeita o pedido e a membership mantém `status: "active"`. Reverte essa alteração antes de fechar o BK.
+Altera temporariamente a confirmação para `"APAGAR"`. Expected result:
+`deleteMyAccount` rejeita o pedido e a membership mantém `status: "active"`.
+Acrescenta ainda uma fixture em que o utilizador é o único admin operacional:
+espera `409 LAST_ACTIVE_ADMIN` e confirma que conta, roster, membership,
+payment attempt, outbox e sessão não mudaram. Reverte qualquer mutação
+temporária antes de fechar o BK.
 
 ### Passo 7 - Fechar evidence operacional
 
@@ -680,7 +956,7 @@ Altera temporariamente a confirmação para `"APAGAR"`. Expected result: `delete
 
 Preparar a prova que `BK-MF9-06` vai usar no gate final.
 
-2. Ficheiros envolvidos:
+2. Ficheiros envolvidos.
     - REVER: `backend/src/modules/privacy/privacy.controller.js`
     - REVER: `backend/src/modules/privacy/privacy.routes.js`
     - REVER: `backend/src/modules/admin-metrics/admin-metrics.controller.js`
@@ -710,7 +986,7 @@ O teste automatizado não substitui a revisão manual das respostas HTTP. Por is
 Expected results:
 
 - `GET /api/privacy/export` autenticado: `200 OK`, `export.sections.subscription_family_memberships` existe.
-- `DELETE /api/privacy/account` autenticado com `{ "confirmation": "ELIMINAR CONTA" }`: `200 OK`, `deleted: true`, `familyMembershipsUpdated` numérico.
+- `DELETE /api/privacy/account` autenticado com `{ "confirmation": "ELIMINAR CONTA", "password": "<password-atual>" }`: `200 OK`, `deleted: true`, `familyMembershipsUpdated` numérico.
 - `GET /api/admin/metrics` como admin: `200 OK`, `metrics.subscriptions.familyMembers` e `metrics.subscriptions.familyInvitationsPending` são números.
 - `GET /api/admin/metrics` como utilizador comum: acesso recusado.
 
@@ -723,10 +999,30 @@ Se as métricas expuserem emails, nomes, `ownerUserId` ou `memberUserId`, o PR d
 - A exportação RGPD inclui `subscription_family_memberships` do owner e do membro.
 - A eliminação de conta invalida memberships `pending` e `active`.
 - `familyMembershipsUpdated` aparece no resultado operacional da eliminação.
+- A eliminação exige frase e password atual; password incorreta devolve
+  `403 CURRENT_PASSWORD_INVALID` sem qualquer alteração.
+- O único admin ativo não pode eliminar a conta: devolve
+  `409 LAST_ACTIVE_ADMIN` sem qualquer alteração.
+- Limpeza, trials, memberships/convites, subscrições, scrub financeiro, outbox,
+  sessões, pedido RGPD e anonimização partilham uma única transação/sessão;
+  fault injection ou CAS falhado deixa zero estado parcial.
+- `payment_attempts` mantém montantes e snapshots, remove contactos facultativos
+  e fica marcado `accountDeleted`; a outbox é limpa apenas por `userId` e
+  `resetTokenId`, nunca por email ou token opaco.
+- A invariante conta apenas admins com `accountStatus` ausente/`active` e
+  `status` ausente/`active`; estados bloqueados, inativos, eliminados,
+  desconhecidos ou `null` não protegem a remoção do último admin real.
 - As métricas admin preservam campos existentes: `users`, `catalog`, `privacy`, `notifications`, `solidarity`, `generatedAt` e `range`.
 - As métricas admin incluem `familyMembers` e `familyInvitationsPending` como contagens.
+- Eventos de consentimento são medidos por `user_consent_events.createdAt`, o
+  campo canónico de `BK-MF5-03`.
 - As métricas admin não expõem emails, nomes ou IDs pessoais de membros familiares.
-- A pool solidária continua baseada em subscrições pagas, não em memberships familiares.
+- A pool solidária reutiliza a função canónica de três argumentos de
+  `BK-MF4-05`, incluindo trigger, referenceDate, audit, DTO, ordenação, replay e
+  proteção de corrida; usa apenas pagamentos `schemaVersion: 2`, aprovados,
+  não estimados e com `approvedAt` no mês UTC.
+- Sem associação elegível no fecho, fica um ledger terminal `deferred_no_eligible_charities`, sem retry infinito nem distribuição retroativa após aprovação posterior.
+- O catch-up processa, no máximo, 120 meses pendentes por passagem e progride através de lotes históricos já fechados.
 - O teste MF9 cobre exportação e invalidação familiar.
 
 #### Validação final
@@ -742,8 +1038,12 @@ Revê também:
 
 - `GET /api/privacy/export`: `200 OK` autenticado e secção `subscription_family_memberships`.
 - `DELETE /api/privacy/account`: `200 OK` com confirmação forte; erro com confirmação errada.
+- `DELETE /api/privacy/account`: `409 LAST_ACTIVE_ADMIN` para o único admin
+  ativo, sem alterações em conta, memberships, ledger, outbox ou sessões.
+- Fault injection após o scrub financeiro: rollback integral de todas as
+  coleções tocadas.
 - `GET /api/admin/metrics`: `200 OK` como admin; acesso recusado como utilizador comum.
-- `backend/src/modules/charities/pool-distribution.service.js`: sem contagem de `subscription_family_memberships` para calcular dinheiro.
+- `backend/src/modules/charities/pool-distribution.service.js`: sem contagem de `subscription_family_memberships`/`subscriptions`; filtro financeiro v2 cumulativo e snapshots persistidos.
 
 Erros comuns a evitar:
 
@@ -760,6 +1060,9 @@ Erros comuns a evitar:
 - `proof`: exemplo de exportação com `sections.subscription_family_memberships`.
 - `proof`: exemplo de métricas com `subscriptions.familyMembers` e `subscriptions.familyInvitationsPending`.
 - `neg`: eliminação com confirmação errada rejeitada.
+- `neg`: eliminação do único admin ativo rejeitada com `LAST_ACTIVE_ADMIN`.
+- `neg`: falha após scrub financeiro reverte ledger, outbox, memberships,
+  sessões, pedido RGPD e conta.
 - `neg`: utilizador comum bloqueado em `GET /api/admin/metrics`.
 - `fonte`: `RF55`, `RF56`, `RF59`, `RF62`, `RNF17`, `RNF19`, `RNF30`, `BK-MF9-03`, `BK-MF9-04`.
 
@@ -769,4 +1072,11 @@ Este BK entrega a prova de privacidade e operação familiar para `BK-MF9-06`. O
 
 #### Changelog
 
+- `2026-07-10`: composição RGPD completada com helper de subscrições definido,
+  invariante do último admin, scrub financeiro e outbox na mesma transação;
+  exportação anterior preservada.
+- `2026-07-10`: normalizado para tutorial v2 e marker analítico autónomo,
+  preservando RGPD transacional e contabilidade v2.
 - `2026-07-01`: guia corrigido com PT-PT, funções completas de privacidade/métricas, validações HTTP objetivas, revisão da pool solidária, teste MF9 e evidence operacional.
+- `2026-07-10`: pool familiar sincronizada para pagamentos v2 aprovados/não estimados, mês UTC fechado e snapshots; eliminação atualizada para confirmação mais password atual.
+- `2026-07-10`: pool sem beneficiárias passa a fecho diferido terminal e não retroativo; catch-up limitado a 120 meses pendentes por passagem.

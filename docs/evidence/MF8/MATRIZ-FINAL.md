@@ -1,4 +1,10 @@
-# Matriz final - MF8
+# Matriz MF8 — snapshot de 2026-06-29
+
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-29`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md`
+- `proof_scope`: matriz MF8 observada em 2026-06-29; baseline e critérios atuais estão na matriz canónica
 
 ## Metadados
 
@@ -6,24 +12,39 @@
 - `macro`: `MF8`
 - `data`: `2026-06-29`
 - `estado`: `PASS_COM_RESSALVAS`
-- `decisao`: requisitos e evidencias ficam consolidados para a lista de riscos totais, mantendo ressalvas documentadas.
+- `decisao`: nesse snapshot, requisitos e evidences ficaram consolidados para a lista de riscos totais, mantendo ressalvas documentadas.
 - `pr`: `NAO_APLICAVEL`; entrega local de evidence PAP.
 - `fonte`: `BK-MF8-06`, `RF_ATIVOS_MVP`, `BACKLOG-MVP.md`, `MATRIZ-CANONICA-BK.md`, evidencias MF6/MF7/MF8 e relatorios de implementacao/auditoria.
 
-## Fontes finais
+> **Aviso de validade — Fase 2 (2026-07-09):** este documento é um snapshot histórico anterior à Fase 2 de 2026-07-09. Os resultados e decisões preservados abaixo não provam CP2 nem o estado atual da aplicação.
+
+## Procedimento atual — interpretação de streaming (2026-07-10)
+
+A matriz histórica abaixo não é reclassificada. A prova atual acrescenta apenas
+uma suite browser isolada com fixtures canvas fMP4 320×180: progressive/HLS/DASH
+passaram em Chromium/Firefox/WebKit (`9/9`) por build + preview test-mode,
+interception de API/media e rede loopback. Não houve backend, DB ou seed.
+
+O DTO atual expõe uma única `content.source = { url, protocol, mimeType }` e
+listas públicas sem fontes. A label `4K` não prova resolução 4K. Assim,
+`RNF08`/`RNF10` permanecem `NAO_PROVADO`, `RNF23` fica `PARCIAL_VALIDADO` e o
+full E2E funcional permanece `NAO_REVALIDADO`; os `PASS_COM_RESSALVAS`
+históricos abaixo não substituem estes estados atuais.
+
+## Snapshot histórico — fontes observadas
 
 | Fonte | Caminho | Uso na matriz |
 | --- | --- | --- |
 | Requisitos funcionais | `docs/RF.md` | Lista de RF ativos e RF descontinuados. |
 | Requisitos nao funcionais | `docs/RNF.md` | Lista de `RNF01..RNF40` ativos. |
 | Matriz canonica | `docs/planificacao/backlogs/MATRIZ-CANONICA-BK.md` | Ligacao requisito -> BK -> owner -> gate. |
-| Backlog final | `docs/planificacao/backlogs/BACKLOG-MVP.md` | Confirma 60 BK e cadeia MF8 de 10 guias. |
+| Backlog observado | `docs/planificacao/backlogs/BACKLOG-MVP.md` | Confirmava 60 BK e a cadeia MF8 de 10 guias na data do snapshot. |
 | Readiness | `docs/evidence/MF8/PAINEL-READINESS-OPERACIONAL.md` | Sinais tecnicos e decisao operacional. |
 | Auditoria admin | `docs/evidence/MF8/AUDITORIA-ADMINISTRATIVA-FINAL.md` | Fecho de `RNF19`/`RNF30` para superficies admin. |
 | Suite final | `docs/evidence/MF8/TESTES-FINAIS-CRIADOS.md` | Matriz de testes para execucao posterior. |
 | Evidencia visual MF7/MF8 | `docs/evidence/MF7/*`, `docs/evidence/MF8/ALINHAMENTO-VISUAL-*.md` | Base para UX, responsividade e navegacao. |
 
-## Requisitos funcionais ativos
+## Requisitos funcionais ativos no snapshot
 
 | Requisitos | BKs principais | Owners principais | Evidence/proof | Negativo esperado | Estado final | Observacao |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -45,7 +66,7 @@
 
 Os IDs `RF29..RF34` e `RF49..RF51` permanecem fora do MVP ativo por rebaseline documentado em `docs/RF.md`. Nao entram como gaps porque nao sao requisitos ativos da matriz final.
 
-## Requisitos nao funcionais ativos
+## Requisitos nao funcionais ativos no snapshot
 
 | Requisitos | BKs principais | Owners principais | Evidence/proof | Negativo esperado | Estado final |
 | --- | --- | --- | --- | --- | --- |
@@ -58,7 +79,7 @@ Os IDs `RF29..RF34` e `RF49..RF51` permanecem fora do MVP ativo por rebaseline d
 | `RNF34`, `RNF35`, `RNF36`, `RNF37` | `BK-MF3-06`, `BK-MF6-03`, `BK-MF8-02` | Mateus/Matheus | Explicabilidade de recomendacao e filtros de privacidade/curadoria. | Recomendacao opaca ou partilha de dados com terceiros sem contrato. | `PASS_COM_RESSALVAS` |
 | `RNF38`, `RNF39`, `RNF40` | `BK-MF8-02`, `BK-MF7-04` | Matheus/Davi | PT-PT, datas/formato europeu e alinhamento visual. | Texto fora de PT-PT sem justificacao. | `PASS_COM_RESSALVAS` |
 
-## Estado por passo do BK
+## Estado observado por passo do BK
 
 | Passo | pr | proof | neg | fonte | Decisao |
 | --- | --- | --- | --- | --- | --- |

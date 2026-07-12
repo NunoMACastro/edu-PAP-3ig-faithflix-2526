@@ -1,5 +1,50 @@
 # Implementacao real_dev MF9 - FaithFlix
 
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: adendos locais atuais e snapshots MF9 delimitados; 4K/streaming/replica set reais não provados
+
+> **Limite probatório atual (2026-07-10):** as referências a 2160p/4K nos
+> snapshots abaixo provam apenas entitlement, seleção de label e ausência de
+> URLs públicas. Não provam reprodução nem resolução 4K real. `RNF08` e
+> `RNF10` permanecem `NAO_PROVADO`; `RNF23` permanece `PARCIAL_VALIDADO` com
+> adapters e fixtures sintéticas locais.
+
+## Adendo pós-correção Fase 3 - billing, pool e família (2026-07-10)
+
+As execuções abaixo permanecem snapshots históricos. Na referência atual,
+checkout Família reutiliza a mesma idempotência/transação do checkout Pro e
+grava snapshot financeiro v2. `maxFamilyMembers` inclui o owner; convites
+`pending` e membros `active` ocupam lugar. Convite e aceite serializam pela
+subscrição do owner, recontam dentro da transação e mantêm o índice parcial único
+por membro. Convidar, aceitar, recusar, remover/sair e notificações aplicáveis
+partilham a sessão, evitando efeitos parciais.
+
+Quando uma renovação simulada falha ou um cancelamento chega ao fim do ciclo, as
+memberships abertas do owner são fechadas na mesma transação. A pool usa apenas
+pagamentos v2 aprovados/não estimados no mês UTC terminado; não usa memberships,
+subscrições atuais nem backfills estimados. A migração v2 não foi executada.
+
+A validação é local com doubles/fault injection. Não prova replica set real,
+worker/gateway de produção, migração aplicada ou contabilidade histórica exata.
+As operações administrativas F3-D estão documentadas nos adendos das auditorias
+MF4/MF9 e não alteram os resultados históricos abaixo.
+
+Fecho documental adicional de 2026-07-10: zero associações elegíveis produz um
+ledger `deferred_no_eligible_charities` imutável e terminal, sem retry infinito
+ou distribuição retroativa. O catch-up limita cada passagem a 120 meses
+pendentes e continua através de lotes já fechados. `charity_memberships` exige
+conta operacional, é exportada e removida no ciclo RGPD da própria conta. Os
+audits administrativos usam estado mínimo e excluem email, telefone e snapshots
+pessoais integrais. As execuções abaixo permanecem snapshots históricos.
+
+## Snapshot histórico — implementações MF9 observadas em 2026-07-04
+
+A partir desta fronteira, ficam preservados os resultados e comandos das
+implementações originais; não constituem prova atual.
+
 ## Execucao 2026-07-04 - BK-MF9-06
 
 ### Resumo executivo

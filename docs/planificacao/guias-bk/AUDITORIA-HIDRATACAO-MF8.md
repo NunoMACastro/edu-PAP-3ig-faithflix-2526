@@ -16,6 +16,15 @@
 - `check_mf_coherence`: true
 - `last_updated`: 2026-06-28
 - `latest_revalidation`: 2026-06-28T19:22:55+0100
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-28`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- `proof_scope`: hidratação dos dez guias MF8 observada nessa data; não revalida a baseline atual
+
+> Este report preserva resultados históricos. As contagens `60/60` abaixo
+> pertencem à baseline anterior a MF9; a baseline ativa posterior é
+> `66 BK / 66 guias`, `94 requisitos` e `13 sprints`.
 
 ## Sumario executivo
 
@@ -119,7 +128,7 @@ Sem findings `PARCIAL` ou `CRITICO` restantes dentro dos BKs MF8.
 
 ## Decisoes tecnicas confirmadas
 
-- Baseline ativa confirmada: `60 BK / 60 guias`, com MF8 condensada para 10 guias finais.
+- Baseline observada nesse snapshot: `60 BK / 60 guias`, com MF8 condensada para 10 guias finais.
 - Stack validavel confirmada: backend Node.js/Express/MongoDB com ES Modules; frontend React/Vite/React Router.
 - `real_dev/backend/package.json` contem scripts `test` e `smoke`; `real_dev/frontend/package.json` contem scripts `build` e `smoke`.
 - Os BKs publicados nao expõem `real_dev/`, variaveis internas da prompt ou comandos privados.
@@ -213,7 +222,7 @@ Confirmacoes de integracao:
 | --- | --- |
 | Inventario de documentos obrigatorios | PASS: documentos obrigatorios e canonicos existem. |
 | Inventario de guias MF8 | PASS: 10 guias atuais. |
-| Inventario global de guias BK | PASS: 60 guias em `MF0..MF8`. |
+| Inventario global de guias BK | `PASS` histórico: 60 guias em `MF0..MF8` na data do snapshot. |
 | Header dos BKs MF8 | PASS: 10/10 com campos obrigatorios, `macro=MF8`, `guia_path` correto e cadeia `proximo_bk` coerente. |
 | Estrutura obrigatoria dos BKs MF8 | PASS: 10/10 com 16 secoes `####` na ordem esperada. |
 | Passos tecnicos dos BKs MF8 | PASS: 70/70 passos com pontos 1 a 7, ficheiros envolvidos, `LOCALIZAÇÃO`, validacao e cenario negativo. |

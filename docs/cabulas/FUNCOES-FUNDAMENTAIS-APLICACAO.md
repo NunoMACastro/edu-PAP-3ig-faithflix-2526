@@ -3,6 +3,34 @@
 Data do levantamento: 2026-07-07
 Base do levantamento: `real_dev/backend/src` e `real_dev/frontend/src`
 
+> Adendo de 2026-07-10: este inventário e as contagens abaixo permanecem como
+> snapshot AST de 2026-07-07. No catálogo administrativo, as assinaturas antigas
+> `updateStatus(contentId, status)` e `revertRevision(contentId, revisionId)`
+> foram substituídas pelo contrato `expectedVersion` descrito em
+> `docs/planificacao/guias-bk/MF2/BK-MF2-03-crud-catalogo-taxonomias.md`.
+> No billing, as assinaturas atuais são
+> `createSimulatedCheckout(userId, input, idempotencyKeyValue)`,
+> `startTrial(userId, idempotencyKeyValue)` e
+> `runMonthlyDistribution(month, createdByUserId, options)`. A pool usa
+> `rotationOffsetForMonth`, não `nextRotationOffset`. Foram ainda acrescentados
+> `scheduled-jobs.service.js`, `billing-jobs.service.js`, `renewal-adapter.js`,
+> `worker.js` e a migração `payment-attempts-v2-migration.js`; estes símbolos
+> não entram nas contagens AST de 2026-07-07. Os helpers familiares passaram a
+> aceitar sessão transacional interna e a serializar pela subscrição do owner.
+> O fecho mensal atual persiste `deferred_no_eligible_charities` quando não há
+> beneficiárias no momento do fecho e o catch-up limita cada passagem a 120
+> meses pendentes. `charity_memberships` aceita apenas contas operacionais e
+> integra exportação/eliminação RGPD. Os audits administrativos de utilizadores
+> e associações usam snapshots mínimos, sem email, telefone ou objetos pessoais
+> integrais. Adendo de 2026-07-11: a página pública lê impacto agregado em
+> `GET /api/charities/public`, enquanto `GET /api/charities/me` resolve apenas
+> `id`/`name` da associação da própria sessão. Foram acrescentados os helpers
+> `publicOwnCharity`, `getMyCharitySummary`, `getMyCharity` e o componente
+> `PublicCharityCard`; não expõem contactos, memberships ou valores individuais.
+> Estes contratos posteriores também não alteram as contagens AST.
+> Não usar este snapshot como prova atual de concorrência/transações, worker,
+> migração aplicada ou contabilidade.
+
 ## Critérios
 
 - A lista foi extraída por AST a partir do código real em `real_dev`.
@@ -783,7 +811,7 @@ Base do levantamento: `real_dev/backend/src` e `real_dev/frontend/src`
 
 ### `real_dev/frontend/src/components/system/ApiStatusBadge.jsx`
 
-- `ApiStatusBadge()` (exportada; função) - Badge técnico que mostra se o frontend consegue contactar o backend. Entradas: sem entradas explícitas. Devolve: Badge de estado da conectividade à API.
+- `ApiStatusBadge()` (legado/dev-only MF1; não usado na home final) - Badge técnico que mostra se o frontend consegue contactar o backend durante validação inicial. Entradas: sem entradas explícitas. Devolve: Badge de estado da conectividade à API.
 
 ### `real_dev/frontend/src/components/ui/BaseButton.jsx`
 
@@ -858,7 +886,7 @@ Base do levantamento: `real_dev/backend/src` e `real_dev/frontend/src`
 
 ### `real_dev/frontend/src/pages/CatalogPage.jsx`
 
-- `CatalogPage()` (exportada; função) - Mostra conteúdos publicados e o bloco "continuar a ver". Entradas: sem entradas explícitas. Devolve: Página de catálogo.
+- `CatalogPage()` (exportada; função) - Mostra o catálogo público com hero compacto, filtros por formato, bloco "continuar a ver", destaques editoriais opcionais, grelha paginada e estados de loading/erro/vazio. Entradas: sem entradas explícitas; lê `type` e `page` da query string. Devolve: Página de catálogo.
 
 ### `real_dev/frontend/src/pages/CharityApplicationPage.jsx`
 
@@ -1089,7 +1117,7 @@ Base do levantamento: `real_dev/backend/src` e `real_dev/frontend/src`
 
 ### `real_dev/frontend/src/services/api/systemApi.js`
 
-- `getApiStatus()` (exportada; função) - Obtém o estado técnico exposto por `GET /api`. Entradas: sem entradas explícitas. Devolve: Dados de estado da API devolvidos pelo backend.
+- `getApiStatus()` (legado/dev-only MF1; não usado na home final) - Obtém o estado técnico exposto por `GET /api` durante validação inicial. Entradas: sem entradas explícitas. Devolve: Dados de estado da API devolvidos pelo backend.
 
 ### `real_dev/frontend/src/services/api/userApi.js`
 

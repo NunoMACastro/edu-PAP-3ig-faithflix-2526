@@ -6,7 +6,9 @@ import { ObjectId } from "mongodb";
 import { HttpError } from "../../utils/http-error.js";
 
 export const CONTENT_TYPES = ["movie", "series", "episode", "documentary"];
+export const PUBLIC_CONTENT_TYPES = ["movie", "series", "documentary"];
 export const CONTENT_STATUS = ["draft", "published", "archived"];
+export const CATALOG_SORTS = ["recent", "title", "rating"];
 
 /**
  * Valida campos de texto obrigatórios.
@@ -177,21 +179,29 @@ export function assertCatalogPayload(input = {}) {
         throw new HttpError(400, "Slug invalido.");
     }
 
-    return {
+    const commonPayload = {
         title,
         slug,
         synopsis: requiredText(input.synopsis, "synopsis", 20, 1000),
         type,
-        durationSeconds: positiveInteger(
-            input.durationSeconds,
-            "durationSeconds",
-        ),
         ageRating: assertAgeRating(input.ageRating ?? 0),
         taxonomyIds: taxonomyObjectIds(input.taxonomyIds),
         assets: {
             posterUrl: optionalText(input.assets?.posterUrl),
             backdropUrl: optionalText(input.assets?.backdropUrl),
         },
+    };
+
+    if (type === "series") {
+        return commonPayload;
+    }
+
+    const playablePayload = {
+        ...commonPayload,
+        durationSeconds: positiveInteger(
+            input.durationSeconds,
+            "durationSeconds",
+        ),
         media: {
             playbackUrl: requiredText(
                 input.media?.playbackUrl,
@@ -201,6 +211,21 @@ export function assertCatalogPayload(input = {}) {
             ),
         },
         ...assertMediaOptions(input),
+    };
+
+    if (type !== "episode") {
+        return playablePayload;
+    }
+
+    if (!ObjectId.isValid(input.seriesId)) {
+        throw new HttpError(400, "seriesId do episodio invalido.");
+    }
+
+    return {
+        ...playablePayload,
+        seriesId: new ObjectId(input.seriesId),
+        seasonNumber: positiveInteger(input.seasonNumber, "seasonNumber"),
+        episodeNumber: positiveInteger(input.episodeNumber, "episodeNumber"),
     };
 }
 
@@ -241,6 +266,39 @@ export function parseCatalogPagination(input = {}) {
     }
 
     return { page, limit };
+}
+
+/**
+ * Valida filtros públicos do catálogo sem permitir campos fora do contrato.
+ *
+ * @param {Record<string, unknown>} input Query params brutos recebidos pela rota pública.
+ * @returns {{ page: number, limit: number, type: string | null, taxonomyId: string | null, sort: string }} Query pública normalizada.
+ */
+export function parseCatalogQuery(input = {}) {
+    const { page, limit } = parseCatalogPagination(input);
+    const type = String(input.type ?? "").trim();
+    const taxonomyId = String(input.taxonomyId ?? "").trim();
+    const sort = String(input.sort ?? "recent").trim();
+
+    if (type && !PUBLIC_CONTENT_TYPES.includes(type)) {
+        throw new HttpError(400, "Tipo de conteudo invalido.");
+    }
+
+    if (taxonomyId && !ObjectId.isValid(taxonomyId)) {
+        throw new HttpError(400, "Taxonomia invalida.");
+    }
+
+    if (!CATALOG_SORTS.includes(sort)) {
+        throw new HttpError(400, "Ordenacao invalida.");
+    }
+
+    return {
+        page,
+        limit,
+        type: type || null,
+        taxonomyId: taxonomyId || null,
+        sort,
+    };
 }
 
 /**

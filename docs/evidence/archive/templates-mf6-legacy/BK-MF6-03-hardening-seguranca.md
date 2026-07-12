@@ -1,5 +1,13 @@
 # Evidence BK-MF6-03 - Hardening segurança e privacidade
 
+- `document_status`: `SUPERSEDED`
+- `snapshot_date`: `2026-07-10`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: template MF6 legado arquivado com placeholders preservados; não constitui procedimento atual, execução ou evidence de segurança
+
+> Arquivado em 2026-07-10: template duplicado com placeholders; não é evidence.
+
 - Owner: Matheus
 - Apoio: Kaue
 - Data: PREENCHER_COM_DATA_DA_EXECUCAO

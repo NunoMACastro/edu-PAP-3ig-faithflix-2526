@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF8-10`
 - `guia_path`: `docs/planificacao/guias-bk/MF8/BK-MF8-09-correcao-erros-report.md`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -48,7 +48,7 @@ Sem este BK, a equipa teria uma lista de erros sem decisão. A correção final 
 - Antes: `BK-MF8-08` entrega erros reproduzíveis.
 - Depois: erros ficam corrigidos, aceites com ressalva ou bloqueados com motivo para `BK-MF8-10`.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - Ler `BK-MF8-08` antes de iniciar este BK.
 - Confirmar que a MF8 ativa tem exatamente `10` guias formais, de `BK-MF8-01` a `BK-MF8-10`.
@@ -110,9 +110,11 @@ Cria tabela de triagem com id, tipo, severidade, owner e estado inicial.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -142,9 +144,11 @@ Define prioridade de correção e motivo.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -174,9 +178,11 @@ Regista ficheiros afetados ou motivo da não correção. Não descrevas alteraç
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -206,9 +212,11 @@ Usa apenas caminhos `backend/`, `frontend/`, `docs/`, `scripts/` ou `tests/`.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -238,9 +246,11 @@ Regista comando, output resumido e estado.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -270,9 +280,11 @@ Atualiza `LISTA-RISCOS-TOTAIS.md` se o risco continuar ativo.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -302,9 +314,11 @@ A decisão final deve dizer se `BK-MF8-10` pode congelar o scope.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 

@@ -1,6 +1,12 @@
 # Auditoria, hidratacao e correcao - MF9
 
-## Auditoria atual - 2026-07-01 - MF9 completa
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-07-01`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- `proof_scope`: auditorias MF9 observadas em 2026-07-01; não promovem guias ou evidence atuais
+
+## Auditoria observada - 2026-07-01 - MF9 completa
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -100,7 +106,7 @@ Como a execucao e `auditar_apenas`, nao houve correcao de BKs nesta passagem. A 
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-06 - confirmacao pos-correcao
+## Reauditoria observada - 2026-07-01 - BK-MF9-06 - confirmacao pos-correcao
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -111,13 +117,13 @@ Como a execucao e `auditar_apenas`, nao houve correcao de BKs nesta passagem. A 
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-06` re-auditado como `OK`; nenhum guia BK nem codigo real foi editado. Apenas este relatorio foi atualizado.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-06` mantem-se alinhado com a sequencia canonica da MF9 e agora cumpre os criterios que tinham bloqueado a reauditoria anterior. O guia ja ensina o aluno a criar o seed MF9 publicavel, configurar Playwright com roots `backend/` e `frontend/`, criar a spec E2E MF9, executar a suite backend MF9 por ficheiro explicito e preencher uma matriz de evidence que cobre `RF61`, `RF62`, `RF63`, `RNF21`, `RNF22`, `RNF29`, `RNF38` e `RNF40`.
 
 Nao foram encontrados novos blockers no guia alvo. As ocorrencias pesquisadas de termos internos nao existem no BK, a estrutura obrigatoria esta completa, a coerencia canonica continua alinhada com `66/66` BK e Gate `S13`, e as validacoes de referencia continuam verdes em backend, frontend e planificacao.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -217,7 +223,7 @@ Nota: o "Antes" reflete a correcao imediatamente abaixo, que tinha promovido `BK
 
 ---
 
-## Correcao atual - 2026-07-01 - BK-MF9-06 - gate MF9, regressao e evidencia final
+## Correcao observada - 2026-07-01 - BK-MF9-06 - gate MF9, regressao e evidencia final
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -228,13 +234,13 @@ Nota: o "Antes" reflete a correcao imediatamente abaixo, que tinha promovido `BK
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-06` corrigido de `CRITICO` para `OK`; a correcao ficou limitada ao guia alvo e a este relatorio.
 
-### Resultado executivo da correcao atual
+### Resultado executivo da correcao observada
 
 `BK-MF9-06` foi reescrito como gate executavel para aluno. O guia agora usa portugues de Portugal com acentuacao, preserva caminhos publicos `backend/` e `frontend/`, inclui matriz de evidence para `RF61`, `RF62`, `RF63`, `RNF21`, `RNF22`, `RNF29`, `RNF38` e `RNF40`, e elimina o falso verde causado por comandos backend demasiado genericos.
 
 A correcao fecha a causa raiz da reauditoria anterior: o guia ja nao manda o aluno depender de ficheiros existentes apenas na raiz interna. Em vez disso, ensina a criar `backend/scripts/seed-mf9-e2e.js`, a configurar `playwright.config.js` com roots publicas, a criar/executar `tests/e2e/mf9-family-subscription.spec.js` e a correr explicitamente `node --test tests/unit/mf9-subscriptions.test.js` para que a suite falhe se a prova MF9 nao existir.
 
-### Contagem antes e depois da correcao atual
+### Contagem antes e depois da correcao observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -333,7 +339,7 @@ Nota: o "Antes" reflete a reauditoria imediatamente abaixo, que classificou `BK-
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-06 - gate MF9, regressao e evidencia final
+## Reauditoria observada - 2026-07-01 - BK-MF9-06 - gate MF9, regressao e evidencia final
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -344,7 +350,7 @@ Nota: o "Antes" reflete a reauditoria imediatamente abaixo, que classificou `BK-
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-06` re-auditado como `CRITICO`; nenhum guia BK nem codigo real foi editado. Apenas este relatorio foi atualizado.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-06` esta corretamente posicionado na sequencia canonica da MF9: consome `BK-MF9-01..05`, fecha o gate S13, cobre `RF61`, `RF62`, `RF63`, `RNF21`, `RNF22`, `RNF29`, `RNF38` e `RNF40`, e liga o fecho da MF9 ao universo ativo de `66/66` BK.
 
@@ -354,7 +360,7 @@ Tambem permanece uma falha formal de publicacao: o guia tem dezenas de ocorrenci
 
 Como `MODO=auditar_apenas`, estes problemas ficam registados como findings. A correcao recomendada deve ser feita numa execucao posterior com permissao para editar `BK-MF9-06`.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -459,7 +465,7 @@ Nota: o "Antes" reflete a classificacao historica mais recente neste relatorio, 
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-05 - estado pos-correcao
+## Reauditoria observada - 2026-07-01 - BK-MF9-05 - estado pos-correcao
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -470,13 +476,13 @@ Nota: o "Antes" reflete a classificacao historica mais recente neste relatorio, 
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-05` re-auditado no estado atual como `OK`; nenhum guia BK nem codigo real foi editado. Apenas este relatorio foi atualizado.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-05` esta agora apto para aluno seguir sem adivinhar pecas tecnicas em falta. O guia atual conserva a estrutura obrigatoria de 16 secoes, tem 7 passos tecnicos, usa caminhos publicos `backend/`, evita linguagem interna e apresenta funcoes completas ou blocos de revisao suficientes para fechar privacidade, metricas admin, pool solidaria e evidence MF9.
 
 A reauditoria nao reproduziu os findings da reauditoria historica preservada mais abaixo. O Passo 4 ja nao esta truncado: a versao atual de `getAdminMetrics` preserva `generatedAt`, `range`, `users`, `catalog`, `privacy`, `notifications` e `solidarity`, acrescentando apenas `subscriptions.familyMembers` e `subscriptions.familyInvitationsPending`. Os Passos 2 e 3 mostram as funcoes completas de privacidade, e a validacao final fixa endpoints, status HTTP esperados e negativos objetivos.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -573,7 +579,7 @@ Nota: o "Antes" reflete a secao de correcao imediatamente abaixo, que ja tinha f
 
 ---
 
-## Correcao atual - 2026-07-01 - BK-MF9-05 - privacidade, operacao e metricas familiares
+## Correcao observada - 2026-07-01 - BK-MF9-05 - privacidade, operacao e metricas familiares
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -584,7 +590,7 @@ Nota: o "Antes" reflete a secao de correcao imediatamente abaixo, que ja tinha f
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-05` corrigido de `CRITICO` para `OK`; a correcao ficou limitada ao guia alvo e a este relatorio.
 
-### Resultado executivo da correcao atual
+### Resultado executivo da correcao observada
 
 `BK-MF9-05` foi reescrito como guia autocontido para aluno. O guia agora usa portugues de Portugal com acentuacao, conserva caminhos publicos `backend/`, remove fragmentos incompletos e passa a ensinar funcoes completas ou blocos funcionais completos para privacidade, metricas admin, revisao da pool solidaria e teste MF9.
 
@@ -592,7 +598,7 @@ A correcao fecha o risco principal da reauditoria anterior: o Passo 4 ja nao pub
 
 Tambem foram fechados os problemas de completude em privacidade: `exportFamilyMemberships`, `buildUserDataExport`, `invalidateFamilyMembershipsForDeletedAccount` e `deleteMyAccount` aparecem como funcoes completas com JSDoc, comentarios didaticos e explicacao pedagogica. A evidence final passa a incluir endpoints, status esperados e negativos objetivos.
 
-### Contagem antes e depois da correcao atual
+### Contagem antes e depois da correcao observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -688,7 +694,7 @@ Nota: o "Antes" reflete a reauditoria imediatamente abaixo, que tinha classifica
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-05 - privacidade, operacao e metricas familiares
+## Reauditoria observada - 2026-07-01 - BK-MF9-05 - privacidade, operacao e metricas familiares
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -699,7 +705,7 @@ Nota: o "Antes" reflete a reauditoria imediatamente abaixo, que tinha classifica
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-05` re-auditado como `CRITICO`; nenhum guia BK nem codigo real foi editado. Apenas este relatorio foi atualizado.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-05` esta corretamente posicionado na sequencia canonica da MF9: consome a API/modelo familiar de `BK-MF9-03`, depende da UI de `BK-MF9-04` e prepara `BK-MF9-06` para o gate S13. A implementacao de referencia confirma que a funcionalidade existe: `privacy.service.js` exporta memberships familiares, invalida memberships abertas na eliminacao de conta, `admin-metrics.service.js` devolve metricas agregadas e a pool solidaria continua baseada em documentos de `subscriptions`.
 
@@ -707,7 +713,7 @@ Mesmo assim, o guia atual nao deve ficar `OK` para alunos. O bloco de metricas d
 
 Como `MODO=auditar_apenas`, estes problemas ficam registados como findings abertos. A correcao recomendada deve ser feita numa execucao posterior com permissao para editar o BK alvo.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -810,7 +816,7 @@ Nota: o "Antes" reflete a classificacao historica mais recente neste relatorio, 
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-04 - confirmacao pos-correcao
+## Reauditoria observada - 2026-07-01 - BK-MF9-04 - confirmacao pos-correcao
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -821,13 +827,13 @@ Nota: o "Antes" reflete a classificacao historica mais recente neste relatorio, 
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-04` re-auditado como `OK`; nenhum guia BK nem codigo real foi editado nesta reauditoria. Apenas este relatorio foi atualizado.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 A reauditoria fresca confirma que a correcao imediatamente abaixo fechou os findings anteriores de `BK-MF9-04`. O guia atual esta autocontido para aluno: apresenta o cliente `frontend/src/services/api/subscriptionsApi.js` completo, substitui `frontend/src/pages/SubscriptionPage.jsx` com um ficheiro completo, declara `familyUserLabel(user)` antes do componente, usa mensagens visiveis em portugues de Portugal e inclui expected results para fluxos positivos e negativos.
 
 A coerencia canonica da MF9 tambem se mantem: `BK-MF9-04` consome a API familiar criada em `BK-MF9-03`, nao inventa regras de ownership no browser, mantem a gestao familiar dentro da pagina de subscricao e prepara `BK-MF9-05` para privacidade, operacao e metricas familiares. Nao foi encontrado leakage de caminhos privados `real_dev` nos guias dos alunos.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -919,7 +925,7 @@ Nota: o "Antes" reflete a correcao atual imediatamente abaixo, que ja tinha prom
 
 ---
 
-## Correcao atual - 2026-07-01 - BK-MF9-04 - UI de gestao familiar e convites
+## Correcao observada - 2026-07-01 - BK-MF9-04 - UI de gestao familiar e convites
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -930,13 +936,13 @@ Nota: o "Antes" reflete a correcao atual imediatamente abaixo, que ja tinha prom
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-04` corrigido de `CRITICO` para `OK`; a correcao ficou limitada ao guia alvo e a este relatorio.
 
-### Resultado executivo da correcao atual
+### Resultado executivo da correcao observada
 
 `BK-MF9-04` fica agora autocontido e publicavel para aluno: o guia define `familyUserLabel`, mostra `subscriptionsApi.js` completo, substitui a pagina `SubscriptionPage.jsx` por um ficheiro completo e integrado, corrige mensagens pedagogicas/visiveis para portugues de Portugal com acentuacao e acrescenta validacoes negativas com expected results.
 
 A correcao nao alterou codigo real da app. A implementacao de referencia continua a validar o contrato MF9; o trabalho desta execucao foi transportar esse contrato para o guia do aluno, usando apenas caminhos publicos `frontend/` e preservando a sequencia `BK-MF9-03 -> BK-MF9-04 -> BK-MF9-05`.
 
-### Contagem antes e depois da correcao atual
+### Contagem antes e depois da correcao observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -1030,7 +1036,7 @@ Nota: o "Antes" reflete a reauditoria imediatamente abaixo, que tinha rebaixado 
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-04 - UI de gestao familiar e convites
+## Reauditoria observada - 2026-07-01 - BK-MF9-04 - UI de gestao familiar e convites
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -1041,7 +1047,7 @@ Nota: o "Antes" reflete a reauditoria imediatamente abaixo, que tinha rebaixado 
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-04` re-auditado como `CRITICO`; nenhum guia BK nem codigo real foi editado nesta reauditoria.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-04` esta corretamente posicionado na sequencia canonica da MF9: consome a API familiar de `BK-MF9-03`, expoe a gestao de convites na pagina de subscricao e prepara `BK-MF9-05` para privacidade, operacao e metricas familiares. A implementacao de referencia em `real_dev/frontend` confirma que o fluxo existe: `subscriptionsApi.js` tem metodos para overview, convite, aceite, recusa, remocao e saida; `SubscriptionPage.jsx` integra `familyUserLabel`, estados React, loading/error/success e UI familiar; o build Vite passa.
 
@@ -1049,7 +1055,7 @@ Mesmo assim, o guia atual nao pode ficar `OK` para alunos. O BK apresenta `Subsc
 
 Como `MODO=auditar_apenas`, estes problemas ficam registados como findings abertos. A correcao recomendada deve ser feita numa execucao posterior com permissao para editar o BK alvo.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -1151,7 +1157,7 @@ Nota: o "Antes" reflete a classificacao historica mais recente neste relatorio, 
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-03 - confirmacao pos-correcao
+## Reauditoria observada - 2026-07-01 - BK-MF9-03 - confirmacao pos-correcao
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -1162,13 +1168,13 @@ Nota: o "Antes" reflete a classificacao historica mais recente neste relatorio, 
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-03` re-auditado como `OK`; nenhum guia BK nem codigo real foi editado nesta reauditoria.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-03` mantem estado `OK` apos reauditoria fresca. O guia atual ja inclui as pecas que estavam abertas na reauditoria historica: `subscriptions.routes.js` preserva `/plans`, `/me` e `/me/cancel-renewal`, o controller apresenta todos os handlers familiares, o service entrega `getFamilyOverview`, `getEffectiveSubscriptionAccess`, `hasActiveSubscriptionAccess`, convite, aceite, recusa, remocao e saida, e a suite MF9 inclui fluxo positivo e negativos principais.
 
 O contrato funcional continua coerente com `RF62`, `RNF13`, `RNF15`, `RNF16`, `RNF19`, `BK-MF9-01`, `BK-MF2-01`, `BK-MF9-02`, `BK-MF9-04`, `BK-MF9-05` e `BK-MF9-06`. A implementacao de referencia continua a passar nos testes MF9, por isso nao ha finding ativo nem blocker funcional para este BK.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -1274,7 +1280,7 @@ As secoes historicas abaixo preservam o ciclo anterior: uma reauditoria marcou `
 
 ---
 
-## Correcao atual - 2026-07-01 - BK-MF9-03 - modelo/API de partilha familiar
+## Correcao observada - 2026-07-01 - BK-MF9-03 - modelo/API de partilha familiar
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -1285,13 +1291,13 @@ As secoes historicas abaixo preservam o ciclo anterior: uma reauditoria marcou `
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-03` corrigido de `CRITICO` para `OK`; a correcao ficou limitada ao guia alvo e a este relatorio.
 
-### Resultado executivo da correcao atual
+### Resultado executivo da correcao observada
 
 `BK-MF9-03` fica agora autocontido e executavel para alunos: o guia preserva as rotas publicas/privadas ja criadas por `BK-MF9-01`, apresenta controllers completos, entrega `getFamilyOverview`, fecha o ciclo aceitar/recusar/remover/sair, inclui testes negativos concretos e cumpre a regra de comentarios didaticos nos blocos longos.
 
 A correcao nao alterou codigo real da app. A implementacao de referencia ja validava o contrato MF9; o trabalho desta execucao foi transportar esse contrato para o guia do aluno, usando apenas caminhos publicos `backend/` e mantendo a sequencia `BK-MF9-01 -> BK-MF9-02 -> BK-MF9-03 -> BK-MF9-04 -> BK-MF9-05 -> BK-MF9-06`.
 
-### Contagem antes e depois da correcao atual
+### Contagem antes e depois da correcao observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -1387,7 +1393,7 @@ Nota: o "Antes" reflete a reauditoria imediatamente abaixo, que tinha rebaixado 
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-03 - modelo/API de partilha familiar
+## Reauditoria observada - 2026-07-01 - BK-MF9-03 - modelo/API de partilha familiar
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -1398,7 +1404,7 @@ Nota: o "Antes" reflete a reauditoria imediatamente abaixo, que tinha rebaixado 
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-03` re-auditado como `CRITICO`; nenhum guia BK nem codigo real foi editado nesta reauditoria.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-03` esta alinhado no dominio certo: `RF62` exige partilha familiar real entre contas existentes, owner com plano Familia ativo, bloqueio de multiplas familias ativas por membro e acesso premium apenas enquanto o owner mantiver o plano Familia. O guia tambem aponta corretamente para `BK-MF9-01` como fonte de `familySharing`/`maxFamilyMembers`, para `BK-MF2-01` como base de sessao autenticada, e para `BK-MF9-04` como consumidor da API familiar.
 
@@ -1406,7 +1412,7 @@ Mesmo assim, o guia nao pode ficar `OK` nesta reauditoria. Seguindo apenas o BK,
 
 A implementacao de referencia confirma que estes contratos existem e passam nos testes MF9, por isso o problema atual e de guia/autocontencao pedagogica, nao de inexistencia funcional no `IMPLEMENTATION_ROOT`. Como `MODO=auditar_apenas`, a correcao fica registada como finding e nao foi aplicada ao BK.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -1509,7 +1515,7 @@ Nota: o "Antes" reflete a secao historica deste relatorio que marcava `BK-MF9-03
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-02 - confirmacao pos-correcao
+## Reauditoria observada - 2026-07-01 - BK-MF9-02 - confirmacao pos-correcao
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -1520,13 +1526,13 @@ Nota: o "Antes" reflete a secao historica deste relatorio que marcava `BK-MF9-03
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-02` re-auditado como `OK`; nenhum guia BK nem codigo real foi editado nesta reauditoria.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-02` mantem estado `OK` apos reauditoria fresca. A correcao pedagogica anterior fechou a lacuna do Passo 5: o bloco de teste tem agora 21 linhas nao vazias e 3 linhas de comentario, incluindo comentarios didaticos reais sobre a fixture 4K bloqueada e a ausencia de URL sensivel.
 
 O contrato funcional continua coerente com `RF63`, `RF15`, `RNF29`, `BK-MF9-01`, `BK-MF2-06` e o handoff para `BK-MF9-03`. A implementacao de referencia confirma enforcement no backend: `filterQualityOptionsByEntitlements` remove `playbackUrl`/`src` de qualidades bloqueadas, `getPlayback` usa `getEffectiveSubscriptionAccess`, a UI desativa opcoes com `locked` e os testes MF9 provam filtro, fallback e ausencia de URL bloqueada.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -1620,7 +1626,7 @@ As secoes historicas abaixo preservam o ciclo anterior: uma reauditoria marcou `
 
 ---
 
-## Correcao atual - 2026-07-01 - BK-MF9-02 - comentario didatico Passo 5
+## Correcao observada - 2026-07-01 - BK-MF9-02 - comentario didatico Passo 5
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -1631,13 +1637,13 @@ As secoes historicas abaixo preservam o ciclo anterior: uma reauditoria marcou `
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-02` corrigido de `PARCIAL` para `OK`; a correcao ficou limitada ao comentario didatico em falta no Passo 5 e a este relatorio.
 
-### Resultado executivo da correcao atual
+### Resultado executivo da correcao observada
 
 `BK-MF9-02` passa novamente a `OK` depois de fechar o unico finding aberto na reauditoria anterior: `MF9-02-AUD-003`. A alteracao foi estritamente pedagogica e nao mudou contratos, caminhos, codigo real da app, comandos, endpoints, regras de dominio ou sequencia da MF9.
 
 O bloco de teste do Passo 5 recebeu um comentario didatico junto da fixture `1080p`/`2160p`, explicando que o cenario inclui 4K com URL para provar que o backend remove dados sensiveis em planos Pro. Assim, o bloco deixa de incumprir a regra da prompt para blocos com 20 ou mais linhas nao vazias.
 
-### Contagem antes e depois da correcao atual
+### Contagem antes e depois da correcao observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -1731,7 +1737,7 @@ O drift de classificacao aberto na reauditoria anterior fica fechado: `BK-MF9-02
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-02
+## Reauditoria observada - 2026-07-01 - BK-MF9-02
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -1742,7 +1748,7 @@ O drift de classificacao aberto na reauditoria anterior fica fechado: `BK-MF9-02
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-02` re-auditado como `PARCIAL`; nenhum guia BK foi editado nesta reauditoria.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-02` esta tecnicamente alinhado com `RF63`, `RF15`, `RNF29`, `BK-MF9-01`, `BK-MF2-06` e o handoff para `BK-MF9-03`. A implementacao de referencia confirma o contrato: `filterQualityOptionsByEntitlements` remove `playbackUrl`/`src` de qualidades bloqueadas, `getPlayback` aplica `getEffectiveSubscriptionAccess`, a UI desativa opcoes com `locked` e os testes MF9 provam filtro e fallback.
 
@@ -1750,7 +1756,7 @@ As duas lacunas anteriores continuam fechadas: o texto pedagogico do BK esta em 
 
 Mesmo assim, a reauditoria estrita encontrou uma lacuna residual na regra mecanica de comentarios didaticos: o bloco de codigo do Passo 5 tem exatamente 20 linhas nao vazias e apenas um comentario didatico real, alem do comentario inicial de caminho do ficheiro. Pela prompt, blocos com 20 ou mais linhas nao vazias precisam de pelo menos 2 comentarios didaticos dentro do proprio bloco. Por isso, o BK nao deve ser classificado como `OK` absoluto nesta execucao.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -1846,7 +1852,7 @@ Foi reaberto apenas drift de classificacao no relatorio: a secao de correcao ant
 
 ---
 
-## Correcao atual - 2026-07-01 - BK-MF9-02
+## Correcao observada - 2026-07-01 - BK-MF9-02
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -1857,13 +1863,13 @@ Foi reaberto apenas drift de classificacao no relatorio: a secao de correcao ant
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-02` corrigido de `PARCIAL` para `OK`; nao foram editados outros BKs nem codigo real.
 
-### Resultado executivo da correcao atual
+### Resultado executivo da correcao observada
 
 `BK-MF9-02` passa a `OK` apos a correcao das duas lacunas abertas na reauditoria anterior. O guia ficou alinhado com o contrato de produto e com a regra pedagogica da prompt: texto publicavel em portugues de Portugal com acentuacao, blocos de codigo com imports/contexto suficientes e testes com comentarios didaticos nos blocos longos.
 
 O contrato tecnico manteve-se igual: `RF63` continua a exigir enforcement backend da qualidade maxima; Pro/trial ficam limitados a `1080p`; Familia pode receber `2160p/4K` quando o conteudo tiver essa opcao; URLs de qualidades bloqueadas nao sao expostas ao frontend; e a UI apenas reflete `locked` sem decidir permissoes.
 
-### Contagem antes e depois da correcao atual
+### Contagem antes e depois da correcao observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -1966,7 +1972,7 @@ O drift de classificacao registado na reauditoria anterior fica fechado: `BK-MF9
 - Strict scope: sim
 - Resultado desta execucao: `BK-MF9-02` re-auditado como `PARCIAL`; nenhum guia BK foi editado nesta reauditoria.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-02` esta tecnicamente alinhado com o contrato de produto: `RF63` exige enforcement backend da qualidade maxima, `RNF29` exige testes, `BK-MF9-01` fornece `maxQuality`/`qualityRank` e `BK-MF9-03` consegue reutilizar o mesmo filtro quando introduzir acesso familiar efetivo.
 
@@ -1974,7 +1980,7 @@ A implementacao de referencia confirma o caminho tecnico: `filterQualityOptionsB
 
 Mesmo assim, o guia nao pode ser classificado como `OK` para aluno porque ainda incumpre duas regras pedagogicas da prompt: o texto destinado ao aluno continua amplamente sem acentuacao PT-PT e alguns blocos de codigo continuam demasiado dependentes de contexto criado fora do proprio passo, sem explicitar imports/helpers suficientes para um aluno seguir sem adivinhar.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -2067,7 +2073,7 @@ Foi encontrado drift de classificacao no relatorio: o historico preservado class
 
 ---
 
-## Reauditoria atual - 2026-07-01 - BK-MF9-01
+## Reauditoria observada - 2026-07-01 - BK-MF9-01
 
 - Projeto: FaithFlix
 - MF alvo: `MF9`
@@ -2078,7 +2084,7 @@ Foi encontrado drift de classificacao no relatorio: o historico preservado class
 - Strict scope: sim
 - Resultado desta execução: `BK-MF9-01` re-auditado como `OK`; nenhum guia BK foi editado nesta reauditoria.
 
-### Resultado executivo da reauditoria atual
+### Resultado executivo da reauditoria observada
 
 `BK-MF9-01` mantém estado `OK` após nova leitura integral do guia, cruzamento com documentação canónica e validação técnica focada.
 
@@ -2086,7 +2092,7 @@ O guia cumpre o contrato pedagógico e técnico exigido para `RF61`: preserva `f
 
 Não foram reabertos os findings da auditoria anterior. O componente `PlansSection` está autocontido, o teste MF9 apresentado inclui imports/helpers/fixtures/asserts suficientes para o contexto do BK, e o texto narrativo do `BK-MF9-01` está em português de Portugal com acentuação correta nas secções destinadas aos alunos.
 
-### Contagem antes e depois da reauditoria atual
+### Contagem antes e depois da reauditoria observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |
@@ -2158,7 +2164,7 @@ Não foi encontrado drift ativo entre RF/RNF, backlog, matriz, contrato de campo
 - Strict scope: sim
 - Resultado desta execução: `BK-MF9-01` corrigido e relatório atualizado.
 
-### Resultado executivo da execução atual
+### Resultado executivo da execução observada
 
 `BK-MF9-01` foi corrigido a partir dos três findings abertos na reauditoria anterior e passa de `PARCIAL` para `OK`.
 
@@ -2166,7 +2172,7 @@ O contrato de produto manteve-se coerente: `RF61` pede planos Pro/Família com e
 
 As correções foram documentais e pedagógicas: texto narrativo normalizado para português de Portugal com acentuação, componente frontend autocontido para a zona de planos e ficheiro de teste MF9 completo para o contexto inicial do BK. Não foram editados ficheiros de produto em `real_dev`.
 
-### Contagem antes e depois da execução atual
+### Contagem antes e depois da execução observada
 
 | Estado | Antes | Depois |
 | --- | ---: | ---: |

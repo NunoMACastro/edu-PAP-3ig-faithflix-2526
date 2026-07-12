@@ -166,7 +166,7 @@ export async function postTaxonomy(req, res) {
  * @returns {Promise<unknown>} Resposta HTTP com o detalhe público.
  */
 export async function getCatalogDetail(req, res) {
-    return res.status(200).json({
-        content: await getPublishedContentDetail(req.params.idOrSlug),
-    });
+    return res
+        .status(200)
+        .json(await getPublishedContentDetail(req.params.idOrSlug));
 }

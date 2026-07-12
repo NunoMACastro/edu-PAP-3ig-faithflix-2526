@@ -1,5 +1,11 @@
 # MF8 - Scope freeze
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-30`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: scope freeze MF8 observado em 2026-06-30; não congela a baseline posterior MF9
+
 ## Metadados
 
 - Projeto: FaithFlix
@@ -11,9 +17,15 @@
 - Decisao: `SCOPE_CONGELADO_COM_RISCOS_CONTROLADOS`
 - PR: `NAO_APLICAVEL`
 
-## Sumario executivo
+> **Aviso de validade — Fase 2 (2026-07-09):** este documento é um snapshot histórico anterior à Fase 2 de 2026-07-09. Os resultados e decisões preservados abaixo não provam CP2 nem o estado atual da aplicação.
 
-O scope final da PAP FaithFlix fica congelado com decisao `GO_COM_RESSALVAS`. A entrega inclui a aplicacao MVP validavel, os fluxos principais de streaming cristao, monetizacao solidaria simulada, administracao, privacidade, notificacoes, recomendacao baseline, evidencias MF6/MF7/MF8 e testes finais registados.
+## Sumario executivo do snapshot
+
+Na observação de 2026-06-30, o scope então final da PAP FaithFlix ficou
+congelado com decisão `GO_COM_RESSALVAS`. A entrega observada incluía a
+aplicação MVP validável, os fluxos principais de streaming cristão,
+monetização solidária simulada, administração, privacidade, notificações,
+recomendação baseline, evidences MF6/MF7/MF8 e testes então registados.
 
 Nao ha blocker funcional P0/P1 confirmado no fecho. As ressalvas aceites sao operacionais/documentais e nao devem ser apresentadas como funcionalidades entregues: runbook formal de rollback/deployment, documento tecnico unico consolidado e revisao humana alargada em browsers/dispositivos reais.
 
@@ -28,9 +40,9 @@ Nao ha blocker funcional P0/P1 confirmado no fecho. As ressalvas aceites sao ope
 | `docs/evidence/MF8/PAINEL-READINESS-OPERACIONAL.md` | Decisao operacional `GO_COM_RESSALVAS`. |
 | `docs/evidence/MF8/AUDITORIA-ADMINISTRATIVA-FINAL.md` | Fecho de superficies admin, permissoes e logs. |
 | `docs/evidence/MF7/GATE-UI-NAVEGACAO-SEGURA.md` | Entrada visual/navegacional consumida pela MF8. |
-| `docs/planificacao/backlogs/BACKLOG-MVP.md`, `MATRIZ-CANONICA-BK.md`, `CONTRATO-CAMPOS-BK.md`, `MF-VIEWS.md`, `PLANO-SPRINTS.md` | Cadeia formal de 60 BK e MF8 final com 10 guias. |
+| `docs/planificacao/backlogs/BACKLOG-MVP.md`, `MATRIZ-CANONICA-BK.md`, `CONTRATO-CAMPOS-BK.md`, `MF-VIEWS.md`, `PLANO-SPRINTS.md` | Cadeia de 60 BK e MF8 com 10 guias observada no snapshot. |
 
-## Funcionalidades congeladas como entregues
+## Funcionalidades registadas como entregues no snapshot
 
 | Area | Estado | Prova | Ressalva |
 | --- | --- | --- | --- |
@@ -64,7 +76,7 @@ Nao ha blocker funcional P0/P1 confirmado no fecho. As ressalvas aceites sao ope
 | Validacao humana total | Sweep automatico nao cobre todos os dispositivos reais. | `CONTROLADO` | Screenshots desktop/mobile, E2E e checks de responsividade cobrem rotas principais. | Mateus/Davi | `RESSALVA_UX` |
 | Ambiente sandbox | Porta/DNS podem falhar por restricao local. | `CONTROLADO` | Comandos criticos foram repetidos em ambiente adequado quando necessario. | Nuno/Matheus | `RESSALVA_AMBIENTE` |
 
-## Estado final da app
+## Estado observado da app
 
 | Sinal | Estado | Prova | Decisao |
 | --- | --- | --- | --- |
@@ -85,7 +97,7 @@ Nao ha blocker funcional P0/P1 confirmado no fecho. As ressalvas aceites sao ope
 | Logs/outputs colados | Outputs resumidos e sem segredos. | Output bruto com headers/cookies/tokens fica proibido. | `PASS` |
 | Scope freeze | Exclusoes e trabalho futuro separados da entrega atual. | Prometer provider externo como entregue sem prova fica `FAIL`. | `PASS` |
 
-## Checklist final de entrega
+## Checklist observado da entrega
 
 | Item | Estado | Proof | Neg |
 | --- | --- | --- | --- |
@@ -120,7 +132,7 @@ Nao ha blocker funcional P0/P1 confirmado no fecho. As ressalvas aceites sao ope
 | 6. Fechar checklist final de entrega | `NAO_APLICAVEL` | Checklist com `OK`/`OK_COM_RESSALVA`. | Caixa vazia sem proof nao conta. | Este ficheiro | `PASS_COM_RESSALVAS` |
 | 7. Indicar trabalho pos-PAP | `NAO_APLICAVEL` | Trabalho futuro separado e marcado como nao entregue. | Futuro necessario para requisito ativo voltaria a riscos. | Este ficheiro | `PASS` |
 
-## Handoff final
+## Handoff observado no snapshot
 
 - Proximo BK: `BK-MF9-01` (extensao MF9; nao conta como funcionalidade entregue na MF8).
 - Decisao final: `SCOPE_CONGELADO_COM_RISCOS_CONTROLADOS`.
@@ -130,6 +142,6 @@ Nao ha blocker funcional P0/P1 confirmado no fecho. As ressalvas aceites sao ope
 - Ressalvas a comunicar: rollback/deployment formal, documento tecnico unico e revisao humana alargada.
 - Nao fazer depois do freeze sem nova decisao: criar features, trocar stack, prometer providers externos ou reclassificar trabalho futuro como entregue.
 
-## Decisao final BK-MF8-10
+## Decisao observada no BK-MF8-10
 
 `PASS_COM_RESSALVAS`. O scope fica congelado. A entrega final e coerente com os reports e evidencias existentes, nao apresenta bloqueadores funcionais confirmados e separa claramente o que esta entregue, o que esta aceite com ressalva e o que pertence a trabalho pos-PAP.

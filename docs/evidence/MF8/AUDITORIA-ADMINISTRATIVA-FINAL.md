@@ -1,6 +1,105 @@
 # Auditoria administrativa final - MF8
 
-## Metadados
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: adendos atuais da referência privada e snapshot MF8 de 2026-06-29 claramente delimitado; não constitui evidence dos alunos
+
+## Adendo docente pós-correção - robustez administrativa Fase 5 (2026-07-10)
+
+Este adendo acrescenta prova local atual da referência privada. Não reescreve o
+snapshot MF8 de 2026-06-29, não promove BKs dos alunos e não altera a decisão
+histórica `PASS_COM_RESSALVAS`.
+
+| Superfície atual | Contrato Fase 5 | Prova local atual |
+| --- | --- | --- |
+| Candidaturas | API `{ applications, page, limit, total, totalPages }`, `limit <= 50`, ordem estável; decisão com confirmação, busy por linha, abort/anti-stale e retry. | `AdminCharityApplicationsPage.test.jsx`; backend `f5-validation-pagination.test.js`. |
+| Membership | Confirma utilizador e associação, impede dupla submissão, aborta no unmount e só mostra a resposta autoritativa. | `AdminCharityMembersPage.test.jsx`; `adminActionApis.test.js`. |
+| Pool | Mês inicial deriva do tempo civil local, fecho manual exige confirmação; dashboard cancela leituras, traduz estados financeiros e separa loading/error/empty/retry. | `AdminPoolDistributionPage.test.jsx`; `AdminPoolDashboardPage.test.jsx`. |
+| Utilizadores | API `{ users, page, limit, total, totalPages }`, `limit <= 50`, filtros fechados e ordenação estável; UI confirma papel/estado, repõe select cancelado, usa busy por linha, abort e PT-PT. | `AdminUsersPage.test.jsx`; backend `f5-validation-pagination.test.js`. |
+| Métricas | Leitura cancelável, intervalo invertido recusado antes da API, retry e rótulos agregados PT-PT. | `AdminMetricsPage.test.jsx`. |
+| Integrações | Confirma ativação/modo, repõe controlo cancelado, busy por integração, abort e resposta autoritativa; `publicConfig` continua sem segredos. | `AdminIntegrationsPage.test.jsx`; `adminActionApis.test.js`. |
+
+Validação acumulada registada no report canónico: backend `191/191` e frontend
+`50` ficheiros/`197` testes, lint/build verdes. A matriz Axe local passou
+`14/14`; entre as rotas autenticadas cobriu `/admin/utilizadores` e
+`/admin/catalogo`. Estes testes
+usam doubles/interceções locais e não são um fluxo E2E administrativo completo
+com MongoDB replica set. A ressalva browser/E2E histórica continua, portanto,
+aberta e não é convertida em `PASS` de produção.
+
+## Adendo docente pós-correção - catálogo editorial Fase 4 (2026-07-10)
+
+Este adendo regista a baseline atual da referência privada sem reescrever nem
+promover o snapshot MF8 de 2026-06-29 que permanece abaixo. O estado dos alunos
+e a decisão histórica `PASS_COM_RESSALVAS` não mudam por esta prova local.
+
+| Contrato administrativo atual | Estado local | Prova atual |
+| --- | --- | --- |
+| Create aceita metadata/assets/taxonomias e força media vazia, `mediaStatus: "pending"`, tracks vazias e zero quality options. | `VALIDADO_LOCAL` | `catalog-transactions.test.js` e `media-boundary.test.js` tentam injetar fontes e confirmam o documento vazio/pending. |
+| Update recusa `media`, `mediaStatus`, `tracks`, `qualityOptions`, `playbackUrl` e `src` com `400 CATALOG_MEDIA_MUTATION_FORBIDDEN` e `details.field`. | `VALIDADO_LOCAL` | Unitário confirma zero revisão/audit/escrita; regressão HTTP confirma o envelope 400 com CSRF e sessão admin. |
+| Update e reversão editorial preservam a media existente; CAS, revisão e audit continuam transacionais. | `VALIDADO_LOCAL` | Testes com media corrente diferente do snapshot e negativos de CAS/fault injection. |
+| Catálogo admin e revisões devolvem `{ items, page, limit, total, totalPages }`, aceitam no máximo 50 e usam `_id` como desempate estável. | `VALIDADO_LOCAL` | Unitário pagina empates; regressão HTTP consulta a segunda página das duas rotas. |
+
+Comandos atuais em `real_dev/backend`: suite unitária `152/152` e suite backend
+completa `183/183`, zero fail/skip. A prova HTTP usa servidor loopback e DB
+in-memory; nenhum seed, E2E, migração ou acesso à DB configurada foi executado.
+Isto não substitui browser real, replica set MongoDB nem evidência dos alunos.
+
+## Adendo docente pos-correcao - operacoes admin Fase 3 (2026-07-10)
+
+Este adendo acrescenta prova atual da referência privada sem alterar a decisão
+histórica MF8 de 2026-06-29. Qualquer path `real_dev/backend/` ou
+`real_dev/frontend/` neste documento identifica exclusivamente a referência
+docente privada; nunca representa a entrega publicável dos alunos.
+
+| Operação atual | Unidade de commit e concorrência | Estado local |
+| --- | --- | --- |
+| Candidatura pública | Índice parcial único por `email` quando `status: "pending"`; colisão sequencial ou concorrente devolve `409 PENDING_APPLICATION_EXISTS`. | `VALIDADO_LOCAL` |
+| Review da candidatura | Claim condicional de `pending`; decisão, eventual associação `active/eligible` e `charity.application_review` partilham transação. A decisão perdedora devolve `409 APPLICATION_ALREADY_REVIEWED`. | `VALIDADO_LOCAL` |
+| Membership de associação | Ligação nova e `charity.membership_create` partilham transação; repetição igual é idempotente; outra associação devolve `409 CHARITY_MEMBERSHIP_EXISTS`, sem transferência implícita. | `VALIDADO_LOCAL` |
+| Gestão de utilizador | `user.admin_update`, alteração e revogação de todas as sessões no bloqueio fazem commit/rollback juntos. `requestId` correlaciona o pedido com o audit. | `VALIDADO_LOCAL` |
+| Último admin ativo | Auto-bloqueio/autodespromoção continuam recusados; remoções concorrentes serializam pela invariante `active-admin-roster` e preservam pelo menos um admin, ou devolvem `409 LAST_ACTIVE_ADMIN`. | `VALIDADO_LOCAL` |
+
+O audit administrativo guarda `action`, ator, tipo/id do alvo,
+`before`/`after` sanitizados, metadata segura, `requestId` quando existe e
+timestamp. Passwords, hashes de autenticação/CSRF, tokens, cookies e segredos
+não são persistidos no evento.
+
+Prova focada: `real_dev/backend/tests/unit/f3-admin-transactions.test.js`.
+Em 2026-07-10, a execução combinada com `mf5-validation.test.js` passou
+`14/14`, sem DB ou rede.
+Os doubles locais incluem rollback e serialização de transações, mas não provam
+topologia MongoDB replica set real; essa limitação continua explícita no report
+canónico da correção end-to-end.
+
+## Adendo docente pos-correcao - catalogo Fase 3 (2026-07-10)
+
+Este adendo complementa, sem reescrever, o snapshot MF8 de 2026-06-29. A prova
+histórica abaixo foi recolhida sobre a referência privada; os paths
+`real_dev/backend/` e `real_dev/frontend/` não são paths públicos dos alunos. A
+validação atual da referência não altera o estado histórico dos outros domínios
+administrativos nem o estado dos BK estudantis.
+
+| Contrato atual do catálogo admin | Estado local | Prova atual |
+| --- | --- | --- |
+| Create devolve `version: 1`; listagem admin devolve uma versão positiva. | `VALIDADO_LOCAL` | `real_dev/backend/tests/unit/catalog-transactions.test.js` |
+| Edit/status/revert exigem `expectedVersion`; valor ausente ou não numérico falha fechado. | `VALIDADO_LOCAL` | Teste de `EXPECTED_VERSION_REQUIRED` e services reais. |
+| Lost update devolve `409 CONTENT_VERSION_CONFLICT`. | `VALIDADO_LOCAL` | CAS obsoleto e CAS perdido depois da leitura cobertos. |
+| Revisão, mutação e `admin_audit_logs` partilham a mesma transação/sessão. | `VALIDADO_LOCAL` | Fault injection de update e audit confirma rollback total. |
+| Repetir `published` não cria revisão nem altera `version`/`publishedAt`. | `VALIDADO_LOCAL` | Negativo idempotente focado. |
+| Conteúdo publicado com `mediaStatus: "pending"` continua visível, mas não reproduzível. | `VALIDADO_LOCAL` | `media-boundary.test.js`; zero fonte no serializer público. |
+
+Comando atual: `cd real_dev/backend && node --test tests/unit/catalog-transactions.test.js tests/unit/media-boundary.test.js`
+— `14/14` pass, sem DB ou rede. Esta fixture local não é
+prova de transações numa topologia MongoDB real, streaming real ou browser E2E.
+
+## Snapshot histórico de 2026-06-29
+
+Daqui até ao fim do documento preserva-se a auditoria original. Paths da
+referência privada continuam a ser `REFERENCE` e nunca representam a lane dos
+alunos; os `PASS` abaixo não são revalidação atual.
 
 - `bk_id`: `BK-MF8-05`
 - `macro`: `MF8`
@@ -17,9 +116,9 @@
 | Readiness operacional | `docs/evidence/MF8/PAINEL-READINESS-OPERACIONAL.md` | Entrada para sinais de logging, health, riscos e decisao `GO_COM_RESSALVAS`. |
 | Hardening MF6 | `docs/evidence/MF6/BK-MF6-03-hardening-seguranca.md` | Prova previa de rotas admin protegidas e logs de auditoria. |
 | Navegacao segura MF7 | `docs/evidence/MF7/NAVEGACAO-SEGURA-POR-PERFIL.md` | Prova visual/UX de guardas por sessao e role no frontend. |
-| Regressao admin MF8 | `backend/tests/regression/mf8-admin-final-audit.test.js` | Prova executavel de 401/403 e auditoria segura. |
-| Rotas backend | `backend/src/modules/*/*.routes.js` | Inventario de endpoints admin e guards. |
-| Rotas frontend | `frontend/src/routes/AppRoutes.jsx` | Inventario de paginas admin e guarda visual. |
+| Regressao admin MF8 | `real_dev/backend/tests/regression/mf8-admin-final-audit.test.js` | Prova executavel de 401/403 e auditoria segura. |
+| Rotas backend | `real_dev/backend/src/modules/*/*.routes.js` | Inventario de endpoints admin e guards. |
+| Rotas frontend | `real_dev/frontend/src/routes/AppRoutes.jsx` | Inventario de paginas admin e guarda visual. |
 
 ## Superficie administrativa inventariada
 
@@ -36,7 +135,7 @@
 
 | Perfil | Resultado esperado | Proof | Negativo | Estado |
 | --- | --- | --- | --- | --- |
-| Visitante sem sessao | Recebe `401` em rotas administrativas. | `npm --prefix backend test -- tests/regression/mf8-admin-final-audit.test.js` cobre `GET /api/users`, `/api/admin/metrics`, `/api/admin/integrations`, `/api/catalog/admin`, `/api/charities/applications`, `/api/charities/pool/dashboard`, `POST /api/charities/pool/distributions` e `PATCH /api/admin/integrations/simulated_payments`. | Qualquer `200` anonimo em rota admin passa a `FAIL`. | `PASS` |
+| Visitante sem sessao | Recebe `401` em rotas administrativas. | `npm --prefix real_dev/backend test -- tests/regression/mf8-admin-final-audit.test.js` cobre `GET /api/users`, `/api/admin/metrics`, `/api/admin/integrations`, `/api/catalog/admin`, `/api/charities/applications`, `/api/charities/pool/dashboard`, `POST /api/charities/pool/distributions` e `PATCH /api/admin/integrations/simulated_payments`. | Qualquer `200` anonimo em rota admin passa a `FAIL`. | `PASS` |
 | Utilizador comum | Recebe `403` nas mesmas rotas administrativas. | A mesma regressao usa cookie de sessao valido com role `user`. | Role `user` executar acao admin passa a `FAIL`. | `PASS` |
 | Moderador | Acesso limitado a catalogo admin; sem acesso a utilizadores, metricas, integracoes e pool. | Contrato em `catalog.routes.js` usa `requireRole(["admin", "moderator"])`; restantes rotas usam `requireRole(["admin"])`. | Moderador gerir users/integracoes/pool passa a `FAIL`. | `PASS_COM_RESSALVAS` |
 | Admin | Pode executar superficies administrativas previstas, com validacao backend. | Services existentes de users, metrics, integrations, charities e catalog preservados; regressao MF8 valida auditoria de users/integrations. | Admin sem log de auditoria em operacao critica passa a ressalva ou `FAIL`, conforme impacto. | `PASS_COM_RESSALVAS` |
@@ -91,6 +190,6 @@
 
 - Decisao administrativa: `PASS_COM_RESSALVAS`.
 - Sem findings P0/P1 confirmados.
-- Prova principal nova: `backend/tests/regression/mf8-admin-final-audit.test.js`.
+- Prova principal nova: `real_dev/backend/tests/regression/mf8-admin-final-audit.test.js`.
 - A matriz final deve consumir esta evidence como fonte de `RNF19` e `RNF30`.
 - Riscos a transportar: browser/E2E admin completo, cobertura de auditoria em associacoes/pool e rollback/deployment formal.

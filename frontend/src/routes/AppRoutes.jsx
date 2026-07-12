@@ -21,7 +21,7 @@ import { AdminUsersPage } from "../pages/AdminUsersPage.jsx";
 import { CatalogPage } from "../pages/CatalogPage.jsx";
 import { CharityApplicationPage } from "../pages/CharityApplicationPage.jsx";
 import { CharityHistoryPage } from "../pages/CharityHistoryPage.jsx";
-import { ContentDetailPage } from "../pages/ContentDetailPage.jsx";
+import { ContentDetailPage, EpisodeContextPage } from "../pages/ContentDetailPage.jsx";
 import { DiscoveryHomePage } from "../pages/DiscoveryHomePage.jsx";
 import { ForYouPage } from "../pages/ForYouPage.jsx";
 import { LoginPage } from "../pages/LoginPage.jsx";
@@ -55,6 +55,7 @@ export function AppRoutes() {
       <Routes>
         <Route path="/" element={<DiscoveryHomePage />} />
         <Route path="/catalogo" element={<CatalogPage />} />
+        <Route path="/catalogo/:seriesSlug/episodios/:episodeSlug" element={<EpisodeContextPage />} />
         <Route path="/catalogo/:idOrSlug" element={<ContentDetailPage />} />
         <Route path="/ver/:contentId" element={<PlaybackPage />} />
         <Route path="/login" element={<LoginPage />} />

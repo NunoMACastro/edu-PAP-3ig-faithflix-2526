@@ -3,6 +3,7 @@
  */
 
 import { Link } from "react-router-dom";
+import { formatContentType } from "../../utils/contentTypeLabels.js";
 
 /**
  * Mostra um grupo horizontal de descoberta.
@@ -23,7 +24,9 @@ export function DiscoveryCarousel({ title, items }) {
                         {content.posterUrl ? (
                             <img src={content.posterUrl} alt="" />
                         ) : null}
-                        <p className="content-card-eyebrow">{content.type}</p>
+                        <p className="content-card-eyebrow">
+                            {formatContentType(content.type)}
+                        </p>
                         <h3>{content.title}</h3>
                         {content.ratingAverage ? (
                             <p>Rating médio: {content.ratingAverage}</p>

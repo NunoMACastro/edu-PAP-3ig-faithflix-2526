@@ -3,9 +3,18 @@
 ## Header
 
 - Data: 2026-07-02
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-07-02`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: recomendações/embeddings observados nessa execução; não constitui revalidação atual
 - Area: `MF3` - recomendacoes IA baseline e embeddings opcionais
 - Estado: `VALIDADO`
-- Implementacao: `backend/src/modules/recommendations`, `frontend/src/pages/ForYouPage.jsx`
+- Implementacao: `real_dev/backend/src/modules/recommendations`, `real_dev/frontend/src/pages/ForYouPage.jsx`
+
+> **Snapshot histórico de 2026-07-02:** as contagens e estados abaixo
+> pertencem àquela execução. Os paths foram normalizados para a referência
+> docente `real_dev`, mas isso não constitui reexecução nem prova atual.
 
 ## Contrato implementado
 
@@ -31,11 +40,11 @@
 
 | Comando | Resultado | Observacao |
 | --- | --- | --- |
-| `npm --prefix backend test` | `PASS` | 58/58 fora da sandbox; dentro da sandbox os testes HTTP falham com `listen EPERM`, confirmado como ambiente. |
-| `npm --prefix frontend run build` | `PASS` | Build Vite concluido. |
-| `node scripts/check-security-baseline.mjs` em `backend/` | `PASS` | Scanner cobre `requireAuth` em `/me`, `/feedback` e `/events`. |
-| `npm --prefix backend test -- tests/unit/mf3-validation.test.js` | `PASS` | 13/13; cobre hash, provider disabled, deterministic, cosine similarity e dimensao externa invalida. |
-| `npm --prefix backend run embeddings:generate` | `PASS` | Em provider `disabled`, terminou sem ligar a provider/DB e com mensagem operacional clara. |
+| `npm --prefix real_dev/backend test` | `PASS` | 58/58 fora da sandbox; dentro da sandbox os testes HTTP falham com `listen EPERM`, confirmado como ambiente. |
+| `npm --prefix real_dev/frontend run build` | `PASS` | Build Vite concluido. |
+| `cd real_dev/backend && node scripts/check-security-baseline.mjs` | `PASS` | Scanner cobre `requireAuth` em `/me`, `/feedback` e `/events`. |
+| `npm --prefix real_dev/backend test -- tests/unit/mf3-validation.test.js` | `PASS` | 13/13; cobre hash, provider disabled, deterministic, cosine similarity e dimensao externa invalida. |
+| `npm --prefix real_dev/backend run embeddings:generate` | `PASS` | Em provider `disabled`, terminou sem ligar a provider/DB e com mensagem operacional clara. |
 
 ## Riscos residuais
 

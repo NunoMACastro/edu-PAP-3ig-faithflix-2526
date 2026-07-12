@@ -1,5 +1,11 @@
 # Refinamento visual e mockup - MF7
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-25`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: refinamento visual observado em 2026-06-25; não equivale à matriz browser atual
+
 ## Metadados
 
 - BK: BK-MF7-03
@@ -7,6 +13,9 @@
 - Data: 2026-06-25
 - Fonte: RNF01, RNF02, RNF03, RNF04, RNF28, RNF38
 - Decisão: PASS_COM_RISCOS
+
+> **Snapshot histórico de 2026-06-25:** resultados preservados sem
+> reexecução; não equivalem à matriz browser atual.
 
 ## Verificações
 
@@ -49,8 +58,8 @@ Decisao operacional: `PASS_COM_RISCOS`, nao por falta de screenshots ou prova de
 
 | Comando | Resultado |
 | --- | --- |
-| `npm run build` no package frontend | PASS, bundle Vite gerado. |
-| `node scripts/check-frontend-regression.mjs` no package frontend | PASS. |
+| `npm --prefix real_dev/frontend run build` | PASS, bundle Vite gerado. |
+| `cd real_dev/frontend && node scripts/check-frontend-regression.mjs` | PASS. |
 
 ## Ressalvas
 

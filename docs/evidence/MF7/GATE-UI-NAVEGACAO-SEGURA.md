@@ -1,5 +1,11 @@
 # Gate UI, responsividade e navegação segura - MF7
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-25`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: gate UI MF7 observado em 2026-06-25; matriz manual atual continua pendente
+
 ## Metadados
 
 - BK: BK-MF7-05
@@ -7,6 +13,9 @@
 - Data: 2026-06-25
 - Fonte: RNF21, RNF22, RNF38, RNF40
 - Decisão final: GO_COM_RESSALVAS
+
+> **Snapshot histórico de 2026-06-25:** decisão preservada sem reexecução.
+> Não substitui a matriz manual branded/Safari de 2026-07-10.
 
 ## Entradas obrigatórias
 
@@ -21,18 +30,18 @@
 
 | Critério | Resultado esperado | Resultado observado | Estado | Prova |
 | --- | --- | --- | --- | --- |
-| Visitante | Não vê links admin | Header filtra itens por `visibility` e `roles`; visitante não cumpre `authenticated`. | PASS | `frontend/src/components/layout/AppHeader.jsx` |
-| Visitante em rota admin | Vai para login | `AdminRoute` redireciona `anonymous` para `/login`. | PASS | `frontend/src/components/auth/AdminRoute.jsx` |
-| User comum | Não vê links admin | `hasRole(["admin"])` falha para `user`. | PASS | `frontend/src/context/SessionContext.jsx` |
-| User comum em rota admin | Recebe aviso de permissão | `AdminRoute` mostra mensagem de 403 visual. | PASS | `frontend/src/components/auth/AdminRoute.jsx` |
-| Admin | Acede a páginas admin | Rotas admin usam `AdminRoute` e roles admin. | PASS | `frontend/src/routes/AppRoutes.jsx` |
-| Moderator | Acede apenas ao catálogo admin | Catálogo preserva `["admin", "moderator"]`; restantes rotas admin usam `["admin"]`. | PASS | `frontend/src/routes/AppRoutes.jsx` |
+| Visitante | Não vê links admin | Header filtra itens por `visibility` e `roles`; visitante não cumpre `authenticated`. | PASS | `real_dev/frontend/src/components/layout/AppHeader.jsx` |
+| Visitante em rota admin | Vai para login | `AdminRoute` redireciona `anonymous` para `/login`. | PASS | `real_dev/frontend/src/components/auth/AdminRoute.jsx` |
+| User comum | Não vê links admin | `hasRole(["admin"])` falha para `user`. | PASS | `real_dev/frontend/src/context/SessionContext.jsx` |
+| User comum em rota admin | Recebe aviso de permissão | `AdminRoute` mostra mensagem de 403 visual. | PASS | `real_dev/frontend/src/components/auth/AdminRoute.jsx` |
+| Admin | Acede a páginas admin | Rotas admin usam `AdminRoute` e roles admin. | PASS | `real_dev/frontend/src/routes/AppRoutes.jsx` |
+| Moderator | Acede apenas ao catálogo admin | Catálogo preserva `["admin", "moderator"]`; restantes rotas admin usam `["admin"]`. | PASS | `real_dev/frontend/src/routes/AppRoutes.jsx` |
 | Mobile 390px | Sem sobreposição | Browser 390x844 com visitante validou hero, nav pública e ausência de links admin. | PASS | `browser/mf7-mobile-390-anonymous-home.png`; `browser/mf7-browser-validation-results.json` |
 | Tablet 768px | Grelhas legíveis | Browser 768x900 com user comum validou bloqueio visual em rota admin. | PASS | `browser/mf7-tablet-768-user-admin-denied.png`; `browser/mf7-browser-validation-results.json` |
 | Desktop largo | Conteúdo com largura controlada | Browser 1440x900 com admin validou hero e links admin esperados; 1366x900 validou catálogo moderator. | PASS | `browser/mf7-desktop-1440-admin-home.png`; `browser/mf7-desktop-1366-moderator-catalog.png` |
 | Teclado | Foco visível e skip link funcional | Playwright validou `Tab` no skip link e `Enter` com foco final em `main#conteudo-principal`. | PASS | `browser/mf7-keyboard-skip-link.png`; `browser/mf7-browser-validation-results.json` |
-| PT-PT | Texto visível com acentuação correta | Páginas principais, erros API, catálogo admin e rating foram corrigidos para PT-PT no scope auditado. | PASS | Build, pesquisa textual e `frontend/src/pages/AdminCatalogPage.jsx`; `frontend/src/components/ratings/RatingBox.jsx` |
-| Formatos europeus | Datas e valores em pt-PT | Planos, histórico e dashboards admin da pool usam `Intl.NumberFormat("pt-PT")`; datas usam `toLocaleDateString("pt-PT")`. | PASS | `frontend/src/pages/SubscriptionPage.jsx`, `frontend/src/pages/CharityHistoryPage.jsx`, `frontend/src/pages/AdminPoolDashboardPage.jsx`, `frontend/src/pages/AdminPoolDistributionPage.jsx` |
+| PT-PT | Texto visível com acentuação correta | Páginas principais, erros API, catálogo admin e rating foram corrigidos para PT-PT no scope auditado. | PASS | Build, pesquisa textual e `real_dev/frontend/src/pages/AdminCatalogPage.jsx`; `real_dev/frontend/src/components/ratings/RatingBox.jsx` |
+| Formatos europeus | Datas e valores em pt-PT | Planos, histórico e dashboards admin da pool usam `Intl.NumberFormat("pt-PT")`; datas usam `toLocaleDateString("pt-PT")`. | PASS | `real_dev/frontend/src/pages/SubscriptionPage.jsx`, `real_dev/frontend/src/pages/CharityHistoryPage.jsx`, `real_dev/frontend/src/pages/AdminPoolDashboardPage.jsx`, `real_dev/frontend/src/pages/AdminPoolDistributionPage.jsx` |
 
 ## Validação browser acrescentada em 2026-06-25
 
@@ -74,6 +83,6 @@ Justificação: os P0 de navegação segura ficaram fechados por código, build,
 
 | Comando | Resultado |
 | --- | --- |
-| `npm run build` no package frontend | PASS, 104 módulos transformados. |
-| `node scripts/check-frontend-regression.mjs` no package frontend | PASS, `Regressao frontend MF6: PASS`. |
+| `npm --prefix real_dev/frontend run build` | PASS, 104 módulos transformados. |
+| `cd real_dev/frontend && node scripts/check-frontend-regression.mjs` | PASS, `Regressao frontend MF6: PASS`. |
 | Sessão browser MF7 com fixtures locais | PASS, 5/5 cenários representativos com screenshots anexados, incluindo skip link por teclado. |

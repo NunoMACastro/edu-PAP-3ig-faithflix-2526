@@ -13,11 +13,11 @@
 - `dependencias`: `BK-MF6-02`
 - `rf_rnf`: `RNF01, RNF02, RNF03, RNF04, RNF06`
 - `fase_documental`: `Fase 3`
-- `sprint`: `S11`
+- `sprint`: `S10`
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF6-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-05-acessibilidade-e-ux-final.md`
-- `last_updated`: `2026-06-20`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -60,7 +60,7 @@ Antes deste BK, o frontend já tem layout, header, footer, foco visível global 
 
 Depois deste BK, a aplicação tem um `SkipLink`, um `main` semântico com destino de foco, estilos acessíveis para o link de salto, textos críticos revistos e uma evidence de UX que só pode ser preenchida depois de validação real.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - `BK-MF1-02` criou frontend React + Vite.
 - `BK-MF1-03` criou cliente API e mensagens de erro.
@@ -312,9 +312,11 @@ Transformar a revisão UX final em alterações concretas nos componentes onde o
 
 2. Ficheiros envolvidos:
     - EDITAR: `frontend/src/components/layout/AppHeader.jsx`
+    - CRIAR: `frontend/src/components/playback/MediaPreferenceControls.jsx`
     - EDITAR: `frontend/src/pages/PlaybackPage.jsx`
     - REVER: `frontend/src/components/ui/BaseButton.jsx`
-    - LOCALIZAÇÃO: ficheiro completo `AppHeader.jsx`; zona exata `div.player-controls` e elemento `<video>` em `PlaybackPage.jsx`; componente completo `BaseButton`
+    - LOCALIZAÇÃO: ficheiro completo `AppHeader.jsx`; novo componente de controlos;
+      substituir apenas `div.player-controls` na `PlaybackPage`; componente completo `BaseButton`
 
 3. Instruções do que fazer.
 
@@ -328,21 +330,25 @@ Atualiza a navegação para português de Portugal com acentuação, `aria-label
  * @file Cabeçalho principal com navegação FaithFlix.
  */
 
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useSession } from "../../context/SessionContext.jsx";
+import { toUserMessage } from "../../services/api/apiErrors.js";
 
 const navItems = [
-    { to: "/", label: "Início" },
-    { to: "/catalogo", label: "Catálogo" },
-    { to: "/biblioteca", label: "Biblioteca" },
-    { to: "/pesquisa", label: "Pesquisa" },
-    { to: "/para-si", label: "Para si" },
-    { to: "/associacoes", label: "Associações" },
-    { to: "/planos", label: "Planos" },
-    { to: "/conta", label: "Conta" },
-    { to: "/admin/catalogo", label: "Admin catálogo" },
-    { to: "/admin/utilizadores", label: "Admin utilizadores" },
-    { to: "/admin/metricas", label: "Métricas" },
-    { to: "/admin/integracoes", label: "Integrações" },
+    { to: "/", label: "Início", visibility: "public" },
+    { to: "/catalogo", label: "Catálogo", visibility: "public" },
+    { to: "/pesquisa", label: "Pesquisa", visibility: "public" },
+    { to: "/associacoes", label: "Associações", visibility: "public" },
+    { to: "/planos", label: "Planos", visibility: "public" },
+    { to: "/biblioteca", label: "Biblioteca", visibility: "authenticated" },
+    { to: "/para-si", label: "Para si", visibility: "authenticated" },
+    { to: "/notificacoes", label: "Notificações", visibility: "authenticated" },
+    { to: "/conta", label: "Conta", visibility: "authenticated" },
+    { to: "/admin/catalogo", label: "Admin catálogo", visibility: "admin" },
+    { to: "/admin/utilizadores", label: "Admin utilizadores", visibility: "admin" },
+    { to: "/admin/metricas", label: "Métricas", visibility: "admin" },
+    { to: "/admin/integracoes", label: "Integrações", visibility: "admin" },
 ];
 
 /**
@@ -374,12 +380,43 @@ function renderNavItem(item) {
     );
 }
 
+function canShowNavItem(item, session) {
+    if (item.visibility === "public") return true;
+    if (item.visibility === "authenticated") return session.status === "authenticated";
+    if (item.visibility === "admin") {
+        return session.status === "authenticated" && session.isAdmin;
+    }
+    return false;
+}
+
 /**
  * Renderiza o cabeçalho visível em todas as páginas.
  *
  * @returns {JSX.Element} Cabeçalho com marca e navegação principal.
  */
 export function AppHeader() {
+    const session = useSession();
+    const navigate = useNavigate();
+    const [loggingOut, setLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState("");
+    const visibleItems = navItems.filter((item) => canShowNavItem(item, session));
+
+    async function handleLogout() {
+        setLoggingOut(true);
+        setLogoutError("");
+
+        try {
+            // Só navegamos depois de o backend confirmar a revogação da sessão.
+            await session.logout();
+            navigate("/", { replace: true });
+        } catch (requestError) {
+            // Uma falha operacional mantém a sessão local e apresenta feedback seguro.
+            setLogoutError(toUserMessage(requestError));
+        } finally {
+            setLoggingOut(false);
+        }
+    }
+
     return (
         <header className="app-header">
             <NavLink
@@ -395,99 +432,136 @@ export function AppHeader() {
 
             {/* A label do nav descreve a região para quem navega por leitor de ecrã. */}
             <nav className="main-nav" aria-label="Navegação principal">
-                {navItems.map(renderNavItem)}
+                {visibleItems.map(renderNavItem)}
+                {session.status === "anonymous" ? (
+                    <NavLink className={getNavLinkClassName} to="/login">Entrar</NavLink>
+                ) : null}
             </nav>
+            {session.status === "authenticated" ? (
+                <button type="button" disabled={loggingOut} onClick={handleLogout}>
+                    {loggingOut ? "A sair..." : "Sair"}
+                </button>
+            ) : null}
+            {session.status === "unavailable" ? (
+                <div role="alert">
+                    <p>{session.error || "Não foi possível confirmar a sessão."}</p>
+                    <button type="button" onClick={() => session.refreshSession().catch(() => {})}>
+                        Tentar confirmar sessão
+                    </button>
+                </div>
+            ) : null}
+            {logoutError ? <p role="alert">{logoutError}</p> : null}
         </header>
     );
 }
 ```
 
+Não substituas o elemento `<video>` nem a região de erro/retry da
+`PlaybackPage` criada em `BK-MF2-05` e estendida em `BK-MF2-06`. Esses blocos
+continuam a ser a autoridade para `attachMediaSource`, destruição do adapter,
+MP4 progressivo, HLS nativo/`hls.js`, DASH/`dashjs`, retoma, fila de progresso,
+`MEDIA_NOT_READY` e retry. Em particular, não cries `videoSrc`, não atribuas
+`src` no JSX e não transformes descritores de legendas em `<track src>`.
+
+Cria o componente acessível abaixo e usa-o apenas para substituir o bloco
+`div.player-controls` existente. Assim, esta revisão de UX não volta a decidir
+fontes nem a apagar estados funcionais do player.
+
 ```jsx
-// frontend/src/pages/PlaybackPage.jsx
-// Substitui a zona que começa em <div className="player-controls"...> e termina no </video>.
-<div className="player-controls" aria-label="Opções de média">
-    <label>
+// frontend/src/components/playback/MediaPreferenceControls.jsx
+/**
+ * Controlos acessíveis para preferências que o backend volta a resolver.
+ * Os descritores recebidos contêm labels/valores, nunca URLs reproduzíveis.
+ */
+export function MediaPreferenceControls({
+  playback,
+  preferences,
+  busy,
+  onPreferenceChange,
+}) {
+  const tracks = playback.content.tracks ?? { subtitles: [], audio: [] };
+  const qualityOptions = playback.content.qualityOptions ?? [];
+
+  return (
+    <div className="player-controls" role="group" aria-label="Opções de média">
+      <label>
         Legendas
         <select
-            value={preferences.subtitleLanguage}
-            onChange={(event) =>
-                updatePreference(
-                    "subtitleLanguage",
-                    event.target.value,
-                )
-            }
+          value={preferences.subtitleLanguage}
+          disabled={Boolean(busy)}
+          onChange={(event) => onPreferenceChange("subtitleLanguage", event.target.value)}
         >
-            <option value="">Sem legendas</option>
-            {playback.content.tracks.subtitles.map((track) => (
-                <option key={track.language} value={track.language}>
-                    {track.label}
-                </option>
-            ))}
+          <option value="">Sem legendas</option>
+          {tracks.subtitles.map((track) => (
+            <option key={track.language} value={track.language}>
+              {track.label}
+            </option>
+          ))}
         </select>
-    </label>
-    <label>
+      </label>
+      <label>
         Áudio
         <select
-            value={audioValue}
-            onChange={(event) =>
-                updatePreference("audioLanguage", event.target.value)
-            }
+          value={preferences.audioLanguage}
+          disabled={Boolean(busy)}
+          onChange={(event) => onPreferenceChange("audioLanguage", event.target.value)}
         >
-            <option value="">Original</option>
-            {playback.content.tracks.audio.map((track) => (
-                <option key={track.language} value={track.language}>
-                    {track.label}
-                </option>
-            ))}
+          <option value="">Original</option>
+          {tracks.audio.map((track) => (
+            <option key={track.language} value={track.language}>
+              {track.label}
+            </option>
+          ))}
         </select>
-    </label>
-    <label>
+      </label>
+      <label>
         Qualidade
         <select
-            value={qualityValue}
-            onChange={(event) =>
-                updatePreference("quality", event.target.value)
-            }
+          value={preferences.quality}
+          disabled={Boolean(busy)}
+          onChange={(event) => onPreferenceChange("quality", event.target.value)}
         >
-            <option value="">Automática</option>
-            {playback.content.qualityOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                    {option.label}
-                </option>
-            ))}
+          <option value="">Automática</option>
+          {qualityOptions.map((option) => (
+            <option key={option.value} value={option.value} disabled={option.locked}>
+              {option.locked
+                ? `${option.label} - ${option.lockedReason ?? "indisponível no plano atual"}`
+                : option.label}
+            </option>
+          ))}
         </select>
-    </label>
-</div>
-<video
-    ref={videoRef}
-    controls
-    data-testid="faithflix-player"
-    src={videoSrc}
-    onLoadedMetadata={handleLoadedMetadata}
-    onTimeUpdate={handleTimeUpdate}
-    onPause={handlePause}
->
-    {/* As tracks continuam no video para preservar legendas criadas nos BKs de streaming. */}
-    {playback.content.tracks.subtitles.map((track) => (
-        <track
-            key={track.language}
-            kind="subtitles"
-            srcLang={track.language}
-            label={track.label}
-            src={track.src}
-        />
-    ))}
-    O teu browser não suporta vídeo HTML5.
-</video>
+      </label>
+    </div>
+  );
+}
+```
+
+Integra-o na `PlaybackPage` dentro do ramo de playback pronto, imediatamente
+antes do `<video ref={videoRef} ...>` que já existe:
+
+```jsx
+import { MediaPreferenceControls } from "../components/playback/MediaPreferenceControls.jsx";
+
+<MediaPreferenceControls
+  playback={playback}
+  preferences={preferences}
+  busy={preferenceBusy}
+  onPreferenceChange={updatePreference}
+/>
 ```
 
 5. Explicação do código.
 
 No `AppHeader`, os textos visíveis passam a usar português de Portugal com acentuação: `Início`, `Catálogo`, `Associações`, `Métricas` e `Integrações`. Isto cumpre `RNF01` porque a navegação fica mais clara, e ajuda `RNF04` porque o `nav` tem uma descrição acessível: `aria-label="Navegação principal"`.
 
-O array `navItems` continua a usar as mesmas rotas. Isto preserva os contratos validados em `BK-MF6-02` e evita quebrar React Router. A entrada de cada item é `{ to, label }`; a saída é uma ligação `NavLink`. Não há dados pessoais, autenticação ou chamadas HTTP neste componente.
+O array `navItems` continua a usar as mesmas rotas. Isto preserva os contratos validados em `BK-MF6-02` e evita quebrar React Router. A entrada de cada item junta `visibility` a `{ to, label }`; a saída é uma ligação `NavLink` apenas quando o estado confirmado permite mostrá-la. O header preserva o login e o logout criados em `BK-MF2-01`: uma falha de logout não limpa a sessão nem navega, e `unavailable` permite repetir a confirmação sem fingir que o utilizador saiu.
 
-No `PlaybackPage`, a revisão corrige textos que o utilizador lê diretamente: `Áudio`, `Automática`, `Opções de média` e a mensagem de fallback do vídeo. O bloco preserva `controls`, `data-testid="faithflix-player"`, handlers de progresso e tracks de legendas criados nos BKs de streaming. Isto cumpre `RNF06` sem reinventar o player.
+No `PlaybackPage`, a revisão corrige os textos `Áudio`, `Automática` e
+`Opções de média` num componente puramente descritivo. O `<video>` existente
+continua sem `src` declarativo: a única fonte autenticada é ligada pelo adapter
+do `BK-MF2-05`. Os descritores de legendas/áudio não têm URL e nunca originam
+`<track src>`. O componente também conserva busy state e opções de qualidade
+bloqueadas, sem reinventar o player.
 
 O erro comum que este passo evita é tratar UX como opinião vaga. Aqui tens alterações objetivas: navegação com textos claros, região `nav` descrita, player com labels em português correto e fallback legível. Podes adaptar labels se a equipa alterar nomes no mockup, mas não alteres rotas, handlers do player, `data-testid` ou estrutura de `<label><select>` sem repetir a regressão frontend.
 
@@ -498,11 +572,15 @@ Valida visualmente:
 - header mostra `Início`, `Catálogo`, `Associações`, `Métricas` e `Integrações`;
 - leitor de ecrã ou inspeção DOM mostra `aria-label="Navegação principal"`;
 - player mostra `Áudio`, `Automática` e `Opções de média`;
-- `data-testid="faithflix-player"` continua presente para regressão.
+- `data-testid="faithflix-player"`, erro, retry e adapter continuam presentes;
+- o DOM não contém URL proveniente de `tracks`/`qualityOptions` nem um `videoSrc`.
 
 7. Cenário negativo/erro esperado.
 
-Se trocares `to="/catalogo"` por outro caminho, a navegação pode deixar de bater certo com `AppRoutes.jsx`. Se removeres `controls` do `<video>`, quebras `RNF06`.
+Se trocares `to="/catalogo"` por outro caminho, a navegação pode deixar de bater
+certo com `AppRoutes.jsx`. Se esta revisão atribuir `src` ao `<video>`, criar
+`videoSrc`, montar `<track src>` ou remover o retry/adapter, reabre a regressão de
+segurança e streaming e o BK não pode fechar.
 
 ### Passo 5 - Registar evidence sem sucesso antecipado
 
@@ -523,6 +601,12 @@ Executa build e valida manualmente três larguras: `390px`, `768px` e `1280px`. 
 
 ```md
 # Evidence BK-MF6-05 - Acessibilidade e UX final
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF6/BK-MF6-05-acessibilidade-e-ux-final.md`
+- `proof_scope`: verificações de acessibilidade e UX observadas pelos alunos; não prova todos os browsers/dispositivos reais
 
 - Owner: Mateus
 - Apoio: Kaue

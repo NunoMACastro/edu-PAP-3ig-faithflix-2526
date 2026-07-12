@@ -1,5 +1,11 @@
 # MF8 - Correcao de erros do report anterior
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-30`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: correção MF8 observada em 2026-06-30; não constitui revalidação atual
+
 ## Metadados
 
 - Projeto: FaithFlix
@@ -10,6 +16,8 @@
 - Estado final: `PASS_COM_RESSALVAS`
 - Decisao: `ERROS_FECHADOS_SEM_BLOQUEADOR_FUNCIONAL`
 - PR: `NAO_APLICAVEL`
+
+> **Aviso de validade — Fase 2 (2026-07-09):** este documento é um snapshot histórico anterior à Fase 2 de 2026-07-09. Os resultados e decisões preservados abaixo não provam CP2 nem o estado atual da aplicação.
 
 ## Sumario executivo
 
@@ -44,10 +52,10 @@ As ressalvas que seguem para `BK-MF8-10` nao sao bugs funcionais: rollback/deplo
 
 | ID | Causa raiz | Acao tomada | Ficheiros ligados | Resultado |
 | --- | --- | --- | --- | --- |
-| `MF8-ERR-001` | A sandbox bloqueou servidores locais, causando `listen EPERM` em checks HTTP. | Classificado como ambiente e revalidado fora da sandbox. | `backend/tests/`, `backend/package.json` | Backend tests e smoke passaram; sem bug funcional confirmado. |
-| `MF8-ERR-002` | A sandbox bloqueou DNS/acesso ao MongoDB externo exigido pelos E2E. | Classificado como ambiente e revalidado fora da sandbox. | `tests/e2e/`, `backend/scripts/seed-*` | Seeds e Playwright passaram; sem bug funcional confirmado. |
-| `MF8-ERR-003` | O teste MF2 usava textos/locators antigos e seed sem subscricao ativa. | Locators e fixture premium foram alinhados com o estado real da app. | `tests/e2e/mf2-flow.spec.js`, `backend/scripts/seed-mf2-e2e.js` | E2E MF2 passou e manteve o negativo de acesso premium. |
-| `MF8-ERR-004` | O teste MF4 usava emails, rotas e labels antigos; podia tocar dados E2E dinamicos. | Fluxo realinhado com fixtures atuais e limpeza controlada de dados de teste. | `tests/e2e/mf4-flow.spec.js`, `backend/scripts/seed-mf4-e2e.js` | E2E MF4 passou com subscricao, trial, candidatura, admin, pool, historico e notificacoes. |
+| `MF8-ERR-001` | A sandbox bloqueou servidores locais, causando `listen EPERM` em checks HTTP. | Classificado como ambiente e revalidado fora da sandbox. | `real_dev/backend/tests/`, `real_dev/backend/package.json` | Backend tests e smoke passaram; sem bug funcional confirmado. |
+| `MF8-ERR-002` | A sandbox bloqueou DNS/acesso ao MongoDB externo exigido pelos E2E. | Classificado como ambiente e revalidado fora da sandbox. | `tests/e2e/`, `real_dev/backend/scripts/seed-*` | Seeds e Playwright passaram; sem bug funcional confirmado. |
+| `MF8-ERR-003` | O teste MF2 usava textos/locators antigos e seed sem subscricao ativa. | Locators e fixture premium foram alinhados com o estado real da app. | `tests/e2e/mf2-flow.spec.js`, `real_dev/backend/scripts/seed-mf2-e2e.js` | E2E MF2 passou e manteve o negativo de acesso premium. |
+| `MF8-ERR-004` | O teste MF4 usava emails, rotas e labels antigos; podia tocar dados E2E dinamicos. | Fluxo realinhado com fixtures atuais e limpeza controlada de dados de teste. | `tests/e2e/mf4-flow.spec.js`, `real_dev/backend/scripts/seed-mf4-e2e.js` | E2E MF4 passou com subscricao, trial, candidatura, admin, pool, historico e notificacoes. |
 | `MF8-ERR-005` | O sweep visual capturava paginas ainda em loading. | O spec passou a esperar estado estavel antes de screenshots. | `tests/e2e/mf8-visual-responsiveness.spec.js`, `docs/evidence/MF8/screenshots/` | 6 screenshots finais foram gerados e validados. |
 
 ## Revalidacao por erro
@@ -102,6 +110,6 @@ As ressalvas que seguem para `BK-MF8-10` nao sao bugs funcionais: rollback/deplo
 - Ressalvas a transportar: rollback/deployment formal, documento tecnico unico e revisao humana final dos aspetos manuais/visuais.
 - Owner do freeze: Kaue, com apoio de Matheus, Mateus e Davi.
 
-## Decisao final BK-MF8-09
+## Decisao observada no BK-MF8-09
 
 `PASS_COM_RESSALVAS`. Todos os erros do report anterior ficaram corrigidos, validados ou classificados com motivo verificavel. A MF8 pode avancar para `BK-MF8-10` sem blocker funcional aberto, preservando as ressalvas operacionais/documentais no scope freeze.

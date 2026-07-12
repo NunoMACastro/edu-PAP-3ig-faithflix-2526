@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF6-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-02-suite-de-regressao-frontend.md`
-- `last_updated`: `2026-06-19`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -53,7 +53,7 @@ Antes deste BK, o frontend tem `npm run build`, mas não existe uma verificaçã
 
 Depois deste BK, a equipa tem uma regressão frontend rápida: primeiro valida a estrutura crítica por script Node.js, depois valida a compilação real com Vite.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - `BK-MF1-02` criou a base React + Vite.
 - `BK-MF1-03` criou `apiClient` com tratamento de erro.
@@ -242,9 +242,11 @@ Executa o script de regressão e o build no mesmo terminal, para garantir que a 
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. A validação usa `node` e o script `build` já definido no frontend.
+Sem código neste passo.
 
 5. Explicação do código.
+
+A validação usa `node` e o script `build` já definido no frontend.
 
 O Vite valida imports e JSX de forma mais realista do que uma leitura estática. Por isso, a suite fica em duas camadas: script rápido para contratos de rota e build para compilação.
 
@@ -281,9 +283,11 @@ Revê cada página e confirma que pedidos à API distinguem pelo menos três est
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. O BK valida a presença de estados já introduzidos nas MFs anteriores e só pede correção se algum fluxo estiver incompleto.
+Sem código neste passo.
 
 5. Explicação do código.
+
+O BK valida a presença de estados já introduzidos nas MFs anteriores e só pede correção se algum fluxo estiver incompleto.
 
 Estados de UI são parte da regressão frontend porque uma chamada API pode falhar sem quebrar o build. O utilizador precisa de feedback claro, alinhado com `RNF05`, mesmo que este BK esteja formalmente mapeado a `RNF29`.
 
@@ -313,6 +317,12 @@ Regista a referência da entrega, os comandos executados, o output real do build
 
 ```md
 # Evidence BK-MF6-02 - Regressão frontend
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF6/BK-MF6-02-suite-de-regressao-frontend.md`
+- `proof_scope`: comandos e resultados frontend realmente observados pelos alunos; não prova backend, produção ou referência privada
 
 - Owner: Kaue
 - Apoio: Mateus

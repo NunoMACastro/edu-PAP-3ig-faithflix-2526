@@ -100,7 +100,7 @@ test("ratings agregam apenas conteudo publicado e rejeitam draft", async () => {
              */
             async findOne(query) {
                 if (String(query._id) === String(publishedId) && query.status === "published") {
-                    return { _id: publishedId, status: "published" };
+                    return { _id: publishedId, status: "published", type: "movie" };
                 }
 
                 if (String(query._id) === String(draftId)) {
@@ -155,7 +155,7 @@ test("comentarios publicos escondem userId e devolvem canDelete calculado", asyn
              */
             async findOne(query) {
                 if (String(query._id) === String(contentId) && query.status === "published") {
-                    return { _id: contentId, status: "published" };
+                    return { _id: contentId, status: "published", type: "movie" };
                 }
 
                 return null;

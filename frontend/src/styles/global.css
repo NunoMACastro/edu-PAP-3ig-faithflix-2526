@@ -116,15 +116,15 @@ button {
     height: 2.65rem;
     place-items: center;
     overflow: hidden;
-    border: 1px solid rgba(102, 122, 96, 0.28);
+    border: 1px solid rgba(240, 205, 149, 0.35);
     border-radius: var(--radius-lg);
-    background: var(--color-brand);
+    background: #000;
 }
 
 .brand-logo {
-    width: 2.35rem;
-    height: 2.35rem;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .brand-name {
@@ -221,6 +221,53 @@ button {
 
 .hero-section h1 {
     color: var(--color-text-inverse);
+}
+
+.catalog-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 18rem);
+    align-items: end;
+    gap: 1.5rem;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background:
+        linear-gradient(115deg, rgba(63, 63, 63, 0.9), rgba(63, 63, 63, 0.56) 60%, rgba(102, 122, 96, 0.34)),
+        var(--color-brand);
+    box-shadow: var(--shadow-raised);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.catalog-hero h1,
+.catalog-hero p {
+    color: var(--color-text-inverse);
+}
+
+.catalog-hero-copy {
+    max-width: 720px;
+}
+
+.catalog-hero-copy > p:not(.section-kicker) {
+    max-width: 44rem;
+    color: var(--color-text-inverse-soft);
+}
+
+.catalog-hero-meta {
+    display: grid;
+    gap: 0.2rem;
+    justify-items: end;
+    color: var(--color-text-inverse-soft);
+    text-align: right;
+}
+
+.catalog-hero-meta strong {
+    color: var(--color-accent);
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    line-height: 1;
+}
+
+.catalog-hero-meta span {
+    max-width: 14rem;
 }
 
 .section-kicker,
@@ -490,6 +537,70 @@ button:hover {
     padding: 0.75rem 1rem;
 }
 
+.catalog-filters {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+    padding: 1rem;
+}
+
+.catalog-filters label {
+    flex: 1 1 11rem;
+}
+
+.catalog-filters label:first-child {
+    flex-basis: 18rem;
+}
+
+.secondary-button {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-soft);
+    color: var(--color-brand-strong);
+}
+
+.secondary-button:hover {
+    background: var(--color-accent);
+    color: var(--color-text);
+}
+
+.active-filter-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.active-filter-list span {
+    border: 1px solid rgba(102, 122, 96, 0.26);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+    color: var(--color-brand-strong);
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0.42rem 0.62rem;
+}
+
+.catalog-editorial {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.catalog-section-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.catalog-section-header p {
+    margin-bottom: 0;
+}
+
+.load-more-row {
+    display: flex;
+    justify-content: center;
+}
+
 .base-button:disabled,
 button:disabled {
     cursor: not-allowed;
@@ -716,10 +827,16 @@ progress {
 }
 
 @media (max-width: 860px) {
-    .hero-section {
+    .hero-section,
+    .catalog-hero {
         grid-template-columns: 1fr;
         min-height: auto;
         padding: 2rem;
+    }
+
+    .catalog-hero-meta {
+        justify-items: start;
+        text-align: left;
     }
 
     .main-nav {
@@ -753,5 +870,10 @@ progress {
 
     h2 {
         font-size: 1.5rem;
+    }
+
+    .catalog-section-header {
+        align-items: start;
+        flex-direction: column;
     }
 }

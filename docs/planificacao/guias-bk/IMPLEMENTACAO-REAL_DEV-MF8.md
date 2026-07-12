@@ -1,5 +1,24 @@
 # Implementacao real_dev - MF8
 
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: adendo administrativo local atual e snapshot MF8 delimitado; restore/streaming reais não provados
+
+## Adendo de validade Fase 3 administrativa - 2026-07-10
+
+O corpo abaixo continua a ser o snapshot MF8 de 2026-06-30. A bateria atual
+inclui agora `f3-admin-transactions.test.js`, que cobre review, membership e
+user admin com fault injection, sessões, `requestId` e último admin sob
+concorrência. A execução combinada com `mf5-validation.test.js` passou `14/14`
+sem DB/rede; não prova replica set MongoDB nem reabre o gate/browser MF8.
+
+## Snapshot histórico — implementação MF8 observada em 2026-06-30
+
+A partir desta fronteira, ficam preservados os resultados e comandos da
+implementação original; não constituem prova atual.
+
 ## Resultado geral
 
 - Projeto: FaithFlix

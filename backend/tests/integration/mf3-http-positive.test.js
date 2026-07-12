@@ -113,7 +113,13 @@ function matches(row, query = {}) {
             return expected.some((condition) => matches(row, condition));
         }
 
-        return matchesValue(valueForPath(row, key), expected);
+        const actual = valueForPath(row, key);
+
+        if (Array.isArray(actual)) {
+            return actual.some((entry) => matchesValue(entry, expected));
+        }
+
+        return matchesValue(actual, expected);
     });
 }
 
@@ -205,6 +211,16 @@ function createCollection(rows) {
                     return this;
                 },
                 /**
+                 * Documenta `skip`, mantendo explícita a responsabilidade desta função no módulo.
+                 *
+                 * @param {unknown} skip Valor recebido por `skip`.
+                 * @returns {unknown} Resultado devolvido por `skip`.
+                 */
+                skip(skip) {
+                    result = result.slice(skip);
+                    return this;
+                },
+                /**
                  * Documenta `limit`, mantendo explícita a responsabilidade desta função no módulo.
                  *
                  * @param {unknown} limit Valor recebido por `limit`.
@@ -222,6 +238,16 @@ function createCollection(rows) {
                     return result;
                 },
             };
+        },
+
+        /**
+         * Documenta `countDocuments`, mantendo explícita a responsabilidade desta função no módulo.
+         *
+         * @param {unknown} query Valor recebido por `countDocuments`.
+         * @returns {Promise<unknown>} Resultado devolvido por `countDocuments`.
+         */
+        async countDocuments(query = {}) {
+            return rows.filter((row) => matches(row, query)).length;
         },
 
         /**
@@ -644,6 +670,22 @@ test("MF3 devolve pesquisa, discovery e relacionados positivos sobre publicados"
     assert.equal(search.items[0].id, String(movieId));
     assert.equal(search.filters.type, "movie");
     assert.equal(search.sort, "rating");
+
+    const catalogResponse = await fetch(
+        `${testServer.baseUrl}/api/catalog?type=movie&taxonomyId=${taxonomyId}&sort=rating&page=1&limit=12`,
+    );
+    const catalog = await json(catalogResponse);
+
+    assert.equal(catalogResponse.status, 200);
+    assert.equal(catalog.total, 1);
+    assert.equal(catalog.items[0].id, String(movieId));
+    assert.equal(catalog.items[0].type, "movie");
+
+    const invalidCatalogResponse = await fetch(
+        `${testServer.baseUrl}/api/catalog?type=live`,
+    );
+
+    assert.equal(invalidCatalogResponse.status, 400);
 
     const discoveryResponse = await fetch(`${testServer.baseUrl}/api/discovery/home`);
     const discovery = await json(discoveryResponse);

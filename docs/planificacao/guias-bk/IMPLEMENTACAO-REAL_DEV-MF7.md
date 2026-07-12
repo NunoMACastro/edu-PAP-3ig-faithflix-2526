@@ -1,5 +1,11 @@
 # Implementacao real_dev - MF7
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-25`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: implementação MF7 observada em 2026-06-25; não constitui prova browser atual
+
 ## Resultado geral
 
 - Projeto: FaithFlix

@@ -17,31 +17,27 @@
 - `core_or_reforco`: `Core`
 - `proximo_bk`: `BK-MF4-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF3/BK-MF3-06-explicabilidade-de-recomendacao.md`
-- `last_updated`: `2026-06-12`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagogico (obrigatorio)
-
-### Objetivo pedagogico
+#### Objetivo
 
 Neste BK vais acrescentar explicabilidade a recomendacao baseline (`RF28`, `RNF34`).
 
 No fim, deves conseguir explicar ao utilizador porque um grupo foi sugerido, sem revelar dados pessoais detalhados, sem prometer inteligencia avancada e sem esconder que a recomendacao e feita por regras simples.
 
-### Importancia funcional
+#### Importância
 
 Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumenta confianca, ajuda o aluno a defender a solucao e cumpre o contrato de recomendacao etica do MVP.
 
-### Scope-in
+#### Scope-in
 
 - Criar mapa de explicacoes para `reasonCode`.
 - Acrescentar `explanation` aos grupos de `GET /api/recommendations/me`.
 - Mostrar "Porque recomendamos" na pagina `/para-si`.
 - Explicar cold start de forma honesta.
 - Garantir que a explicacao nao revela IDs internos nem historico detalhado.
-- Explicar a estrategia `weighted-baseline-v2` como regra ponderada simples, sem mostrar scores internos.
-- Explicar `semantic-similarity` como afinidade agregada de conteudos semelhantes, sem mostrar vectores.
 
-### Scope-out
+#### Scope-out
 
 - Novo algoritmo de recomendacao.
 - Dashboard admin de ajustes.
@@ -50,22 +46,34 @@ Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumen
 - Alteracao dos sinais permitidos.
 - Expor pesos internos, scores por utilizador ou historico detalhado na UI.
 
-### Glossario rapido
+#### Estado antes e depois
+
+- Estado antes: aplicam-se os BKs declarados em `dependencias`, os RF/RNF do Header e os artefactos já entregues pelas fases anteriores.
+- Estado depois: ficam implementáveis e verificáveis apenas os resultados listados em `Scope-in`, sem antecipar o `Scope-out`.
+
+#### Pré-requisitos
+
+- `BK-MF3-05` concluido.
+- `GET /api/recommendations/me` devolve `groups` com `reasonCode`.
+- Frontend `/para-si` apresenta grupos.
+- A equipa confirma que recomendacao continua baseline.
+
+#### Glossário
 
 - `Explicabilidade`: capacidade de explicar uma sugestao de forma simples.
 - `reasonCode`: codigo interno usado para escolher a mensagem.
 - `Sinal agregado`: indicacao geral, como "temas vistos", sem listar todo o historico.
 - `Privacidade`: proteger detalhes pessoais que nao precisam de aparecer na UI.
 
-### Conceitos essenciais
+#### Conceitos teóricos essenciais
 
 - `CANONICO`: `RF28` pede explicabilidade.
 - `CANONICO`: `RNF34` pede explicacao simples para grupos sugeridos.
 - `CANONICO`: `RNF37` impede usar dados de recomendacao para outro fim.
 - `DERIVADO`: a explicacao fica ao nivel do grupo, porque o BK anterior devolve grupos.
 - `DERIVADO`: `reasonCode` desconhecido recebe uma mensagem neutra, para evitar quebrar a UI.
-- `DERIVADO`: feedback e eventos ajudam a robustez, mas a explicacao publica continua agregada por grupo.
-- `DERIVADO`: embeddings de conteudo podem aparecer como sinal agregado, mas nunca como vector, score bruto ou historico detalhado.
+- `DERIVADO`: feedback `not_interested` altera exclusões, mas a explicação
+  pública continua agregada por grupo e não revela essa escolha.
 
 ### Tempo estimado
 
@@ -87,16 +95,7 @@ Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumen
 - [ ] Sei porque a explicacao nao deve revelar historico detalhado.
 - [ ] Sei testar cold start e `reasonCode` desconhecido.
 
-## Bloco operacional (obrigatorio)
-
-### Pre-condicoes
-
-- `BK-MF3-05` concluido.
-- `GET /api/recommendations/me` devolve `groups` com `reasonCode`.
-- Frontend `/para-si` apresenta grupos.
-- A equipa confirma que recomendacao continua baseline.
-
-### Contrato tecnico deste BK
+#### Arquitetura do BK
 
 | Area | Contrato |
 | --- | --- |
@@ -104,13 +103,16 @@ Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumen
 | Novo campo por grupo | `explanation` |
 | Explicacao | mensagem simples em portugues de Portugal |
 | Privacidade | sem IDs internos, sem lista detalhada de historico |
-| Embeddings | `semantic-similarity` explica afinidade semantica agregada sem expor vectores |
 | Frontend | `RecommendationExplanation`, `ForYouPage` atualizado com feedback explicito |
 | Handoff | `BK-MF4-01` pode iniciar monetizacao sem alterar descoberta |
 
 ### Formato final do grupo
 
-```js
+Schema conceptual de um grupo. Os identificadores representam campos do DTO;
+este bloco não é JavaScript copiável nem output de uma execução.
+
+```text
+// A explicação usa categorias editoriais e não revela eventos individuais do utilizador.
 {
   id,
   title,
@@ -125,7 +127,14 @@ Uma recomendacao sem explicacao pode parecer arbitraria. A explicabilidade aumen
 }
 ```
 
-### Guia de execucao (passo-a-passo)
+#### Ficheiros a criar/editar/rever
+
+- CRIAR: `backend/src/modules/recommendations/recommendation-explanations.js`
+- EDITAR: `backend/src/modules/recommendations/recommendations.service.js`
+- CRIAR: `frontend/src/components/recommendations/RecommendationExplanation.jsx`
+- EDITAR: `frontend/src/pages/ForYouPage.jsx`
+
+#### Tutorial técnico linear
 
 ### Passo 1 - Criar mapa de explicacoes
 
@@ -135,6 +144,7 @@ Traduzir `reasonCode` tecnico para uma explicacao clara.
 
 2. Ficheiros envolvidos.
     - CRIAR: `backend/src/modules/recommendations/recommendation-explanations.js`
+    - CRIAR: `backend/tests/unit/mf3-recommendation-explanations.test.js`
     - LOCALIZACAO: ficheiro completo
 
 3. Instrucoes concretas.
@@ -144,6 +154,16 @@ Cria o ficheiro abaixo no modulo `recommendations`.
 4. Codigo completo.
 
 ```js
+// O mapa fechado mantém mensagens previsíveis e auditáveis para cada reasonCode.
+export const RECOMMENDATION_REASON_CODES = Object.freeze([
+  "themes-from-user-signals",
+  "activity-types",
+  "popular-fallback",
+  "cold-start-popular",
+  "cold-start-recent",
+  "cold-start-catalog",
+]);
+
 const EXPLANATIONS = {
   "themes-from-user-signals": {
     title: "Porque recomendamos",
@@ -184,6 +204,8 @@ const EXPLANATIONS = {
 };
 
 export function buildRecommendationExplanation(reasonCode) {
+  // O fallback cobre apenas um código realmente desconhecido; os seis códigos
+  // produzidos pela baseline têm entradas explícitas e são testados abaixo.
   return EXPLANATIONS[reasonCode] ?? {
     title: "Porque recomendamos",
     message: "Este grupo foi gerado por regras simples da recomendacao baseline.",
@@ -193,14 +215,55 @@ export function buildRecommendationExplanation(reasonCode) {
 }
 ```
 
+`backend/tests/unit/mf3-recommendation-explanations.test.js`
+
+```js
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import {
+  buildRecommendationExplanation,
+  RECOMMENDATION_REASON_CODES,
+} from "../../src/modules/recommendations/recommendation-explanations.js";
+
+const EXPECTED_MESSAGES = {
+  // O texto esperado distingue cada regra realmente emitida pelo service.
+  "themes-from-user-signals": /temas associados/i,
+  "activity-types": /tipos de conteudo/i,
+  "popular-fallback": /bem avaliados/i,
+  "cold-start-popular": /conteudos populares/i,
+  "cold-start-recent": /adicionados recentemente/i,
+  "cold-start-catalog": /selecao geral/i,
+};
+
+for (const reasonCode of RECOMMENDATION_REASON_CODES) {
+  test(`MF3 explica ${reasonCode}`, () => {
+    const explanation = buildRecommendationExplanation(reasonCode);
+    // Cada código produzido tem label e mensagem próprios; não usa fallback.
+    assert.equal(explanation.title, "Porque recomendamos");
+    assert.match(explanation.message, EXPECTED_MESSAGES[reasonCode]);
+  });
+}
+
+test("MF3 usa fallback apenas para reasonCode desconhecido", () => {
+  // Este caso futuro não substitui a cobertura explícita dos seis códigos.
+  const explanation = buildRecommendationExplanation("future-unknown-code");
+  assert.match(explanation.message, /regras simples/i);
+});
+```
+
 5. Explicacao do codigo ou da decisao.
 
-O mapa usa mensagens fechadas e auditaveis. A app nao inventa uma explicacao nova em runtime; escolhe uma explicacao aprovada para cada regra.
+O mapa usa mensagens fechadas e auditaveis para os seis `reasonCode` realmente
+produzidos pelo `BK-MF3-05`. A app nao inventa uma explicacao nova em runtime;
+escolhe uma explicacao aprovada para cada regra. O fallback não mascara um
+código da baseline em falta: os testes falham se um dos seis deixar de ter
+label/mensagem próprios.
 
 6. Validacao do passo.
 
 ```bash
 node -e "import('./src/modules/recommendations/recommendation-explanations.js').then(({ buildRecommendationExplanation }) => console.log(buildRecommendationExplanation('cold-start-popular').confidence))"
+node --test tests/unit/mf3-recommendation-explanations.test.js
 ```
 
 Resultado esperado: `cold-start`.
@@ -229,6 +292,7 @@ Adiciona o import e substitui a funcao `group` pela versao abaixo.
 import { buildRecommendationExplanation } from "./recommendation-explanations.js";
 
 function group(id, title, reasonCode, items) {
+  // A explicação é derivada do reasonCode controlado pelo servidor, não de texto livre.
   return {
     id,
     title,
@@ -273,6 +337,7 @@ Cria o componente abaixo.
 
 ```jsx
 export function RecommendationExplanation({ explanation }) {
+  // Sem contrato de explicação válido não se apresenta uma caixa vazia.
   if (!explanation) return null;
 
   return (
@@ -328,11 +393,13 @@ import { Link } from "react-router-dom";
 import { RecommendationExplanation } from "../components/recommendations/RecommendationExplanation.jsx";
 
 function RecommendationGroup({ group }) {
+  // Não cria uma secção sem candidatos, reduzindo ruído para tecnologias de apoio.
   if (group.items.length === 0) return null;
 
   return (
     <section className="recommendation-group" aria-label={group.title}>
       <h2>{group.title}</h2>
+      {/* A justificação aparece antes dos cards para contextualizar a lista. */}
       <RecommendationExplanation explanation={group.explanation} />
       <ul className="content-grid">
         {group.items.map((item) => (
@@ -363,17 +430,21 @@ Abre `/para-si` com sessao iniciada e confirma que cada grupo visivel mostra "Po
 
 Se a explicacao ficar fora do grupo, o utilizador pode nao perceber a que sugestao ela pertence.
 
-## Criterios de aceite (mensuraveis)
+#### Critérios de aceite
 
 - `GET /api/recommendations/me` devolve `explanation` em todos os grupos.
+- Os seis códigos da baseline (`themes-from-user-signals`, `activity-types`,
+  `popular-fallback`, `cold-start-popular`, `cold-start-recent` e
+  `cold-start-catalog`) têm label/mensagem explícitos e um teste dedicado.
 - Cada `explanation` contem `title`, `message`, `signals` e `confidence`.
 - Cold start mostra mensagem clara de poucos sinais.
 - A UI `/para-si` mostra "Porque recomendamos" por grupo visivel.
 - A explicacao nao contem `userId`, `contentId` de historico, emails ou tokens.
 - A UI pode mostrar feedback operacional, mas nao mostra score interno nem pesos individuais.
-- `reasonCode` desconhecido recebe mensagem fallback.
+- Apenas um `reasonCode` realmente desconhecido recebe mensagem fallback; não
+  há promessa de scoring ponderado, embeddings ou similaridade semântica.
 
-## Validacao final
+#### Validação final
 
 ```bash
 npm --prefix backend test
@@ -383,28 +454,30 @@ curl -i http://localhost:3000/api/recommendations/me
 
 Resultado esperado: build e testes passam; resposta autenticada inclui `explanation`.
 
-## Evidence para PR/defesa
+#### Evidence para PR/defesa
 
 - `pr`: referencia do PR/commit com explicabilidade.
 - `proof`: resposta JSON com `explanation`.
 - `proof`: captura de `/para-si` com "Porque recomendamos".
 - `neg`: `reasonCode` desconhecido tem fallback, sem dados pessoais expostos.
 
-## Handoff
+#### Handoff
 
 A `MF3` fica fechada com ratings, comentarios, pesquisa, filtros, discovery, recomendacao baseline e explicabilidade. O `BK-MF4-01` pode iniciar monetizacao solidaria sem alterar os contratos de descoberta.
 
 ## Snippet tecnico aplicavel
 
-O codigo aplicavel esta nos passos 1 a 4. O ponto central deste BK e:
+O código aplicável está nos passos 1 a 4. O recorte seguinte identifica a
+propriedade a integrar no DTO já construído; não é uma expressão autónoma nem
+deve ser copiado isoladamente:
 
-```js
+```text
 explanation: buildRecommendationExplanation(reasonCode),
 ```
 
 Este trecho liga cada regra baseline a uma mensagem compreensivel.
 
-## Changelog
+#### Changelog
 
 - `2026-04-13`: retrofit para contrato pedagogico v3.
 - `2026-06-07`: guia reescrito com explicabilidade, privacidade, frontend e validacao mensuravel.

@@ -7,11 +7,19 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-30`
+- `last_updated`: `2026-07-10`
 
 ## Objetivo
 
 Backlog atomico oficial do MVP, com owner unico por BK, dependencias, criterios de aceite e evidencias.
+
+### Separação entre alunos e referência docente
+
+Os estados `TODO|IN_PROGRESS|BLOCKED|DONE` deste ficheiro descrevem o trabalho
+dos alunos em `backend/` e `frontend/`. Correções e testes na referência docente
+privada não alteram automaticamente esses estados. A referência de 2026-07-10
+serve apenas para clarificar os contratos técnicos dos guias MF4/MF9; cada BK
+continua a exigir evidence própria dos alunos antes de passar a `DONE`.
 
 ## Baseline de escopo MVP (2026-04-17)
 

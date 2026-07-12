@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF7-02`
 - `guia_path`: `docs/planificacao/guias-bk/MF7/BK-MF7-01-inventario-ui-vs-mockup-plano-refinamento.md`
-- `last_updated`: `2026-06-23`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -131,9 +131,11 @@ Lê as fontes e escreve, no topo da evidence, três decisões:
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental e prepara a evidence.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental e prepara a evidence.
 
 Não existe código porque ainda não há alteração técnica. A decisão importante é impedir que o inventário se transforme em lista subjetiva de preferências. A equipa deve conseguir apontar para documentos e dizer porque cada discrepância existe.
 
@@ -163,6 +165,12 @@ Cria o ficheiro abaixo e preenche as linhas enquanto fazes a revisão. Mantém o
 
 ```md
 # Inventário UI vs mockup - MF7
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF7/BK-MF7-01-inventario-ui-vs-mockup-plano-refinamento.md`
+- `proof_scope`: inventário visual observado pelos alunos; não constitui implementação nem validação da referência privada
 
 ## Metadados
 
@@ -259,9 +267,11 @@ Percorre cada página e escreve o observado na evidence. Usa estas regras:
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. O trabalho é análise guiada da interface.
+Sem código neste passo.
 
 5. Explicação do código.
+
+O trabalho é análise guiada da interface.
 
 Não há alteração técnica porque este BK cria o plano. O valor está na rastreabilidade: cada problema passa a ter destino e critério de fecho. Assim, `BK-MF7-02` não mistura sessão com paleta, e `BK-MF7-03` não tenta resolver regras de autorização.
 
@@ -297,9 +307,11 @@ No final da evidence, escreve:
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo fecha a passagem de trabalho.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo fecha a passagem de trabalho.
 
 O handoff é uma decisão de arquitetura documental. Ele impede que o próximo BK repita auditoria e ajuda a equipa a defender porque cada alteração foi feita.
 

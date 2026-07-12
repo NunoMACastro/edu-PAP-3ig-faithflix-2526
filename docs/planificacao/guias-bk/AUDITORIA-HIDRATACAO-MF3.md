@@ -1,5 +1,11 @@
 # Auditoria de guias BK - MF3
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-08`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- `proof_scope`: auditoria de hidratação MF3 observada em 2026-06-08; não prova o estado atual
+
 ## Header
 
 - `doc_id`: `AUDITORIA-HIDRATACAO-MF3`

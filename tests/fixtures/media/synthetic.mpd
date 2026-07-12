@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MPD xmlns="urn:mpeg:dash:schema:mpd:2011"
+  type="static"
+  profiles="urn:mpeg:dash:profile:isoff-main:2011"
+  mediaPresentationDuration="PT1.6921S"
+  minBufferTime="PT0.5S">
+  <Period duration="PT1.6921S">
+    <AdaptationSet mimeType="video/mp4" segmentAlignment="true" startWithSAP="1">
+      <Representation
+        id="synthetic"
+        codecs="avc1.42C015"
+        bandwidth="180000"
+        width="320"
+        height="180"
+        frameRate="12">
+        <SegmentList timescale="30000" duration="50763">
+          <Initialization sourceURL="/__fixtures__/synthetic-init.mp4" />
+          <SegmentURL media="/__fixtures__/synthetic-segment.m4s" />
+        </SegmentList>
+      </Representation>
+    </AdaptationSet>
+  </Period>
+</MPD>

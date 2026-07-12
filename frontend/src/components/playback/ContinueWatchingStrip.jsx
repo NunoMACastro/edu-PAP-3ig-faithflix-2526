@@ -49,6 +49,11 @@ export function ContinueWatchingStrip() {
                 {items.map((item) => (
                     <article className="content-tile" key={item.id}>
                         {item.posterUrl ? <img src={item.posterUrl} alt="" /> : null}
+                        {item.series ? (
+                            <p className="content-card-eyebrow">
+                                {item.series.title} · T{item.seasonNumber} E{item.episodeNumber}
+                            </p>
+                        ) : null}
                         <h3>{item.title}</h3>
                         <progress max="100" value={progressPercent(item)} />
                         <Link className="button-link" to={`/ver/${item.id}`}>

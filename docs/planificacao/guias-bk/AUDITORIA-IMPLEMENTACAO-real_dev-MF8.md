@@ -1,5 +1,20 @@
 # FaithFlix - Auditoria de Implementacao real_dev - MF8 / BK-MF8-10
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-30`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: fecho MF8 observado em 2026-06-30; não constitui prova F9 atual
+
+## Adendo de validade - 2026-07-10
+
+Esta auditoria permanece um snapshot do fecho MF8 de 2026-06-30. Não é prova
+atual da Fase 3. A evidence administrativa atual recebeu um adendo separado em
+`docs/evidence/MF8/AUDITORIA-ADMINISTRATIVA-FINAL.md`, com transações de review,
+membership e user admin, revogação de sessões, audit sanitizado/`requestId`,
+fault injection e invariante do último admin. A prova local passou `14/14` com
+doubles; replica set MongoDB e browser continuam fora dessa prova.
+
 ## 1. Metadados
 
 | Campo | Valor |

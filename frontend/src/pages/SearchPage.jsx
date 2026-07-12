@@ -8,6 +8,7 @@ import { ContentCard } from "../components/ui/ContentCard.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
 import { searchApi } from "../services/api/searchApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
+import { formatContentType } from "../utils/contentTypeLabels.js";
 
 const INITIAL_FILTERS = {
     query: "",
@@ -80,7 +81,7 @@ export function SearchPage() {
                 {items.map((content) => (
                     <ContentCard
                         key={content.id}
-                        eyebrow={content.type}
+                        eyebrow={formatContentType(content.type)}
                         title={content.title}
                         description={content.synopsis}
                         imageUrl={content.posterUrl}

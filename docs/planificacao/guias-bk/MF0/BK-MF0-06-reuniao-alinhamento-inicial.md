@@ -17,21 +17,21 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF1-01`
 - `guia_path`: `docs/planificacao/guias-bk/MF0/BK-MF0-06-reuniao-alinhamento-inicial.md`
-- `last_updated`: `2026-05-29`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
 Este BK ensina a fechar uma fase de governance com alinhamento real da equipa. A reunião não é uma formalidade: serve para confirmar que todos percebem plano, responsabilidades, backlog, DoD, calendário, riscos e primeiro handoff técnico para `MF1`.
 
-## Bloco operacional (obrigatorio)
+##### Resultado operacional esperado
 
 O trabalho operacional é preparar, conduzir e registar a reunião de alinhamento inicial, deixando a equipa pronta para iniciar `BK-MF1-01` e `BK-MF1-02` sem reabrir decisões de MF0.
 
-#### Nota anti-drift MF0
+##### Nota anti-drift MF0
 
 `MF0` fecha apenas governance/kickoff: plano, responsabilidades, backlog, DoD, calendário e reunião de alinhamento. Este BK não cria backend, frontend, base de dados, streaming, catálogo, endpoints, componentes ou funcionalidade real. O handoff para `MF1` deve levar contratos documentais, não código pronto.
 
-#### BK-MF0-06 - Reuniao de alinhamento inicial
+##### Enquadramento do BK
 
 ##### O que vamos fazer neste BK
 
@@ -41,7 +41,7 @@ Este BK é o handoff direto para `MF1`. No FaithFlix, `MF1` é fundação técni
 
 A fase foi detalhada sem mockup e sem código de app. Isso deve ficar registado na reunião: a equipa não deve inventar UI final nem caminhos de ficheiros antes da fundação técnica.
 
-##### Porque e que isto e importante
+#### Importância
 
 - Fecha a MF0 com consenso explícito da equipa.
 - Evita que `MF1` comece com dúvidas sobre stack, owners ou DoD.
@@ -49,7 +49,7 @@ A fase foi detalhada sem mockup e sem código de app. Isso deve ficar registado 
 - Regista blockers, assunções e riscos antes de tocar em código.
 - Cria evidence de governance para a defesa PAP.
 
-##### O que entra (scope)
+#### Scope-in
 
 - Preparar agenda da reunião.
 - Rever decisões dos BK `MF0-01..05`.
@@ -58,7 +58,7 @@ A fase foi detalhada sem mockup e sem código de app. Isso deve ficar registado 
 - Registar riscos, blockers e decisões abertas.
 - Preparar handoff para `BK-MF1-01` e `BK-MF1-02`.
 
-##### O que nao entra (scope-out)
+#### Scope-out
 
 - Implementar backend ou frontend.
 - Instalar dependências.
@@ -78,7 +78,7 @@ A fase foi detalhada sem mockup e sem código de app. Isso deve ficar registado 
 
 Este BK e a ponte entre a governance da `MF0` e a primeira implementacao tecnica da `MF1`. Sem esta reuniao registada, a equipa pode comecar backend e frontend com interpretacoes diferentes sobre stack, DoD, responsabilidades, privacidade, mockup e limites de escopo. O produto final depende deste alinhamento para construir catalogo, streaming, perfis, subscricoes e pool solidaria sobre uma base combinada e defensavel.
 
-#### Metadados do BK (CANONICO/DERIVADO):
+##### Metadados do BK (CANONICO/DERIVADO):
 
 - Prioridade: `P0` (CANONICO, `BACKLOG-MVP.md`)
 - Estado: `TODO` (CANONICO, `BACKLOG-MVP.md`)
@@ -95,7 +95,7 @@ Este BK e a ponte entre a governance da `MF0` e a primeira implementacao tecnica
 - Fonte de verdade: `docs/planificacao/backlogs/BACKLOG-MVP.md`
 - Descricao: conduzir reunião de alinhamento inicial e fechar handoff de governance para fundação técnica (DERIVADO)
 
-#### O que vamos fazer neste BK (DERIVADO):
+##### Complemento do objetivo (DERIVADO):
 
 - Preparar agenda baseada nos outputs dos BK anteriores.
 - Confirmar que cada aluno conhece responsabilidade e primeiro foco.
@@ -103,7 +103,7 @@ Este BK e a ponte entre a governance da `MF0` e a primeira implementacao tecnica
 - Confirmar que `MF1` começa por backend modular e frontend componentizado.
 - Produzir handoff objetivo para `BK-MF1-01` e `BK-MF1-02`.
 
-#### Estado, ficheiros e impacto (DERIVADO):
+#### Estado antes e depois
 
 - Estado esperado antes do BK: responsabilidades e calendário publicados; plano, backlog e DoD disponíveis como contexto.
 - Estado esperado depois do BK: MF0 encerrada, blockers registados e MF1 desbloqueada para iniciar fundação técnica.
@@ -116,7 +116,7 @@ Este BK e a ponte entre a governance da `MF0` e a primeira implementacao tecnica
 - Impacto em segurança/testes/UI: reforça RNF de segurança, DoD/evidence e decisão de não inventar UI sem mockup.
 - Handoff para o próximo BK: entregar a `BK-MF1-01` stack derivada, responsabilidades, DoD e limites de escopo.
 
-#### Mapa de ficheiros e localizacao (DERIVADO):
+##### Mapa de ficheiros e localização (DERIVADO):
 
 | Acao | Caminho | Localizacao/insercao | Regra |
 | --- | --- | --- | --- |
@@ -126,7 +126,7 @@ Este BK e a ponte entre a governance da `MF0` e a primeira implementacao tecnica
 | Rever | `docs/planificacao/backlogs/BACKLOG-MVP.md` | Linhas `BK-MF1-01` e `BK-MF1-02` | Confirmar owners, dependencias e foco da fundacao tecnica. |
 | Rever | `docs/RNF.md` | `RNF27`, `RNF28`, `RNF13`, `RNF15`, `RNF17` | Confirmar arquitetura modular, frontend componentizado, sessao segura e segredos fora do repositorio. |
 
-#### Template da ata/registo da reuniao (DERIVADO):
+##### Template da ata/registo da reunião (DERIVADO):
 
 Ficheiro novo: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
 
@@ -134,6 +134,12 @@ Inserir o conteudo completo abaixo e substituir apenas os campos entre parentese
 
 ```markdown
 # Ata de Alinhamento Inicial - MF0 FaithFlix
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF0/BK-MF0-06-reuniao-alinhamento-inicial.md`
+- `proof_scope`: ata observada pelos alunos; não prova implementação, testes ou estado da referência docente
 
 ## Metadados
 
@@ -186,20 +192,20 @@ Confirmar que a equipa compreende plano, responsabilidades, backlog, DoD/evidenc
 - notes: [observacoes curtas]
 ```
 
-#### Bloqueio / decisao necessaria (DERIVADO):
+##### Bloqueio/decisão necessária (DERIVADO):
 
 - Se a equipa ou orientador nao aceitarem `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md` como local do registo, o BK deve ficar `BLOCKED` ate Nuno indicar o caminho oficial.
 - Se algum aluno nao confirmar ownership, disponibilidade ou compreensao minima do primeiro BK tecnico, a reuniao deve registar blocker com owner e prazo antes de autorizar `MF1`.
 - Se surgir proposta de implementar backend, frontend, UI final ou funcionalidades durante a reuniao, registar como fora de escopo da `MF0` e mover a discussao para o BK tecnico correto.
 
-#### Handoff explicito para MF1 (DERIVADO):
+##### Handoff explícito para MF1 (DERIVADO):
 
 - Para `BK-MF1-01`: levar `RNF27`, decisão documental de backend modular, ownership `Matheus`/apoio `Davi`, DoD/evidence e aviso de que o BK deve criar fundação técnica, não autenticação completa, catálogo ou streaming.
 - Para `BK-MF1-02`: levar `RNF28`, decisão documental de frontend por componentes, ownership `Mateus`/apoio `Kaue`, DoD/evidence e aviso de que o BK deve criar estrutura base, não UI final nem fluxos funcionais completos.
 - Para ambos: confirmar que comandos, pastas e ficheiros reais só são definidos/executados nos BKs da `MF1`; em `MF0` ficam apenas contratos, assunções e blockers.
 - Para a equipa: manter `pr/proof/neg`, política de negativos P0, registo de blockers e proibição de segredos no repositório como regras desde o primeiro commit técnico.
 
-#### Pre-leitura minima (10-15 min) (DERIVADO):
+#### Pré-requisitos
 
 - Guia `BK-MF0-01`: plano total.
 - Guia `BK-MF0-02`: responsabilidades.
@@ -211,7 +217,7 @@ Confirmar que a equipa compreende plano, responsabilidades, backlog, DoD/evidenc
 - Mockup: não existe; registar como decisão aberta para fases de UI.
 - Código: não existe app detetável; MF1 deverá criar a estrutura inicial.
 
-#### Glossario (rapido) (DERIVADO):
+#### Glossário
 
 - Alinhamento: confirmação partilhada de plano, papéis e próximos passos.
 - Handoff: passagem de contexto para o próximo BK.
@@ -222,111 +228,362 @@ Confirmar que a equipa compreende plano, responsabilidades, backlog, DoD/evidenc
 - Contrato: decisão documentada que BKs futuros devem respeitar.
 - Ata curta: registo objetivo de decisões e ações.
 
-#### Conceitos teoricos essenciais (DERIVADO):
+#### Conceitos teóricos essenciais
 
 **Reunião com output.** Uma boa reunião técnica termina com decisões, responsáveis e próximos passos. Se não houver output escrito, a equipa pode sair com interpretações diferentes.
 
 **Handoff para implementação.** Handoff não é "boa sorte". Deve incluir o que está decidido, o que falta decidir, que ficheiros consultar e que riscos evitar. Aqui o handoff vai para backend modular e frontend por componentes.
 
-**Stack derivada vs stack instalada.** A stack recomendada vem de README/RNF: Node.js LTS, Express, React/Next.js e MongoDB Atlas. Mas nesta MF0 nada é instalado; a instalação e estrutura real entram em `MF1`.
+**Stack derivada vs stack instalada.** A baseline atual vem de README/RNF:
+Node.js LTS, Express, React + Vite, `fetch`/`AbortController` e MongoDB. As
+opções futuras do RNF, como Next.js/Axios, não são o runtime deste tutorial.
+Nesta MF0 nada é instalado; a estrutura real entra em `MF1`.
 
 **Contrato de segurança inicial.** Mesmo antes do código, a equipa deve saber que passwords não serão guardadas em texto puro, sessões devem usar cookies HttpOnly quando aplicável e segredos não entram no repositório.
 
 **Scope freeze local.** A reunião não é momento para inventar novas funcionalidades. Mudanças de escopo devem virar TODO/BLOCKER ou decisão formal do orientador.
 
-#### Guia de execucao (passo-a-passo) (DERIVADO):
+#### Arquitetura do BK
 
-0. **Objetivo (~10 min): Confirmar pré-condições**
-   - Descricao detalhada do objetivo: verificar se responsabilidades e calendário estão disponíveis.
-   - Justificacao: são dependências canónicas deste BK.
-   - Como fazer (0.1): rever `BK-MF0-02` e `BK-MF0-05`.
-   - Como fazer (0.2): confirmar que backlog e DoD também estão disponíveis como contexto.
-   - Ficheiro a rever: `docs/planificacao/guias-bk/MF0/`
-   - Ficheiro alvo: `docs/planificacao/guias-bk/MF0/BK-MF0-06-reuniao-alinhamento-inicial.md`
-   - Snippet de referencia: `dependencias: BK-MF0-02,BK-MF0-05`
-   - O que verificar: não há blocker que impeça a reunião.
+- Endpoint(s), modelo/schema, service, controller/route, guard, cliente API e página/componente: não aplicável; a MF0 não altera a implementação da app.
+- Artefacto documental: os documentos e evidences enumerados na secção seguinte e nos passos.
+- Testes: validador de planificação, checks documentais e negativos descritos no tutorial.
+- Handoff: contrato documental preparado para `BK-MF1-01`.
 
-1. **Objetivo (~10 min): Preparar agenda**
-   - Descricao detalhada do objetivo: montar uma agenda curta com plano, responsabilidades, backlog, DoD, calendário e MF1.
-   - Justificacao: reunião sem agenda perde foco.
-   - Como fazer (1.1): listar 5 tópicos com tempo estimado.
-   - Como fazer (1.2): colocar `decisão esperada` em cada tópico.
-   - Ficheiro a rever: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
-   - Snippet de referencia: `Segunda: arranque, risco inicial e ownership`
-   - O que verificar: cada tópico tem decisão ou confirmação.
+#### Ficheiros a criar/editar/rever
 
-2. **Objetivo (~15 min): Rever plano e macro fases com a equipa**
-   - Descricao detalhada do objetivo: confirmar que todos entendem `MF0..MF9`.
-   - Justificacao: a equipa precisa perceber continuidade, não só o seu BK isolado.
-   - Como fazer (2.1): pedir a cada aluno que explique uma macro fase.
-   - Como fazer (2.2): corrigir interpretações que tratem MF0 como produto funcional.
-   - Ficheiro a rever: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
-   - Snippet de referencia: `MF1 | Fundacao tecnica`
-   - O que verificar: todos distinguem governance de implementação.
+- CRIAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`.
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md` durante a execução real da reunião; este guia apenas se houver ajustes/evidence do BK.
+- REVER: guias `BK-MF0-01..05`, `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`, `docs/planificacao/sprints/PLANO-SPRINTS.md`, `docs/planificacao/backlogs/BACKLOG-MVP.md`, `docs/RNF.md`.
+- CRIAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+- REVER: `docs/planificacao/guias-bk/MF0/BK-MF0-01-publicar-plano-total.md` a `BK-MF0-05`
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- REVER: `docs/RNF.md`
+- REVER: `docs/planificacao/guias-bk/MF0/`
+- EDITAR: `docs/planificacao/guias-bk/MF0/BK-MF0-06-reuniao-alinhamento-inicial.md`
+- REVER: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
+- REVER: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`
 
-3. **Objetivo (~15 min): Confirmar responsabilidades**
-   - Descricao detalhada do objetivo: validar owner/apoio por aluno e por área.
-   - Justificacao: MF1 começa com Matheus e Mateus como owners técnicos iniciais.
-   - Como fazer (3.1): rever a matriz por área funcional.
-   - Como fazer (3.2): confirmar que cada aluno sabe o seu primeiro papel.
-   - Ficheiro a rever: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
-   - Snippet de referencia: `Matheus: backend core, seguranca, regras de negocio`
-   - O que verificar: não há dúvida sobre owner/apoio.
+#### Tutorial técnico linear
 
-4. **Objetivo (~15 min): Confirmar backlog e DoD**
-   - Descricao detalhada do objetivo: garantir que a equipa sabe que cada BK fecha com critérios e evidence.
-   - Justificacao: previne `DONE` falso nas próximas sprints.
-   - Como fazer (4.1): rever critérios globais de aceite por BK.
-   - Como fazer (4.2): pedir que os alunos expliquem `pr/proof/neg`.
-   - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
-   - Snippet de referencia: `Evidence minima por BK: trio pr, proof, neg`
-   - O que verificar: todos sabem que P0 exige pelo menos 3 negativos.
+### Passo 1 - Confirmar pré-condições (~10 min)
 
-5. **Objetivo (~15 min): Confirmar calendário e Sprint 1**
-   - Descricao detalhada do objetivo: validar o foco da Sprint 1 e os BKs que começam logo após a reunião.
-   - Justificacao: MF1 arranca dentro da Sprint 1.
-   - Como fazer (5.1): rever linha da Sprint 1.
-   - Como fazer (5.2): confirmar primeiro compromisso de Matheus e Mateus.
-   - Ficheiro a rever: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
-   - Snippet de referencia: `BK-MF1-01`, `BK-MF1-02`
-   - O que verificar: equipa sabe que MF1 começa com estrutura base, não com features.
+1. Objetivo funcional do passo no contexto da app.
 
-6. **Objetivo (~15 min): Fechar contratos técnicos iniciais para MF1**
-   - Descricao detalhada do objetivo: registar as decisões derivadas que os BKs técnicos devem respeitar.
-   - Justificacao: evita escolhas incompatíveis quando o código começar.
-   - Como fazer (6.1): confirmar stack derivada: Node.js LTS, Express modular, React/Next.js, MongoDB Atlas.
-   - Como fazer (6.2): marcar como TODO qualquer decisão ainda não fechada, sem inventar.
-   - Ficheiro a rever: `docs/RNF.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
-   - Snippet de referencia: `RNF27 backend modular`, `RNF28 frontend por componentes`
-   - O que verificar: MF1 recebe contratos claros e blockers explícitos.
+Verificar se responsabilidades e calendário estão disponíveis.
 
-7. **Objetivo (~15 min): Executar negativos da reunião**
-   - Descricao detalhada do objetivo: testar se a equipa consegue detetar falhas de alinhamento.
-   - Justificacao: uma reunião pode parecer positiva mas deixar dúvidas críticas abertas.
-   - Como fazer (7.1): perguntar "quem é owner do backend base?" e validar resposta.
-   - Como fazer (7.2): perguntar "o que prova que um BK está DONE?" e validar resposta.
-   - Ficheiro a rever: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
-   - Snippet de referencia: `BK DONE exige evidencia + validacao tecnica`
-   - O que verificar: pelo menos 3 negativos P0 de alinhamento ficam registados.
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/guias-bk/MF0/`
+- EDITAR: `docs/planificacao/guias-bk/MF0/BK-MF0-06-reuniao-alinhamento-inicial.md`
 
-8. **Objetivo (~10 min): Fechar ata, evidence e handoff para MF1**
-   - Descricao detalhada do objetivo: documentar decisões, blockers, owners e próximos passos.
-   - Justificacao: sem registo, a equipa pode reabrir decisões na MF1.
-   - Como fazer (8.1): preencher `pr`, `proof`, `neg`, `files`, `commands`, `notes`.
-   - Como fazer (8.2): entregar handoff direto para `BK-MF1-01` e informar `BK-MF1-02`.
-   - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
-   - Snippet de referencia: `proximo_bk: BK-MF1-01`
-   - O que verificar: os BK técnicos têm autorização e contexto para arrancar.
+3. Instruções do que fazer.
 
-#### Checklist de validacao (DERIVADO):
+- Rever `BK-MF0-02` e `BK-MF0-05`.
+- Confirmar que backlog e DoD também estão disponíveis como contexto.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+São dependências canónicas deste BK.
+Snippet de referência: `dependencias: BK-MF0-02,BK-MF0-05`
+
+6. Validação do passo.
+
+Não há blocker que impeça a reunião.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 2 - Preparar agenda (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Montar uma agenda curta com plano, responsabilidades, backlog, DoD, calendário e MF1.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+
+3. Instruções do que fazer.
+
+- Listar 5 tópicos com tempo estimado.
+- Colocar `decisão esperada` em cada tópico.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Reunião sem agenda perde foco.
+Snippet de referência: `Segunda: arranque, risco inicial e ownership`
+
+6. Validação do passo.
+
+Cada tópico tem decisão ou confirmação.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 3 - Rever plano e macro fases com a equipa (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar que todos entendem `MF0..MF9`.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+
+3. Instruções do que fazer.
+
+- Pedir a cada aluno que explique uma macro fase.
+- Corrigir interpretações que tratem MF0 como produto funcional.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+A equipa precisa perceber continuidade, não só o seu BK isolado.
+Snippet de referência: `MF1 | Fundacao tecnica`
+
+6. Validação do passo.
+
+Todos distinguem governance de implementação.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 4 - Confirmar responsabilidades (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Validar owner/apoio por aluno e por área.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+
+3. Instruções do que fazer.
+
+- Rever a matriz por área funcional.
+- Confirmar que cada aluno sabe o seu primeiro papel.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+MF1 começa com Matheus e Mateus como owners técnicos iniciais.
+Snippet de referência: `Matheus: backend core, seguranca, regras de negocio`
+
+6. Validação do passo.
+
+Não há dúvida sobre owner/apoio.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 5 - Confirmar backlog e DoD (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Garantir que a equipa sabe que cada BK fecha com critérios e evidence.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+
+3. Instruções do que fazer.
+
+- Rever critérios globais de aceite por BK.
+- Pedir que os alunos expliquem `pr/proof/neg`.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Previne `DONE` falso nas próximas sprints.
+Snippet de referência: `Evidence minima por BK: trio pr, proof, neg`
+
+6. Validação do passo.
+
+Todos sabem que P0 exige pelo menos 3 negativos.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 6 - Confirmar calendário e Sprint 1 (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Validar o foco da Sprint 1 e os BKs que começam logo após a reunião.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+
+3. Instruções do que fazer.
+
+- Rever linha da Sprint 1.
+- Confirmar primeiro compromisso de Matheus e Mateus.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+MF1 arranca dentro da Sprint 1.
+Snippet de referência: `BK-MF1-01`, `BK-MF1-02`
+
+6. Validação do passo.
+
+Equipa sabe que MF1 começa com estrutura base, não com features.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 7 - Fechar contratos técnicos iniciais para MF1 (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Registar as decisões derivadas que os BKs técnicos devem respeitar.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/RNF.md`
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+
+3. Instruções do que fazer.
+
+- Confirmar stack atual: Node.js LTS, Express modular, React + Vite,
+  `fetch`/`AbortController` e MongoDB.
+- Marcar como TODO qualquer decisão ainda não fechada, sem inventar.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Evita escolhas incompatíveis quando o código começar.
+Snippet de referência: `RNF27 backend modular`, `RNF28 frontend por componentes`
+
+6. Validação do passo.
+
+MF1 recebe contratos claros e blockers explícitos.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 8 - Executar negativos da reunião (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Testar se a equipa consegue detetar falhas de alinhamento.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+
+3. Instruções do que fazer.
+
+- Perguntar "quem é owner do backend base?" e validar resposta.
+- Perguntar "o que prova que um BK está DONE?" e validar resposta.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Uma reunião pode parecer positiva mas deixar dúvidas críticas abertas.
+Snippet de referência: `BK DONE exige evidencia + validacao tecnica`
+
+6. Validação do passo.
+
+Pelo menos 3 negativos P0 de alinhamento ficam registados.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 9 - Fechar ata, evidence e handoff para MF1 (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Documentar decisões, blockers, owners e próximos passos.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- EDITAR: `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md`
+
+3. Instruções do que fazer.
+
+- Preencher `pr`, `proof`, `neg`, `files`, `commands`, `notes`.
+- Entregar handoff direto para `BK-MF1-01` e informar `BK-MF1-02`.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Sem registo, a equipa pode reabrir decisões na MF1.
+Snippet de referência: `proximo_bk: BK-MF1-01`
+
+6. Validação do passo.
+
+Os BK técnicos têm autorização e contexto para arrancar.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+#### Critérios de aceite
+
+**Outputs:**
+- Agenda e registo da reunião.
+- Lista de decisões, blockers e próximos passos.
+- Handoff para `BK-MF1-01` e `BK-MF1-02`.
+- Ficheiro `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md` criado com template preenchido.
+
+**Verificacoes:**
+- Todos os alunos confirmam o seu primeiro foco.
+- `BK-MF1-01` e `BK-MF1-02` estão desbloqueados.
+- Pelo menos 3 negativos de alinhamento foram registados.
+- Todos os blockers têm owner, prazo e acao necessaria.
+
+**Qualidade:**
+- Ata curta, objetiva e sem decisões inventadas.
+- Escopo da MF0 encerrado sem adicionar funcionalidades.
+
+**Continuidade:**
+- MF1 começa com contratos de arquitetura e validação claros.
+- Decisões abertas ficam como TODO/BLOCKER, não como suposições silenciosas.
+
+**Evidencia:**
+- `pr`, `proof` e `neg` preenchidos antes de marcar `DONE`.
+
+#### Validação final
 
 **Smoke**
 - [ ] Reunião teve agenda.
@@ -356,32 +613,7 @@ Confirmar que a equipa compreende plano, responsabilidades, backlog, DoD/evidenc
 - [ ] A equipa reconhece RNF de passwords, sessões, segredos e dados pessoais como contratos futuros.
 - [ ] Nenhuma credencial ou conta real é registada na ata.
 
-#### Criterios de aceite:
-
-**Outputs:**
-- Agenda e registo da reunião.
-- Lista de decisões, blockers e próximos passos.
-- Handoff para `BK-MF1-01` e `BK-MF1-02`.
-- Ficheiro `docs/planificacao/sprints/ATA-ALINHAMENTO-INICIAL-MF0.md` criado com template preenchido.
-
-**Verificacoes:**
-- Todos os alunos confirmam o seu primeiro foco.
-- `BK-MF1-01` e `BK-MF1-02` estão desbloqueados.
-- Pelo menos 3 negativos de alinhamento foram registados.
-- Todos os blockers têm owner, prazo e acao necessaria.
-
-**Qualidade:**
-- Ata curta, objetiva e sem decisões inventadas.
-- Escopo da MF0 encerrado sem adicionar funcionalidades.
-
-**Continuidade:**
-- MF1 começa com contratos de arquitetura e validação claros.
-- Decisões abertas ficam como TODO/BLOCKER, não como suposições silenciosas.
-
-**Evidencia:**
-- `pr`, `proof` e `neg` preenchidos antes de marcar `DONE`.
-
-#### Evidence (para o PR/defesa):
+#### Evidence para PR/defesa
 
 - `pr`: `A preencher no fecho do BK`
 - `proof`: `A preencher apos validacao`
@@ -391,7 +623,7 @@ Confirmar que a equipa compreende plano, responsabilidades, backlog, DoD/evidenc
 - `screenshots`: `Nao aplicavel; BK documental sem UI`
 - `notes`: `Fase detalhada sem mockup e sem codigo de app existente; MF1 deve criar estrutura inicial`
 
-#### TODOs
+##### TODOs
 
 - TODO: preencher ata real da reunião quando for executada.
 - TODO: preencher evidence real antes de marcar `DONE`.
@@ -402,7 +634,7 @@ Confirmar que a equipa compreende plano, responsabilidades, backlog, DoD/evidenc
 - Decisao dependente de mockup: UI final fica bloqueada até existir mockup ou decisão visual formal.
 - Decisao dependente de app/codigo ainda inexistente: comandos, pastas e ficheiros reais serão criados em `MF1`.
 
-## Snippet tecnico aplicavel
+##### Snippet técnico aplicável
 
 ```text
 CHECK BK-MF0-06
@@ -413,11 +645,11 @@ CHECK BK-MF0-06
 5. sem_decisoes_visuais_inventadas == true
 ```
 
-## Proximo BK recomendado
+#### Handoff
 
 `BK-MF1-01`
 
-## Changelog
+#### Changelog
 
 - `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
 - `2026-05-25`: refinado para guia executável de reunião de alinhamento e handoff MF0 -> MF1.

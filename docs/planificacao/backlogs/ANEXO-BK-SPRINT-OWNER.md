@@ -24,16 +24,16 @@ Consolidar BK, sprint e ownership para validação cruzada rápida.
 | BK-MF1-02 | MF1 | S01 | Mateus | Kaue | P0 | Reforco | RNF28 | BK-MF0-06 | docs/planificacao/guias-bk/MF1/BK-MF1-02-estrutura-base-frontend-componentes.md |
 | BK-MF1-03 | MF1 | S02 | Mateus | Matheus | P0 | Reforco | RNF05, RNF30 | BK-MF1-02 | docs/planificacao/guias-bk/MF1/BK-MF1-03-cliente-api-frontend-tratamento-erro.md |
 | BK-MF1-04 | MF1 | S02 | Matheus | Kaue | P0 | Reforco | RNF13, RNF15 | BK-MF1-01 | docs/planificacao/guias-bk/MF1/BK-MF1-04-sessao-segura-backend-cookies-auth-base.md |
-| BK-MF1-05 | MF1 | S02 | Kaue | Davi | P1 | Core | RNF31 | BK-MF1-01 | docs/planificacao/guias-bk/MF1/BK-MF1-05-health-check-e-logging-estruturado.md |
-| BK-MF1-06 | MF1 | S02 | Kaue | Mateus | P1 | Core | RNF29 | BK-MF1-03,BK-MF1-04 | docs/planificacao/guias-bk/MF1/BK-MF1-06-smoke-tests-fe-be.md |
-| BK-MF2-01 | MF2 | S02 | Matheus | Mateus | P0 | Reforco | RF01, RF02, RF05 | BK-MF1-04 | docs/planificacao/guias-bk/MF2/BK-MF2-01-registo-login-recuperacao-password.md |
+| BK-MF1-05 | MF1 | S02 | Kaue | Davi | P1 | Core | RNF31 | BK-MF1-01,BK-MF1-04 | docs/planificacao/guias-bk/MF1/BK-MF1-05-health-check-e-logging-estruturado.md |
+| BK-MF1-06 | MF1 | S02 | Kaue | Mateus | P1 | Core | RNF29 | BK-MF1-03,BK-MF1-04,BK-MF1-05 | docs/planificacao/guias-bk/MF1/BK-MF1-06-smoke-tests-fe-be.md |
+| BK-MF2-01 | MF2 | S02 | Matheus | Mateus | P0 | Reforco | RF01, RF02, RF05 | BK-MF1-06 | docs/planificacao/guias-bk/MF2/BK-MF2-01-registo-login-recuperacao-password.md |
 | BK-MF2-02 | MF2 | S03 | Matheus | Kaue | P0 | Reforco | RF03, RF04 | BK-MF2-01 | docs/planificacao/guias-bk/MF2/BK-MF2-02-edicao-perfil-papeis-base.md |
-| BK-MF2-03 | MF2 | S03 | Davi | Matheus | P0 | Reforco | RF06, RF07, RF09, RF10 | BK-MF1-01 | docs/planificacao/guias-bk/MF2/BK-MF2-03-crud-catalogo-taxonomias.md |
+| BK-MF2-03 | MF2 | S03 | Davi | Matheus | P0 | Reforco | RF06, RF07, RF09, RF10 | BK-MF2-02 | docs/planificacao/guias-bk/MF2/BK-MF2-03-crud-catalogo-taxonomias.md |
 | BK-MF2-04 | MF2 | S03 | Mateus | Davi | P0 | Reforco | RF08 | BK-MF2-03 | docs/planificacao/guias-bk/MF2/BK-MF2-04-pagina-detalhe-conteudo.md |
 | BK-MF2-05 | MF2 | S04 | Mateus | Matheus | P0 | Reforco | RF11, RF12 | BK-MF2-04 | docs/planificacao/guias-bk/MF2/BK-MF2-05-reproducao-continuar-a-ver.md |
 | BK-MF2-06 | MF2 | S04 | Mateus | Kaue | P1 | Core | RF13, RF14, RF15 | BK-MF2-05 | docs/planificacao/guias-bk/MF2/BK-MF2-06-legendas-audio-parental-e-qualidade.md |
 | BK-MF2-07 | MF2 | S04 | Davi | Mateus | P0 | Reforco | RF16, RF17, RF18 | BK-MF2-05 | docs/planificacao/guias-bk/MF2/BK-MF2-07-favoritos-watchlist-historico.md |
-| BK-MF2-08 | MF2 | S04 | Kaue | Mateus | P0 | Reforco | RNF07, RNF08 | BK-MF2-01,BK-MF2-07 | docs/planificacao/guias-bk/MF2/BK-MF2-08-teste-e2e-fluxo-principal.md |
+| BK-MF2-08 | MF2 | S04 | Kaue | Mateus | P0 | Reforco | RNF07, RNF08 | BK-MF2-06,BK-MF2-07 | docs/planificacao/guias-bk/MF2/BK-MF2-08-teste-e2e-fluxo-principal.md |
 | BK-MF3-01 | MF3 | S05 | Davi | Matheus | P1 | Core | RF19, RF21 | BK-MF2-07 | docs/planificacao/guias-bk/MF3/BK-MF3-01-ratings-e-agregacao.md |
 | BK-MF3-02 | MF3 | S05 | Matheus | Kaue | P2 | Core | RF20 | BK-MF3-01 | docs/planificacao/guias-bk/MF3/BK-MF3-02-comentarios-curtos-moderados.md |
 | BK-MF3-03 | MF3 | S05 | Davi | Mateus | P0 | Reforco | RF22 | BK-MF2-03 | docs/planificacao/guias-bk/MF3/BK-MF3-03-pesquisa-unificada.md |

@@ -17,28 +17,28 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF6-02`
 - `guia_path`: `docs/planificacao/guias-bk/MF6/BK-MF6-01-suite-de-regressao-backend.md`
-- `last_updated`: `2026-06-19`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
-Neste BK vais criar uma suite de regressão backend para garantir que a API FaithFlix continua a cumprir os contratos críticos de `RNF29`: autenticação, criação e cancelamento de subscrições, reprodução básica de conteúdo e rotação mensal de associações.
+Neste BK vais separar a regressão backend em duas lanes: uma suite unitária para contratos puros e services não transacionais, e uma integração dedicada para checkout, rollback e rotação mensal em MongoDB replica set. `RNF29` só fica integralmente provado quando existem resultados atuais das duas lanes.
 
-O resultado final é o ficheiro `backend/tests/regression/mf6-backend-regression.test.js`, executado com `node --test`, e a evidence `docs/evidence/MF6/BK-MF6-01-regressao-backend.md` pronta para o gate S12.
+Este guia fornece integralmente o ficheiro unitário `backend/tests/regression/mf6-backend-regression.test.js`, executado com `node --test`. A evidence `docs/evidence/MF6/BK-MF6-01-regressao-backend.md` separa esse resultado da integração transacional; não pode declarar checkout, rollback ou rotação como provados apenas com o snippet fornecido aqui.
 
 #### Importância
 
 Uma regressão acontece quando uma funcionalidade que já funcionava deixa de funcionar depois de uma alteração nova. Na MF6, a aplicação já tem identidade, streaming, subscrições, pagamentos simulados, pool solidária, privacidade, métricas e integrações admin. Um pequeno ajuste num validator, service ou router pode quebrar um fluxo antigo sem que a equipa repare durante a implementação.
 
-`RNF29` não pede apenas testes de funções isoladas. O requisito pede testes automatizados para fluxos que representam valor real da aplicação: autenticar, criar/cancelar subscrição, registar progresso de reprodução e distribuir a pool por associações. Esta suite junta esses pontos num único ficheiro para o owner responder com segurança: "a regressão backend principal continua verde?".
+`RNF29` não pede apenas testes de funções isoladas. O requisito pede testes automatizados para fluxos que representam valor real da aplicação: autenticar, criar/cancelar subscrição, registar progresso de reprodução e distribuir a pool por associações. A lane unitária deste guia protege validação, cancelamento, progresso e autorização; criação, atomicidade e rotação pertencem exclusivamente à lane de integração transacional.
 
 #### Scope-in
 
 - Criar uma suite de regressão backend com `node:test`.
 - Validar autenticação por validators reais de email/password.
-- Validar criação de subscrição através do checkout simulado aprovado.
+- Definir a prova separada de criação de subscrição através do checkout simulado aprovado, sem a confundir com a suite unitária fornecida.
 - Validar cancelamento de renovação através do service real de subscrições.
 - Validar reprodução básica através do payload real de progresso.
-- Validar distribuição mensal com rotação real entre associações elegíveis.
+- Exigir integração em replica set para provar distribuição mensal e rotação real entre associações elegíveis.
 - Confirmar que os endpoints admin herdados de `BK-MF5-06` continuam montados para regressão futura.
 - Executar regressão, testes existentes e smoke backend.
 - Registar evidence objetiva com comandos, resultados reais e negativos.
@@ -54,11 +54,11 @@ Uma regressão acontece quando uma funcionalidade que já funcionava deixa de fu
 
 #### Estado antes e depois
 
-Antes deste BK, o backend já tem testes unitários, testes de integração e smoke tests espalhados por macrofase. Falta uma suite de regressão MF6 que prove, num ponto único, que os fluxos mínimos de `RNF29` ainda funcionam depois das entregas de MF4 e MF5.
+Antes deste BK, o backend já tem testes unitários, testes de integração e smoke tests espalhados por macrofase. Falta uma regressão MF6 que separe claramente o que pode ser provado sem MongoDB do que exige uma sessão transacional real.
 
-Depois deste BK, a equipa passa a ter uma regressão backend com cinco áreas: autenticação, subscrições, reprodução, pool solidária e endpoints admin entregues pela MF5. Esta prova alimenta `BK-MF6-02`, `BK-MF6-03` e o gate final de `BK-MF6-06`.
+Depois deste BK, a equipa passa a ter uma lane unitária copiável e um contrato explícito para a lane de integração. A evidence só agrega as cinco áreas quando o ficheiro transacional existir e o respetivo comando tiver resultado atual; até lá, criação de subscrição e rotação permanecem `NAO_PROVADO`.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - `BK-MF1-06` criou a base de smoke tests FE/BE.
 - `BK-MF2-01` criou validação de identidade e sessão.
@@ -83,10 +83,14 @@ Depois deste BK, a equipa passa a ter uma regressão backend com cinco áreas: a
 - `CANONICO`: `RNF29` pede testes automatizados para autenticação, criação e cancelamento de subscrições, reprodução básica de conteúdo e rotação de associações.
 - `CANONICO`: a matriz canónica regista `BK-MF6-01` como cobertura complementar de `RNF29` no gate S12.
 - `CANONICO`: `BK-MF5-06` entrega para `BK-MF6-01` a regressão backend de `/api/admin/integrations` e `/api/admin/metrics`.
-- `DERIVADO`: a suite usa uma base em memória porque a regressão deve correr sem depender de MongoDB real, mas continua a chamar os services reais da app.
+- `DERIVADO`: a lane unitária usa base em memória apenas para services
+  compatíveis; checkout/pool chamam os services reais exclusivamente na lane
+  de integração com replica set dedicado.
 - Um teste de regressão deve ser curto, estável e repetível. Não serve para testar tudo; serve para bloquear quebras em pontos de alto risco.
 - `node:test` é o runner nativo do Node.js. Nesta app evita dependências novas e mantém a suite no mesmo runtime usado pelo backend.
-- Um service testado com base em memória continua a testar lógica real. A diferença é que os dados ficam em arrays controlados, para o teste ser rápido e determinístico.
+- Um service não transacional pode usar arrays controlados. Um service que
+  exige `runInTransaction` nunca recebe uma sessão fictícia: a prova de commit,
+  rollback e concorrência requer MongoDB transacional.
 - Em segurança e privacidade, negativos são tão importantes como positivos: validar rejeições evita aceitar input inseguro, estado impossível ou operação sem autorização.
 - A regressão de endpoints admin não substitui testes de negócio de métricas e integrações. Ela garante que os routers continuam montados e que a barreira de role admin continua documentada para o gate.
 
@@ -97,8 +101,9 @@ Depois deste BK, a equipa passa a ter uma regressão backend com cinco áreas: a
 | Backend | `backend` |
 | Test runner | `node --test` |
 | Novo ficheiro | `tests/regression/mf6-backend-regression.test.js` |
-| Dados de teste | Base em memória ligada por `setDbForTests` |
-| Domínios cobertos | auth, payments/subscriptions, playback, charities/pool, admin metrics/integrations |
+| Dados de teste | Unitários puros/base em memória; transações apenas em replica set `TEST_MONGODB_*` |
+| Lane unitária fornecida | auth validators, cancelamento, progresso, mês da pool, admin RBAC |
+| Lane transacional exigida | checkout/idempotência/rollback e distribuição/rotação; não fornecida neste guia |
 | Evidence | `docs/evidence/MF6/BK-MF6-01-regressao-backend.md` |
 | Handoff | `BK-MF6-02` valida cliente API, rotas frontend e estados visuais sobre estes contratos backend |
 
@@ -117,7 +122,7 @@ Depois deste BK, a equipa passa a ter uma regressão backend com cinco áreas: a
 
 1. Objetivo funcional do passo no contexto da app.
 
-Criar um teste automatizado que protege os fluxos mínimos de `RNF29` e confirma o handoff backend de `BK-MF5-06`, sem ligar a serviços externos.
+Criar o teste unitário automatizado que protege contratos não transacionais de `RNF29` e confirma o handoff backend de `BK-MF5-06`, sem o apresentar como prova de checkout, rollback ou rotação.
 
 2. Ficheiros envolvidos:
     - CRIAR: `backend/tests/regression/mf6-backend-regression.test.js`
@@ -134,8 +139,8 @@ Cria a pasta `backend/tests/regression/` se ainda não existir. Depois cria o fi
 /**
  * @file Suite de regressão backend da MF6.
  *
- * Protege os contratos mínimos de RNF29 usando validators, services e routers
- * reais da aplicação, mas com uma base de dados em memória controlada.
+ * Protege a subset unitária de RNF29 usando validators, services não
+ * transacionais e routers reais, com uma base de dados em memória controlada.
  */
 
 import assert from "node:assert/strict";
@@ -147,11 +152,14 @@ import {
   assertValidEmail,
   assertValidPassword,
 } from "../../src/modules/auth/auth.validation.js";
-import { requireRole } from "../../src/modules/auth/auth.middleware.js";
-import { createSimulatedCheckout } from "../../src/modules/payments/payments.service.js";
+import { requireRole } from "../../src/middlewares/auth.middleware.js";
+import {
+  assertCheckoutPayload,
+  assertIdempotencyKey,
+} from "../../src/modules/payments/payments.validation.js";
 import { cancelRenewal } from "../../src/modules/subscriptions/subscriptions.service.js";
 import { assertProgressPayload } from "../../src/modules/playback/playback.validation.js";
-import { runMonthlyDistribution } from "../../src/modules/charities/pool-distribution.service.js";
+import { assertDistributionMonth } from "../../src/modules/charities/pool-distribution.validation.js";
 
 /**
  * Compara identificadores MongoDB pelo seu valor textual.
@@ -446,7 +454,7 @@ test("auth mantém email normalizado e password mínima", () => {
   assertHttpFailure(() => assertValidPassword("curta"), 400);
 });
 
-test("subscrições cobrem criação por checkout simulado e cancelamento de renovação", async () => {
+test("subscrições validam payload/chave e cancelamento de renovação", async () => {
   const userId = new ObjectId();
   const collections = setCollectionsForRegression({
     subscription_plans: collection([
@@ -461,30 +469,34 @@ test("subscrições cobrem criação por checkout simulado e cancelamento de ren
         active: true,
       },
     ]),
-    subscriptions: collection([]),
-    payment_attempts: collection([]),
-    notification_preferences: collection([]),
-    notifications: collection([]),
+    subscriptions: collection([
+      {
+        _id: new ObjectId(),
+        userId,
+        status: "active",
+        currentPeriodEnd: new Date("2999-01-01T00:00:00.000Z"),
+        cancelAtPeriodEnd: false,
+      },
+    ]),
   });
 
-  const checkout = await createSimulatedCheckout(String(userId), {
+  const payload = assertCheckoutPayload({
     planCode: "faithflix-monthly",
     paymentMethod: "card_test",
     simulateOutcome: "approved",
   });
-
-  assert.equal(checkout.status, "approved");
-  assert.equal(checkout.subscription.status, "active");
-  assert.equal(collections.payment_attempts.rows.length, 1);
-  assert.equal(collections.subscriptions.rows.length, 1);
+  const idempotencyKey = assertIdempotencyKey(
+    "mf6-contract-checkout-00000001",
+  );
+  assert.equal(payload.paymentMethod, "card_test");
+  assert.equal(idempotencyKey, "mf6-contract-checkout-00000001");
 
   const canceled = await cancelRenewal(String(userId));
   // O cancelamento mantém acesso até ao fim do ciclo, mas impede renovação automática.
   assert.equal(canceled.subscription.cancelAtPeriodEnd, true);
 
-  await assert.rejects(
-    () =>
-      createSimulatedCheckout(String(userId), {
+  assert.throws(
+    () => assertCheckoutPayload({
         planCode: "faithflix-monthly",
         paymentMethod: "cartao-real",
         simulateOutcome: "approved",
@@ -505,60 +517,9 @@ test("playback limita progresso ao tamanho real do conteúdo", () => {
   assertHttpFailure(() => assertProgressPayload({ currentTimeSeconds: -1 }, 120), 400);
 });
 
-test("pool solidária executa distribuição mensal e roda associações", async () => {
-  const firstCharityId = new ObjectId();
-  const secondCharityId = new ObjectId();
-  setCollectionsForRegression({
-    subscription_plans: collection([
-      {
-        _id: new ObjectId(),
-        code: "faithflix-monthly",
-        interval: "monthly",
-        priceCents: 1000,
-        solidaritySharePercent: 20,
-        active: true,
-      },
-    ]),
-    subscriptions: collection([
-      {
-        _id: new ObjectId(),
-        userId: new ObjectId(),
-        planCode: "faithflix-monthly",
-        status: "active",
-        currentPeriodEnd: new Date("2099-01-01T00:00:00.000Z"),
-      },
-    ]),
-    charities: collection([
-      {
-        _id: firstCharityId,
-        name: "Associação Vida",
-        status: "active",
-        poolStatus: "eligible",
-        approvedAt: new Date("2026-01-01T00:00:00.000Z"),
-      },
-      {
-        _id: secondCharityId,
-        name: "Associação Esperança",
-        status: "active",
-        poolStatus: "eligible",
-        approvedAt: new Date("2026-02-01T00:00:00.000Z"),
-      },
-    ]),
-    pool_distributions: collection([]),
-  });
-
-  const june = await runMonthlyDistribution("2026-06", String(new ObjectId()));
-  const july = await runMonthlyDistribution("2026-07", String(new ObjectId()));
-
-  assert.equal(june.distribution.totalPoolCents, 200);
-  assert.equal(june.distribution.items[0].charityId, String(firstCharityId));
-  // A segunda distribuição começa na associação seguinte, provando rotação real.
-  assert.equal(july.distribution.items[0].charityId, String(secondCharityId));
-
-  await assert.rejects(
-    () => runMonthlyDistribution("2026-07", String(new ObjectId())),
-    /Distribuição deste mês já existe/,
-  );
+test("pool solidária fecha o contrato de mês sem fingir transações", () => {
+  assert.equal(assertDistributionMonth("2026-06"), "2026-06");
+  assertHttpFailure(() => assertDistributionMonth("2026-13"), 400);
 });
 
 test("endpoints admin herdados da MF5 continuam montados e exigem role admin", () => {
@@ -580,15 +541,53 @@ test("endpoints admin herdados da MF5 continuam montados e exigem role admin", (
 });
 ```
 
+A suite acima não chama `runInTransaction` com o DB double. Ela fecha contratos
+puros e services não transacionais. Este guia não fornece o conteúdo de
+`backend/tests/integration/mf6-billing-pool-transaction.integration.test.js`;
+logo, a existência ou cobertura desse ficheiro nunca pode ser inferida deste
+snippet. Antes de fechar `RNF29`, a equipa tem de implementar e rever essa lane
+separadamente. Só então executa o teste com services canónicos,
+`Idempotency-Key` nova e sem `MONGODB_*`:
+
+```bash
+NODE_ENV=test \
+E2E_SUITE_ID='mf4' \
+E2E_RUN_ID='20260710t120000' \
+RATE_LIMIT_PEPPER='faithflix-e2e-test-only-pepper-20260710' \
+FRONTEND_ORIGINS='http://127.0.0.1:5173' \
+TEST_MONGODB_URI='mongodb://127.0.0.1:27017/?replicaSet=rs0' \
+TEST_MONGODB_DB_NAME='faithflix_mf4_20260710t120000_e2e' \
+node --test tests/integration/mf6-billing-pool-transaction.integration.test.js
+```
+
+Quando estiver implementado, o teste de integração deve chamar, entre outros casos,
+`createSimulatedCheckout(userId, payload,
+"mf6-checkout-20260710t120000")`, verificar replay sem duplicação e fazer fault
+injection nas transações de checkout/pool. O ficheiro valida a lane com
+`assertE2eRuntimeEnvironment(process.env)` antes de ligar, usa fixtures marcadas
+e limpa apenas o run atual. Se o ficheiro não existir, regista `NAO_IMPLEMENTADO`;
+se existir mas não houver replica set local, regista `BLOQUEADO_AMBIENTE`. Em
+nenhum caso substituas a prova por DB double ou pela DB normal.
+
 5. Explicação do código.
 
-Este ficheiro usa código real da app, não contratos inventados. `assertValidEmail` e `assertValidPassword` validam a entrada de autenticação. `createSimulatedCheckout` cria uma tentativa de pagamento simulado e ativa a subscrição quando o resultado é aprovado. `cancelRenewal` prova o cancelamento de renovação sem apagar o acesso do ciclo atual. `assertProgressPayload` protege a reprodução básica, limitando o progresso à duração real. `runMonthlyDistribution` executa a distribuição mensal e prova que a rotação muda a primeira associação entre meses.
+Este ficheiro usa validators e services compatíveis com a lane unitária.
+`assertValidEmail`, `assertValidPassword`, `assertCheckoutPayload` e
+`assertIdempotencyKey` fecham input; `cancelRenewal` prova o cancelamento sem
+apagar o ciclo; `assertProgressPayload` limita a retoma. Checkout e pool
+transacionais ficam exclusivamente na integração com replica set acima.
 
-A base em memória existe para substituir o MongoDB real durante a suite. Ela implementa apenas a subset usada pelos services: `findOne`, `find`, `insertOne`, `updateOne` e `findOneAndUpdate`. Isto evita dependência externa, mas continua a chamar os services reais, que são os pontos onde regressões de domínio normalmente aparecem.
+A base em memória implementa apenas a subset usada por services não
+transacionais. Nunca finge `ClientSession`, `withTransaction` ou rollback; essa
+prova pertence ao teste de integração real.
 
-O teste final fecha o handoff de `BK-MF5-06`: confirma que `/api/admin/metrics` e `/api/admin/integrations` continuam montados na aplicação e que o middleware `requireRole(["admin"])` rejeita pedidos anónimos ou de utilizadores comuns. Assim, a regressão não ignora os últimos endpoints admin entregues antes da MF6.
+O teste final da lane unitária fecha o handoff de `BK-MF5-06`: confirma que `/api/admin/metrics` e `/api/admin/integrations` continuam montados na aplicação e que o middleware `requireRole(["admin"])` rejeita pedidos anónimos ou de utilizadores comuns. Assim, a regressão unitária não ignora os últimos endpoints admin entregues antes da MF6.
 
-Os dados entram como objetos de teste controlados: `userId`, plano mensal, subscrições, associações e pedidos de checkout. Os dados saem como objetos públicos dos services. As validações acontecem nos validators e nos services; a regra de segurança principal é nunca aceitar ownership ou role vindos do frontend como autoridade final.
+Na lane unitária, os dados entram como objetos controlados para validators,
+cancelamento, progresso e guards. Checkout, associação e distribuição só entram
+na prova depois de existir a lane transacional. As validações acontecem nos
+validators e nos services; a regra de segurança principal é nunca aceitar
+ownership ou role vindos do frontend como autoridade final.
 
 6. Validação do passo.
 
@@ -597,7 +596,9 @@ cd backend
 node --test tests/regression/mf6-backend-regression.test.js
 ```
 
-Resultado esperado: 5 testes passados e zero falhas.
+Só depois de executar regista o total observado. Não escrevas `5/5` ou `PASS`
+por antecipação; a componente transacional fica `NAO_IMPLEMENTADO` sem o
+ficheiro e `BLOQUEADO_AMBIENTE` se apenas faltar o replica set.
 
 7. Cenário negativo/erro esperado.
 
@@ -620,13 +621,20 @@ Executa os comandos abaixo por ordem. Se um comando falhar, lê a primeira falha
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. O passo é de validação operacional e usa os scripts já definidos no package do backend.
+Sem código neste passo.
 
 5. Explicação do código.
 
+O passo é de validação operacional e usa os scripts já definidos no package do backend.
+
 Não existe código novo porque a app já expõe `npm test` e `npm run smoke`. A decisão correta é reutilizar os scripts oficiais, para a equipa não criar dois caminhos diferentes de validação.
 
-`npm test` confirma que a regressão nova não entrou em conflito com testes unitários e de integração anteriores. `npm run smoke` confirma que a app Express ainda arranca e responde ao essencial. Se o ambiente local bloquear abertura de portas, regista o erro exato e volta a correr o smoke num terminal com permissão de rede local.
+`npm test` confirma apenas as suites realmente descobertas pelo script atual. Não
+prova a lane transacional se o ficheiro estiver ausente ou se o output não o
+identificar; por isso, o respetivo comando explícito e o seu estado continuam
+obrigatórios. `npm run smoke` confirma que a app Express ainda arranca e responde
+ao essencial. Se o ambiente local bloquear abertura de portas, regista o erro
+exato e volta a correr o smoke num terminal com permissão de rede local.
 
 6. Validação do passo.
 
@@ -636,7 +644,10 @@ npm test
 npm run smoke
 ```
 
-Resultado esperado: os testes unitários, integração, regressão e smoke existentes passam sem falhas.
+Resultado esperado: a lane unitária e o smoke terminam sem falhas. A lane
+transacional recebe separadamente `PASS` com output atual, `NAO_IMPLEMENTADO`
+quando o ficheiro ainda não existe, ou `BLOQUEADO_AMBIENTE` quando só falta o
+replica set; `npm test` não altera esse estado por inferência.
 
 7. Cenário negativo/erro esperado.
 
@@ -661,6 +672,12 @@ Cria a pasta `docs/evidence/MF6/` se ainda não existir. Depois cria o ficheiro 
 ```md
 # Evidence BK-MF6-01 - Regressão backend
 
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/guias-bk/MF6/BK-MF6-01-suite-de-regressao-backend.md`
+- `proof_scope`: comandos e resultados backend realmente observados pelos alunos; não prova browser, produção ou referência privada
+
 - Owner: Kaue
 - Apoio: Matheus
 - Data da execução: PREENCHER_COM_DATA_REAL
@@ -672,50 +689,64 @@ Cria a pasta `docs/evidence/MF6/` se ainda não existir. Depois cria o ficheiro 
 | Comando | Resultado real |
 | --- | --- |
 | `node --test tests/regression/mf6-backend-regression.test.js` | PREENCHER_COM_OUTPUT_REAL |
+| `node --test tests/integration/mf6-billing-pool-transaction.integration.test.js` com lane `TEST_MONGODB_*` | PREENCHER_COM_OUTPUT_REAL_OU_NAO_IMPLEMENTADO_OU_BLOQUEADO_AMBIENTE |
 | `npm test` | PREENCHER_COM_OUTPUT_REAL |
 | `npm run smoke` | PREENCHER_COM_OUTPUT_REAL |
 
 ## Cobertura
 
-| Área RNF29 | Prova esperada |
-| --- | --- |
-| Autenticação | Email normalizado, password mínima e rejeições HTTP 400 |
-| Criação de subscrição | Checkout simulado aprovado cria subscrição ativa |
-| Cancelamento de subscrição | `cancelRenewal` mantém o ciclo atual e marca `cancelAtPeriodEnd=true` |
-| Reprodução básica | Progresso é limitado à duração e negativo é rejeitado |
-| Rotação de associações | Segunda distribuição começa na associação seguinte |
-| Handoff MF5 | `/api/admin/metrics` e `/api/admin/integrations` continuam montados e protegidos |
+| Área RNF29 | Lane | Prova esperada | Estado observado |
+| --- | --- | --- | --- |
+| Autenticação | Unitária fornecida | Email normalizado, password mínima e rejeições HTTP 400 | PREENCHER_COM_RESULTADO_REAL |
+| Criação de subscrição | Integração não fornecida | Checkout com chave explícita cria subscrição, replay não duplica e fault injection faz rollback | PREENCHER_COM_PASS_OU_NAO_IMPLEMENTADO_OU_BLOQUEADO_AMBIENTE |
+| Cancelamento de subscrição | Unitária fornecida | `cancelRenewal` mantém o ciclo atual e marca `cancelAtPeriodEnd=true` | PREENCHER_COM_RESULTADO_REAL |
+| Reprodução básica | Unitária fornecida | Progresso é limitado à duração e negativo é rejeitado | PREENCHER_COM_RESULTADO_REAL |
+| Rotação de associações | Integração não fornecida | Segunda distribuição começa na associação seguinte, sem duplicar o mês | PREENCHER_COM_PASS_OU_NAO_IMPLEMENTADO_OU_BLOQUEADO_AMBIENTE |
+| Handoff MF5 | Unitária fornecida | `/api/admin/metrics` e `/api/admin/integrations` continuam montados e protegidos | PREENCHER_COM_RESULTADO_REAL |
 
 ## Negativos
 
-| Cenário | Resultado esperado |
-| --- | --- |
-| Email inválido | Erro HTTP 400 |
-| Password curta | Erro HTTP 400 |
-| Método de pagamento não documentado | Erro de validação |
-| Progresso negativo | Erro HTTP 400 |
-| Distribuição duplicada no mesmo mês | Erro de conflito |
-| Pedido admin anónimo | HTTP 401 |
-| Pedido admin com role comum | HTTP 403 |
+| Cenário | Lane | Resultado esperado |
+| --- | --- | --- |
+| Email inválido | Unitária fornecida | Erro HTTP 400 |
+| Password curta | Unitária fornecida | Erro HTTP 400 |
+| Método de pagamento não documentado | Unitária fornecida | Erro de validação |
+| Progresso negativo | Unitária fornecida | Erro HTTP 400 |
+| Distribuição duplicada no mesmo mês | Integração não fornecida | Erro de conflito, apenas com prova transacional atual |
+| Pedido admin anónimo | Unitária fornecida | HTTP 401 |
+| Pedido admin com role comum | Unitária fornecida | HTTP 403 |
 
 ## Observações
 
-A suite usa base em memória e não grava dados reais. Não foram usados cartões reais, tokens externos, gateways de pagamento, serviços externos de vídeo ou IA avançada.
+A suite unitária usa base em memória. A integração, quando existir, usa apenas a
+DB `_e2e` dedicada declarada na evidence. `NAO_IMPLEMENTADO` e
+`BLOQUEADO_AMBIENTE` não contam como prova de checkout, rollback ou rotação. Não
+foram usados cartões reais, tokens externos, gateways de pagamento, serviços
+externos de vídeo ou IA avançada.
 ```
 
 5. Explicação do código.
 
 Este ficheiro não é código executável; é evidence. Ele liga requisito, owner, comandos, cobertura, negativos e resultados reais. A diferença importante é que o ficheiro não vem com `PASS` preenchido: o aluno só pode fechar a evidence depois de executar os comandos.
 
-A tabela de cobertura mapeia cada parte de `RNF29` para uma prova observável. Isto evita uma evidência vaga como "regressão feita" e ajuda o orientador a confirmar se subscrições, reprodução e pool solidária ficaram realmente cobertas.
+A tabela de cobertura mapeia cada parte de `RNF29` para uma lane e uma prova
+observável. Isto impede que validators unitários sejam apresentados como
+checkout ou rotação reais e permite ao orientador distinguir `PASS`,
+`NAO_IMPLEMENTADO` e `BLOQUEADO_AMBIENTE`.
 
 6. Validação do passo.
 
-Confirma que os três comandos têm output real, que a data corresponde à execução e que o ficheiro não contém passwords, cookies, dados pessoais, valores de ambiente ou segredos.
+Confirma que os comandos unitário, `npm test` e smoke têm output real. Para a
+integração, regista output real ou exatamente um estado honesto com motivo. A
+data corresponde à execução e o ficheiro não contém passwords, cookies, dados
+pessoais, valores de ambiente ou segredos.
 
 7. Cenário negativo/erro esperado.
 
-Se algum comando ficar com `PREENCHER_COM_OUTPUT_REAL`, o BK não pode ser fechado como `DONE`. O estado correto é manter o BK aberto até existir proof reproduzível.
+Se algum comando ficar com placeholder, o BK não pode ser fechado como `DONE`.
+`NAO_IMPLEMENTADO` mantém a cobertura transacional aberta;
+`BLOQUEADO_AMBIENTE` só é válido quando o ficheiro existe e a única ausência
+demonstrada é o replica set.
 
 ### Passo 4 - Preparar handoff para regressão frontend
 
@@ -729,17 +760,31 @@ Entregar ao owner do próximo BK uma lista clara do que o frontend deve proteger
 
 3. Instruções do que fazer.
 
-No fecho do PR ou entrega local, comunica que o backend validou autenticação, checkout simulado, subscrição ativa, cancelamento de renovação, progresso de reprodução, distribuição da pool e endpoints admin de métricas/integrações.
+No fecho do PR ou entrega local, comunica separadamente o que a lane unitária
+validou e o resultado real da integração. Só declara checkout, subscrição ativa
+e distribuição transacional quando o comando em replica set tiver output atual;
+caso contrário, regista `NAO_IMPLEMENTADO` ou `BLOQUEADO_AMBIENTE` conforme a
+causa real.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. O passo é de coordenação técnica entre BKs.
+Sem código neste passo.
 
 5. Explicação do código.
 
-O handoff evita duplicação. O frontend não precisa voltar a testar a rotação interna da pool nem o cálculo de subscrição, mas deve confirmar que as páginas chamam as rotas certas, usam `credentials: "include"` quando há sessão por cookie e apresentam estados de loading, erro, vazio e sucesso.
+O passo é de coordenação técnica entre BKs.
 
-Este handoff também prepara `BK-MF6-03`: segurança e privacidade devem rever os mesmos fluxos protegidos pela regressão, sobretudo sessão, roles admin, dados de subscrição, progresso de reprodução e pool solidária.
+O handoff evita duplicação. O frontend não precisa repetir detalhes internos que
+tenham prova backend atual, mas a rotação da pool e o checkout só podem ser
+dados como protegidos se a lane transacional estiver verde. O frontend deve
+confirmar que as páginas chamam as rotas certas, usam `credentials: "include"`
+quando há sessão por cookie e apresentam estados de loading, erro, vazio e
+sucesso.
+
+Este handoff também prepara `BK-MF6-03`: segurança e privacidade devem rever
+sessão, roles admin, dados de subscrição e progresso protegidos pela lane
+unitária, e manter checkout/pool explicitamente pendentes da integração quando
+essa prova não existir.
 
 6. Validação do passo.
 
@@ -752,11 +797,23 @@ Se a equipa não souber dizer que fluxo backend protege cada página frontend, e
 #### Critérios de aceite
 
 - A suite `tests/regression/mf6-backend-regression.test.js` existe e executa com `node --test`.
-- A suite cobre autenticação, criação/cancelamento de subscrições, reprodução básica e rotação mensal.
+- A lane unitária fornecida cobre validators de autenticação e checkout,
+  cancelamento de renovação, validação de progresso, validação do mês e guards
+  admin; não prova criação, commit/rollback financeiro nem rotação mensal.
+- Criação de subscrição, idempotência persistida, fault injection e rotação só
+  ficam `VALIDADO` quando
+  `tests/integration/mf6-billing-pool-transaction.integration.test.js` existir e
+  passar num replica set dedicado com output atual.
 - A suite confirma que `/api/admin/metrics` e `/api/admin/integrations` continuam montados e protegidos por role admin.
-- A base de dados usada na suite é em memória e não toca em MongoDB real.
-- `npm test` e `npm run smoke` foram executados e registados.
-- Existem negativos para autenticação, subscrição, reprodução, pool e autorização admin.
+- A lane unitária usa apenas base em memória; a transacional usa apenas
+  `TEST_MONGODB_*` numa DB fresca `_e2e` com replica set e nunca a DB normal.
+- Ausência do ficheiro transacional é `NAO_IMPLEMENTADO`; ficheiro presente sem
+  replica set é `BLOQUEADO_AMBIENTE`. Nenhum desses estados conta como cobertura.
+- `npm test`, `npm run smoke` e o comando unitário foram executados e registados;
+  o comando transacional tem output real ou um dos estados explícitos acima.
+- Existem negativos unitários para autenticação, payload de checkout,
+  reprodução e autorização admin; os negativos de duplicação/rollback da pool
+  pertencem à integração e não são inferidos pelo validator do mês.
 - A evidence inclui `pr`, `proof` e `neg` com resultados reais, sem `PASS` pré-preenchido.
 
 #### Validação final
@@ -764,16 +821,36 @@ Se a equipa não souber dizer que fluxo backend protege cada página frontend, e
 ```bash
 cd backend
 node --test tests/regression/mf6-backend-regression.test.js
+
+NODE_ENV=test \
+E2E_SUITE_ID='mf4' \
+E2E_RUN_ID='20260710t120000' \
+RATE_LIMIT_PEPPER='faithflix-e2e-test-only-pepper-20260710' \
+FRONTEND_ORIGINS='http://127.0.0.1:5173' \
+TEST_MONGODB_URI='mongodb://127.0.0.1:27017/?replicaSet=rs0' \
+TEST_MONGODB_DB_NAME='faithflix_mf4_20260710t120000_e2e' \
+node --test tests/integration/mf6-billing-pool-transaction.integration.test.js
+
 npm test
 npm run smoke
 ```
 
+Se o segundo ficheiro não existir, não executes um substituto: regista
+`NAO_IMPLEMENTADO`. Se existir e o replica set não estiver disponível, regista
+`BLOQUEADO_AMBIENTE` com o erro sanitizado.
+
 #### Evidence para PR/defesa
 
 - `pr`: referência do PR ou entrega local com o ficheiro de regressão.
-- `proof`: output real dos três comandos de validação.
-- `neg`: email inválido, password curta, método de pagamento não documentado, progresso negativo, distribuição duplicada, pedido admin anónimo e pedido admin com role comum.
-- `coverage`: autenticação, subscrições, reprodução, rotação de associações e endpoints admin herdados de `BK-MF5-06`.
+- `proof-unit`: output real da regressão unitária, `npm test` e smoke.
+- `proof-integration`: output atual da integração transacional, ou
+  `NAO_IMPLEMENTADO`/`BLOQUEADO_AMBIENTE` sem os converter em `PASS`.
+- `neg-unit`: email inválido, password curta, método de pagamento não
+  documentado, progresso negativo, pedido admin anónimo e pedido admin comum.
+- `neg-integration`: distribuição duplicada, rollback sob fault injection e
+  replay idempotente, apenas quando a lane transacional existir.
+- `coverage`: autenticação/cancelamento/reprodução/admin na lane unitária;
+  criação/rollback/rotação exclusivamente na lane transacional.
 
 #### Handoff
 
@@ -785,4 +862,8 @@ npm run smoke
 
 - `2026-04-13`: guia inicial criado em formato genérico.
 - `2026-06-18`: guia revisto com suite de regressão backend executável, comandos reais e evidence de gate S12.
-- `2026-06-19`: suite corrigida para cobrir criação/cancelamento real de subscrições, rotação real da pool, endpoints admin herdados de MF5 e evidence sem resultados pré-preenchidos.
+- `2026-06-19`: versão anterior juntava na mesma alegação contratos unitários e
+  cobertura transacional ainda não fornecida pelo guia.
+- `2026-07-10`: separadas as lanes unitária e transacional; checkout, rollback e
+  rotação exigem ficheiro de integração, replica set e output atual, permanecendo
+  `NAO_IMPLEMENTADO` ou `BLOQUEADO_AMBIENTE` sem essa prova.

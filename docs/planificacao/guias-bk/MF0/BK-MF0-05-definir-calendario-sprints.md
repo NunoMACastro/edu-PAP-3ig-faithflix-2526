@@ -17,21 +17,21 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF0-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF0/BK-MF0-05-definir-calendario-sprints.md`
-- `last_updated`: `2026-05-25`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
 Este BK ensina que um calendário de sprints não é só uma tabela de datas: é uma decisão de capacidade, prioridade, risco e validação. Para alunos, isto ajuda a perceber porque não se deve encher uma semana com trabalho que não dá tempo de testar.
 
-## Bloco operacional (obrigatorio)
+##### Resultado operacional esperado
 
 O trabalho operacional é validar `docs/planificacao/sprints/PLANO-SPRINTS.md`, garantindo que os 66 BK estão distribuídos por 13 sprints, com carga controlada, excecoes S12/S13 documentadas e gates claros.
 
-#### Nota anti-drift MF0
+##### Nota anti-drift MF0
 
 `MF0` fecha apenas governance/kickoff: plano, responsabilidades, backlog, DoD, calendário e reunião de alinhamento. Este BK não cria backend, frontend, base de dados, streaming, catálogo, endpoints, componentes ou funcionalidade real. O calendário pode posicionar `BK-MF1-01` e `BK-MF1-02`, mas isso é handoff de planeamento, não implementação em `MF0`.
 
-#### BK-MF0-05 - Definir calendario de sprints
+##### Enquadramento do BK
 
 ##### O que vamos fazer neste BK
 
@@ -41,7 +41,7 @@ O calendário também garante continuidade técnica: a Sprint 1 começa com gove
 
 A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porque o calendário prepara execução futura; as validações de UI e comandos de build serão concretizadas quando a app existir em `MF1` e seguintes.
 
-##### Porque e que isto e importante
+#### Importância
 
 - Ajuda a equipa a trabalhar em ciclos curtos e validáveis.
 - Evita picos de carga acima do limite de 11 pontos.
@@ -49,7 +49,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - Reserva gates formais para corrigir drift antes da defesa.
 - Desbloqueia `BK-MF0-06`, onde a equipa valida se percebe o plano e o calendário.
 
-##### O que entra (scope)
+#### Scope-in
 
 - Validar calendário de 13 sprints.
 - Confirmar carga alvo por sprint e limite máximo.
@@ -57,7 +57,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - Confirmar gates `S4/S8/S12/S13`.
 - Confirmar regras de replaneamento e checkpoints semanais.
 
-##### O que nao entra (scope-out)
+#### Scope-out
 
 - Alterar datas reais do calendário escolar sem confirmação externa.
 - Reatribuir BKs a outros alunos.
@@ -73,7 +73,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - A Sprint 1 fecha MF0 e prepara MF1.
 - O calendário considera validação/evidence, não apenas escrita de código.
 
-#### Metadados do BK (CANONICO/DERIVADO):
+##### Metadados do BK (CANONICO/DERIVADO):
 
 - Prioridade: `P0` (CANONICO, `BACKLOG-MVP.md`)
 - Estado: `TODO` (CANONICO, `BACKLOG-MVP.md`)
@@ -90,7 +90,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - Fonte de verdade: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`
 - Descricao: validar calendário de sprints, carga, gates e regras de replaneamento para execução cumulativa (DERIVADO)
 
-#### O que vamos fazer neste BK (DERIVADO):
+##### Complemento do objetivo (DERIVADO):
 
 - Confirmar que as 13 sprints cobrem os 66 BK.
 - Confirmar que Sprint 1 contém `BK-MF0-01..06`, `BK-MF1-01` e `BK-MF1-02`.
@@ -98,7 +98,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - Confirmar que os gates têm critérios de validação, não apenas datas.
 - Preparar agenda de reunião para `BK-MF0-06`.
 
-#### Estado, ficheiros e impacto (DERIVADO):
+#### Estado antes e depois
 
 - Estado esperado antes do BK: backlog atómico existe; calendário precisa de validação de carga, sequência e gates.
 - Estado esperado depois do BK: 13 sprints validadas e agenda de alinhamento pronta.
@@ -111,7 +111,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - Impacto em segurança/testes/UI: mantém sprints futuras para sessão segura, smoke tests, hardening e UX.
 - Handoff para o próximo BK: entregar a `BK-MF0-06` calendário, foco da Sprint 1, gates e regras de remediação.
 
-#### Pre-leitura minima (10-15 min) (DERIVADO):
+#### Pré-requisitos
 
 - `docs/planificacao/backlogs/BACKLOG-MVP.md`: BKs e esforço `S/M/L`.
 - `docs/planificacao/sprints/PLANO-SPRINTS.md`: documento alvo.
@@ -122,7 +122,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - Mockup: não existe; sem impacto direto no calendário.
 - Código: não existe app detetável; comandos futuros serão fechados em MF1.
 
-#### Glossario (rapido) (DERIVADO):
+#### Glossário
 
 - Sprint: período curto de execução com objetivo definido.
 - Carga: soma dos pontos planeados para uma sprint.
@@ -133,7 +133,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - Semáforo de risco: indicador verde/amarelo/vermelho.
 - Replaneamento: ajuste controlado sem quebrar prioridades.
 
-#### Conceitos teoricos essenciais (DERIVADO):
+#### Conceitos teóricos essenciais
 
 **Capacidade.** Capacidade é o trabalho que a equipa consegue fazer com qualidade. Não é o máximo imaginável; é o máximo sustentável com implementação, testes, evidence e revisão.
 
@@ -145,99 +145,341 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 
 **Risco de sobrecarga.** Uma sprint cheia demais aumenta erros e reduz aprendizagem. O limite de 11 pontos ajuda a manter trabalho realista para quatro alunos.
 
-#### Guia de execucao (passo-a-passo) (DERIVADO):
+#### Arquitetura do BK
 
-0. **Objetivo (~10 min): Confirmar dependência do backlog**
-   - Descricao detalhada do objetivo: verificar que o calendário é derivado do backlog atómico.
-   - Justificacao: não se planeia sprint com itens fora do backlog.
-   - Como fazer (0.1): rever a dependência `BK-MF0-03`.
-   - Como fazer (0.2): confirmar que o plano de sprints menciona 66 BK.
-   - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `Planeamento alinhado ao backlog final de 66 BK`
-   - O que verificar: calendário não contém BK fora do backlog.
+- Endpoint(s), modelo/schema, service, controller/route, guard, cliente API e página/componente: não aplicável; a MF0 não altera a implementação da app.
+- Artefacto documental: os documentos e evidences enumerados na secção seguinte e nos passos.
+- Testes: validador de planificação, checks documentais e negativos descritos no tutorial.
+- Handoff: contrato documental preparado para `BK-MF0-06`.
 
-1. **Objetivo (~10 min): Validar capacidade recomendada**
-   - Descricao detalhada do objetivo: confirmar capacidade semanal por aluno e papel do Nuno.
-   - Justificacao: a carga de sprint precisa ser realista para equipa de 4 alunos.
-   - Como fazer (1.1): rever a secção `Capacidade recomendada`.
-   - Como fazer (1.2): cruzar com distribuição de responsabilidades.
-   - Ficheiro a rever: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `Matheus: 3 a 4 pontos/semana`
-   - O que verificar: nenhum aluno é tratado como capacidade ilimitada.
+#### Ficheiros a criar/editar/rever
 
-2. **Objetivo (~15 min): Validar conversão de esforço**
-   - Descricao detalhada do objetivo: confirmar que `S=1`, `M=2`, `L=3`.
-   - Justificacao: a soma de carga depende desta regra.
-   - Como fazer (2.1): rever a secção `Conversao de pontos`.
-   - Como fazer (2.2): confirmar que o scorecard usa cargas planeadas compatíveis.
-   - Ficheiro a rever: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `S = 1; M = 2; L = 3`
-   - O que verificar: a mesma regra é usada na planificação.
+- CRIAR: nenhum.
+- EDITAR: apenas este guia se forem registados ajustes/evidence do BK.
+- REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`, `docs/planificacao/sprints/SCORECARD-SPRINTS.md`, `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`, `docs/planificacao/backlogs/BACKLOG-MVP.md`, `docs/planificacao/backlogs/MF-VIEWS.md`.
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- EDITAR: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- REVER: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`
+- REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- REVER: `docs/planificacao/backlogs/MF-VIEWS.md`
+- REVER: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
+- REVER: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
+- EDITAR: `docs/planificacao/guias-bk/MF0/BK-MF0-05-definir-calendario-sprints.md`
 
-3. **Objetivo (~20 min): Validar calendário de 13 sprints**
-   - Descricao detalhada do objetivo: rever todas as linhas do calendário e confirmar foco, BKs alvo e carga.
-   - Justificacao: a equipa precisa saber quando cada macro fase acontece.
-   - Como fazer (3.1): percorrer a tabela de `Sprint 1` a `Sprint 12`.
-   - Como fazer (3.2): confirmar que a carga alvo não passa de 11.
-   - Ficheiro a rever: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `Regra operacional: nenhuma sprint pode ultrapassar 11 pontos`
-   - O que verificar: todas as cargas estão dentro do limite.
+#### Tutorial técnico linear
 
-4. **Objetivo (~15 min): Validar Sprint 1 em detalhe**
-   - Descricao detalhada do objetivo: confirmar que Sprint 1 fecha MF0 e arranca MF1 com backend/frontend base.
-   - Justificacao: a transição MF0->MF1 é crítica para continuidade.
-   - Como fazer (4.1): rever linha da Sprint 1.
-   - Como fazer (4.2): cruzar com MF views da MF0 e MF1.
-   - Ficheiro a rever: `docs/planificacao/backlogs/MF-VIEWS.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `BK-MF0-01..06, BK-MF1-01, BK-MF1-02`
-   - O que verificar: o calendário não deixa hiato entre governance e fundação técnica.
+### Passo 1 - Confirmar dependência do backlog (~10 min)
 
-5. **Objetivo (~15 min): Validar gates**
-   - Descricao detalhada do objetivo: confirmar que `S4`, `S8`, `S12` e `S13` têm critérios e registo obrigatório.
-   - Justificacao: gates controlam qualidade documental e técnica ao longo do projeto.
-   - Como fazer (5.1): rever secções de gates.
-   - Como fazer (5.2): comparar com `PLANO-IMPLEMENTACAO-TOTAL.md`.
-   - Ficheiro a rever: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `PASS ou FAIL + acao corretiva + dono + prazo`
-   - O que verificar: gates têm resultado e ação, não só descrição.
+1. Objetivo funcional do passo no contexto da app.
 
-6. **Objetivo (~10 min): Validar checkpoints semanais**
-   - Descricao detalhada do objetivo: confirmar que segunda a sexta têm ações claras.
-   - Justificacao: alunos precisam de ritmo de execução, não só fim da semana.
-   - Como fazer (6.1): rever `Step-by-step semanal`.
-   - Como fazer (6.2): cruzar com `GUIAO-DOCENTE-SEMANAL.md`.
-   - Ficheiro a rever: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `Segunda: arranque; Quinta: pre-gate; Sexta: fecho`
-   - O que verificar: cada dia tem objetivo operacional.
+Verificar que o calendário é derivado do backlog atómico.
 
-7. **Objetivo (~15 min): Executar negativos documentais**
-   - Descricao detalhada do objetivo: procurar incoerências de carga, sequência ou cobertura.
-   - Justificacao: calendário errado gera atrasos e scope creep.
-   - Como fazer (7.1): procurar sprint com carga `> 11`.
-   - Como fazer (7.2): procurar BK planeado antes da sua dependência.
-   - Ficheiro a rever: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Ficheiro alvo: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Snippet de referencia: `BK P0 nao fechado regressa ao topo da sprint seguinte`
-   - O que verificar: pelo menos 3 negativos P0 documentados.
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- EDITAR: `docs/planificacao/sprints/PLANO-SPRINTS.md`
 
-8. **Objetivo (~10 min): Fechar agenda para reunião inicial**
-   - Descricao detalhada do objetivo: preparar o conteúdo que será validado em `BK-MF0-06`.
-   - Justificacao: a reunião final da MF0 precisa de inputs claros: plano, responsabilidades, backlog, DoD e calendário.
-   - Como fazer (8.1): listar as decisões que a equipa deve confirmar.
-   - Como fazer (8.2): preencher evidence e preparar handoff.
-   - Ficheiro a rever: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Ficheiro alvo: `docs/planificacao/guias-bk/MF0/BK-MF0-05-definir-calendario-sprints.md`
-   - Snippet de referencia: `proximo_bk: BK-MF0-06`
-   - O que verificar: `BK-MF0-06` tem agenda objetiva.
+3. Instruções do que fazer.
 
-#### Checklist de validacao (DERIVADO):
+- Rever a dependência `BK-MF0-03`.
+- Confirmar que o plano de sprints menciona 66 BK.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Não se planeia sprint com itens fora do backlog.
+Snippet de referência: `Planeamento alinhado ao backlog final de 66 BK`
+
+6. Validação do passo.
+
+Calendário não contém BK fora do backlog.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 2 - Validar capacidade recomendada (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar capacidade semanal por aluno e papel do Nuno.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- EDITAR: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+
+3. Instruções do que fazer.
+
+- Rever a secção `Capacidade recomendada`.
+- Cruzar com distribuição de responsabilidades.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+A carga de sprint precisa ser realista para equipa de 4 alunos.
+Snippet de referência: `Matheus: 3 a 4 pontos/semana`
+
+6. Validação do passo.
+
+Nenhum aluno é tratado como capacidade ilimitada.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 3 - Validar conversão de esforço (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar que `S=1`, `M=2`, `L=3`.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/sprints/SCORECARD-SPRINTS.md`
+- EDITAR: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+
+3. Instruções do que fazer.
+
+- Rever a secção `Conversao de pontos`.
+- Confirmar que o scorecard usa cargas planeadas compatíveis.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+A soma de carga depende desta regra.
+Snippet de referência: `S = 1; M = 2; L = 3`
+
+6. Validação do passo.
+
+A mesma regra é usada na planificação.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 4 - Validar calendário de 13 sprints (~20 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Rever todas as linhas do calendário e confirmar foco, BKs alvo e carga.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- EDITAR: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+
+3. Instruções do que fazer.
+
+- Percorrer a tabela de `Sprint 1` a `Sprint 12`.
+- Confirmar que a carga alvo não passa de 11.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+A equipa precisa saber quando cada macro fase acontece.
+Snippet de referência: `Regra operacional: nenhuma sprint pode ultrapassar 11 pontos`
+
+6. Validação do passo.
+
+Todas as cargas estão dentro do limite.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 5 - Validar Sprint 1 em detalhe (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar que Sprint 1 fecha MF0 e arranca MF1 com backend/frontend base.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/backlogs/MF-VIEWS.md`
+- EDITAR: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+
+3. Instruções do que fazer.
+
+- Rever linha da Sprint 1.
+- Cruzar com MF views da MF0 e MF1.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+A transição MF0->MF1 é crítica para continuidade.
+Snippet de referência: `BK-MF0-01..06, BK-MF1-01, BK-MF1-02`
+
+6. Validação do passo.
+
+O calendário não deixa hiato entre governance e fundação técnica.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 6 - Validar gates (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar que `S4`, `S8`, `S12` e `S13` têm critérios e registo obrigatório.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
+- EDITAR: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+
+3. Instruções do que fazer.
+
+- Rever secções de gates.
+- Comparar com `PLANO-IMPLEMENTACAO-TOTAL.md`.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Gates controlam qualidade documental e técnica ao longo do projeto.
+Snippet de referência: `PASS ou FAIL + acao corretiva + dono + prazo`
+
+6. Validação do passo.
+
+Gates têm resultado e ação, não só descrição.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 7 - Validar checkpoints semanais (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar que segunda a sexta têm ações claras.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/sprints/GUIAO-DOCENTE-SEMANAL.md`
+- EDITAR: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+
+3. Instruções do que fazer.
+
+- Rever `Step-by-step semanal`.
+- Cruzar com `GUIAO-DOCENTE-SEMANAL.md`.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Alunos precisam de ritmo de execução, não só fim da semana.
+Snippet de referência: `Segunda: arranque; Quinta: pre-gate; Sexta: fecho`
+
+6. Validação do passo.
+
+Cada dia tem objetivo operacional.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 8 - Executar negativos documentais (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Procurar incoerências de carga, sequência ou cobertura.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- EDITAR: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+
+3. Instruções do que fazer.
+
+- Procurar sprint com carga `> 11`.
+- Procurar BK planeado antes da sua dependência.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Calendário errado gera atrasos e scope creep.
+Snippet de referência: `BK P0 nao fechado regressa ao topo da sprint seguinte`
+
+6. Validação do passo.
+
+Pelo menos 3 negativos P0 documentados.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 9 - Fechar agenda para reunião inicial (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Preparar o conteúdo que será validado em `BK-MF0-06`.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- EDITAR: `docs/planificacao/guias-bk/MF0/BK-MF0-05-definir-calendario-sprints.md`
+
+3. Instruções do que fazer.
+
+- Listar as decisões que a equipa deve confirmar.
+- Preencher evidence e preparar handoff.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+A reunião final da MF0 precisa de inputs claros: plano, responsabilidades, backlog, DoD e calendário.
+Snippet de referência: `proximo_bk: BK-MF0-06`
+
+6. Validação do passo.
+
+`BK-MF0-06` tem agenda objetiva.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+#### Critérios de aceite
+
+**Outputs:**
+- Calendário de 13 sprints validado.
+- Agenda de reunião inicial preparada.
+
+**Verificacoes:**
+- Nenhuma sprint acima de 11 pontos.
+- Gates `S4/S8/S12/S13` com critérios.
+- Scorecard alinhado com cargas planeadas.
+
+**Qualidade:**
+- Calendário legível para alunos e orientador.
+- Sem alteração de backlog ou escopo.
+
+**Continuidade:**
+- `BK-MF0-06` consegue validar compromissos da Sprint 1.
+- `MF1` fica pronta para arrancar logo após alinhamento.
+
+**Evidencia:**
+- `pr`, `proof` e `neg` preenchidos antes de marcar `DONE`.
+
+#### Validação final
 
 **Smoke**
 - [ ] `PLANO-SPRINTS.md` existe e está ativo.
@@ -266,29 +508,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - [ ] Sprints futuras preservam BKs de sessão segura, hardening e RGPD.
 - [ ] Nenhuma data ou integração externa é inventada.
 
-#### Criterios de aceite:
-
-**Outputs:**
-- Calendário de 13 sprints validado.
-- Agenda de reunião inicial preparada.
-
-**Verificacoes:**
-- Nenhuma sprint acima de 11 pontos.
-- Gates `S4/S8/S12/S13` com critérios.
-- Scorecard alinhado com cargas planeadas.
-
-**Qualidade:**
-- Calendário legível para alunos e orientador.
-- Sem alteração de backlog ou escopo.
-
-**Continuidade:**
-- `BK-MF0-06` consegue validar compromissos da Sprint 1.
-- `MF1` fica pronta para arrancar logo após alinhamento.
-
-**Evidencia:**
-- `pr`, `proof` e `neg` preenchidos antes de marcar `DONE`.
-
-#### Evidence (para o PR/defesa):
+#### Evidence para PR/defesa
 
 - `pr`: `A preencher no fecho do BK`
 - `proof`: `A preencher apos validacao`
@@ -298,7 +518,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - `screenshots`: `Nao aplicavel; BK documental sem UI`
 - `notes`: `Fase detalhada sem mockup e sem codigo de app existente`
 
-#### TODOs
+##### TODOs
 
 - TODO: preencher evidence real após validação do calendário.
 - TODO: confirmar datas reais com o calendário escolar, se necessário.
@@ -308,7 +528,7 @@ A fase foi detalhada sem mockup e sem código existente. Isso é aceitável porq
 - Decisao dependente de mockup: nenhuma nesta fase.
 - Decisao dependente de app/codigo ainda inexistente: comandos de validação técnicos serão concretizados em `MF1`.
 
-## Snippet tecnico aplicavel
+##### Snippet técnico aplicável
 
 ```text
 CHECK BK-MF0-05
@@ -319,11 +539,11 @@ CHECK BK-MF0-05
 5. scorecard.cargas == plano_sprints.cargas
 ```
 
-## Proximo BK recomendado
+#### Handoff
 
 `BK-MF0-06`
 
-## Changelog
+#### Changelog
 
 - `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
 - `2026-05-25`: refinado para guia executável de calendário, capacidade, gates e replaneamento.

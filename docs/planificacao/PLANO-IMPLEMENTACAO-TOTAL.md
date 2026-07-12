@@ -7,7 +7,11 @@
 - `area`: `project`
 - `owner`: `Nuno (orientacao)`
 - `status`: `ativo`
-- `last_updated`: `2026-06-30`
+- `last_updated`: `2026-07-10`
+- `document_status`: `CURRENT`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- `proof_scope`: plano e gates dos alunos; resultados da referência privada são contexto separado e não fecham BKs
 
 ## Objetivo
 
@@ -70,8 +74,8 @@ A fundacao tecnica com ficheiros, comandos, estrutura de projeto e decisoes impl
 ### Gate S4
 
 - Cobertura de matriz para janela `S1..S4`.
-- Guias da janela conformes ao template v3.
-- Guias da janela com bloco pedagogico + bloco operacional completos.
+- Guias da janela conformes ao contrato `tutorial-v2` de 16 secções.
+- Passos técnicos completos nos sete pontos definidos em `_TEMPLATE-BK.md`.
 - Evidence minima e criterios mensuraveis validados.
 
 ### Gate S8
@@ -83,17 +87,31 @@ A fundacao tecnica com ficheiros, comandos, estrutura de projeto e decisoes impl
 
 ### Gate S12
 
-- Fecho integral da baseline MF8: `91/91` (RF+RNF ativos) e `60/60` BK.
+- Snapshot histórico pré-MF9: fecho então planeado da baseline MF8 em `91/91`
+  requisitos e `60/60` BK. Estas contagens não são a baseline ativa atual.
 - Scorecard oficial consolidado sprint-a-sprint.
 - Score final consolidado no scorecard oficial.
 - Parecer final `GO/NO-GO` com assinatura do orientador.
 
 ### Gate S13
 
-- Fecho incremental `94/94` (RF+RNF ativos) e `66/66` BK.
-- Validacao end-to-end de planos Pro/Familia, partilha familiar real e qualidade por plano.
+- Alvo corrente: fecho incremental `94/94` requisitos e `66/66` BK.
+- Validação end-to-end de planos Pro/Família, partilha familiar real e qualidade
+  por plano, apenas quando executada na lane dos alunos.
 - Regressao backend/frontend e evidence MF9 anexada.
 - Parecer final atualizado `GO/NO-GO` com assinatura do orientador.
+
+### Estado pós-auditoria em 2026-07-10
+
+- A referência privada atingiu `GO_LOCAL_COM_RESSALVAS` apenas para execução
+  local e testes sem persistência real.
+- O estado de produção permanece `NO_GO_PRODUCAO`.
+- Full E2E com DB transacional dedicada, restore real, browsers branded/Safari,
+  vídeo/4K/CDN/carga e gateway real continuam por provar ou fora de escopo.
+- `RNF08` e `RNF10` ficam `NAO_PROVADO`; `RNF23` fica
+  `PARCIAL_VALIDADO` na referência.
+- Estes resultados não marcam automaticamente o gate S13 nem qualquer BK dos
+  alunos como concluído.
 
 ## Criterios de saida do plano
 
@@ -113,3 +131,4 @@ A fundacao tecnica com ficheiros, comandos, estrutura de projeto e decisoes impl
 - `2026-06-22`: MF7 passou a UI/navegacao segura e MF8 passou a consolidacao, evidencia, defesa, buffer e fecho.
 - `2026-06-27`: MF8 condensada para 10 BKs finais, com matriz final apenas depois dos BKs tecnicos.
 - `2026-06-30`: adicionada MF9 em S13 para planos Pro/Familia, partilha familiar real, qualidade por plano e regressao final.
+- `2026-07-10`: distinguido o snapshot S12 da baseline ativa 66/66/94 e registado o estado pós-auditoria sem promover o gate dos alunos.

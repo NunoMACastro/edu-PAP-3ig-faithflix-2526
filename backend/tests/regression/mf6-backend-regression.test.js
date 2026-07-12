@@ -21,6 +21,8 @@ import { createSimulatedCheckout } from "../../src/modules/payments/payments.ser
 import { assertProgressPayload } from "../../src/modules/playback/playback.validation.js";
 import { cancelRenewal } from "../../src/modules/subscriptions/subscriptions.service.js";
 
+let activeRegressionCollections = {};
+
 /**
  * Compara identificadores MongoDB pelo seu valor textual.
  *
@@ -320,6 +322,75 @@ function collection(rows = []) {
 
             return applyUpdate(existing, update, false);
         },
+
+        /**
+         * Agrega documentos com a subset usada pelo catálogo público ordenado por rating.
+         *
+         * @param {Record<string, unknown>[]} pipeline Pipeline MongoDB simplificada.
+         * @returns {{ toArray: Function }} Cursor fake de agregação.
+         */
+        aggregate(pipeline = []) {
+            let result = [...rows];
+
+            for (const stage of pipeline) {
+                if (stage.$match) {
+                    result = result.filter((row) => matches(row, stage.$match));
+                }
+
+                if (stage.$lookup?.from === "content_ratings") {
+                    const ratings =
+                        activeRegressionCollections.content_ratings?.rows ?? [];
+                    result = result.map((row) => ({
+                        ...row,
+                        ratings: ratings.filter((rating) =>
+                            sameId(rating.contentId, row._id),
+                        ),
+                    }));
+                }
+
+                if (stage.$addFields?.ratingAverage) {
+                    result = result.map((row) => {
+                        const ratings = row.ratings ?? [];
+                        const ratingAverage =
+                            ratings.length === 0
+                                ? 0
+                                : ratings.reduce(
+                                      (sum, rating) => sum + rating.value,
+                                      0,
+                                  ) / ratings.length;
+
+                        return { ...row, ratingAverage };
+                    });
+                }
+
+                if (stage.$sort) {
+                    result = [...result].sort(compareBySort(stage.$sort));
+                }
+
+                if (stage.$facet) {
+                    const metadata = [{ total: result.length }];
+                    const skipStage = stage.$facet.items.find(
+                        (item) => "$skip" in item,
+                    );
+                    const limitStage = stage.$facet.items.find(
+                        (item) => "$limit" in item,
+                    );
+                    const skip = skipStage?.$skip ?? 0;
+                    const limit = limitStage?.$limit;
+                    const items = result.slice(
+                        skip,
+                        limit ? skip + limit : undefined,
+                    );
+                    result = [{ metadata, items }];
+                }
+            }
+
+            return {
+                async toArray() {
+                    return result;
+                },
+            };
+        },
     };
 }
 
@@ -330,6 +401,8 @@ function collection(rows = []) {
  * @returns {Record<string, ReturnType<typeof collection>>} Colecoes instaladas.
  */
 function setCollectionsForRegression(collections) {
+    activeRegressionCollections = collections;
+
     setDbForTests({
         /**
          * Devolve uma colecao existente ou cria uma vazia para o service real.
@@ -382,6 +455,7 @@ function createResponseDouble() {
 }
 
 afterEach(() => {
+    activeRegressionCollections = {};
     setDbForTests(null);
 });
 
@@ -497,25 +571,43 @@ test("playback limita progresso ao tamanho real do conteudo", () => {
 });
 
 test("catalogo publico pagina itens publicados sem expor rascunhos", async () => {
+    const firstMovieId = new ObjectId();
+    const secondMovieId = new ObjectId();
+    const documentaryId = new ObjectId();
+    const faithTaxonomyId = new ObjectId();
+    const familyTaxonomyId = new ObjectId();
+
     setCollectionsForRegression({
         contents: collection([
             {
-                _id: new ObjectId(),
+                _id: firstMovieId,
                 title: "Primeiro publicado",
                 slug: "primeiro-publicado",
                 synopsis: "Conteudo publicado usado para medir paginação.",
                 type: "movie",
                 status: "published",
+                taxonomyIds: [faithTaxonomyId],
                 publishedAt: new Date("2026-06-01T00:00:00.000Z"),
             },
             {
-                _id: new ObjectId(),
+                _id: secondMovieId,
                 title: "Segundo publicado",
                 slug: "segundo-publicado",
                 synopsis: "Outro conteudo publicado usado na segunda pagina.",
                 type: "movie",
                 status: "published",
+                taxonomyIds: [familyTaxonomyId],
                 publishedAt: new Date("2026-06-02T00:00:00.000Z"),
+            },
+            {
+                _id: documentaryId,
+                title: "Documentario publicado",
+                slug: "documentario-publicado",
+                synopsis: "Documentario publicado usado nos filtros por tipo e rating.",
+                type: "documentary",
+                status: "published",
+                taxonomyIds: [faithTaxonomyId],
+                publishedAt: new Date("2026-06-03T00:00:00.000Z"),
             },
             {
                 _id: new ObjectId(),
@@ -524,7 +616,20 @@ test("catalogo publico pagina itens publicados sem expor rascunhos", async () =>
                 synopsis: "Conteudo que nao pode entrar no catalogo publico.",
                 type: "movie",
                 status: "draft",
+                taxonomyIds: [faithTaxonomyId],
                 publishedAt: null,
+            },
+        ]),
+        content_ratings: collection([
+            {
+                _id: new ObjectId(),
+                contentId: firstMovieId,
+                value: 3,
+            },
+            {
+                _id: new ObjectId(),
+                contentId: documentaryId,
+                value: 5,
             },
         ]),
     });
@@ -533,13 +638,53 @@ test("catalogo publico pagina itens publicados sem expor rascunhos", async () =>
 
     assert.equal(page.page, 1);
     assert.equal(page.limit, 1);
-    assert.equal(page.total, 2);
+    assert.equal(page.total, 3);
     assert.equal(page.items.length, 1);
-    assert.equal(page.items[0].slug, "segundo-publicado");
+    assert.equal(page.items[0].slug, "documentario-publicado");
+
+    const moviePage = await listPublishedCatalog({
+        type: "movie",
+        page: "1",
+        limit: "12",
+    });
+    assert.equal(moviePage.total, 2);
+    assert.equal(
+        moviePage.items.every((content) => content.type === "movie"),
+        true,
+    );
+
+    const taxonomyPage = await listPublishedCatalog({
+        taxonomyId: String(faithTaxonomyId),
+    });
+    assert.equal(taxonomyPage.total, 2);
+    assert.deepEqual(
+        taxonomyPage.items.map((content) => content.slug),
+        ["documentario-publicado", "primeiro-publicado"],
+    );
+
+    const ratingPage = await listPublishedCatalog({ sort: "rating" });
+    assert.deepEqual(
+        ratingPage.items.map((content) => content.slug),
+        [
+            "documentario-publicado",
+            "primeiro-publicado",
+            "segundo-publicado",
+        ],
+    );
+    assert.equal(ratingPage.items[0].ratingAverage, 5);
+    assert.equal(ratingPage.items[2].ratingAverage, 0);
 
     await assert.rejects(
         () => listPublishedCatalog({ limit: "100" }),
         /Limite invalido/,
+    );
+    await assert.rejects(
+        () => listPublishedCatalog({ type: "live" }),
+        /Tipo de conteudo invalido/,
+    );
+    await assert.rejects(
+        () => listPublishedCatalog({ taxonomyId: "invalida" }),
+        /Taxonomia invalida/,
     );
 });
 

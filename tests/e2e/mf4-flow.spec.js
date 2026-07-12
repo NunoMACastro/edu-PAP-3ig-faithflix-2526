@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { createNetworkSafeContext, expect, test } from "./test.js";
 
 const PASSWORD = "password-segura-123";
 const USER_EMAIL = "user-mf4@faithflix.test";
@@ -22,19 +22,21 @@ async function login(page, email) {
     await page.getByTestId("email-input").fill(email);
     await page.getByTestId("password-input").fill(PASSWORD);
     await page.getByTestId("login-submit").click();
-    await expect(page.getByRole("status")).toHaveText("Sess\u00e3o iniciada.");
+    await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
 }
 
 test("MF4 cobre subscricao, trial, candidatura, pool, historico e notificacoes", async ({
     browser,
 }) => {
-    const userContext = await browser.newContext();
+    const userContext = await createNetworkSafeContext(browser);
     const userPage = await userContext.newPage();
 
     await login(userPage, USER_EMAIL);
     await userPage.goto("/planos");
     await expect(
-        userPage.getByRole("heading", { name: "Subscri\u00e7\u00e3o" }),
+        userPage.getByRole("heading", {
+            name: "Escolhe como queres viver a FaithFlix.",
+        }),
     ).toBeVisible();
     await expect(userPage.getByText("Subscri\u00e7\u00e3o pr\u00f3pria")).toBeVisible();
     await userPage.getByRole("button", { name: "Cancelar renova\u00e7\u00e3o" }).click();
@@ -61,7 +63,7 @@ test("MF4 cobre subscricao, trial, candidatura, pool, historico e notificacoes",
         "Candidatura submetida para revis\u00e3o.",
     );
 
-    const charityContext = await browser.newContext();
+    const charityContext = await createNetworkSafeContext(browser);
     const charityPage = await charityContext.newPage();
 
     await login(charityPage, CHARITY_USER_EMAIL);
@@ -84,7 +86,9 @@ test("MF4 cobre subscricao, trial, candidatura, pool, historico e notificacoes",
     });
 
     await expect(charityCard).toBeVisible();
-    await charityCard.getByRole("link", { name: "Ver hist\u00f3rico" }).click();
+    await charityPage
+        .getByRole("link", { name: "\u00c1rea da associa\u00e7\u00e3o" })
+        .click();
     await expect(
         charityPage.getByRole("heading", { name: "Hist\u00f3rico da associa\u00e7\u00e3o" }),
     ).toBeVisible();
@@ -93,7 +97,7 @@ test("MF4 cobre subscricao, trial, candidatura, pool, historico e notificacoes",
         charityPage.getByRole("link", { name: "Exportar CSV" }),
     ).toBeVisible();
 
-    const adminContext = await browser.newContext();
+    const adminContext = await createNetworkSafeContext(browser);
     const adminPage = await adminContext.newPage();
 
     await login(adminPage, ADMIN_EMAIL);

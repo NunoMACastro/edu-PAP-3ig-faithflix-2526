@@ -1,11 +1,55 @@
-# Implementacao referencia_privada_docente - MF4
+# Implementacao real_dev - MF4
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: adendo billing/pool local atual e snapshot de implementação MF4 delimitado
+
+## Adendo pós-correção Fase 3 - billing e pool (2026-07-10)
+
+O relatório abaixo é um snapshot de 2026-06-15; não foi reescrito nem conta
+como prova atual. A referência privada evoluiu nos seguintes contratos:
+
+- checkout/trial exigem `Idempotency-Key`, guardam `requestHash` e executam
+  ledger, subscrição/trial e notificação na mesma transação;
+- `payment_attempts` novos usam schema financeiro v2 e snapshot do plano com
+  `accountingEstimate: false`;
+- o worker separado usa lease por subscrição/ciclo, processa trial,
+  cancelamento, renovação simulada aprovada/recusada e fecha o mês UTC anterior;
+- a pool já não usa `subscriptions` ativas: exige cumulativamente pagamento v2,
+  aprovado, não estimado e `approvedAt` dentro do mês UTC fechado;
+- distribuições guardam snapshots e replay do mesmo mês não duplica o fecho;
+- ciclos mensais/anuais preservam fim do mês em UTC.
+
+Existe uma migração v2 idempotente, dry-run por defeito e com escrita protegida
+por `--apply` + `ALLOW_DATA_MIGRATION=true`; não foi executada nesta correção.
+Renovação continua simulada por adapter determinístico, sem gateway real. A
+prova atual é local com doubles/fault injection; não prova replica set, worker
+de produção ou contabilidade histórica exata. As operações administrativas
+F3-D estão descritas no adendo datado do relatório de auditoria MF4 e não
+alteram este snapshot histórico.
+
+Fecho documental adicional de 2026-07-10: se não existir associação elegível
+no momento do fecho, a pool persiste o ledger imutável
+`deferred_no_eligible_charities`; o job considera-o terminal, sem retry infinito
+nem distribuição retroativa. O catch-up limita cada passagem a 120 meses
+pendentes. Membership administrativa exige conta não bloqueada/não eliminada e
+entra na exportação/eliminação RGPD. Audit de utilizadores e associações retém
+apenas estado mínimo, sem email, telefone ou snapshots pessoais integrais. O
+corpo histórico abaixo continua inalterado e não substitui estes contratos.
+
+## Snapshot histórico — implementação MF4 observada em 2026-06-15
+
+A partir desta fronteira, ficam preservados os resultados e comandos da
+implementação original; não constituem prova atual.
 
 ## Header
 
 - Data: 2026-06-15
 - Projeto: FaithFlix
 - Modo: implementar
-- Implementacao auditada: `referencia_privada_docente`
+- Implementacao auditada: `real_dev`
 - MF alvo: `MF4`
 - BKs abrangidos: `BK-MF4-01`, `BK-MF4-02`, `BK-MF4-03`, `BK-MF4-04`, `BK-MF4-05`, `BK-MF4-06`, `BK-MF4-08`
 - Estado geral: `IMPLEMENTADO_SEM_VALIDACAO_TOTAL`
@@ -13,7 +57,7 @@
 
 ## Resultado executivo
 
-A `MF4 - Monetizacao solidaria` foi implementada em `referencia_privada_docente/backend` e `referencia_privada_docente/frontend`, dentro do escopo permitido.
+A `MF4 - Monetizacao solidaria` foi implementada em `real_dev/backend` e `real_dev/frontend`, dentro do escopo permitido.
 
 Foram entregues:
 
@@ -93,36 +137,36 @@ Nao avaliados por configuracao (`INCLUIR_P3: nao`).
 
 Backend:
 
-- `referencia_privada_docente/backend/src/app.js`
-- `referencia_privada_docente/backend/src/server.js`
-- `referencia_privada_docente/backend/src/modules/subscriptions/*`
-- `referencia_privada_docente/backend/src/modules/payments/*`
-- `referencia_privada_docente/backend/src/modules/notifications/*`
-- `referencia_privada_docente/backend/src/modules/charities/*`
-- `referencia_privada_docente/backend/src/modules/playback/playback.routes.js`
-- `referencia_privada_docente/backend/src/modules/playback/playback.service.js`
-- `referencia_privada_docente/backend/src/modules/system/health.service.js`
-- `referencia_privada_docente/backend/tests/unit/mf4-validation.test.js`
+- `real_dev/backend/src/app.js`
+- `real_dev/backend/src/server.js`
+- `real_dev/backend/src/modules/subscriptions/*`
+- `real_dev/backend/src/modules/payments/*`
+- `real_dev/backend/src/modules/notifications/*`
+- `real_dev/backend/src/modules/charities/*`
+- `real_dev/backend/src/modules/playback/playback.routes.js`
+- `real_dev/backend/src/modules/playback/playback.service.js`
+- `real_dev/backend/src/modules/system/health.service.js`
+- `real_dev/backend/tests/unit/mf4-validation.test.js`
 
 Frontend:
 
-- `referencia_privada_docente/frontend/src/services/api/subscriptionsApi.js`
-- `referencia_privada_docente/frontend/src/services/api/paymentsApi.js`
-- `referencia_privada_docente/frontend/src/services/api/notificationsApi.js`
-- `referencia_privada_docente/frontend/src/services/api/charitiesApi.js`
-- `referencia_privada_docente/frontend/src/pages/SubscriptionPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/NotificationsPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/CharityApplicationPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/PublicCharitiesPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminCharityApplicationsPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminPoolDistributionPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminPoolDashboardPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/CharityHistoryPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminCharityMembersPage.jsx`
-- `referencia_privada_docente/frontend/src/routes/AppRoutes.jsx`
-- `referencia_privada_docente/frontend/src/components/layout/AppHeader.jsx`
-- `referencia_privada_docente/frontend/src/pages/pages.jsx`
-- `referencia_privada_docente/frontend/src/styles/global.css`
+- `real_dev/frontend/src/services/api/subscriptionsApi.js`
+- `real_dev/frontend/src/services/api/paymentsApi.js`
+- `real_dev/frontend/src/services/api/notificationsApi.js`
+- `real_dev/frontend/src/services/api/charitiesApi.js`
+- `real_dev/frontend/src/pages/SubscriptionPage.jsx`
+- `real_dev/frontend/src/pages/NotificationsPage.jsx`
+- `real_dev/frontend/src/pages/CharityApplicationPage.jsx`
+- `real_dev/frontend/src/pages/PublicCharitiesPage.jsx`
+- `real_dev/frontend/src/pages/AdminCharityApplicationsPage.jsx`
+- `real_dev/frontend/src/pages/AdminPoolDistributionPage.jsx`
+- `real_dev/frontend/src/pages/AdminPoolDashboardPage.jsx`
+- `real_dev/frontend/src/pages/CharityHistoryPage.jsx`
+- `real_dev/frontend/src/pages/AdminCharityMembersPage.jsx`
+- `real_dev/frontend/src/routes/AppRoutes.jsx`
+- `real_dev/frontend/src/components/layout/AppHeader.jsx`
+- `real_dev/frontend/src/pages/pages.jsx`
+- `real_dev/frontend/src/styles/global.css`
 
 Relatorio:
 
@@ -133,10 +177,10 @@ Relatorio:
 | Comando/verificacao | Resultado | Observacao |
 | --- | --- | --- |
 | `git status --short --branch` | `PASS_COM_NOTA` | `main` esta atras de `origin/main` 7 commits; sem alteracoes rastreadas antes da implementacao. |
-| `npm --prefix pasta_privada_do_professor/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | Falhou com `listen EPERM 127.0.0.1`; testes sem porta passaram. |
-| `npm --prefix pasta_privada_do_professor/backend test` fora do sandbox | `PASS` | 32/32 testes passaram. |
-| `npm --prefix pasta_privada_do_professor/frontend run build` | `PASS` | Vite build passou com 92 modulos transformados. |
-| Pesquisa estatica de seguranca/drift em `referencia_privada_docente` | `PASS_COM_NOTA` | Falsos positivos: README proibe `localStorage`; `temporary` aparece em docstring de trial; `secret` esta na lista de redaccao do logger. |
+| `npm --prefix real_dev/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | Falhou com `listen EPERM 127.0.0.1`; testes sem porta passaram. |
+| `npm --prefix real_dev/backend test` fora do sandbox | `PASS` | 32/32 testes passaram. |
+| `npm --prefix real_dev/frontend run build` | `PASS` | Vite build passou com 92 modulos transformados. |
+| Pesquisa estatica de seguranca/drift em `real_dev` | `PASS_COM_NOTA` | Falsos positivos: README proibe `localStorage`; `temporary` aparece em docstring de trial; `secret` esta na lista de redaccao do logger. |
 | Pesquisa de drift OPSA/Orelle/StudyFlow/etc. | `PASS` | Sem ocorrencias. |
 | `git diff --check` | `PASS` | Sem problemas de whitespace em ficheiros rastreados. |
 | Browser local `http://127.0.0.1:4174` | `PASS_COM_NOTA` | Rotas `/planos`, `/associacoes`, `/notificacoes` renderizam; sem backend/Mongo ativo, paginas mostram erro de API esperado. |

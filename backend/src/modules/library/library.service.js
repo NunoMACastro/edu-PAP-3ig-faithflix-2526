@@ -5,6 +5,12 @@
 import { getDb } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
 import { asObjectId, assertListType } from "./library.validation.js";
+import {
+    assertEngageableContent,
+    episodeCanonicalPath,
+    getEpisodeSeries,
+    publicSeriesSummary,
+} from "../catalog/catalog-hierarchy.js";
 
 /**
  * Garante que um conteúdo publicado existe antes de operações de lista.
@@ -73,7 +79,8 @@ export async function addToList(userId, contentId, type) {
     const listType = assertListType(type);
     const now = new Date();
 
-    await assertPublishedContent(db, contentObjectId);
+    const content = await assertPublishedContent(db, contentObjectId);
+    assertEngageableContent(content);
 
     await db.collection("user_content_lists").updateOne(
         { userId: userObjectId, contentId: contentObjectId, type: listType },
@@ -103,10 +110,18 @@ export async function addToList(userId, contentId, type) {
 export async function removeFromList(userId, contentId, type) {
     const db = await getDb();
     const listType = assertListType(type);
+    const contentObjectId = asObjectId(contentId, "Conteudo");
+    const content = await db.collection("contents").findOne({
+        _id: contentObjectId,
+    });
+
+    if (content) {
+        assertEngageableContent(content);
+    }
 
     await db.collection("user_content_lists").deleteOne({
         userId: asObjectId(userId, "Utilizador"),
-        contentId: asObjectId(contentId, "Conteudo"),
+        contentId: contentObjectId,
         type: listType,
     });
 
@@ -141,7 +156,12 @@ export async function listSavedContent(userId, type) {
                 },
             },
             { $unwind: "$content" },
-            { $match: { "content.status": "published" } },
+            {
+                $match: {
+                    "content.status": "published",
+                    "content.type": { $in: ["movie", "series", "documentary"] },
+                },
+            },
         ])
         .toArray();
 
@@ -174,11 +194,41 @@ export async function listHistory(userId) {
         ])
         .toArray();
 
-    return rows.map((row) => ({
-        ...publicContent(row.content),
-        currentTimeSeconds: row.currentTimeSeconds,
-        durationSeconds: row.durationSeconds,
-        completed: row.completed,
-        lastWatchedAt: row.lastWatchedAt,
-    }));
+    const items = await Promise.all(
+        rows.map(async (row) => {
+            const item = {
+                ...publicContent(row.content),
+                currentTimeSeconds: row.currentTimeSeconds,
+                durationSeconds: row.durationSeconds,
+                completed: row.completed,
+                lastWatchedAt: row.lastWatchedAt,
+            };
+
+            if (row.content.type !== "episode") {
+                return item;
+            }
+
+            try {
+                const series = await getEpisodeSeries(db, row.content.seriesId, {
+                    requirePublished: true,
+                });
+
+                return {
+                    ...item,
+                    series: publicSeriesSummary(series),
+                    seasonNumber: row.content.seasonNumber,
+                    episodeNumber: row.content.episodeNumber,
+                    canonicalPath: episodeCanonicalPath(series, row.content),
+                };
+            } catch (error) {
+                if (error.statusCode === 404) {
+                    return null;
+                }
+
+                throw error;
+            }
+        }),
+    );
+
+    return items.filter(Boolean);
 }

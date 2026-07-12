@@ -17,26 +17,25 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF4-04`
 - `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-03-candidaturas-associacoes.md`
-- `last_updated`: `2026-06-13`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagógico (obrigatório)
+#### Objetivo
 
 Neste BK vais criar o fluxo de candidatura de uma associação à pool solidária. A associação submete dados essenciais, o sistema guarda a candidatura com estado `pending` e o administrador só decide no BK seguinte.
 
-### Objetivo pedagógico
 
 - Perceber a diferença entre candidatura e associação aprovada.
 - Validar dados de contacto e descrição antes de persistir.
 - Criar um fluxo público de submissão e uma listagem admin protegida.
 - Preparar o `BK-MF4-04`, onde entra aprovação/rejeição.
 
-### Importância funcional
+#### Importância
 
 - A pool solidária só é credível se as associações entrarem por um processo rastreável.
 - Este BK recolhe os dados mínimos para avaliação sem transformar automaticamente o pedido numa associação aprovada.
 - A separação entre submissão pública e listagem admin evita exposição indevida de contactos.
 
-### Scope-in
+#### Scope-in
 
 - Criar validação de candidatura.
 - Criar endpoint público de submissão.
@@ -44,7 +43,7 @@ Neste BK vais criar o fluxo de candidatura de uma associação à pool solidári
 - Guardar candidaturas com estado inicial `pending`.
 - Criar formulário frontend para submissão.
 
-### Scope-out
+#### Scope-out
 
 - Não aprovar nem rejeitar candidaturas; isso entra no `BK-MF4-04`.
 - Não colocar associações na pool neste BK.
@@ -56,14 +55,25 @@ Neste BK vais criar o fluxo de candidatura de uma associação à pool solidári
 - 2 blocos de 90 minutos.
 - Se a equipa misturar candidatura com aprovação, separar os campos numa tabela antes de codificar.
 
-### Glossário rápido
+#### Estado antes e depois
+
+- Estado antes: aplicam-se os BKs declarados em `dependencias`, os RF/RNF do Header e os artefactos já entregues pelas fases anteriores.
+- Estado depois: ficam implementáveis e verificáveis apenas os resultados listados em `Scope-in`, sem antecipar o `Scope-out`.
+
+#### Pré-requisitos
+
+- `BK-MF2-02` executado com perfil, papéis base e `requireRole(["admin"])`.
+- `backend/src/config/database.js` disponível.
+- Confirmar que RF41 pertence a este BK na matriz canonica.
+
+#### Glossário
 
 - Candidatura: pedido submetido por uma associação para ser avaliado.
 - Associação aprovada: entidade que passou pela decisão admin e pode entrar na pool.
 - Estado `pending`: candidatura recebida, mas ainda sem decisão.
 - Listagem admin: consulta protegida para quem tem permissão de gestão.
 
-### Conceitos teóricos essenciais
+#### Conceitos teóricos essenciais
 
 - Domínio FaithFlix: uma candidatura inicia o percurso solidário, mas não recebe distribuição enquanto não for aprovada.
 - Backend: validação protege o service de dados incompletos, email inválido e textos demasiado curtos.
@@ -72,6 +82,12 @@ Neste BK vais criar o fluxo de candidatura de uma associação à pool solidári
 - Dados: `charity_applications` guarda o estado e impede duplicados pendentes pelo mesmo email.
 - `CANONICO`: RF41 exige submissão de candidaturas por associação.
 - `DERIVADO`: candidatura pública não exige login para reduzir atrito, mas os endpoints admin exigem `admin`.
+- `DERIVADO`: a submissão permite 5 pedidos por IP/hora; o pedido 6 devolve
+  `429 RATE_LIMITED` com `Retry-After`, usando a chave HMAC do rate limiter.
+- `DERIVADO`: um índice único parcial por email e estado `pending` fecha
+  duplicações concorrentes sem impedir nova candidatura após uma decisão.
+- `DERIVADO`: a listagem admin usa enum fechada, `page >= 1`, `1 <= limit <= 50`,
+  total real e ordenação estável por `submittedAt: -1, _id: 1`.
 
 ### Erros comuns
 
@@ -86,23 +102,18 @@ Neste BK vais criar o fluxo de candidatura de uma associação à pool solidári
 - [ ] Sei indicar que endpoint e público e que endpoint e admin.
 - [ ] Sei provar que submissão inválida não cria registo.
 
-## Bloco operacional (obrigatório)
-
-### Pré-condições
-
-- `BK-MF2-02` executado com perfil, papéis base e `requireRole(["admin"])`.
-- `backend/src/config/database.js` disponível.
-- Confirmar que RF41 pertence a este BK na matriz canonica.
-
-### Arquitetura do BK
+#### Arquitetura do BK
 
 - Backend: módulo `charities` começa com candidatura, validação, service, controller e router.
 - Persistência: `charity_applications` guarda pedidos com estado `pending`.
 - Frontend: `charitiesApi` envia candidatura e `CharityApplicationPage` mostra o formulário.
 - Segurança: submissão é pública; listagem de candidaturas é protegida por `requireRole(["admin"])`.
 - Integração: o `BK-MF4-04` reutiliza a candidatura para aprovar/rejeitar.
+- Resposta admin: `{ applications, page, limit, total, totalPages }`.
+- Robustez do consumidor admin: propaga `AbortSignal`, ignora pedidos abortados
+  e respostas antigas e volta à página 1 quando o filtro muda.
 
-### Ficheiros a criar, editar e rever
+#### Ficheiros a criar/editar/rever
 
 - CRIAR: `backend/src/modules/charities/charity-applications.validation.js`
 - CRIAR: `backend/src/modules/charities/charity-applications.service.js`
@@ -110,12 +121,13 @@ Neste BK vais criar o fluxo de candidatura de uma associação à pool solidári
 - CRIAR: `backend/src/modules/charities/charities.routes.js`
 - CRIAR: `frontend/src/services/api/charitiesApi.js`
 - CRIAR: `frontend/src/pages/CharityApplicationPage.jsx`
+- CRIAR/EDITAR: `backend/tests/unit/f3-admin-transactions.test.js`
 - EDITAR: `backend/src/app.js`
 - EDITAR: `backend/src/server.js`
 - EDITAR: `frontend/src/routes/AppRoutes.jsx`
 - REVER: `BK-MF1-04`, `BK-MF2-02`, `RF41`, `RNF16`, `RNF19`
 
-### Guia de execução (passo-a-passo)
+#### Tutorial técnico linear
 
 ### Passo 1 - Criar validação de candidatura
 
@@ -134,6 +146,9 @@ Cria o módulo `charities`, que será usado também nos BKs seguintes.
 4. Código completo.
 
 ```js
+import { isIP } from "node:net";
+import { HttpError } from "../../utils/http-error.js";
+
 /**
  * Expressao regular simples para rejeitar emails obviamente inválidos.
  * A validação final de existencia do domínio fica fora do âmbito do MVP.
@@ -145,12 +160,15 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  *
  * @param {string} message Mensagem segura para devolver ao cliente.
  * @param {number} [statusCode=400] Código HTTP associado.
- * @returns {Error} Erro com `statusCode`.
+ * @returns {HttpError} Erro canónico com código estável.
  */
 function httpError(message, statusCode = 400) {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
+  return new HttpError(
+    statusCode,
+    message,
+    undefined,
+    "INVALID_CHARITY_APPLICATION",
+  );
 }
 
 /**
@@ -163,7 +181,10 @@ function httpError(message, statusCode = 400) {
  * @returns {string} Texto normalizado.
  */
 function requiredText(value, field, min, max) {
-  const text = String(value ?? "").trim();
+  if (typeof value !== "string") {
+    throw httpError(`${field} deve ser texto.`);
+  }
+  const text = value.trim();
   if (text.length < min || text.length > max) {
     throw httpError(`${field} inválido.`);
   }
@@ -175,11 +196,17 @@ function requiredText(value, field, min, max) {
  *
  * @param {string} value URL recebida no formulário.
  * @returns {string} URL normalizada ou string vazia.
- * @throws {Error} Quando o protocolo não e `http` ou `https`.
+ * @throws {Error} Quando não é uma URL pública HTTPS da allowlist.
  */
 function optionalPublicUrl(value) {
-  const text = String(value ?? "").trim();
+  if (value === undefined || value === "") return "";
+  if (typeof value !== "string") throw httpError("Website inválido.");
+  const text = value.trim();
   if (!text) return "";
+  if (text.length > 500) throw httpError("Website inválido.");
+  if (/[\u0000-\u001f\u007f]/.test(text)) {
+    throw httpError("Website inválido.");
+  }
 
   let url;
   try {
@@ -188,8 +215,25 @@ function optionalPublicUrl(value) {
     throw httpError("Website inválido.");
   }
 
-  if (!["http:", "https:"].includes(url.protocol)) {
-    throw httpError("Website deve comecar por http:// ou https://.");
+  const hostnameAllowed =
+    url.hostname.includes(".") &&
+    isIP(url.hostname) === 0 &&
+    /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(url.hostname);
+  const hasEncodedControl = /%(?:0[0-9a-f]|1[0-9a-f]|7f)/i.test(url.pathname);
+
+  // A allowlist pública aceita só HTTPS, host DNS público e path; não aceita
+  // credenciais, porta custom, query, fragmento ou controlos codificados.
+  if (
+    url.protocol !== "https:" ||
+    url.username ||
+    url.password ||
+    (url.port && url.port !== "443") ||
+    url.search ||
+    url.hash ||
+    !hostnameAllowed ||
+    hasEncodedControl
+  ) {
+    throw httpError("Website deve ser uma URL pública HTTPS sem credenciais, query ou fragmento.");
   }
 
   return url.toString();
@@ -203,29 +247,83 @@ function optionalPublicUrl(value) {
  * @throws {Error} Quando algum campo obrigatório e inválido.
  */
 export function assertCharityApplicationPayload(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    throw httpError("A candidatura deve ser um objeto JSON.");
+  }
+
+  const allowedFields = new Set([
+    "name", "contactName", "email", "phone", "mission", "websiteUrl",
+  ]);
+  if (Object.keys(input).some((key) => !allowedFields.has(key))) {
+    throw httpError("A candidatura contém campos não permitidos.");
+  }
+
   const name = requiredText(input.name, "Nome", 3, 120);
   const contactName = requiredText(input.contactName, "Contacto", 3, 120);
-  const email = String(input.email ?? "").trim().toLowerCase();
+  if (typeof input.email !== "string") throw httpError("Email inválido.");
+  const email = input.email.trim().toLowerCase();
 
-  if (!EMAIL_PATTERN.test(email)) {
+  if (email.length > 254 || !EMAIL_PATTERN.test(email)) {
     throw httpError("Email inválido.");
   }
+
+  if (input.phone !== undefined && typeof input.phone !== "string") {
+    throw httpError("Telefone inválido.");
+  }
+  const phone = input.phone?.trim() ?? "";
+  if (phone.length > 40) throw httpError("Telefone inválido.");
 
   // O retorno inclui apenas campos permitidos; estado e dados de revisão sao definidos pelo backend.
   return {
     name,
     contactName,
     email,
-    phone: String(input.phone ?? "").trim(),
+    phone,
     mission: requiredText(input.mission, "Missao", 30, 1200),
     websiteUrl: optionalPublicUrl(input.websiteUrl),
+  };
+}
+
+const APPLICATION_STATUSES = ["pending", "approved", "rejected", "all"];
+
+function positiveIntegerQuery(value, field, defaultValue, maximum) {
+  if (value === undefined) return defaultValue;
+  if (typeof value !== "string" || !/^[1-9]\d*$/.test(value)) {
+    throw httpError(`${field} inválido.`);
+  }
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isSafeInteger(parsed) || parsed > maximum) {
+    throw httpError(`${field} inválido.`);
+  }
+  return parsed;
+}
+
+export function assertApplicationListQuery(query) {
+  if (!query || typeof query !== "object" || Array.isArray(query)) {
+    throw httpError("Query de listagem inválida.");
+  }
+  const allowedFields = new Set(["status", "page", "limit"]);
+  if (Object.keys(query).some((key) => !allowedFields.has(key))) {
+    throw httpError("Query de listagem contém campos não permitidos.");
+  }
+  const status = query.status === undefined ? "pending" : query.status;
+  if (typeof status !== "string" || !APPLICATION_STATUSES.includes(status)) {
+    throw httpError("Estado inválido.");
+  }
+  return {
+    status,
+    page: positiveIntegerQuery(query.page, "Página", 1, 1_000_000),
+    limit: positiveIntegerQuery(query.limit, "Limite", 20, 50),
   };
 }
 ```
 
 5. Explicação do código ou da decisão.
 
-O validador devolve apenas campos aceites. Isto impede que o visitante envie `status: "approved"` ou outro campo sensível. O website e opcional, mas quando existe fica normalizado como URL pública `http` ou `https`, porque será exposto na página pública de associações.
+O validador devolve apenas campos aceites. Isto impede que o visitante envie
+`status: "approved"` ou outro campo sensível. O website e opcional, mas quando
+existe fica limitado a HTTPS num host DNS público, sem userinfo, porta custom,
+query, fragmento ou controlos, porque será exposto na página pública.
 
 6. Validação do passo.
 
@@ -261,7 +359,18 @@ Cria o service abaixo.
  * campos internos antes de devolver respostas seguras para a API.
  */
 import { getDb } from "../../config/database.js";
+import { HttpError } from "../../utils/http-error.js";
 import { assertCharityApplicationPayload } from "./charity-applications.validation.js";
+
+/**
+ * Identifica uma violacao de indice unico MongoDB.
+ *
+ * @param {unknown} error Erro devolvido pelo driver.
+ * @returns {boolean} Verdadeiro quando existe uma chave duplicada.
+ */
+function isDuplicateKeyError(error) {
+  return error?.code === 11000;
+}
 
 /**
  * Remove campos internos antes de devolver uma candidatura.
@@ -271,7 +380,7 @@ import { assertCharityApplicationPayload } from "./charity-applications.validati
  */
 function publicApplication(application) {
   return {
-    id: String(application._id),
+    id: application._id.toHexString(),
     name: application.name,
     contactName: application.contactName,
     email: application.email,
@@ -292,8 +401,19 @@ function publicApplication(application) {
  */
 export async function ensureCharityApplicationIndexes() {
   const db = await getDb();
-  await db.collection("charity_applications").createIndex({ email: 1, status: 1 });
-  await db.collection("charity_applications").createIndex({ status: 1, submittedAt: -1 });
+  await db.collection("charity_applications").createIndex(
+    { email: 1 },
+    {
+      name: "uniq_pending_charity_application_email",
+      unique: true,
+      partialFilterExpression: { status: "pending" },
+    },
+  );
+  await db.collection("charity_applications").createIndex({
+    status: 1,
+    submittedAt: -1,
+    _id: 1,
+  });
 }
 
 /**
@@ -307,18 +427,6 @@ export async function submitCharityApplication(input) {
   const db = await getDb();
   const payload = assertCharityApplicationPayload(input);
 
-  // A duplicação e limitada ao estado pending para permitir nova candidatura depois de uma decisão.
-  const duplicate = await db.collection("charity_applications").findOne({
-    email: payload.email,
-    status: "pending",
-  });
-
-  if (duplicate) {
-    const error = new Error("Já existe uma candidatura pendente para este email.");
-    error.statusCode = 409;
-    throw error;
-  }
-
   const now = new Date();
   const application = {
     ...payload,
@@ -329,27 +437,60 @@ export async function submitCharityApplication(input) {
     updatedAt: now,
   };
 
-  const result = await db.collection("charity_applications").insertOne(application);
+  let result;
+
+  try {
+    // O indice parcial unico fecha tambem duas submissões concorrentes.
+    result = await db.collection("charity_applications").insertOne(application);
+  } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      throw new HttpError(
+        409,
+        "Já existe uma candidatura pendente para este email.",
+        undefined,
+        "PENDING_APPLICATION_EXISTS",
+      );
+    }
+
+    throw error;
+  }
+
   return { application: publicApplication({ ...application, _id: result.insertedId }) };
 }
 
 /**
  * Lista candidaturas para administradores, com filtro por estado.
  *
- * @param {string} [status="pending"] Estado a listar ou `all`.
- * @returns {Promise<{ applications: object[] }>} Candidaturas ordenadas por submissão.
+ * @param {{ status: string, page: number, limit: number }} query Query validada.
+ * @returns {Promise<{ applications: object[], page: number, limit: number, total: number, totalPages: number }>} Página administrativa estável.
  */
-export async function listCharityApplications(status = "pending") {
+export async function listCharityApplications({ status, page, limit }) {
   const db = await getDb();
   const filter = status === "all" ? {} : { status };
-  const applications = await db.collection("charity_applications").find(filter).sort({ submittedAt: -1 }).toArray();
-  return { applications: applications.map(publicApplication) };
+  const collection = db.collection("charity_applications");
+  const total = await collection.countDocuments(filter);
+  const applications = await collection
+    .find(filter)
+    .sort({ submittedAt: -1, _id: 1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+  return {
+    applications: applications.map(publicApplication),
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 ```
 
 5. Explicação do código ou da decisão.
 
-O estado inicial e sempre `pending`. A duplicação por email reduz spam operacional, sem impedir nova candidatura depois de decisão.
+O estado inicial e sempre `pending`. A unicidade vive num índice parcial da base
+de dados, porque uma leitura `findOne` seguida de `insertOne` deixaria passar
+duas submissões concorrentes. Depois de uma decisão, o índice deixa de abranger
+a candidatura antiga e permite uma nova submissão para o mesmo email.
 
 6. Validação do passo.
 
@@ -392,6 +533,7 @@ import {
   listCharityApplications,
   submitCharityApplication,
 } from "./charity-applications.service.js";
+import { assertApplicationListQuery } from "./charity-applications.validation.js";
 
 /**
  * Recebe uma candidatura pública de associação.
@@ -412,7 +554,8 @@ export async function postCharityApplication(req, res) {
  * @returns {Promise<void>}
  */
 export async function getCharityApplications(req, res) {
-  res.status(200).json(await listCharityApplications(req.query.status ?? "pending"));
+  const query = assertApplicationListQuery(req.query);
+  res.status(200).json(await listCharityApplications(query));
 }
 ```
 
@@ -426,8 +569,12 @@ export async function getCharityApplications(req, res) {
  * evitando que contactos privados fiquem acessíveis a utilizadores anónimos.
  */
 import { Router } from "express";
-import { requireRole } from "../auth/auth.middleware.js";
+import { requireRole } from "../../middlewares/auth.middleware.js";
 import { asyncHandler } from "../../utils/async-handler.js";
+import {
+  rateLimit,
+  rateLimitKeys,
+} from "../../middlewares/rate-limit.middleware.js";
 import {
   getCharityApplications,
   postCharityApplication,
@@ -439,7 +586,18 @@ import {
  */
 export const charitiesRouter = Router();
 
-charitiesRouter.post("/applications", asyncHandler(postCharityApplication));
+const applicationSubmissionLimit = rateLimit({
+  scope: "charity-application:ip",
+  limit: 5,
+  windowMs: 60 * 60_000,
+  key: rateLimitKeys.ip,
+});
+
+charitiesRouter.post(
+  "/applications",
+  applicationSubmissionLimit,
+  asyncHandler(postCharityApplication),
+);
 charitiesRouter.get("/applications", requireRole(["admin"]), asyncHandler(getCharityApplications));
 ```
 
@@ -488,7 +646,9 @@ Permitir submissão de candidatura com loading, erro e sucesso.
 
 3. Instrucoes concretas.
 
-Cria rota `/charities/apply`.
+Cria a rota pública `/associacoes/candidatura`, coerente com a navegação
+PT-PT. Acrescenta apenas a declaração lazy e o `Route`; não substituas o router
+base, `Suspense`, `ErrorBoundary` ou `RouteLifecycle`.
 
 4. Código completo.
 
@@ -510,8 +670,8 @@ export const charitiesApi = {
    * @param {object} input Campos do formulário.
    * @returns {Promise<{ application: object }>} Candidatura criada.
    */
-  submitApplication(input) {
-    return apiClient.post("/api/charities/applications", input);
+  submitApplication(input, options = {}) {
+    return apiClient.post("/api/charities/applications", input, options);
   },
   /**
    * Lista candidaturas para ecras de administração.
@@ -519,8 +679,13 @@ export const charitiesApi = {
    * @param {string} [status="pending"] Estado a consultar.
    * @returns {Promise<{ applications: object[] }>} Lista devolvida pela API.
    */
-  listApplications(status = "pending") {
-    return apiClient.get(`/api/charities/applications?status=${encodeURIComponent(status)}`);
+  listApplications({ status = "pending", page = 1, limit = 20 } = {}, options = {}) {
+    const params = new URLSearchParams({
+      status,
+      page: String(page),
+      limit: String(limit),
+    });
+    return apiClient.get(`/api/charities/applications?${params.toString()}`, options);
   },
 };
 ```
@@ -534,7 +699,7 @@ export const charitiesApi = {
  * Gere formulário, validação mínima de UI e feedback ao utilizador, enviando
  * apenas dados da candidatura para validação definitiva no backend.
  */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
@@ -554,6 +719,9 @@ export function CharityApplicationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+  const submitControllerRef = useRef(null);
+
+  useEffect(() => () => submitControllerRef.current?.abort(), []);
 
   /**
    * Atualiza um campo isolado mantendo os restantes valores do formulário.
@@ -574,17 +742,25 @@ export function CharityApplicationPage() {
    */
   async function handleSubmit(event) {
     event.preventDefault();
+    if (submitControllerRef.current) return;
+    const controller = new AbortController();
+    submitControllerRef.current = controller;
     setSubmitting(true);
     setError("");
     setStatus("");
     try {
-      await charitiesApi.submitApplication(form);
+      await charitiesApi.submitApplication(form, { signal: controller.signal });
+      if (controller.signal.aborted) return;
       setForm(INITIAL_FORM);
       setStatus("Candidatura submetida para revisão.");
     } catch (apiError) {
+      if (controller.signal.aborted || apiError?.name === "AbortError") return;
       setError(toUserMessage(apiError));
     } finally {
-      setSubmitting(false);
+      if (submitControllerRef.current === controller) {
+        submitControllerRef.current = null;
+        setSubmitting(false);
+      }
     }
   }
 
@@ -607,9 +783,21 @@ export function CharityApplicationPage() {
 }
 ```
 
+Em `frontend/src/routes/AppRoutes.jsx`:
+
+```jsx
+// ADICIONAR uma única vez, junto das restantes declarações lazy.
+const CharityApplicationPage = lazyNamedPage(
+  () => import("../pages/CharityApplicationPage.jsx"),
+  "CharityApplicationPage",
+);
+
+<Route path="/associacoes/candidatura" element={<CharityApplicationPage />} />
+```
+
 5. Explicação do código ou da decisão.
 
-O formulário envia apenas os campos permitidos e mostra feedback claro em portugues de Portugal.
+O formulário envia apenas os campos permitidos e mostra feedback claro em português de Portugal. A rota usa o helper lazy da fundação e mantém a composição cumulativa do router.
 
 6. Validação do passo.
 
@@ -619,14 +807,23 @@ Submeter candidatura valida e depois repetir o mesmo email.
 
 Sem estado de loading, o utilizador pode carregar duas vezes e criar tentativas duplicadas.
 
-## Critérios de aceite (mensuráveis)
+#### Critérios de aceite
 
 - `POST /api/charities/applications` devolve `201` com estado `pending`.
 - Email inválido devolve `400`.
+- Website só aceita a allowlist HTTPS pública; username/password, localhost/IP,
+  control chars (também percent-encoded), porta custom, query, fragmento ou
+  outro protocolo devolvem `400`.
 - Candidatura pendente duplicada devolve `409`.
+- Duas submissões concorrentes para o mesmo email deixam apenas uma candidatura
+  `pending`; a outra devolve `409` com `code: "PENDING_APPLICATION_EXISTS"`.
 - `GET /api/charities/applications` exige role `admin`.
+- A listagem recusa `limit > 50` e devolve
+  `{ applications, page, limit, total, totalPages }` com ordenação estável.
+- O teste transacional confirma o índice parcial e o conflito estável sem usar
+  uma base normal ou partilhada.
 
-## Validação final
+#### Validação final
 
 ```bash
 cd backend
@@ -635,13 +832,15 @@ npm test
 
 Executar submissão valida, submissão inválida e listagem sem permissão.
 
-## Evidence para PR/defesa
+#### Evidence para PR/defesa
 
 - `pr`: commit/PR com módulo `charities` e página de candidatura.
 - `proof`: candidatura criada com `status: "pending"`.
-- `neg`: email inválido, duplicado e listagem sem admin.
+- `neg`: email inválido, duplicado sequencial/concorrente, pedido 6 do mesmo IP
+  na mesma hora com `429`, URLs `https://user:pass@example.org`, `javascript:`,
+  IP/localhost/query/fragment/controlos e listagem sem admin.
 
-## Handoff
+#### Handoff
 
 O `BK-MF4-04` deve usar `charity_applications` e alterar estado para `approved` ou `rejected`. Não deve criar uma candidatura nova para aprovar.
 
@@ -649,9 +848,15 @@ O `BK-MF4-04` deve usar `charity_applications` e alterar estado para `approved` 
 
 ```js
 // O estado nasce sempre pending; aprovação e rejeição pertencem ao BK seguinte.
-status: "pending",
+const application = { status: "pending" };
 ```
 
-## Changelog
+#### Changelog
 
 - `2026-06-13`: guia reescrito com submissão pública, listagem admin, validação, frontend e negativos.
+- `2026-07-10`: unicidade de candidatura pendente movida para índice parcial,
+  com conflito estável também sob concorrência.
+- `2026-07-10`: listagem administrativa fechada por enum e paginação estável,
+  com `limit <= 50`, metadata total e contrato de cancelamento no consumidor.
+- `2026-07-10`: validação copiável consolidada com tipos/limites estritos e
+  submissão protegida por 5 pedidos por IP/hora antes da persistência.

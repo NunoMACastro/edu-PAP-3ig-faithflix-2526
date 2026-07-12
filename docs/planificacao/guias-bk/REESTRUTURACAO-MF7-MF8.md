@@ -1,18 +1,27 @@
-# Reestruturacao MF7/MF8 - baseline final
+# Reestruturação MF7/MF8 — snapshot da baseline de 2026-06-27
 
 ## Header
 
 - `doc_id`: `REESTRUTURACAO-MF7-MF8`
 - `area`: `planificacao`
 - `owner`: `Nuno (orientacao)`
-- `status`: `ativo`
+- `status`: `historico`
 - `last_updated`: `2026-06-27`
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-27`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- `proof_scope`: decisão de reestruturação MF7/MF8 anterior à criação da MF9; não descreve a baseline ativa 66/66/94/13
 
-## Decisao atual
+## Decisão observada no snapshot
 
-A baseline final fica em `60 BK / 60 guias`. A MF7 mantem o fecho visual e de navegacao segura; a MF8 fica condensada para 10 BKs praticos, sem os antigos BKs documentais de defesa/pacote como itens formais.
+Em 2026-06-27, a baseline passou para `60 BK / 60 guias`. A MF7 manteve o
+fecho visual e de navegação segura; a MF8 ficou condensada em 10 BK práticos,
+sem os antigos BK documentais de defesa/pacote como itens formais. A baseline
+ativa posterior acrescentou MF9 e está em `66 BK / 66 guias`, `94 requisitos` e
+`13 sprints`.
 
-## MF8 final
+## MF8 observado no snapshot
 
 | BK | Titulo | Owner | Dependencia |
 | --- | --- | --- | --- |

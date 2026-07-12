@@ -1,13 +1,34 @@
-# Implementacao - referencia_privada_docente - MF5
+# Implementacao - real_dev - MF5
+
+- `document_status`: `CURRENT`
+- `snapshot_date`: `-`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: adendo administrativo local atual e snapshot de implementação MF5 delimitado
+
+## Adendo de validade Fase 3 administrativa - 2026-07-10
+
+Este documento preserva o snapshot de implementação MF5. O estado atual
+acrescenta uma unidade transacional para alteração admin, revogação de sessões
+e `user.admin_update`, com snapshots sanitizados e `requestId`. A invariante do
+último admin ativo devolve `409 LAST_ACTIVE_ADMIN` e foi testada sob duas
+remoções concorrentes. A revalidação atual está no adendo de
+`AUDITORIA-IMPLEMENTACAO-real_dev-MF5.md`; não reclassificar os totais
+históricos abaixo.
+
+## Snapshot histórico — implementação MF5 observada em 2026-06-18
+
+A partir desta fronteira, ficam preservados os resultados e comandos da
+implementação original; não constituem prova atual.
 
 ## Resultado geral
 
 - Modo executado: `implementar`
 - MF alvo: `MF5 - Operacao e privacidade`
 - BKs abrangidos: `BK-MF5-01`, `BK-MF5-02`, `BK-MF5-03`, `BK-MF5-04`, `BK-MF5-05`, `BK-MF5-06`
-- Raiz de implementacao: `referencia_privada_docente`
+- Raiz de implementacao: `real_dev`
 - Estado geral: `IMPLEMENTADO`
-- Codigo alterado: sim, apenas em `referencia_privada_docente/backend` e `referencia_privada_docente/frontend`
+- Codigo alterado: sim, apenas em `real_dev/backend` e `real_dev/frontend`
 - Relatorio tecnico atualizado: `docs/planificacao/guias-bk/IMPLEMENTACAO-REAL_DEV-MF5.md`
 - Commits/push: nao executados (`PERMITIR_COMMITS: nao`)
 
@@ -68,46 +89,46 @@ Esta execucao implementou a MF5 no codigo real. Foram preservados os contratos e
 - `P0`: nenhum finding ativo.
 - `P1`: nenhum finding ativo.
 - `P2`: nenhum finding funcional ativo. O sandbox bloqueia testes que abrem porta local (`listen EPERM 127.0.0.1`), mas os mesmos comandos passaram fora do sandbox.
-- `P3`: nota operacional controlada: os guias MF5 referem exemplos `apps/...`; a implementacao real usou `referencia_privada_docente/...`, conforme a prompt ativa.
+- `P3`: nota operacional controlada: os guias MF5 referem exemplos `apps/...`; a implementacao real usou `real_dev/...`, conforme a prompt ativa.
 
 ## Ficheiros alterados
 
 Backend:
 
-- `referencia_privada_docente/backend/src/app.js`
-- `referencia_privada_docente/backend/src/modules/privacy/privacy.validation.js`
-- `referencia_privada_docente/backend/src/modules/privacy/privacy.service.js`
-- `referencia_privada_docente/backend/src/modules/privacy/privacy.controller.js`
-- `referencia_privada_docente/backend/src/modules/privacy/privacy.routes.js`
-- `referencia_privada_docente/backend/src/modules/users/user.validation.js`
-- `referencia_privada_docente/backend/src/modules/users/user.service.js`
-- `referencia_privada_docente/backend/src/modules/users/user.controller.js`
-- `referencia_privada_docente/backend/src/modules/users/user.routes.js`
-- `referencia_privada_docente/backend/src/modules/admin-metrics/admin-metrics.validation.js`
-- `referencia_privada_docente/backend/src/modules/admin-metrics/admin-metrics.service.js`
-- `referencia_privada_docente/backend/src/modules/admin-metrics/admin-metrics.controller.js`
-- `referencia_privada_docente/backend/src/modules/admin-metrics/admin-metrics.routes.js`
-- `referencia_privada_docente/backend/src/modules/integrations/integrations.validation.js`
-- `referencia_privada_docente/backend/src/modules/integrations/integrations.service.js`
-- `referencia_privada_docente/backend/src/modules/integrations/integrations.controller.js`
-- `referencia_privada_docente/backend/src/modules/integrations/integrations.routes.js`
-- `referencia_privada_docente/backend/tests/unit/mf5-validation.test.js`
+- `real_dev/backend/src/app.js`
+- `real_dev/backend/src/modules/privacy/privacy.validation.js`
+- `real_dev/backend/src/modules/privacy/privacy.service.js`
+- `real_dev/backend/src/modules/privacy/privacy.controller.js`
+- `real_dev/backend/src/modules/privacy/privacy.routes.js`
+- `real_dev/backend/src/modules/users/user.validation.js`
+- `real_dev/backend/src/modules/users/user.service.js`
+- `real_dev/backend/src/modules/users/user.controller.js`
+- `real_dev/backend/src/modules/users/user.routes.js`
+- `real_dev/backend/src/modules/admin-metrics/admin-metrics.validation.js`
+- `real_dev/backend/src/modules/admin-metrics/admin-metrics.service.js`
+- `real_dev/backend/src/modules/admin-metrics/admin-metrics.controller.js`
+- `real_dev/backend/src/modules/admin-metrics/admin-metrics.routes.js`
+- `real_dev/backend/src/modules/integrations/integrations.validation.js`
+- `real_dev/backend/src/modules/integrations/integrations.service.js`
+- `real_dev/backend/src/modules/integrations/integrations.controller.js`
+- `real_dev/backend/src/modules/integrations/integrations.routes.js`
+- `real_dev/backend/tests/unit/mf5-validation.test.js`
 
 Frontend:
 
-- `referencia_privada_docente/frontend/src/services/api/privacyApi.js`
-- `referencia_privada_docente/frontend/src/services/api/metricsApi.js`
-- `referencia_privada_docente/frontend/src/services/api/integrationsApi.js`
-- `referencia_privada_docente/frontend/src/components/privacy/PrivacyExportPanel.jsx`
-- `referencia_privada_docente/frontend/src/components/privacy/PrivacyDangerZone.jsx`
-- `referencia_privada_docente/frontend/src/components/privacy/PrivacyConsentsPanel.jsx`
-- `referencia_privada_docente/frontend/src/pages/AccountPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminUsersPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminMetricsPage.jsx`
-- `referencia_privada_docente/frontend/src/pages/AdminIntegrationsPage.jsx`
-- `referencia_privada_docente/frontend/src/routes/AppRoutes.jsx`
-- `referencia_privada_docente/frontend/src/components/layout/AppHeader.jsx`
-- `referencia_privada_docente/frontend/src/styles/global.css`
+- `real_dev/frontend/src/services/api/privacyApi.js`
+- `real_dev/frontend/src/services/api/metricsApi.js`
+- `real_dev/frontend/src/services/api/integrationsApi.js`
+- `real_dev/frontend/src/components/privacy/PrivacyExportPanel.jsx`
+- `real_dev/frontend/src/components/privacy/PrivacyDangerZone.jsx`
+- `real_dev/frontend/src/components/privacy/PrivacyConsentsPanel.jsx`
+- `real_dev/frontend/src/pages/AccountPage.jsx`
+- `real_dev/frontend/src/pages/AdminUsersPage.jsx`
+- `real_dev/frontend/src/pages/AdminMetricsPage.jsx`
+- `real_dev/frontend/src/pages/AdminIntegrationsPage.jsx`
+- `real_dev/frontend/src/routes/AppRoutes.jsx`
+- `real_dev/frontend/src/components/layout/AppHeader.jsx`
+- `real_dev/frontend/src/styles/global.css`
 
 Relatorio:
 
@@ -117,15 +138,15 @@ Relatorio:
 
 | Comando | Resultado | Nota |
 | --- | --- | --- |
-| `node --check referencia_privada_docente/backend/src/modules/privacy/privacy.service.js` | `PASS` | Sem erros de sintaxe. |
-| `node --check referencia_privada_docente/backend/src/modules/admin-metrics/admin-metrics.service.js` | `PASS` | Sem erros de sintaxe. |
-| `node --check referencia_privada_docente/backend/src/modules/integrations/integrations.service.js` | `PASS` | Sem erros de sintaxe. |
-| `npm --prefix pasta_privada_do_professor/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | 22 testes passaram, 15 HTTP/smoke falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
-| `npm --prefix pasta_privada_do_professor/backend test` fora do sandbox | `PASS` | `37/37` testes passaram. |
-| `npm --prefix pasta_privada_do_professor/frontend run build` | `PASS` | Vite build passou; 100 modulos transformados. |
+| `node --check real_dev/backend/src/modules/privacy/privacy.service.js` | `PASS` | Sem erros de sintaxe. |
+| `node --check real_dev/backend/src/modules/admin-metrics/admin-metrics.service.js` | `PASS` | Sem erros de sintaxe. |
+| `node --check real_dev/backend/src/modules/integrations/integrations.service.js` | `PASS` | Sem erros de sintaxe. |
+| `npm --prefix real_dev/backend test` no sandbox | `BLOQUEADO_AMBIENTE` | 22 testes passaram, 15 HTTP/smoke falharam por `listen EPERM: operation not permitted 127.0.0.1`. |
+| `npm --prefix real_dev/backend test` fora do sandbox | `PASS` | `37/37` testes passaram. |
+| `npm --prefix real_dev/frontend run build` | `PASS` | Vite build passou; 100 modulos transformados. |
 | `npm run smoke` no sandbox | `BLOQUEADO_AMBIENTE` | Smoke backend falhou por `listen EPERM: operation not permitted 127.0.0.1`. |
 | `npm run smoke` fora do sandbox | `PASS` | Smoke backend `8/8` e smoke frontend/build passaram. |
-| Pesquisa estatica de seguranca em `referencia_privada_docente` | `PASS_COM_NOTA` | Falsos positivos: lista de redacao `secret`, README a proibir tokens em storage, teste negativo `stripe_real`. |
+| Pesquisa estatica de seguranca em `real_dev` | `PASS_COM_NOTA` | Falsos positivos: lista de redacao `secret`, README a proibir tokens em storage, teste negativo `stripe_real`. |
 | Pesquisa de drift OPSA/Orelle/StudyFlow/etc. | `PASS` | Sem ocorrencias. |
 | `git diff --check` | `PASS` | Sem erros de whitespace nos ficheiros rastreados. |
 

@@ -1,5 +1,17 @@
 # Correcao da auditoria de implementacao real_dev - MF8
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-30`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: correção MF8 observada em 2026-06-30; não constitui prova atual de operação/streaming
+
+> **Snapshot histórico de 2026-06-30:** esta correção não descreve as operações
+> administrativas transacionais acrescentadas na Fase 3. Consultar os adendos
+> atuais de `AUDITORIA-IMPLEMENTACAO-real_dev-MF8.md` e
+> `docs/evidence/MF8/AUDITORIA-ADMINISTRATIVA-FINAL.md`; não reclassificar a
+> decisão histórica com a prova local posterior.
+
 ## Metadados
 
 - `project`: FaithFlix
@@ -89,6 +101,6 @@ Uma reauditoria posterior abriu ainda o finding `P3-MF8-10-01`, porque relatorio
 - Ressalvas herdadas continuam aceites no freeze: rollback/deployment formal, documento tecnico unico e revisao humana alargada.
 - Commits: nao executados, conforme `PERMITIR_COMMITS: nao`.
 
-## Decisao final
+## Decisao observada no snapshot
 
 `PASS_APOS_CORRECAO`. Os findings `P2-MF8-10-01` e `P3-MF8-10-02` ficaram corrigidos sem alterar comportamento de produto, sem expandir scope de MF8 e sem transformar funcionalidades de MF9 em entrega MF8.

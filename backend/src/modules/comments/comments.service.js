@@ -10,6 +10,7 @@ import {
     assertModerationStatus,
     initialModerationFor,
 } from "./comments.validation.js";
+import { assertEngageableContent } from "../catalog/catalog-hierarchy.js";
 
 /**
  * Garante que comentários só podem apontar para conteúdo publicado.
@@ -28,6 +29,7 @@ async function assertPublishedContent(db, contentId) {
         throw new HttpError(404, "Conteudo nao encontrado.");
     }
 
+    assertEngageableContent(content);
     return content;
 }
 

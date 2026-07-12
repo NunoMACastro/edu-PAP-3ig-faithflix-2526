@@ -15,28 +15,27 @@
 - `fase_documental`: `Fase 2`
 - `sprint`: `S08`
 - `core_or_reforco`: `Core`
-- `proximo_bk`: `BK-MF5-01`
+- `proximo_bk`: `BK-MF5-04`
 - `guia_path`: `docs/planificacao/guias-bk/MF4/BK-MF4-06-relatorios-e-historico-por-associacao.md`
-- `last_updated`: `2026-06-13`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagógico (obrigatório)
+#### Objetivo
 
 Neste BK vais criar transparência sobre a pool solidária: painel admin, histórico privado por associação e página pública agregada sem dados sensíveis.
 
-### Objetivo pedagógico
 
 - Ler distribuições mensais sem recalcular valores.
 - Proteger histórico privado de cada associação.
 - Criar uma página pública com associações aprovadas.
 - Exportar CSV simples para evidencia PAP.
 
-### Importância funcional
+#### Importância
 
 - A pool solidária só é confiável se a equipa conseguir mostrar histórico, transparência e limites de acesso.
 - Este BK fecha a parte visível da monetização solidária: admin vê agregados, associação vê apenas o seu histórico e visitantes veem informação pública.
 - O CSV ajuda a defender a solução com evidência objetiva.
 
-### Scope-in
+#### Scope-in
 
 - Criar dashboard admin da pool.
 - Criar ligação entre utilizador autenticado e associação.
@@ -44,7 +43,7 @@ Neste BK vais criar transparência sobre a pool solidária: painel admin, histó
 - Criar exportação CSV simples.
 - Criar página pública de associações aprovadas.
 
-### Scope-out
+#### Scope-out
 
 - Não recalcular distribuição mensal; o BK lê `pool_distributions`.
 - Não expor emails, contactos internos ou dados privados na página pública.
@@ -56,14 +55,26 @@ Neste BK vais criar transparência sobre a pool solidária: painel admin, histó
 - 2 blocos de 90 minutos.
 - Se o ownership por associação não estiver claro, não avançar para frontend.
 
-### Glossário rápido
+#### Estado antes e depois
+
+- Estado antes: aplicam-se os BKs declarados em `dependencias`, os RF/RNF do Header e os artefactos já entregues pelas fases anteriores.
+- Estado depois: ficam implementáveis e verificáveis apenas os resultados listados em `Scope-in`, sem antecipar o `Scope-out`.
+
+#### Pré-requisitos
+
+- `BK-MF4-05` executado com `pool_distributions`.
+- `BK-MF2-02` executado com utilizadores autenticados e role `admin`.
+- `charities` contem associações aprovadas.
+- `requireAuth` e `requireRole` disponíveis.
+
+#### Glossário
 
 - Dashboard admin: visão agregada da pool para administração.
 - Histórico privado: distribuição filtrada por associação.
 - Página pública: apresentação segura das associações aprovadas.
 - Membership: ligação entre utilizador autenticado e associação.
 
-### Conceitos teóricos essenciais
+#### Conceitos teóricos essenciais
 
 - Domínio FaithFlix: relatórios dão transparência ao impacto social sem expor dados privados.
 - Backend: o controller verifica se o utilizador pode ler aquela associação antes de devolver histórico.
@@ -86,27 +97,43 @@ Neste BK vais criar transparência sobre a pool solidária: painel admin, histó
 - [ ] Sei indicar que dados sao públicos.
 - [ ] Sei provar que acesso cruzado e bloqueado.
 
-## Bloco operacional (obrigatório)
-
-### Pré-condições
-
-- `BK-MF4-05` executado com `pool_distributions`.
-- `BK-MF2-02` executado com utilizadores autenticados e role `admin`.
-- `charities` contem associações aprovadas.
-- `requireAuth` e `requireRole` disponíveis.
-
-### Arquitetura do BK
+#### Arquitetura do BK
 
 - Backend: service de relatórios, controller de acesso e rotas públicas/privadas.
+- Transversal: membership e audit usam os helpers transacionais já introduzidos
+  na revisão administrativa.
 - Persistência: `charity_memberships` liga utilizador e associação; `pool_distributions` fornece histórico.
 - Frontend: páginas para público, admin, histórico privado e ligação admin de membros.
 - Segurança: `assertCanReadCharity` aplica ownership antes de devolver histórico ou CSV.
-- Integração: `BK-MF5-01` pode usar estes dados em exportação RGPD com o mesmo cuidado de privacidade.
+- Segurança de conta: a ligação escreve apenas sobre uma conta não bloqueada nem eliminada; indisponibilidade devolve `404 USER_NOT_OPERATIONAL` sem efeitos parciais.
+- Integração RGPD: `BK-MF5-01` exporta `charity_memberships` da própria conta e `BK-MF5-02` remove-a transacionalmente, sem tocar em ligações de outros utilizadores.
 
-### Ficheiros a criar, editar e rever
+### Contrato vinculativo das interfaces administrativas (Fase 5 - 2026-07-10)
+
+- Ligar um utilizador a uma associação exige confirmação explícita com ambos os
+  identificadores e avisa que a ação concede acesso ao histórico privado.
+- O formulário de membership impede submissões sobrepostas antes do render,
+  expõe `aria-busy`, desativa campos/botão durante a escrita e cancela o pedido
+  no unmount. Uma resposta abortada ou antiga não substitui o resultado atual.
+- O dashboard da pool usa `AbortController`, distingue loading/error/empty,
+  oferece `Tentar novamente` e não apresenta `REQUEST_ABORTED` ao utilizador.
+- Estados financeiros técnicos são traduzidos: `completed` torna-se
+  `Distribuída` e `deferred_no_eligible_charities` torna-se
+  `Adiada: sem associações elegíveis`. Um valor desconhecido usa
+  `Indisponível`, sem mostrar enums brutos.
+- O dashboard continua a ler, no máximo, os 12 fechos persistidos mais recentes;
+  não recalcula valores no browser. A ausência de paginação neste resumo fixo
+  não autoriza remover paginação das listagens administrativas que a expõem.
+- Os exemplos lineares do Passo 3 devem ser completados com estas guardas de
+  confirmação, cancelamento e PT-PT.
+
+#### Ficheiros a criar/editar/rever
 
 - CRIAR: `backend/src/modules/charities/charity-reports.service.js`
 - CRIAR: `backend/src/modules/charities/charity-reports.controller.js`
+- REVER: `backend/src/modules/audit/audit.service.js`
+- REVER: `backend/src/config/database.js`
+- CRIAR/EDITAR: `backend/tests/unit/f3-admin-transactions.test.js`
 - CRIAR: `frontend/src/pages/PublicCharitiesPage.jsx`
 - CRIAR: `frontend/src/pages/AdminPoolDashboardPage.jsx`
 - CRIAR: `frontend/src/pages/CharityHistoryPage.jsx`
@@ -117,7 +144,7 @@ Neste BK vais criar transparência sobre a pool solidária: painel admin, histó
 - EDITAR: `frontend/src/routes/AppRoutes.jsx`
 - REVER: `BK-MF4-05`, `RF46`, `RF47`, `RF48`, `RNF18`, `RNF19`, `RNF26`
 
-### Guia de execução (passo-a-passo)
+#### Tutorial técnico linear
 
 ### Passo 1 - Criar service de relatórios
 
@@ -143,7 +170,9 @@ Cria o service abaixo.
  * membership, preservando contactos internos e regras de ownership no backend.
  */
 import { ObjectId } from "mongodb";
-import { getDb } from "../../config/database.js";
+import { getDb, runInTransaction } from "../../config/database.js";
+import { HttpError } from "../../utils/http-error.js";
+import { writeAdminAudit } from "../audit/audit.service.js";
 
 /**
  * Converte identificadores recebidos em `ObjectId` com erro de domínio.
@@ -205,62 +234,155 @@ export async function ensureCharityReportIndexes() {
 }
 
 /**
+ * Cria o conflito estável usado quando já existe outra ligação.
+ *
+ * @returns {HttpError} Conflito que exige transferência explícita.
+ */
+function membershipConflict() {
+  return new HttpError(
+    409,
+    "O utilizador já está ligado a uma associação. A transferência exige uma operação explícita.",
+    undefined,
+    "CHARITY_MEMBERSHIP_EXISTS",
+  );
+}
+
+/**
  * Liga um utilizador existente a uma associação elegível.
  *
  * @param {string} charityId Identificador da associação.
  * @param {string} userId Identificador do utilizador que passara a consultar histórico.
  * @param {string} createdByUserId Identificador do admin que cria a ligacao.
- * @returns {Promise<{ membership: object }>} Ligacao criada ou atualizada.
- * @throws {Error} Quando a associação ou o utilizador não existem.
+ * @param {{ requestId?: string }} [context] Metadados seguros do pedido HTTP.
+ * @returns {Promise<{ membership: object }>} Ligacao criada ou repetida.
+ * @throws {Error} Quando a associação não existe, a conta não está operacional
+ * ou já existe uma ligação a outra associação.
  */
-export async function linkUserToCharity(charityId, userId, createdByUserId) {
-  const db = await getDb();
+export async function linkUserToCharity(
+  charityId,
+  userId,
+  createdByUserId,
+  context = {},
+) {
   const charityObjectId = asObjectId(charityId, "Associação");
   const userObjectId = asObjectId(userId, "Utilizador");
   const createdByObjectId = asObjectId(createdByUserId, "Admin");
 
-  // Apenas associações ativas e elegíveis podem receber utilizadores associados.
-  const charity = await db.collection("charities").findOne({
-    _id: charityObjectId,
-    status: "active",
-    poolStatus: "eligible",
-  });
+  try {
+    return await runInTransaction(async ({ db, session }) => {
+      const charity = await db.collection("charities").findOne(
+        { _id: charityObjectId, status: "active", poolStatus: "eligible" },
+        { session },
+      );
 
-  if (!charity) {
-    const error = new Error("Associação ativa e elegível não encontrada.");
-    error.statusCode = 404;
-    throw error;
-  }
+      if (!charity) {
+        throw new HttpError(404, "Associação ativa e elegível não encontrada.");
+      }
 
-  // A ligacao exige um utilizador real para não criar ownership quebrado.
-  const user = await db.collection("users").findOne({ _id: userObjectId });
+      const user = await db.collection("users").findOne(
+        { _id: userObjectId },
+        { session },
+      );
+      const accountStatusAllowsAccess = user && (
+        user.accountStatus === undefined || user.accountStatus === "active"
+      );
+      const legacyStatusAllowsAccess = user && (
+        user.status === undefined || user.status === "active"
+      );
+      if (!accountStatusAllowsAccess || !legacyStatusAllowsAccess) {
+        throw new HttpError(
+          404,
+          "Utilizador ativo não encontrado.",
+          undefined,
+          "USER_NOT_OPERATIONAL",
+        );
+      }
 
-  if (!user) {
-    const error = new Error("Utilizador não encontrado.");
-    error.statusCode = 404;
-    throw error;
-  }
+      const existing = await db.collection("charity_memberships").findOne(
+        { userId: userObjectId },
+        { session },
+      );
 
-  const now = new Date();
-  // Um utilizador fica ligado a uma associação de cada vez; `upsert` permite corrigir a ligacao.
-  await db.collection("charity_memberships").updateOne(
-    { userId: userObjectId },
-    {
-      $set: {
-        charityId: charityObjectId,
-        updatedAt: now,
-      },
-      $setOnInsert: {
+      if (existing) {
+        if (String(existing.charityId) !== String(charityObjectId)) {
+          throw membershipConflict();
+        }
+
+        // Repetir a mesma ligação é idempotente e não duplica o audit log.
+        return { membership: publicMembership(existing) };
+      }
+
+      // Só uma criação nova incrementa a versão. O filtro reproduz exatamente
+      // os dois estados observados e fecha a corrida com billing/RGPD/admin.
+      const userLock = await db.collection("users").updateOne(
+        {
+          _id: userObjectId,
+          accountStatus: user.accountStatus === undefined
+            ? { $exists: false }
+            : "active",
+          status: user.status === undefined
+            ? { $exists: false }
+            : "active",
+          operationalVersion: user.operationalVersion === undefined
+            ? { $exists: false }
+            : user.operationalVersion,
+        },
+        { $inc: { operationalVersion: 1 } },
+        { session },
+      );
+
+      if (userLock.matchedCount !== 1) {
+        throw new HttpError(
+          409,
+          "A conta mudou durante a operação. Tenta novamente.",
+          undefined,
+          "USER_STATE_CHANGED",
+        );
+      }
+
+      const now = new Date();
+      const membership = {
         userId: userObjectId,
+        charityId: charityObjectId,
         createdBy: createdByObjectId,
         createdAt: now,
-      },
-    },
-    { upsert: true },
-  );
+        updatedAt: now,
+      };
+      const result = await db.collection("charity_memberships").insertOne(
+        membership,
+        { session },
+      );
+      const persistedMembership = { ...membership, _id: result.insertedId };
 
-  const membership = await db.collection("charity_memberships").findOne({ userId: userObjectId });
-  return { membership: publicMembership(membership) };
+      await writeAdminAudit({
+        db,
+        session,
+        actorUserId: createdByObjectId,
+        action: "charity.membership_create",
+        targetType: "charity_membership",
+        targetId: result.insertedId,
+        before: null,
+        after: persistedMembership,
+        requestId: context.requestId,
+      });
+
+      return { membership: publicMembership(persistedMembership) };
+    });
+  } catch (error) {
+    // O índice único fecha a race entre leituras concorrentes.
+    if (Number(error?.code) === 11000) {
+      const db = await getDb();
+      const winner = await db.collection("charity_memberships").findOne({
+        userId: userObjectId,
+      });
+      if (winner && String(winner.charityId) === String(charityObjectId)) {
+        return { membership: publicMembership(winner) };
+      }
+      throw membershipConflict();
+    }
+
+    throw error;
+  }
 }
 
 /**
@@ -359,7 +481,10 @@ export function historyToCsv(history) {
 
 5. Explicação do código ou da decisão.
 
-O service le `pool_distributions`; não recalcula a pool. A colecao `charity_memberships` cria o ownership entre um utilizador autenticado e uma associação sem alterar o contrato de roles da app.
+O service le `pool_distributions`; não recalcula a pool. Uma membership nova e
+o evento `charity.membership_create` são confirmados na mesma transação. Repetir
+a mesma ligação é idempotente; ligar o utilizador a outra associação devolve
+`409 CHARITY_MEMBERSHIP_EXISTS` e nunca transfere ownership silenciosamente.
 
 6. Validação do passo.
 
@@ -435,6 +560,16 @@ export async function getPoolDashboardController(_req, res) {
   res.status(200).json(await getPoolDashboard());
 }
 
+function assertObjectBody(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    const error = new Error("O corpo do pedido deve ser um objeto JSON.");
+    error.statusCode = 400;
+    error.code = "INVALID_REQUEST_BODY";
+    throw error;
+  }
+  return body;
+}
+
 /**
  * Liga um utilizador a uma associação por acao administrativa.
  *
@@ -443,7 +578,12 @@ export async function getPoolDashboardController(_req, res) {
  * @returns {Promise<void>}
  */
 export async function postCharityMember(req, res) {
-  res.status(201).json(await linkUserToCharity(req.params.id, req.body.userId, req.user.id));
+  const body = assertObjectBody(req.body);
+  res.status(201).json(
+    await linkUserToCharity(req.params.id, body.userId, req.user.id, {
+      requestId: req.id,
+    }),
+  );
 }
 
 /**
@@ -538,28 +678,32 @@ Mostrar página pública e painel admin simples.
 
 3. Instrucoes concretas.
 
-Acrescenta chamadas API e rotas `/charities` e `/admin/pool`.
+Acrescenta chamadas API e as rotas públicas PT-PT `/associacoes` e
+`/associacoes/:charityId/historico`, mais as rotas administrativas explícitas
+abaixo. Substitui apenas o elemento placeholder de `/associacoes`; não
+reconstruas o router.
 
-4. Código completo.
+4. Código completo das páginas e patch contextual do cliente.
 
-Adicionar a `charitiesApi`:
+O recorte seguinte é para inserir no objeto `charitiesApi` já exportado pelo
+ficheiro; não é um módulo JavaScript autónomo e não substitui os métodos atuais:
 
-```js
+```text
 /**
  * Lista associações elegíveis para página pública.
  *
  * @returns {Promise<{ charities: object[] }>} Associações públicas.
  */
-listPublicCharities() {
-  return apiClient.get("/api/charities/public");
+listPublicCharities(options = {}) {
+  return apiClient.get("/api/charities/public", options);
 },
 /**
  * Obtem totais mensais agregados da pool.
  *
  * @returns {Promise<{ months: object[] }>} Meses recentes.
  */
-getPoolDashboard() {
-  return apiClient.get("/api/charities/pool/dashboard");
+getPoolDashboard(options = {}) {
+  return apiClient.get("/api/charities/pool/dashboard", options);
 },
 /**
  * Obtem histórico privado de uma associação.
@@ -567,8 +711,11 @@ getPoolDashboard() {
  * @param {string} charityId Identificador da associação.
  * @returns {Promise<object>} Histórico com linhas mensais.
  */
-getCharityHistory(charityId) {
-  return apiClient.get(`/api/charities/${encodeURIComponent(charityId)}/history`);
+getCharityHistory(charityId, options = {}) {
+  return apiClient.get(
+    `/api/charities/${encodeURIComponent(charityId)}/history`,
+    options,
+  );
 },
 /**
  * Liga um utilizador a uma associação.
@@ -577,9 +724,13 @@ getCharityHistory(charityId) {
  * @param {string} userId Identificador do utilizador.
  * @returns {Promise<{ membership: object }>} Ligacao criada.
  */
-linkUserToCharity(charityId, userId) {
-  return apiClient.post(`/api/charities/${encodeURIComponent(charityId)}/members`, { userId });
-}
+linkUserToCharity(charityId, userId, options = {}) {
+  return apiClient.post(
+    `/api/charities/${encodeURIComponent(charityId)}/members`,
+    { userId },
+    options,
+  );
+},
 ```
 
 `frontend/src/pages/PublicCharitiesPage.jsx`
@@ -591,7 +742,7 @@ linkUserToCharity(charityId, userId) {
  * Apresenta apenas dados públicos devolvidos pela API, evitando expor contactos
  * internos ou regras administrativas ao visitante.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
@@ -604,8 +755,14 @@ export function PublicCharitiesPage() {
   const [charities, setCharities] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const requestEpochRef = useRef(0);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const requestEpoch = requestEpochRef.current + 1;
+    requestEpochRef.current = requestEpoch;
+
     /**
      * Carrega associações públicas e separa loading de estado vazio.
      *
@@ -615,22 +772,33 @@ export function PublicCharitiesPage() {
       setLoading(true);
       setError("");
       try {
-        const response = await charitiesApi.listPublicCharities();
+        const response = await charitiesApi.listPublicCharities({
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted || requestEpochRef.current !== requestEpoch) return;
         setCharities(response.charities);
       } catch (apiError) {
+        if (controller.signal.aborted || requestEpochRef.current !== requestEpoch) return;
         setError(toUserMessage(apiError));
       } finally {
+        if (controller.signal.aborted || requestEpochRef.current !== requestEpoch) return;
         setLoading(false);
       }
     }
 
-    loadCharities();
-  }, []);
+    void loadCharities();
+    return () => controller.abort();
+  }, [reloadVersion]);
 
   return (
     <main>
       <h1>Associações apoiadas</h1>
       {error && <p role="alert">{error}</p>}
+      {error && (
+        <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+          Tentar novamente
+        </button>
+      )}
       {loading && <p>A carregar associações...</p>}
       {!loading && charities.length === 0 && !error && <p>Ainda não existem associações públicas.</p>}
       {charities.map((charity) => (
@@ -667,40 +835,58 @@ export function AdminPoolDashboardPage() {
   const [months, setMonths] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [reloadVersion, setReloadVersion] = useState(0);
 
   useEffect(() => {
-    /**
-     * Carrega dashboard admin sem recalcular valores no browser.
-     *
-     * @returns {Promise<void>}
-     */
-    async function loadDashboard() {
-      setLoading(true);
-      setError("");
-      try {
-        const response = await charitiesApi.getPoolDashboard();
-        setMonths(response.months);
-      } catch (apiError) {
-        setError(toUserMessage(apiError));
-      } finally {
-        setLoading(false);
-      }
-    }
+    const controller = new AbortController();
+    let active = true;
+    setLoading(true);
+    setError("");
 
-    loadDashboard();
-  }, []);
+    charitiesApi.getPoolDashboard({ signal: controller.signal })
+      .then((response) => {
+        if (!active || controller.signal.aborted) return;
+        setMonths(response.months);
+      })
+      .catch((apiError) => {
+        if (!active || apiError?.code === "REQUEST_ABORTED") return;
+        setError(toUserMessage(apiError));
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [reloadVersion]);
+
+  function distributionStatusLabel(status) {
+    if (status === "completed") return "Distribuída";
+    if (status === "deferred_no_eligible_charities") {
+      return "Adiada: sem associações elegíveis";
+    }
+    return "Indisponível";
+  }
 
   return (
     <main>
       <h1>Painel da pool</h1>
       {error && <p role="alert">{error}</p>}
-      {loading && <p>A carregar painel...</p>}
-      {!loading && months.length === 0 && !error && <p>Sem distribuicoes registadas.</p>}
+      {error && (
+        <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+          Tentar novamente
+        </button>
+      )}
+      {loading && <p role="status">A carregar painel...</p>}
+      {!loading && months.length === 0 && !error && <p>Sem distribuições registadas.</p>}
       {months.map((month) => (
         <article key={month.month}>
           <h2>{month.month}</h2>
           <p>Total: {(month.totalPoolCents / 100).toFixed(2)} EUR</p>
           <p>Associações: {month.charitiesCount}</p>
+          <p>Estado: {distributionStatusLabel(month.status)}</p>
         </article>
       ))}
     </main>
@@ -717,7 +903,7 @@ export function AdminPoolDashboardPage() {
  * Usa o `charityId` da rota para consultar o histórico autorizado pelo backend,
  * onde admin e membership determinam quem pode ver os valores.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
@@ -731,31 +917,53 @@ export function CharityHistoryPage() {
   const { charityId } = useParams();
   const [history, setHistory] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const requestEpochRef = useRef(0);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const requestEpoch = requestEpochRef.current + 1;
+    requestEpochRef.current = requestEpoch;
+
     /**
      * Carrega histórico já protegido pelo backend.
      *
      * @returns {Promise<void>}
      */
     async function loadHistory() {
+      setLoading(true);
       setError("");
+      setHistory(null);
       try {
-        const response = await charitiesApi.getCharityHistory(charityId);
+        const response = await charitiesApi.getCharityHistory(charityId, {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted || requestEpochRef.current !== requestEpoch) return;
         setHistory(response);
       } catch (apiError) {
+        if (controller.signal.aborted || requestEpochRef.current !== requestEpoch) return;
         setError(toUserMessage(apiError));
+      } finally {
+        if (controller.signal.aborted || requestEpochRef.current !== requestEpoch) return;
+        setLoading(false);
       }
     }
 
-    loadHistory();
-  }, [charityId]);
+    void loadHistory();
+    return () => controller.abort();
+  }, [charityId, reloadVersion]);
 
   return (
     <main>
       <h1>Histórico da associação</h1>
       {error && <p role="alert">{error}</p>}
-      {!history && !error && <p>A carregar histórico...</p>}
+      {error && (
+        <button type="button" onClick={() => setReloadVersion((value) => value + 1)}>
+          Tentar novamente
+        </button>
+      )}
+      {loading && <p role="status">A carregar histórico...</p>}
       {history && (
         <>
           <p>Total recebido: {(history.totalCents / 100).toFixed(2)} EUR</p>
@@ -783,7 +991,7 @@ export function CharityHistoryPage() {
  * Envia IDs explícitos para um endpoint protegido por `admin`, permitindo criar
  * ownership operacional sem transformar associações em utilizadores comuns.
  */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { charitiesApi } from "../services/api/charitiesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 
@@ -798,6 +1006,17 @@ export function AdminCharityMembersPage() {
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const submissionRef = useRef(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      submissionRef.current?.abort();
+      submissionRef.current = null;
+    };
+  }, []);
 
   /**
    * Envia a ligacao para o backend e mostra o resultado.
@@ -807,89 +1026,173 @@ export function AdminCharityMembersPage() {
    */
   async function handleSubmit(event) {
     event.preventDefault();
+    if (submissionRef.current) return;
+    const normalizedCharityId = charityId.trim();
+    const normalizedUserId = userId.trim();
+    if (!window.confirm(
+      `Ligar o utilizador ${normalizedUserId} à associação ${normalizedCharityId}? Esta ação concede acesso ao histórico privado.`,
+    )) return;
+
+    const controller = new AbortController();
+    submissionRef.current = controller;
     setSubmitting(true);
     setStatus("");
     setError("");
 
     try {
-      const response = await charitiesApi.linkUserToCharity(charityId, userId);
-      setStatus(`Utilizador ligado a associação ${response.membership.charityId}.`);
+      const response = await charitiesApi.linkUserToCharity(
+        normalizedCharityId,
+        normalizedUserId,
+        { signal: controller.signal },
+      );
+      if (controller.signal.aborted || !mountedRef.current) return;
+      setStatus(`Utilizador ligado à associação ${response.membership.charityId}.`);
     } catch (apiError) {
+      if (controller.signal.aborted || apiError?.code === "REQUEST_ABORTED") return;
+      if (!mountedRef.current) return;
       setError(toUserMessage(apiError));
     } finally {
-      setSubmitting(false);
+      if (submissionRef.current === controller) submissionRef.current = null;
+      if (mountedRef.current) setSubmitting(false);
     }
   }
 
   return (
     <main>
       <h1>Ligar utilizador a associação</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} aria-busy={submitting}>
         <label htmlFor="charityId">ID da associação</label>
-        <input id="charityId" value={charityId} onChange={(event) => setCharityId(event.target.value)} required />
+        <input id="charityId" value={charityId} disabled={submitting} onChange={(event) => setCharityId(event.target.value)} required />
         <label htmlFor="userId">ID do utilizador</label>
-        <input id="userId" value={userId} onChange={(event) => setUserId(event.target.value)} required />
+        <input id="userId" value={userId} disabled={submitting} onChange={(event) => setUserId(event.target.value)} required />
         <button type="submit" disabled={submitting}>
-          {submitting ? "A guardar..." : "Guardar ligacao"}
+          {submitting ? "A guardar..." : "Guardar ligação"}
         </button>
       </form>
-      {status && <p>{status}</p>}
+      {status && <p role="status">{status}</p>}
       {error && <p role="alert">{error}</p>}
     </main>
   );
 }
 ```
 
+Em `frontend/src/routes/AppRoutes.jsx`:
+
+```jsx
+// ADICIONAR cada binding uma única vez junto das restantes páginas lazy.
+const PublicCharitiesPage = lazyNamedPage(
+  () => import("../pages/PublicCharitiesPage.jsx"),
+  "PublicCharitiesPage",
+);
+const CharityHistoryPage = lazyNamedPage(
+  () => import("../pages/CharityHistoryPage.jsx"),
+  "CharityHistoryPage",
+);
+const AdminPoolDashboardPage = lazyNamedPage(
+  () => import("../pages/AdminPoolDashboardPage.jsx"),
+  "AdminPoolDashboardPage",
+);
+const AdminCharityMembersPage = lazyNamedPage(
+  () => import("../pages/AdminCharityMembersPage.jsx"),
+  "AdminCharityMembersPage",
+);
+
+// SUBSTITUIR /associacoes; ADICIONAR as outras três rotas sem remover nenhuma anterior.
+<>
+  <Route path="/associacoes" element={<PublicCharitiesPage />} />
+  <Route path="/associacoes/:charityId/historico" element={<CharityHistoryPage />} />
+  <Route path="/admin/pool/dashboard" element={<AdminPoolDashboardPage />} />
+  <Route path="/admin/charity-members" element={<AdminCharityMembersPage />} />
+</>
+```
+
 5. Explicação do código ou da decisão.
 
-A página pública mostra apenas dados institucionais. O painel admin mostra totais mensais agregados e a página de ligacao permite ao admin criar o ownership necessário para o histórico privado.
-
-A página pública e o painel admin distinguem loading de estado vazio, evitando mostrar mensagens de ausencia antes de a resposta chegar. O link público usa o website validado no `BK-MF4-03` e abre como link externo com `rel="noreferrer"`.
+A página pública mostra apenas dados institucionais. O dashboard usa
+`AbortController`, retry e rótulos PT-PT para os estados financeiros, sem
+recalcular montantes no browser. A ligação de membership pede confirmação com
+os dois IDs, reserva a submissão num `ref`, desativa campos, expõe `aria-busy` e
+cancela a mutation no unmount. O link público usa o website validado no
+`BK-MF4-03` e abre como link externo com `rel="noreferrer"`.
 
 6. Validação do passo.
 
-Abrir `/charities` sem login, `/admin/pool` com admin, `/admin/charity-members` com admin e `/charities/:charityId/history` com o utilizador ligado a essa associação.
+Abrir `/associacoes` sem login, `/admin/pool/dashboard` com admin, `/admin/charity-members` com admin e `/associacoes/:charityId/historico` com o utilizador ligado a essa associação.
 
 7. Caso negativo, erro comum ou risco que este passo evita.
 
 Expor email da associação na página pública pode criar risco de privacidade e spam.
 
-## Critérios de aceite (mensuráveis)
+#### Critérios de aceite
 
 - `GET /api/charities/public` devolve associações elegíveis sem contactos internos.
 - `GET /api/charities/pool/dashboard` exige admin.
 - `POST /api/charities/:id/members` exige admin e liga um utilizador existente a uma associação elegível.
+- Repetir a mesma ligação é idempotente e não duplica auditoria; tentar outra
+  associação devolve `409` com `code: "CHARITY_MEMBERSHIP_EXISTS"`.
+- Conta bloqueada, eliminada ou inexistente devolve `404 USER_NOT_OPERATIONAL`;
+  não cria membership nem audit log. O write-lock da conta serializa a ligação
+  com bloqueio/eliminação concorrente.
+- Membership e `charity.membership_create` fazem commit ou rollback em conjunto
+  e o audit recebe o `requestId` do pedido.
+- A conta alvo exige simultaneamente `accountStatus` ausente/`active` e
+  `status` ausente/`active`; estados inativos, desconhecidos ou `null` falham
+  fechados. `body` nulo/array devolve `400 INVALID_REQUEST_BODY` pelo envelope.
+- Replay da mesma membership retorna o documento existente antes do CAS, não
+  incrementa `operationalVersion` nem cria novo audit; a corrida por duplicate
+  key devolve o mesmo resultado vencedor e a revisão perdedora faz rollback.
+- A exportação RGPD inclui `sections.charity_memberships` da própria conta; a
+  eliminação remove essa ligação na mesma transação e preserva as de terceiros.
 - Histórico privado bloqueia acesso cruzado entre associações.
 - CSV devolve `text/csv` com linhas coerentes com o histórico.
+- Membership exige confirmação, busy state e cancelamento; duplo clique ou
+  unmount não produz duas ligações nem feedback tardio.
+- Páginas pública, dashboard e histórico usam abort/epoch, permitem retry e
+  ignoram respostas abortadas/antigas; `completed` é apresentado como
+  `Distribuída` e enums desconhecidos como `Indisponível`.
 
-## Validação final
+#### Validação final
 
 ```bash
 cd backend
 npm test
 ```
 
-Testar página pública, dashboard admin, ligacao admin de utilizador a associação e acesso cruzado bloqueado.
+Testar página pública, dashboard admin, ligação admin, repetição idempotente,
+tentativa de transferência implícita, fault injection no audit e acesso cruzado
+bloqueado. Confirmar também conta indisponível, exportação da ligação própria e
+eliminação sem afetar a membership de outra conta.
 
-## Evidence para PR/defesa
+#### Evidence para PR/defesa
 
 - `pr`: commit/PR com reports service, memberships e paginas.
 - `proof`: captura da página pública, dashboard admin e histórico privado do utilizador ligado.
-- `neg`: associação A bloqueada ao consultar associação B, período sem dados e dashboard sem admin.
+- `neg`: transferência implícita bloqueada, conta não operacional, rollback
+  quando o audit falha, associação A bloqueada ao consultar B, período sem dados
+  e dashboard sem admin.
 
-## Handoff
+#### Handoff
 
 `BK-MF5-01` pode usar estes relatórios como contexto de dados pessoais a exportar, mas deve manter privacidade, ownership por `charity_memberships` e limites de dados públicos.
 
 ## Snippet técnico aplicável
 
-```js
+Este recorte resume o guard dentro do controller completo do Passo 2. Não é
+JavaScript autónomo: `req` e `charityId` pertencem à função que trata o pedido.
+
+```text
 // Admin ve tudo; utilizador ligado a associação ve apenas o seu proprio histórico.
 if (req.user.role === "admin") return;
 const membership = await getMyCharityMembership(req.user.id);
 if (String(membership.charityId) === String(charityId)) return;
 ```
 
-## Changelog
+#### Changelog
 
 - `2026-06-13`: guia reescrito com dashboard, histórico privado, CSV, página pública e ownership.
+- `2026-07-10`: membership administrativa tornada transacional e auditada,
+  idempotente na repetição e fail-closed perante transferência implícita.
+- `2026-07-10`: membership limitada a conta operacional e integrada na
+  exportação/eliminação RGPD com ownership estrito.
+- `2026-07-10`: membership e dashboard sincronizados com confirmação,
+  anti-duplo-clique, abort/anti-stale, retry e estados financeiros em PT-PT.

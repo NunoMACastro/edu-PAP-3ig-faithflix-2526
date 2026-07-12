@@ -96,6 +96,46 @@ A arquitetura privilegia separação de responsabilidades, rastreabilidade de de
 
 Fonte canónica RNF: [docs/RNF.md](docs/RNF.md).
 
+### Estado implementado e limites da prova
+
+As funcionalidades descritas neste README representam o escopo do produto e o
+objetivo pedagógico; não significam que todos os fluxos estejam concluídos pelos
+alunos. A implementação docente em `real_dev/` é uma referência privada e não
+é a entrega dos alunos em `backend/` e `frontend/`.
+
+Na baseline auditada em 2026-07-10:
+
+- não existem vídeos reais fornecidos para o player;
+- conteúdos publicados sem media permanecem visíveis com
+  `mediaStatus: "pending"`, `isPlayable: false` e reprodução desativada;
+- MP4/HLS/DASH foram exercitados apenas com fixtures sintéticas locais, que não
+  provam vídeo real, 4K, CDN, ABR, DRM, performance ou carga;
+- checkout e renovação continuam explicitamente simulados, sem gateway ou
+  webhook real;
+- `RNF08` e `RNF10` permanecem `NAO_PROVADO` e `RNF23` apenas
+  `PARCIAL_VALIDADO`;
+- o gate máximo da referência é `GO_LOCAL_COM_RESSALVAS`; produção permanece
+  `NO_GO_PRODUCAO`.
+
+O catálogo, a pesquisa, a pool e as restantes funcionalidades só devem ser
+apresentados como concluídos na lane dos alunos quando existir evidence própria,
+datada e ligada aos respetivos BK.
+
+Operação local e limites atuais:
+
+- [arquitetura técnica](ARCHITECTURE.md);
+- [arranque e shutdown local](docs/runbooks/ARRANQUE-E-SHUTDOWN-LOCAL.md);
+- [worker local](docs/runbooks/WORKER-LOCAL.md);
+- [backup e verificação de restore](docs/runbooks/BACKUP-RESTORE-LOCAL.md);
+- [rollback manual local](docs/runbooks/ROLLBACK-MANUAL-LOCAL.md).
+- [reset e dataset de demonstração](docs/runbooks/DEMO-DATASET.md).
+
+Estes artefactos descrevem apenas uma baseline local. Não provam CI/deployment,
+rollback remoto, backup diário automático, restore real, MongoDB transacional
+de produção ou operação contínua. No ambiente auditado em 2026-07-10,
+`mongodump` e `mongorestore` não estavam disponíveis; a verificação real de
+backup/restore permanece bloqueada pelo ambiente.
+
 ## 8. Roadmap Resumido por Fases
 1. fundação técnica e identidade da aplicação;
 2. catálogo, detalhe e experiência de visualização;
@@ -117,3 +157,4 @@ Projeto académico para fins educativos.
 ### Changelog
 - 2026-04-17: README reescrito integralmente com estrutura canónica, escopo MVP/pós-PAP e alinhamento com plano mestre.
 - 2026-06-30: escopo MVP atualizado para incluir MF9 com planos Pro/Família, partilha familiar real e qualidade por plano.
+- 2026-07-10: separados escopo, referência privada e estado dos alunos; registadas as limitações de media sintética, pagamentos simulados e `NO_GO_PRODUCAO`.

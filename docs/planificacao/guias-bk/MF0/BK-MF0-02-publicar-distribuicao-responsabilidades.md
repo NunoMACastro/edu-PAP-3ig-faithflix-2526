@@ -17,21 +17,21 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF0-03`
 - `guia_path`: `docs/planificacao/guias-bk/MF0/BK-MF0-02-publicar-distribuicao-responsabilidades.md`
-- `last_updated`: `2026-05-25`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
 Este BK ensina a equipa a separar ownership, apoio e validação. Para alunos de 12.º ano, isto evita uma confusão comum: "todos fazem tudo" parece colaborativo, mas em projeto real costuma gerar buracos de responsabilidade.
 
-## Bloco operacional (obrigatorio)
+##### Resultado operacional esperado
 
 O trabalho operacional é publicar e validar `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`, reutilizando o plano total fechado em `BK-MF0-01` e preparando o backlog atómico de `BK-MF0-03`.
 
-#### Nota anti-drift MF0
+##### Nota anti-drift MF0
 
 `MF0` fecha apenas governance/kickoff: plano, responsabilidades, backlog, DoD, calendário e reunião de alinhamento. Este BK não cria backend, frontend, base de dados, streaming, catálogo, endpoints, componentes ou funcionalidade real. Qualquer referência a áreas técnicas neste guia serve para distribuir responsabilidade futura, não para implementar essas áreas agora.
 
-#### BK-MF0-02 - Publicar distribuicao de responsabilidades
+##### Enquadramento do BK
 
 ##### O que vamos fazer neste BK
 
@@ -41,7 +41,7 @@ O resultado esperado é um documento que diga quem decide, quem implementa, quem
 
 A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de mockup não bloqueia a distribuição de responsabilidades.
 
-##### Porque e que isto e importante
+#### Importância
 
 - Evita que BKs críticos fiquem sem dono real.
 - Ajuda os alunos a perceber que "owner" não significa trabalhar sozinho; significa responder pelo fecho do BK.
@@ -49,7 +49,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - Desbloqueia `BK-MF0-03`, porque o backlog atómico precisa de owner e apoio por BK.
 - Protege a arquitetura futura: backend, frontend, dados e QA ficam com responsabilidades explícitas.
 
-##### O que entra (scope)
+#### Scope-in
 
 - Rever `DISTRIBUICAO-RESPONSABILIDADES.md`.
 - Confirmar equipa, áreas funcionais, matriz por artefacto e cerimónias.
@@ -57,7 +57,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - Confirmar que cada BK do backlog tem owner único.
 - Preparar evidência de que a distribuição bate certo com o plano total e o backlog.
 
-##### O que nao entra (scope-out)
+#### Scope-out
 
 - Trocar owners do backlog sem decisão explícita do orientador.
 - Mudar prioridades, dependências ou RF/RNF.
@@ -73,7 +73,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - A distribuição não contradiz `BACKLOG-MVP.md`.
 - O próximo BK consegue usar esta distribuição para confirmar ownership do backlog.
 
-#### Metadados do BK (CANONICO/DERIVADO):
+##### Metadados do BK (CANONICO/DERIVADO):
 
 - Prioridade: `P0` (CANONICO, `BACKLOG-MVP.md`)
 - Estado: `TODO` (CANONICO, `BACKLOG-MVP.md`)
@@ -90,7 +90,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - Fonte de verdade: `docs/planificacao/sprints/PLANO-SPRINTS.md`
 - Descricao: publicar responsabilidade por aluno, área, artefacto e cerimónia para sustentar execução dos BKs seguintes (DERIVADO)
 
-#### O que vamos fazer neste BK (DERIVADO):
+##### Complemento do objetivo (DERIVADO):
 
 - Confirmar a equipa: `Matheus`, `Mateus`, `Davi`, `Kaue` e `Nuno`.
 - Confirmar responsabilidades por área funcional e por artefacto técnico.
@@ -98,7 +98,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - Confirmar que handoff semanal P0 e pairing semanal estão definidos.
 - Preparar uma checklist que `BK-MF0-03` usa para validar owners do backlog.
 
-#### Estado, ficheiros e impacto (DERIVADO):
+#### Estado antes e depois
 
 - Estado esperado antes do BK: plano total validado em `BK-MF0-01`; responsabilidades ainda podem estar dispersas.
 - Estado esperado depois do BK: owners, apoios, cerimónias, pairing e handoff P0 publicados.
@@ -111,7 +111,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - Impacto em segurança/testes/UI: atribui segurança/RGPD a Matheus/Kaue, QA/evidências a Kaue e UI/UX a Mateus.
 - Handoff para o próximo BK: entregar a `BK-MF0-03` a matriz de owners/apoios para validar backlog atómico.
 
-#### Pre-leitura minima (10-15 min) (DERIVADO):
+#### Pré-requisitos
 
 - `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`: equipa, limites e regras transversais.
 - `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`: documento alvo.
@@ -121,7 +121,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - Mockup: não existe; sem impacto neste BK.
 - Código: não existe app detetável; sem ficheiros técnicos a rever.
 
-#### Glossario (rapido) (DERIVADO):
+#### Glossário
 
 - Owner: pessoa responsável por fechar o BK com evidência.
 - Apoio: pessoa que ajuda, revê ou desbloqueia partes do BK.
@@ -132,7 +132,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - Capacidade: quantidade realista de trabalho por sprint.
 - RACI: modelo de responsabilidades; aqui usamos uma versão simples por owner/apoio/gate.
 
-#### Conceitos teoricos essenciais (DERIVADO):
+#### Conceitos teóricos essenciais
 
 **Ownership.** Em engenharia de software, ownership significa que existe uma pessoa responsável por garantir que uma entrega fica completa, validada e documentada. Não significa que a pessoa faça tudo sozinha.
 
@@ -144,99 +144,340 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 
 **Risco de responsabilidade difusa.** Quando todos são responsáveis, na prática ninguém é. Este BK reduz esse risco ao ligar cada área e artefacto a um owner principal.
 
-#### Guia de execucao (passo-a-passo) (DERIVADO):
+#### Arquitetura do BK
 
-0. **Objetivo (~10 min): Confirmar dependência do plano total**
-   - Descricao detalhada do objetivo: verificar que `BK-MF0-01` foi revisto antes de publicar responsabilidades.
-   - Justificacao: responsabilidades derivam do plano, não de preferências soltas.
-   - Como fazer (0.1): rever macro fases e equipa no plano total.
-   - Como fazer (0.2): confirmar que `BK-MF0-02` depende de `BK-MF0-01`.
-   - Ficheiro a rever: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
-   - Ficheiro alvo: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Snippet de referencia: `Equipa tecnica: Matheus, Mateus, Davi, Kaue`
-   - O que verificar: a distribuição usa a mesma equipa do plano.
+- Endpoint(s), modelo/schema, service, controller/route, guard, cliente API e página/componente: não aplicável; a MF0 não altera a implementação da app.
+- Artefacto documental: os documentos e evidences enumerados na secção seguinte e nos passos.
+- Testes: validador de planificação, checks documentais e negativos descritos no tutorial.
+- Handoff: contrato documental preparado para `BK-MF0-03`.
 
-1. **Objetivo (~10 min): Validar equipa e carga alvo**
-   - Descricao detalhada do objetivo: confirmar nomes, papéis gerais e percentagens de carga.
-   - Justificacao: erros de nomes ou carga afetam toda a planificação.
-   - Como fazer (1.1): comparar secção `Equipa` com `Capacidade recomendada` no plano de sprints.
-   - Como fazer (1.2): confirmar que Nuno tem papel de orientação e não de implementação core.
-   - Ficheiro a rever: `docs/planificacao/sprints/PLANO-SPRINTS.md`
-   - Ficheiro alvo: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Snippet de referencia: `Nuno: governance, gate e avaliacao`
-   - O que verificar: os nomes estão consistentes.
+#### Ficheiros a criar/editar/rever
 
-2. **Objetivo (~15 min): Validar matriz por área funcional**
-   - Descricao detalhada do objetivo: confirmar que cada domínio do FaithFlix tem owner principal, apoio e revisor.
-   - Justificacao: áreas como autenticação, catálogo, streaming e pool solidária cruzam vários BKs.
-   - Como fazer (2.1): rever a tabela `Matriz por area funcional`.
-   - Como fazer (2.2): comparar com os domínios do README e RF.
-   - Ficheiro a rever: `docs/RF.md`
-   - Ficheiro alvo: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Snippet de referencia: `Pool de associacoes | Davi | Kaue | Nuno`
-   - O que verificar: nenhum domínio principal do MVP fica sem owner.
+- CRIAR: nenhum.
+- EDITAR: apenas este guia se forem registados ajustes/evidence do BK.
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`, `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`, `docs/planificacao/backlogs/BACKLOG-MVP.md`, `docs/planificacao/sprints/PLANO-SPRINTS.md`.
+- REVER: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
+- EDITAR: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- REVER: `docs/RF.md`
+- REVER: `docs/RNF.md`
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- EDITAR: `docs/planificacao/guias-bk/MF0/BK-MF0-02-publicar-distribuicao-responsabilidades.md`
 
-3. **Objetivo (~15 min): Validar matriz por artefacto**
-   - Descricao detalhada do objetivo: confirmar quem responde por rotas, modelos, páginas, testes, métricas e evidências.
-   - Justificacao: os BKs futuros vão pedir ficheiros concretos; a equipa deve saber quem lidera cada tipo de artefacto.
-   - Como fazer (3.1): rever a tabela `Matriz por artefacto`.
-   - Como fazer (3.2): cruzar com RNF27, RNF28, RNF29 e RNF30.
-   - Ficheiro a rever: `docs/RNF.md`
-   - Ficheiro alvo: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Snippet de referencia: `Testes E2E/integração | Kaue | Mateus`
-   - O que verificar: QA/evidências têm dono claro.
+#### Tutorial técnico linear
 
-4. **Objetivo (~15 min): Cruzar owners com backlog**
-   - Descricao detalhada do objetivo: confirmar que cada BK em `BACKLOG-MVP.md` tem owner único e apoio coerente.
-   - Justificacao: a distribuição só é útil se bater certo com o backlog operacional.
-   - Como fazer (4.1): rever a tabela da `MF1` e confirmar owners técnicos.
-   - Como fazer (4.2): rever uma amostra de `MF2..MF6` para validar áreas funcionais.
-   - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-   - Ficheiro alvo: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Snippet de referencia: `BK-MF1-01 | Matheus | Davi`
-   - O que verificar: não há BK sem owner.
+### Passo 1 - Confirmar dependência do plano total (~10 min)
 
-5. **Objetivo (~10 min): Validar cerimónias**
-   - Descricao detalhada do objetivo: confirmar que planning, sync, review, retro, gate, handoff e pairing têm frequência e resultado.
-   - Justificacao: cerimónias sem output viram reuniões sem valor.
-   - Como fazer (5.1): rever a tabela `Cerimonias`.
-   - Como fazer (5.2): confirmar que cada cerimónia tem owner e resultado.
-   - Ficheiro a rever: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Ficheiro alvo: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Snippet de referencia: `Handoff BK P0 | semanal | Owner do BK P0`
-   - O que verificar: todas as cerimónias têm propósito verificável.
+1. Objetivo funcional do passo no contexto da app.
 
-6. **Objetivo (~10 min): Confirmar mecanismos pedagógicos**
-   - Descricao detalhada do objetivo: garantir que handoff P0 e pairing semanal estão escritos como ações concretas.
-   - Justificacao: a PAP avalia produto e processo; aprendizagem transferida precisa de registo.
-   - Como fazer (6.1): rever `Handoff semanal de BK P0`.
-   - Como fazer (6.2): rever `Pairing semanal (60-90 min)`.
-   - Ficheiro a rever: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Ficheiro alvo: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Snippet de referencia: `1 aprendizagem transferida registada`
-   - O que verificar: o mecanismo é executável por alunos.
+Verificar que `BK-MF0-01` foi revisto antes de publicar responsabilidades.
 
-7. **Objetivo (~10 min): Executar negativos documentais**
-   - Descricao detalhada do objetivo: procurar falhas típicas na distribuição.
-   - Justificacao: um erro de ownership propaga-se para todos os BKs.
-   - Como fazer (7.1): procurar BK sem owner no backlog.
-   - Como fazer (7.2): procurar área funcional sem owner principal.
-   - Ficheiro a rever: `docs/planificacao/backlogs/BACKLOG-MVP.md`
-   - Ficheiro alvo: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Snippet de referencia: `Cada BK tem owner unico`
-   - O que verificar: pelo menos 3 negativos P0 ficam registados.
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/PLANO-IMPLEMENTACAO-TOTAL.md`
+- EDITAR: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
 
-8. **Objetivo (~10 min): Fechar evidence e handoff**
-   - Descricao detalhada do objetivo: preparar evidência e entregar a `BK-MF0-03` a distribuição validada.
-   - Justificacao: o backlog atómico precisa desta distribuição para confirmar owners/apoios por BK.
-   - Como fazer (8.1): preencher `pr`, `proof` e `neg`.
-   - Como fazer (8.2): entregar resumo de owners por área a quem vai validar backlog.
-   - Ficheiro a rever: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
-   - Ficheiro alvo: `docs/planificacao/guias-bk/MF0/BK-MF0-02-publicar-distribuicao-responsabilidades.md`
-   - Snippet de referencia: `proximo_bk: BK-MF0-03`
-   - O que verificar: `BK-MF0-03` consegue reutilizar owners sem decidir tudo outra vez.
+3. Instruções do que fazer.
 
-#### Checklist de validacao (DERIVADO):
+- Rever macro fases e equipa no plano total.
+- Confirmar que `BK-MF0-02` depende de `BK-MF0-01`.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Responsabilidades derivam do plano, não de preferências soltas.
+Snippet de referência: `Equipa tecnica: Matheus, Mateus, Davi, Kaue`
+
+6. Validação do passo.
+
+A distribuição usa a mesma equipa do plano.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 2 - Validar equipa e carga alvo (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar nomes, papéis gerais e percentagens de carga.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/sprints/PLANO-SPRINTS.md`
+- EDITAR: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+
+3. Instruções do que fazer.
+
+- Comparar secção `Equipa` com `Capacidade recomendada` no plano de sprints.
+- Confirmar que Nuno tem papel de orientação e não de implementação core.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Erros de nomes ou carga afetam toda a planificação.
+Snippet de referência: `Nuno: governance, gate e avaliacao`
+
+6. Validação do passo.
+
+Os nomes estão consistentes.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 3 - Validar matriz por área funcional (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar que cada domínio do FaithFlix tem owner principal, apoio e revisor.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/RF.md`
+- EDITAR: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+
+3. Instruções do que fazer.
+
+- Rever a tabela `Matriz por area funcional`.
+- Comparar com os domínios do README e RF.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Áreas como autenticação, catálogo, streaming e pool solidária cruzam vários BKs.
+Snippet de referência: `Pool de associacoes | Davi | Kaue | Nuno`
+
+6. Validação do passo.
+
+Nenhum domínio principal do MVP fica sem owner.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 4 - Validar matriz por artefacto (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar quem responde por rotas, modelos, páginas, testes, métricas e evidências.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/RNF.md`
+- EDITAR: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+
+3. Instruções do que fazer.
+
+- Rever a tabela `Matriz por artefacto`.
+- Cruzar com RNF27, RNF28, RNF29 e RNF30.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Os BKs futuros vão pedir ficheiros concretos; a equipa deve saber quem lidera cada tipo de artefacto.
+Snippet de referência: `Testes E2E/integração | Kaue | Mateus`
+
+6. Validação do passo.
+
+QA/evidências têm dono claro.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 5 - Cruzar owners com backlog (~15 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar que cada BK em `BACKLOG-MVP.md` tem owner único e apoio coerente.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- EDITAR: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+
+3. Instruções do que fazer.
+
+- Rever a tabela da `MF1` e confirmar owners técnicos.
+- Rever uma amostra de `MF2..MF6` para validar áreas funcionais.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+A distribuição só é útil se bater certo com o backlog operacional.
+Snippet de referência: `BK-MF1-01 | Matheus | Davi`
+
+6. Validação do passo.
+
+Não há BK sem owner.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 6 - Validar cerimónias (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Confirmar que planning, sync, review, retro, gate, handoff e pairing têm frequência e resultado.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- EDITAR: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+
+3. Instruções do que fazer.
+
+- Rever a tabela `Cerimonias`.
+- Confirmar que cada cerimónia tem owner e resultado.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Cerimónias sem output viram reuniões sem valor.
+Snippet de referência: `Handoff BK P0 | semanal | Owner do BK P0`
+
+6. Validação do passo.
+
+Todas as cerimónias têm propósito verificável.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 7 - Confirmar mecanismos pedagógicos (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Garantir que handoff P0 e pairing semanal estão escritos como ações concretas.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- EDITAR: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+
+3. Instruções do que fazer.
+
+- Rever `Handoff semanal de BK P0`.
+- Rever `Pairing semanal (60-90 min)`.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+A PAP avalia produto e processo; aprendizagem transferida precisa de registo.
+Snippet de referência: `1 aprendizagem transferida registada`
+
+6. Validação do passo.
+
+O mecanismo é executável por alunos.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 8 - Executar negativos documentais (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Procurar falhas típicas na distribuição.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- EDITAR: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+
+3. Instruções do que fazer.
+
+- Procurar BK sem owner no backlog.
+- Procurar área funcional sem owner principal.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+Um erro de ownership propaga-se para todos os BKs.
+Snippet de referência: `Cada BK tem owner unico`
+
+6. Validação do passo.
+
+Pelo menos 3 negativos P0 ficam registados.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+### Passo 9 - Fechar evidence e handoff (~10 min)
+
+1. Objetivo funcional do passo no contexto da app.
+
+Preparar evidência e entregar a `BK-MF0-03` a distribuição validada.
+
+2. Ficheiros envolvidos.
+- REVER: `docs/planificacao/DISTRIBUICAO-RESPONSABILIDADES.md`
+- EDITAR: `docs/planificacao/guias-bk/MF0/BK-MF0-02-publicar-distribuicao-responsabilidades.md`
+
+3. Instruções do que fazer.
+
+- Preencher `pr`, `proof` e `neg`.
+- Entregar resumo de owners por área a quem vai validar backlog.
+
+4. Código completo, correto e integrado com a app final.
+
+Sem código neste passo.
+
+5. Explicação do código.
+
+O backlog atómico precisa desta distribuição para confirmar owners/apoios por BK.
+Snippet de referência: `proximo_bk: BK-MF0-03`
+
+6. Validação do passo.
+
+`BK-MF0-03` consegue reutilizar owners sem decidir tudo outra vez.
+
+7. Cenário negativo/erro esperado.
+
+Se a verificação falhar ou não tiver evidence, o passo fica por concluir e o desvio é registado antes do handoff.
+
+#### Critérios de aceite
+
+**Outputs:**
+- Documento de distribuição revisto e publicável.
+- Resumo de owner/apoio por área pronto para usar no backlog.
+
+**Verificacoes:**
+- 100% dos BKs do backlog têm owner.
+- Nuno aparece como orientação/gate, não como owner core recorrente.
+- Handoff P0 e pairing semanal estão documentados.
+
+**Qualidade:**
+- Responsabilidades escritas de forma clara para alunos.
+- Sem drift em owner, prioridade ou dependências.
+
+**Continuidade:**
+- `BK-MF0-03` usa esta distribuição para validar o backlog atómico.
+- `MF1` fica com Matheus/Mateus/Davi/Kaue preparados para áreas técnicas.
+
+**Evidencia:**
+- `pr`, `proof` e `neg` preenchidos antes de marcar `DONE`.
+
+#### Validação final
 
 **Smoke**
 - [ ] `DISTRIBUICAO-RESPONSABILIDADES.md` existe e está ativo.
@@ -263,29 +504,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - [ ] Áreas de autenticação, sessão, RGPD e segurança têm owners claros.
 - [ ] Nenhuma credencial, segredo ou conta real é registada no documento.
 
-#### Criterios de aceite:
-
-**Outputs:**
-- Documento de distribuição revisto e publicável.
-- Resumo de owner/apoio por área pronto para usar no backlog.
-
-**Verificacoes:**
-- 100% dos BKs do backlog têm owner.
-- Nuno aparece como orientação/gate, não como owner core recorrente.
-- Handoff P0 e pairing semanal estão documentados.
-
-**Qualidade:**
-- Responsabilidades escritas de forma clara para alunos.
-- Sem drift em owner, prioridade ou dependências.
-
-**Continuidade:**
-- `BK-MF0-03` usa esta distribuição para validar o backlog atómico.
-- `MF1` fica com Matheus/Mateus/Davi/Kaue preparados para áreas técnicas.
-
-**Evidencia:**
-- `pr`, `proof` e `neg` preenchidos antes de marcar `DONE`.
-
-#### Evidence (para o PR/defesa):
+#### Evidence para PR/defesa
 
 - `pr`: `A preencher no fecho do BK`
 - `proof`: `A preencher apos validacao`
@@ -295,7 +514,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - `screenshots`: `Nao aplicavel; BK documental sem UI`
 - `notes`: `Fase detalhada sem mockup e sem codigo de app existente`
 
-#### TODOs
+##### TODOs
 
 - TODO: preencher evidence real quando a equipa executar a validação.
 - TODO: confirmar em reunião se todos os alunos aceitam owner/apoio atribuídos.
@@ -305,7 +524,7 @@ A fase foi detalhada sem mockup. Como este BK não define UI, a ausência de moc
 - Decisao dependente de mockup: nenhuma nesta fase.
 - Decisao dependente de app/codigo ainda inexistente: responsabilidades por ficheiros concretos só serão fechadas em `MF1`.
 
-## Snippet tecnico aplicavel
+##### Snippet técnico aplicável
 
 ```text
 CHECK BK-MF0-02
@@ -316,11 +535,11 @@ CHECK BK-MF0-02
 5. pairing_e_handoff.documentados == true
 ```
 
-## Proximo BK recomendado
+#### Handoff
 
 `BK-MF0-03`
 
-## Changelog
+#### Changelog
 
 - `2026-04-13`: retrofit para contrato pedagogico v3 (objetivo especifico, pre-condicoes, outputs, snippet e proximo BK real).
 - `2026-05-25`: refinado para guia executável de ownership, pairing e handoff da MF0.

@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
+import { ObjectId } from "mongodb";
 import {
     getLatestDevPasswordResetToken,
     requestPasswordReset,
@@ -19,6 +20,7 @@ import {
     assertMediaOptions,
     assertStatus,
     parseCatalogPagination,
+    parseCatalogQuery,
     slugify,
 } from "../../src/modules/catalog/catalog.validation.js";
 import { assertListType } from "../../src/modules/library/library.validation.js";
@@ -195,8 +197,71 @@ test("catalog validation fecha tipos, estados e media", () => {
         page: 2,
         limit: 12,
     });
+    assert.deepEqual(
+        parseCatalogQuery({
+            page: "2",
+            limit: "12",
+            type: "movie",
+            taxonomyId: "64f300000000000000000001",
+            sort: "rating",
+        }),
+        {
+            page: 2,
+            limit: 12,
+            type: "movie",
+            taxonomyId: "64f300000000000000000001",
+            sort: "rating",
+        },
+    );
     assert.throws(() => assertStatus("publicado"), /Estado/);
     assert.throws(() => parseCatalogPagination({ limit: "100" }), /Limite/);
+    assert.throws(() => parseCatalogQuery({ type: "live" }), /Tipo/);
+    assert.throws(() => parseCatalogQuery({ type: "episode" }), /Tipo/);
+    assert.throws(() => parseCatalogQuery({ taxonomyId: "x" }), /Taxonomia/);
+    assert.throws(() => parseCatalogQuery({ sort: "popular" }), /Ordenacao/);
+});
+
+test("catalogo separa serie agregadora de episodio reproduzivel", () => {
+    const seriesId = new ObjectId();
+    const series = assertCatalogPayload({
+        title: "Familia em Oracao",
+        synopsis: "Uma serie familiar com episodios de reflexao e reconciliacao.",
+        type: "series",
+        ageRating: 6,
+    });
+    const episode = assertCatalogPayload({
+        title: "O Recomeço",
+        synopsis: "O primeiro episodio acompanha uma conversa que muda a familia.",
+        type: "episode",
+        ageRating: 6,
+        seriesId,
+        seasonNumber: 1,
+        episodeNumber: 1,
+        durationSeconds: 1200,
+        media: { playbackUrl: "/media/recomeco.mp4" },
+    });
+
+    assert.equal("durationSeconds" in series, false);
+    assert.equal("media" in series, false);
+    assert.equal(String(episode.seriesId), String(seriesId));
+    assert.equal(episode.seasonNumber, 1);
+    assert.equal(episode.episodeNumber, 1);
+    assert.throws(
+        () =>
+            assertCatalogPayload({
+                ...episode,
+                seriesId: "",
+            }),
+        /seriesId/,
+    );
+    assert.throws(
+        () =>
+            assertCatalogPayload({
+                ...episode,
+                seasonNumber: 0,
+            }),
+        /seasonNumber/,
+    );
 });
 
 test("playback progress limita tempo e marca conteudo completo", () => {

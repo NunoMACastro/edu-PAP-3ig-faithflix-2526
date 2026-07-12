@@ -1,6 +1,10 @@
 # Guias BK - README
 
-`last_updated`: `2026-06-30`
+`last_updated`: `2026-07-10`
+
+- `contract_version`: `tutorial-v2`
+- `document_status`: `CURRENT`
+- `implementation_lane`: `STUDENT`
 
 ## O que esta pasta contem
 
@@ -22,13 +26,44 @@ Regras obrigatorias:
 - `proximo_bk`: `BK-MFxx-yy` para BK nao terminal; `-` apenas no terminal.
 - `guia_path` deve corresponder ao caminho real do ficheiro.
 
-## Contrato pedagogico-operacional
+## Contrato tutorial v2
 
-- Criterios de aceite mensuraveis: condicao observavel + metrica/limiar + evidencia esperada.
-- Politica de negativos: `P0/P1 >= 3` e `P2 >= 1`.
-- Bloco pedagogico obrigatorio: `Objetivo pedagogico`, `Tempo estimado`, `Erros comuns`, `Check de compreensao`.
-- Bloco operacional obrigatorio: `Pre-condicoes`, `Execucao`, `Outputs`, `Validacao`, `Handoff`.
-- Snippet tecnico aplicavel obrigatorio em todos os guias.
+O contrato ativo é o mesmo de `_TEMPLATE-BK.md`. Depois do `Header`, cada guia
+contém, por esta ordem, as 16 secções:
+
+1. `Objetivo`;
+2. `Importância`;
+3. `Scope-in`;
+4. `Scope-out`;
+5. `Estado antes e depois`;
+6. `Pré-requisitos`;
+7. `Glossário`;
+8. `Conceitos teóricos essenciais`;
+9. `Arquitetura do BK`;
+10. `Ficheiros a criar/editar/rever`;
+11. `Tutorial técnico linear`;
+12. `Critérios de aceite`;
+13. `Validação final`;
+14. `Evidence para PR/defesa`;
+15. `Handoff`;
+16. `Changelog`.
+
+Cada passo do tutorial usa os sete pontos do template: objetivo, ficheiros,
+instruções, código, explicação, validação e cenário negativo. O aluno não deve
+precisar de descobrir imports, helpers, DTOs, services, componentes, rotas,
+testes ou comandos em documentação externa.
+
+Regras obrigatórias:
+
+- critérios de aceite mensuráveis: condição observável + métrica/limiar +
+  evidence esperada;
+- política de negativos: `P0/P1 >= 3` e `P2 >= 1`;
+- código copiável completo e coerente com o contrato final do próprio guia;
+- quando um passo não tem código, usar exatamente `Sem código neste passo.`;
+- não conservar um snippet inseguro acompanhado apenas por um adendo que diga
+  para o adaptar;
+- paths de implementação exclusivamente públicos: `backend/` e `frontend/`;
+  `real_dev/` nunca aparece num guia BK student-facing.
 
 ## Ordem de execucao
 
@@ -46,3 +81,5 @@ Regras obrigatorias:
 
 - Comando oficial: `bash scripts/validate-planificacao.sh`.
 - Qualquer drift entre backlog, matriz, guias, `MF-VIEWS` e `PLANO-SPRINTS` reprova validacao.
+- A validade de reports/evidence segue `docs/evidence/README.md`; prova da lane
+  `REFERENCE` não promove o estado dos alunos.

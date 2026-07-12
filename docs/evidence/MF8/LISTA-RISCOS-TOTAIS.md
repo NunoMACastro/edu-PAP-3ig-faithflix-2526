@@ -1,5 +1,11 @@
 # MF8 - Lista de riscos totais
 
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-29`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/guias-bk/CORRECAO-AUDITORIA-END-TO-END-real_dev.md`
+- `proof_scope`: riscos consolidados em 2026-06-29; estados atuais pertencem ao report canónico
+
 ## Metadados
 
 - Projeto: FaithFlix
@@ -9,6 +15,8 @@
 - Estado final: `PASS_COM_RESSALVAS`
 - Decisao: `GO_COM_RISCOS_CONTROLADOS`
 - PR: `NAO_APLICAVEL`
+
+> **Aviso de validade — Fase 2 (2026-07-09):** este documento é um snapshot histórico anterior à Fase 2 de 2026-07-09. Os resultados e decisões preservados abaixo não provam CP2 nem o estado atual da aplicação.
 
 ## Fontes usadas
 
@@ -62,6 +70,6 @@
 | `MF8-RISK-003` | Nao bloqueia validacao local nem MVP funcional; e operacional/documental. | Manter como ressalva operacional no freeze; criar runbook curto antes de `GO` pleno/producao ou como fecho documental pos-PAP. |
 | `MF8-RISK-004` | Existem evidencias BK e relatorio acumulado; falta consolidacao em documento unico. | Manter como ressalva documental no freeze; consolidar documento tecnico unico como fecho documental pos-PAP, sem bloquear a MF8 congelada. |
 
-## Decisao final BK-MF8-07
+## Decisao observada no BK-MF8-07
 
 `PASS_COM_RESSALVAS`. A lista total de riscos existe, esta rastreada a fontes concretas, separa riscos mitigados/corrigidos/aceites e entrega a `BK-MF8-08` sem blocker P0/P1 aberto.

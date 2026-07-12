@@ -6,12 +6,20 @@
 - `area`: `planificacao`
 - `macro`: `MF8`
 - `owner`: `Nuno (orientacao)`
-- `status`: `atualizado`
+- `status`: `historico`
 - `last_updated`: `2026-06-27`
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-27`
+- `implementation_lane`: `REFERENCE`
+- `current_authority`: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- `proof_scope`: avaliação dos candidatos MF8 antes de MF9; não descreve a baseline ativa
 
 ## Decisao
 
-A avaliacao de candidatos fica sincronizada com a MF8 final de 10 BKs. A estrutura ativa deixa de usar a cadeia anterior e passa a privilegiar trabalho pratico: alinhamento visual, testes, readiness, auditoria, matriz, riscos totais, report de erros, correcao e scope freeze.
+Na data do snapshot, a avaliação de candidatos ficou sincronizada com a MF8 de
+10 BK. A estrutura então ativa deixou de usar a cadeia anterior e passou a
+privilegiar trabalho prático: alinhamento visual, testes, readiness, auditoria,
+matriz, riscos totais, report de erros, correção e scope freeze.
 
 ## Candidatos aprovados para a MF8 formal
 
@@ -30,7 +38,7 @@ A avaliacao de candidatos fica sincronizada com a MF8 final de 10 BKs. A estrutu
 
 ## Resultado esperado
 
-- `60 BKs / 60 guias` no total global.
+- `60 BKs / 60 guias` no total global observado em 2026-06-27; a baseline ativa posterior é `66/66`, com `94 requisitos` e `13 sprints`.
 - `10/10` guias MF8 ativos.
 - Nenhum BK MF8 removido deve aparecer em backlog, sprints, matriz ou indices ativos.
 - Guias student-facing usam caminhos publicos/canonicos.

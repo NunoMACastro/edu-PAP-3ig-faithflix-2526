@@ -31,10 +31,8 @@ Backend Node.js/Express da app FaithFlix, criado na MF1 como base tecnica modula
 - `FRONTEND_ORIGIN` define as origens frontend autorizadas.
 - Em desenvolvimento, `http://localhost:5173` e `http://127.0.0.1:5173` estao autorizadas para permitir cookies com `credentials: include`.
 
-## Fora de scope nesta fase
+## Dados locais e demonstracao
 
-- Sem login real.
-- Sem catalogo real.
-- Sem streaming.
-- Sem base de dados.
-- Sem pagamentos.
+- O backend usa MongoDB configurado por `MONGODB_URI` e `MONGODB_DB_NAME`.
+- Os scripts `seed:e2e*` continuam reservados para fluxos Playwright/E2E.
+- O script `npm run seed:demo` cria dados ficticios realistas marcados com `demoFixture: "demo-v1"` para demonstrar catalogo, subscricoes, familia, pool solidaria, passagens biblicas, metricas e privacidade.

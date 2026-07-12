@@ -8,31 +8,35 @@
 - `owner`: `Matheus`
 - `apoio`: `Davi`
 - `prioridade`: `P0`
-- `estado`: `TODO`
+- `estado`: `DONE`
 - `esforco`: `M`
 - `dependencias`: `BK-MF0-06`
 - `rf_rnf`: `RNF27`
 - `fase_documental`: `Fase 1`
 - `sprint`: `S01`
-- `core_or_reforco`: `Core`
+- `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF1-02`
 - `guia_path`: `docs/planificacao/guias-bk/MF1/BK-MF1-01-estrutura-base-backend-modulos.md`
-- `last_updated`: `2026-05-30`
+- `last_updated`: `2026-07-10`
 
-## Bloco pedagogico (obrigatorio)
+#### Objetivo
 
 Este BK cria a primeira base real do backend FaithFlix. O objetivo e montar uma API Node.js com Express, organizada por modulos, para que os BKs seguintes consigam acrescentar sessao segura, health-check, catalogo, streaming, subscricoes, pool solidaria e privacidade sem refazer a estrutura.
 
 Para alunos do 12.º ano, a ideia principal e esta: antes de criar funcionalidades grandes, precisamos de uma casa arrumada. Neste BK ainda nao ha login real, catalogo, streaming, pagamentos, recomendacoes nem base de dados. Vamos apenas criar a fundacao onde essas partes vao encaixar.
 
-### O que entra
+#### Importância
+
+Este BK materializa os RF/RNF indicados no Header e entrega ao próximo BK uma base verificável. Sem esta etapa, os passos seguintes não têm um contrato técnico estável para reutilizar.
+
+#### Scope-in
 
 - Criar a pasta `backend/`.
 - Criar uma app Express modular com `app.js` separado de `server.js`.
 - Criar configuracao de ambiente, rota tecnica inicial, erro 404 e error handler.
 - Preparar a base para `BK-MF1-04`, `BK-MF1-05`, `BK-MF1-06` e `BK-MF2-03`.
 
-### O que nao entra
+#### Scope-out
 
 - Autenticacao funcional, registo, login ou passwords.
 - Base de dados MongoDB ou modelos de dados.
@@ -45,16 +49,60 @@ Para alunos do 12.º ano, a ideia principal e esta: antes de criar funcionalidad
 - [ ] Sei onde entram rotas, controllers, middlewares e utilitarios.
 - [ ] Sei provar que a API responde 200 em `/api` e 404 em rotas inexistentes.
 
-## Bloco operacional (obrigatorio)
+#### Estado antes e depois
 
-### Pre-condicoes
+- Estado antes: aplicam-se as dependências e os RF/RNF declarados no Header; não se assume funcionalidade além dos BKs anteriores.
+- Estado depois: ficam implementáveis e verificáveis apenas os resultados do `Scope-in`, mantendo integralmente o `Scope-out`.
+
+#### Pré-requisitos
 
 - `BK-MF0-06` concluido ou com handoff registado.
 - Confirmar em `BACKLOG-MVP.md` que este BK continua com owner `Matheus`, apoio `Davi`, prioridade `P0`, dependencia `BK-MF0-06` e `rf_rnf` `RNF27`.
 - Confirmar em `RNF.md` que o backend deve seguir arquitetura modular por dominio.
 - Confirmar que ainda nao existe pasta real `backend/`. Se existir, parar e adaptar os passos sem apagar trabalho existente.
 
-### Guia de execucao (passo-a-passo)
+#### Glossário
+
+- `módulo`: unidade de código agrupada por responsabilidade.
+- `middleware`: função executada durante o tratamento de um pedido HTTP.
+- `app/server split`: separação entre configurar Express e abrir a porta HTTP.
+- `handoff`: contrato entregue ao BK seguinte.
+
+#### Conceitos teóricos essenciais
+
+Uma fundação modular separa configuração, transporte HTTP, regras de domínio e erros. A separação entre `app.js` e `server.js` permite testar a aplicação sem abrir uma porta fixa e evita acoplamento prematuro.
+
+#### Arquitetura do BK
+
+- Endpoint(s): rota técnica inicial e fallback `404` descritos nos passos.
+- Modelo/schema: não aplicável neste BK; MongoDB fica fora do scope.
+- Service(s): não aplicável; a fundação prepara services futuros.
+- Controller/route: router técnico modular.
+- Guard/middleware: JSON parser e error handler.
+- Cliente API/página: não aplicável neste BK backend.
+- Testes: validação técnica e negativos descritos no tutorial.
+- Handoff: base backend para sessão, health e módulos de domínio.
+
+#### Ficheiros a criar/editar/rever
+
+- CRIAR: `backend/package.json`
+- CRIAR: `backend/.env.example`
+- CRIAR: `backend/src/config/env.js`
+- REVER: `docs/RNF.md`, seccoes `RNF17` e `RNF27`
+- CRIAR: `backend/src/utils/http-error.js`
+- CRIAR: `backend/src/modules/system/system.controller.js`
+- CRIAR: `backend/src/modules/system/system.routes.js`
+- REVER: `BK-MF1-03`, porque o frontend vai consumir respostas e erros desta API
+- CRIAR: `backend/src/middlewares/error.middleware.js`
+- CRIAR: `backend/src/app.js`
+- REVER: `BK-MF1-04`, `BK-MF1-05` e `BK-MF1-06`, porque todos vao reutilizar `createApp()`
+- CRIAR: `backend/src/server.js`
+- CRIAR: `backend/README.md`
+- REVER: `docs/planificacao/guias-bk/MF1/BK-MF1-04-sessao-segura-backend-cookies-auth-base.md`
+- EDITAR: nenhum ficheiro novo se os passos anteriores estiverem corretos
+- REVER: `backend/src/app.js`, `backend/src/middlewares/error.middleware.js`, `backend/README.md`
+
+#### Tutorial técnico linear
 
 ### Passo 1 - Criar o pacote backend e a configuracao de ambiente
 
@@ -73,7 +121,9 @@ Criar a pasta `backend/`, declarar a app Node.js como projeto independente e pre
 
 Cria a pasta `backend/` e depois cria os ficheiros abaixo. O ficheiro `.env.example` serve como modelo seguro: mostra que variaveis existem, mas nao contem passwords, tokens, chaves privadas nem dados reais.
 
-4. Codigo do ficheiro `backend/package.json`.
+4. Codigo completo do passo.
+
+**`backend/package.json`**
 
 ```json
 {
@@ -95,16 +145,7 @@ Cria a pasta `backend/` e depois cria os ficheiros abaixo. O ficheiro `.env.exam
 }
 ```
 
-5. Explicacao do codigo.
-
-- `private: true` evita publicacao acidental no npm.
-- `type: module` permite usar `import` e `export`, que e a sintaxe moderna de JavaScript.
-- `dev` usa `node --watch` para reiniciar o servidor quando os ficheiros mudam.
-- `start` e o comando normal para executar a API.
-- `test` fica pronto para `BK-MF1-06`, onde entram smoke tests.
-- A unica dependencia neste momento e `express`, porque este BK cria apenas a API base.
-
-6. Codigo do ficheiro `backend/.env.example`.
+**`backend/.env.example`**
 
 ```env
 NODE_ENV=development
@@ -112,15 +153,12 @@ PORT=3000
 SERVICE_NAME=faithflix-api
 ```
 
-7. Explicacao do codigo.
-
-`NODE_ENV` indica o ambiente. `PORT` define a porta local. `SERVICE_NAME` identifica a API nos logs e respostas tecnicas. Estes valores sao seguros para exemplo; quando existirem credenciais reais, ficam num `.env` local e nunca entram no Git.
-
-8. Codigo do ficheiro `backend/src/config/env.js`.
+**`backend/src/config/env.js`**
 
 ```js
 const DEFAULT_PORT = 3000;
 
+// Validar a porta no arranque evita que uma configuração inválida falhe mais tarde sem contexto.
 function parsePort(value) {
     if (value === undefined || value === "") {
         return DEFAULT_PORT;
@@ -144,11 +182,18 @@ export const env = {
 export const isProduction = env.nodeEnv === "production";
 ```
 
-9. Explicacao do codigo.
+5. Explicacao do codigo.
 
-Este ficheiro concentra a leitura de variaveis de ambiente. Em vez de chamar `process.env.PORT` em muitos ficheiros, a app passa a usar `env.port`. Isto evita duplicacao e torna erros mais faceis de diagnosticar. A funcao `parsePort` valida a porta antes do servidor arrancar; assim, `PORT=abc` falha logo com uma mensagem clara.
+- `private: true` evita publicacao acidental no npm.
+- `type: module` permite usar `import` e `export`, que e a sintaxe moderna de JavaScript.
+- `dev` usa `node --watch` para reiniciar o servidor quando os ficheiros mudam.
+- `start` e o comando normal para executar a API.
+- `test` fica pronto para `BK-MF1-06`, onde entram smoke tests.
+- A unica dependencia neste momento e `express`, porque este BK cria apenas a API base.
+- `NODE_ENV`, `PORT` e `SERVICE_NAME` documentam o ambiente sem publicar segredos.
+- `env.js` concentra a leitura de `process.env`; `parsePort` faz a app falhar cedo perante uma porta inválida.
 
-10. Validacao do passo.
+6. Validacao do passo.
 
 Executar dentro de `backend/`:
 
@@ -159,7 +204,7 @@ node -e "import('./src/config/env.js').then(({ env }) => console.log(env))"
 
 Resultado esperado: aparece um objeto com `nodeEnv`, `port` e `serviceName`.
 
-11. Caso negativo ou erro comum.
+7. Cenario negativo/erro esperado.
 
 Executar:
 
@@ -186,33 +231,48 @@ Criar uma primeira rota tecnica `GET /api`, com resposta JSON previsivel, e um u
 
 Cria primeiro `utils/`, depois `modules/system/`. O nome `system` e usado para endpoints tecnicos simples da API base. Mais tarde podem existir modulos como `auth`, `catalog`, `streaming`, `subscriptions` e `charities`, mas ainda nao entram neste BK.
 
-4. Codigo do ficheiro `backend/src/utils/http-error.js`.
+4. Codigo completo do passo.
+
+**`backend/src/utils/http-error.js`**
 
 ```js
 export class HttpError extends Error {
-    constructor(statusCode, message, details = undefined) {
+    constructor(
+        statusCode,
+        message,
+        details = undefined,
+        code = "REQUEST_FAILED",
+    ) {
+        // Guardar o estado HTTP no erro permite ao middleware responder sem depender da mensagem.
         super(message);
         this.name = "HttpError";
         this.statusCode = statusCode;
         this.details = details;
+        // O quarto argumento é aditivo: chamadas antigas com dois/três argumentos continuam válidas.
+        this.code =
+            typeof code === "string" && code.trim()
+                ? code
+                : "REQUEST_FAILED";
     }
 }
 
 export function notFound(path) {
-    return new HttpError(404, "Recurso nao encontrado.", { path });
+    return new HttpError(
+        404,
+        "Recurso nao encontrado.",
+        { path },
+        "NOT_FOUND",
+    );
 }
 ```
 
-5. Explicacao do codigo.
-
-`HttpError` e uma classe propria para erros HTTP. Em Express, um erro precisa de duas informacoes importantes: o codigo HTTP e a mensagem para devolver ao cliente. Ao guardar `statusCode`, o error handler consegue responder `404`, `400` ou `500` sem adivinhar. A funcao `notFound` cria um erro padronizado para rotas inexistentes.
-
-6. Codigo do ficheiro `backend/src/modules/system/system.controller.js`.
+**`backend/src/modules/system/system.controller.js`**
 
 ```js
 import { env } from "../../config/env.js";
 
 export function getApiInfo(_req, res) {
+    // A resposta expõe apenas metadados técnicos não sensíveis definidos pelo contrato da rota.
     return res.status(200).json({
         service: env.serviceName,
         name: "FaithFlix API",
@@ -222,11 +282,7 @@ export function getApiInfo(_req, res) {
 }
 ```
 
-7. Explicacao do codigo.
-
-Um controller recebe o pedido e decide a resposta. Aqui devolvemos apenas informacao tecnica basica. Isto nao e catalogo nem streaming; e um ponto simples para provar que a API esta viva e que o frontend consegue falar com ela em `BK-MF1-03`.
-
-8. Codigo do ficheiro `backend/src/modules/system/system.routes.js`.
+**`backend/src/modules/system/system.routes.js`**
 
 ```js
 import { Router } from "express";
@@ -237,15 +293,21 @@ export const systemRouter = Router();
 systemRouter.get("/", getApiInfo);
 ```
 
-9. Explicacao do codigo.
+5. Explicacao do codigo.
 
-`Router()` permite agrupar rotas de um modulo. Como este router sera montado em `/api`, a rota `systemRouter.get('/')` fica disponivel como `GET /api`. Esta separacao evita que `app.js` fique cheio de endpoints misturados.
+`HttpError` guarda estado, mensagem, detalhes e um `code` estável. O quarto
+argumento não altera o significado do terceiro: `new HttpError(400, message,
+details)` continua válido e usa `REQUEST_FAILED`; quem precisa de um código de
+domínio usa `new HttpError(status, message, details, code)`. `notFound`
+normaliza rotas inexistentes. O controller devolve apenas informação técnica da
+API. `Router()` agrupa o módulo e, quando for montado em `/api`, disponibiliza
+`GET /api` sem encher `app.js` de endpoints.
 
-10. Validacao do passo.
+6. Validacao do passo.
 
 Ainda nao ha servidor completo, por isso a validacao final deste passo acontece no Passo 3. Antes disso, confirma que os imports usam extensao `.js`, porque em ES Modules isso e obrigatorio.
 
-11. Caso negativo ou erro comum.
+7. Cenario negativo/erro esperado.
 
 Erro comum: escrever `import { getApiInfo } from './system.controller'` sem `.js`. Em Node.js com ES Modules, isto pode partir o arranque da app.
 
@@ -265,7 +327,9 @@ Criar a aplicacao Express reutilizavel pelos testes, montar a rota `/api` e gara
 
 Cria a pasta `middlewares/` e adiciona o error handler. Depois cria `app.js`. A regra importante e: `app.js` constroi a aplicacao, mas nao abre porta. Abrir porta fica para `server.js`.
 
-4. Codigo do ficheiro `backend/src/middlewares/error.middleware.js`.
+4. Codigo completo do passo.
+
+**`backend/src/middlewares/error.middleware.js`**
 
 ```js
 import { notFound } from "../utils/http-error.js";
@@ -274,19 +338,27 @@ export function notFoundHandler(req, _res, next) {
     next(notFound(req.originalUrl));
 }
 
-export function errorHandler(error, _req, res, _next) {
+export function errorHandler(error, req, res, _next) {
     const statusCode = error.statusCode ?? error.status ?? 500;
+    // Estados fora do intervalo HTTP de erro são normalizados para não produzir respostas inválidas.
     const safeStatusCode =
         statusCode >= 400 && statusCode <= 599 ? statusCode : 500;
 
+    const isServerError = safeStatusCode >= 500;
     const response = {
+        code: isServerError
+            ? "INTERNAL_ERROR"
+            : (error.code ?? "REQUEST_FAILED"),
+        // Mensagens internas são substituídas para não revelar detalhes de uma falha 500.
         message:
-            safeStatusCode === 500
+            isServerError
                 ? "Erro interno do servidor."
                 : error.message,
+        // O request logger da MF1-05 torna este campo não-null em todas as respostas.
+        requestId: typeof req.id === "string" ? req.id : null,
     };
 
-    if (error.details !== undefined) {
+    if (!isServerError && error.details !== undefined) {
         response.details = error.details;
     }
 
@@ -294,11 +366,7 @@ export function errorHandler(error, _req, res, _next) {
 }
 ```
 
-5. Explicacao do codigo.
-
-`notFoundHandler` e executado quando nenhuma rota respondeu. Em vez de deixar Express devolver HTML, criamos um erro 404 em JSON. `errorHandler` e o ultimo middleware da app; ele transforma erros em respostas previsiveis. Para erros internos, a mensagem e generica, porque detalhes tecnicos podem revelar informacao sensivel.
-
-6. Codigo do ficheiro `backend/src/app.js`.
+**`backend/src/app.js`**
 
 ```js
 import express from "express";
@@ -315,6 +383,7 @@ export function createApp() {
 
     app.use("/api", systemRouter);
 
+    // Os handlers de erro ficam no fim para receber pedidos que nenhuma rota resolveu.
     app.use(notFoundHandler);
     app.use(errorHandler);
 
@@ -322,11 +391,11 @@ export function createApp() {
 }
 ```
 
-7. Explicacao do codigo.
+5. Explicacao do codigo.
 
-`createApp()` devolve uma app Express pronta a usar. A linha `express.json({ limit: '1mb' })` permite receber JSON e limita o tamanho do body para reduzir abuso. Montar `systemRouter` em `/api` faz com que `GET /api` funcione. Os middlewares de erro ficam no fim, porque so devem correr depois das rotas.
+`notFoundHandler` converte uma rota sem resposta num 404 JSON e `errorHandler` esconde detalhes de erros internos. `createApp()` configura o limite do body, monta `GET /api` e coloca os handlers de erro no fim. A função não chama `listen()`, por isso é reutilizável em testes.
 
-8. Validacao do passo.
+6. Validacao do passo.
 
 Executar dentro de `backend/`:
 
@@ -336,7 +405,7 @@ node -e "import('./src/app.js').then(({ createApp }) => console.log(typeof creat
 
 Resultado esperado: `function`.
 
-9. Caso negativo ou erro comum.
+7. Cenario negativo/erro esperado.
 
 Erro comum: chamar `app.listen()` dentro de `app.js`. Isso dificulta testes, porque cada teste abriria uma porta fixa. O `BK-MF1-06` precisa de importar `createApp()` sem arrancar o servidor principal.
 
@@ -356,7 +425,9 @@ Criar o ponto de entrada que abre a porta e deixar um README curto para qualquer
 
 Cria `server.js` apenas depois de `app.js`. Depois cria o README com comandos e limites de escopo.
 
-4. Codigo do ficheiro `backend/src/server.js`.
+4. Codigo completo do passo.
+
+**`backend/src/server.js`**
 
 ```js
 import { createApp } from "./app.js";
@@ -364,6 +435,7 @@ import { env } from "./config/env.js";
 
 const app = createApp();
 
+// Apenas o entrypoint abre a porta; createApp continua importável sem efeitos laterais nos testes.
 app.listen(env.port, () => {
     console.log(
         JSON.stringify({
@@ -376,11 +448,7 @@ app.listen(env.port, () => {
 });
 ```
 
-5. Explicacao do codigo.
-
-`server.js` importa a app ja montada e abre a porta. O log em JSON prepara o caminho para logging estruturado em `BK-MF1-05`. Nesta fase usamos `console.log`, mas ja com campos organizados: `level`, `message`, `service` e `port`.
-
-6. Codigo do ficheiro `backend/README.md`.
+**`backend/README.md`**
 
 ```md
 # FaithFlix Backend
@@ -406,11 +474,11 @@ Backend Node.js/Express da app FaithFlix.
 - Sem pagamentos.
 ```
 
-7. Explicacao do codigo.
+5. Explicacao do codigo.
 
-O README evita que cada aluno tenha de adivinhar como arrancar o backend. Tambem deixa claro o que ainda nao existe. Isto protege o projeto contra funcionalidades falsas, como inventar catalogo ou login antes dos BKs certos.
+`server.js` abre a porta apenas depois de importar a app já montada e produz um primeiro log JSON com campos estáveis. O README torna os comandos e o limite funcional explícitos, evitando que alguém invente catálogo ou login antes dos BKs correspondentes.
 
-8. Validacao do passo.
+6. Validacao do passo.
 
 Executar dentro de `backend/`:
 
@@ -426,7 +494,7 @@ curl -i http://localhost:3000/api
 
 Resultado esperado: HTTP 200 com JSON.
 
-9. Caso negativo ou erro comum.
+7. Cenario negativo/erro esperado.
 
 Erro comum: colocar rotas funcionais de catalogo ou auth neste BK. Isso cria drift, porque esses dominios entram mais tarde.
 
@@ -445,7 +513,9 @@ Confirmar que a base backend funciona, que erros usam JSON e que a estrutura est
 
 Com o servidor ligado, executa os pedidos abaixo e guarda os outputs em evidence.
 
-4. Resposta esperada para `GET /api`.
+4. Respostas completas esperadas.
+
+**`GET /api`**
 
 ```http
 HTTP/1.1 200 OK
@@ -461,11 +531,7 @@ Content-Type: application/json; charset=utf-8
 }
 ```
 
-5. Explicacao da resposta.
-
-Esta resposta prova que a API arrancou, que Express esta a devolver JSON e que o frontend pode usar este endpoint para validar conectividade em `BK-MF1-03`.
-
-6. Resposta esperada para `GET /api/nao-existe`.
+**`GET /api/nao-existe`**
 
 ```http
 HTTP/1.1 404 Not Found
@@ -474,38 +540,48 @@ Content-Type: application/json; charset=utf-8
 
 ```json
 {
+    "code": "NOT_FOUND",
     "message": "Recurso nao encontrado.",
+    "requestId": null,
     "details": {
         "path": "/api/nao-existe"
     }
 }
 ```
 
-7. Explicacao da resposta.
+5. Explicacao das respostas.
 
-Uma API profissional nao deve devolver uma pagina HTML confusa quando o frontend espera JSON. O 404 em JSON permite ao cliente API mostrar uma mensagem clara ao utilizador.
+O 200 prova que Express arrancou e oferece um contrato JSON ao frontend. O 404
+também em JSON evita uma página HTML inesperada e permite ao cliente API mostrar
+um erro previsível. Nesta fundação, `requestId` ainda pode ser `null`; o
+`BK-MF1-05` monta o request logger antes das rotas e passa a fornecer uma string
+validada em todas as respostas.
 
-8. Validacao do passo.
+6. Validacao do passo.
 
 - `npm run dev` arranca sem erro.
 - `GET /api` devolve 200.
 - `GET /api/nao-existe` devolve 404 JSON.
 - `PORT=abc node src/server.js` falha com erro claro.
 
-9. Caso negativo ou erro comum.
+7. Cenario negativo/erro esperado.
 
 Erro comum: devolver `200 OK` em rotas inexistentes. Isso engana testes e pode fazer o frontend pensar que uma funcionalidade existe quando ainda nao existe.
 
-## Criterios de aceite (mensuraveis)
+#### Critérios de aceite
 
 - `backend/package.json`, `.env.example`, `src/config/env.js`, `src/app.js`, `src/server.js`, `src/modules/system/*`, `src/middlewares/error.middleware.js` e `src/utils/http-error.js` existem.
 - `npm install` termina sem erro dentro de `backend/`.
 - `npm run dev` arranca a API na porta configurada.
 - `GET /api` devolve HTTP 200 e JSON com `service`, `name`, `version` e `status`.
 - `GET /api/nao-existe` devolve HTTP 404 em JSON.
+- `HttpError(status, message, details)` mantém compatibilidade e
+  `HttpError(status, message, details, code)` preserva o código de domínio.
+- Erros seguem `{ code, message, requestId, details? }`; `5xx` usa
+  `INTERNAL_ERROR` e nunca expõe `details`.
 - Nenhuma funcionalidade de auth, catalogo, streaming, pagamentos, subscricoes ou pool solidaria foi criada neste BK.
 
-## Validacao final
+#### Validação final
 
 Executar dentro de `backend/`:
 
@@ -517,20 +593,20 @@ curl -i http://localhost:3000/api/nao-existe
 PORT=abc node src/server.js
 ```
 
-## Evidence para PR/defesa
+#### Evidence para PR/defesa
 
 - `pr`: referencia do PR/commit que cria `backend/`.
 - `proof`: output de `npm run dev` e `curl -i http://localhost:3000/api`.
 - `neg`: outputs de 404, `PORT=abc` e confirmacao de ausencia de funcionalidades fora de scope.
 
-## Handoff
+#### Handoff
 
 - `BK-MF1-02` pode assumir que a app backend existira em `backend/`, mas nao depende de codigo backend para criar a base frontend.
 - `BK-MF1-04` deve reutilizar `createApp()`, `src/middlewares/` e `src/modules/` para montar sessao segura.
 - `BK-MF1-05` deve adicionar `/health` e logging sem substituir `GET /api`.
 - `BK-MF1-06` deve importar `createApp()` para smoke tests sem abrir porta fixa.
 
-## Changelog
+#### Changelog
 
 - `2026-05-30`: reestruturado como tutorial linear, com codigo movido para passos executaveis e sem anexo tecnico no fim.
 - `2026-05-29`: acrescentada versao detalhada para o scaffold backend Express, respostas esperadas, negativos e evidence.

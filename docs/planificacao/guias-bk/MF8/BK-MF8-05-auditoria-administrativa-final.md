@@ -17,7 +17,7 @@
 - `core_or_reforco`: `Reforco`
 - `proximo_bk`: `BK-MF8-06`
 - `guia_path`: `docs/planificacao/guias-bk/MF8/BK-MF8-05-auditoria-administrativa-final.md`
-- `last_updated`: `2026-06-27`
+- `last_updated`: `2026-07-10`
 
 #### Objetivo
 
@@ -34,6 +34,9 @@ A administração concentra ações sensíveis, dados agregados e configuração
 - Inventariar páginas, rotas e endpoints administrativos.
 - Validar permissões e estados sem sessão.
 - Rever logs e dados expostos.
+- Confirmar atomicidade de ações multi-write e revogação de sessões.
+- Confirmar invariantes sob concorrência: decisão única, membership única e
+  pelo menos um administrador ativo.
 - Separar falha bloqueante de ressalva controlada.
 
 #### Scope-out
@@ -48,7 +51,7 @@ A administração concentra ações sensíveis, dados agregados e configuração
 - Antes: `BK-MF8-04` fecha readiness operacional.
 - Depois: a área administrativa tem decisão auditável para alimentar `BK-MF8-06`.
 
-#### Pre-requisitos
+#### Pré-requisitos
 
 - Ler `BK-MF8-04` antes de iniciar este BK.
 - Confirmar que a MF8 ativa tem exatamente `10` guias formais, de `BK-MF8-01` a `BK-MF8-10`.
@@ -62,6 +65,8 @@ A administração concentra ações sensíveis, dados agregados e configuração
 - `Permissão`: regra que define quem pode executar uma ação.
 - `Exposição indevida`: dado sensível ou restrito mostrado a quem não deve ver.
 - `Auditoria`: registo controlado de ação relevante sem dados sensíveis.
+- `Fault injection`: falha deliberada num ponto tardio para provar rollback da
+  unidade completa, não apenas ausência de exceção.
 
 #### Conceitos teóricos essenciais
 
@@ -70,6 +75,11 @@ A administração concentra ações sensíveis, dados agregados e configuração
 - `DERIVADO`: uma matriz de rotas permite provar que visitante, utilizador comum, associação e admin têm limites claros.
 - `CANONICO`: associações veem apenas os dados da sua entidade salvo autorização admin documentada; evita fuga de dados entre entidades.
 - `DERIVADO`: configuração pública pode ser auditada, mas segredos nunca entram no documento.
+- `CANONICO`: um audit log não pode ser escrito fora da transação da operação
+  (`writeAdminAudit` recusa ausência de contexto `runInTransaction` antes do
+  insert, incluindo em novos callers).
+  crítica; uma falha do audit deve reverter também a mutação e, quando existe,
+  a revogação de sessões.
 
 #### Arquitetura do BK
 
@@ -106,13 +116,17 @@ Listar páginas, rotas e endpoints admin existentes e a sua finalidade.
 
 3. Instruções do que fazer.
 
-Revê `frontend/`, `backend/` e docs anteriores. Cada item deve ter owner, permissão esperada e evidence.
+Revê `frontend/`, `backend/` e docs anteriores. Cada item deve ter owner,
+permissão esperada, unidade de commit e evidence. Inclui explicitamente
+`PATCH /api/users/:id/admin`, revisão de candidaturas e criação de memberships.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -138,13 +152,19 @@ Confirmar comportamento para visitante, utilizador comum, associação e admin.
 
 3. Instruções do que fazer.
 
-Regista expected result por perfil, incluindo HTTP status ou estado UI.
+Regista expected result por perfil, incluindo HTTP status ou estado UI. Para
+utilizadores, acrescenta auto-bloqueio/autodespromoção e `409 LAST_ACTIVE_ADMIN`.
+Para candidaturas, acrescenta `409 APPLICATION_ALREADY_REVIEWED`. Para
+memberships, acrescenta `409 CHARITY_MEMBERSHIP_EXISTS` quando a ação tentaria
+transferir implicitamente o utilizador.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -170,19 +190,25 @@ Confirmar que ações sensíveis geram registo útil sem dados privados.
 
 3. Instruções do que fazer.
 
-Lista evento, origem, campos seguros e campos proibidos.
+Lista evento, origem, campos seguros e campos proibidos. Os eventos mínimos
+esperados são `user.admin_update`, `charity.application_review` e
+`charity.membership_create`. Confirma `requestId`, `before`/`after` sanitizados
+e que password, hashes, cookies, tokens e segredos são removidos.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
 6. Validação do passo.
 
-A validação passa quando logs citados não expõem valores sensíveis.
+A validação passa quando logs citados não expõem valores sensíveis e quando a
+evidence prova que usam a mesma sessão/transação da mutação auditada.
 
 7. Cenário negativo/erro esperado.
 
@@ -206,9 +232,11 @@ Regista só nomes de variáveis ou chaves públicas permitidas.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -234,13 +262,17 @@ Provar que dados pessoais, pagamento simulado e associação ficam limitados ao 
 
 3. Instruções do que fazer.
 
-Cria uma matriz de campo, origem, visibilidade e motivo.
+Cria uma matriz de campo, origem, visibilidade e motivo. Acrescenta uma matriz
+de atomicidade com: operação, escritas abrangidas, ponto de falha injetado,
+estado esperado após rollback e teste que o prova.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -250,7 +282,9 @@ A validação passa quando não há campo sensível sem regra.
 
 7. Cenário negativo/erro esperado.
 
-Campo sensível sem owner ou permissão deve ser tratado como falha.
+Campo sensível sem owner ou permissão deve ser tratado como falha. Estado de
+utilizador alterado, sessões removidas ou associação criada depois de falha do
+audit também é `FAIL`.
 
 ### Passo 6 - Fechar critérios de segurança administrativa
 
@@ -266,13 +300,17 @@ Transformar observações em decisão `PASS`, `PASS_COM_RESSALVAS` ou `FAIL`.
 
 3. Instruções do que fazer.
 
-Liga cada critério a RNF, prova e negativo.
+Liga cada critério a RNF, prova e negativo. Não uses apenas scanner textual:
+executa o teste de transações admin e regista total, exit code e nomes dos
+cenários de rollback/concorrência.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -302,9 +340,11 @@ Inclui rotas validadas, falhas, ressalvas e decisões aceites.
 
 4. Código completo, correto e integrado com a app final.
 
-Sem código neste passo. Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
+Sem código neste passo.
 
 5. Explicação do código.
+
+Este passo é documental, analítico ou de validação final; por isso, o trabalho técnico é preencher a evidence com dados observáveis e não criar implementação nova.
 
 Como não há código neste passo, a explicação incide sobre a decisão técnica: que prova foi recolhida, que risco evita, que contrato do BK protege e que informação fica preparada para o próximo passo.
 
@@ -320,6 +360,13 @@ Se houver falha sem classificação, a matriz final fica bloqueada.
 
 - O artefacto `docs/evidence/MF8/AUDITORIA-ADMINISTRATIVA-FINAL.md` existe e referencia `BK-MF8-05`.
 - Todos os 7 passos têm prova, decisão e negativo associado.
+- A evidence cobre `user.admin_update`, `charity.application_review` e
+  `charity.membership_create`, incluindo `requestId` e redaction.
+- O bloqueio de conta prova revogação de sessões no mesmo commit do update e do
+  audit; fault injection prova rollback total.
+- Duas decisões concorrentes deixam uma decisão, duas remoções de admin deixam
+  pelo menos um admin ativo e membership para outra associação não transfere o
+  utilizador silenciosamente.
 - Cada decisão usa `PASS`, `PASS_COM_RESSALVAS`, `FAIL` ou `NAO_APLICAVEL` com justificação.
 - Os campos `pr`, `proof`, `neg` e `fonte` estão preenchidos ou justificados.
 - Erros comuns a evitar: prova sem comando, screenshot sem contexto, decisão sem fonte e handoff sem owner.
@@ -353,3 +400,6 @@ Resultado esperado: a validação documental fica em `PASS`; se existir falha t�
 
 - `2026-06-27`: frase dos passos sem código uniformizada com acentuação portuguesa correta.
 - `2026-06-27`: guia corrigido para a MF8 final de 10 BKs, com estrutura obrigatória, conceitos específicos, passos sem código declarados e critérios de evidence mais concretos.
+- `2026-07-10`: auditoria final passa a exigir atomicidade, fault injection,
+  correlação por `requestId`, revogação transacional de sessões e invariantes
+  administrativas sob concorrência.

@@ -4,6 +4,30 @@
 
 import { apiClient } from "./apiClient.js";
 
+/**
+ * Constrói a query pública do catálogo sem expor parâmetros vazios.
+ *
+ * @param {{ page?: number, limit?: number, type?: string, taxonomyId?: string, sort?: string }} input Filtros e paginação públicos.
+ * @returns {URLSearchParams} Query string segura para a rota de catálogo.
+ */
+function buildCatalogParams(input = {}) {
+    const params = new URLSearchParams();
+
+    params.set("page", String(input.page ?? 1));
+    params.set("limit", String(input.limit ?? 12));
+    params.set("sort", input.sort ?? "recent");
+
+    if (input.type) {
+        params.set("type", input.type);
+    }
+
+    if (input.taxonomyId) {
+        params.set("taxonomyId", input.taxonomyId);
+    }
+
+    return params;
+}
+
 export const catalogApi = {
     /**
      * Lista conteúdos publicados disponíveis para o público.
@@ -11,10 +35,11 @@ export const catalogApi = {
      * Esta chamada alimenta páginas de catálogo sem expor rascunhos ou metadados
      * administrativos.
      *
+     * @param {{ page?: number, limit?: number, type?: string, taxonomyId?: string, sort?: string }} [params] Filtros e paginação públicos.
      * @returns {Promise<unknown>} Catálogo público devolvido pela API.
      */
-    listPublished() {
-        return apiClient.get("/api/catalog");
+    listPublished(params = {}) {
+        return apiClient.get(`/api/catalog?${buildCatalogParams(params)}`);
     },
     /**
      * Obtém o detalhe público de um conteúdo.

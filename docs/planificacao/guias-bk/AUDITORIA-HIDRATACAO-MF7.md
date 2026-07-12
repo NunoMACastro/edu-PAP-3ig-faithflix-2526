@@ -15,6 +15,14 @@
 - `run_commands`: true
 - `check_mf_coherence`: true
 - `last_updated`: 2026-06-23
+- `document_status`: `HISTORICAL_SNAPSHOT`
+- `snapshot_date`: `2026-06-23`
+- `implementation_lane`: `STUDENT`
+- `current_authority`: `docs/planificacao/backlogs/BACKLOG-MVP.md`
+- `proof_scope`: hidratação dos cinco guias MF7 e comandos observados nessa data; as contagens 60/60 não são atuais
+
+> Este report preserva resultados históricos. Qualquer menção a `60 BK`,
+> `60 guias`, build ou `PASS` vale apenas para a execução de 2026-06-23.
 
 ## Sumario executivo
 
