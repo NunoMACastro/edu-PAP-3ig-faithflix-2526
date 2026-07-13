@@ -89,11 +89,11 @@ test("MF2 identidade: recuperação genérica e reset sem expor o token", async 
     await page.getByTestId("forgot-submit").click();
 
     await expect(
-        page.getByText("Se o email existir, foi criado um pedido de recuperacao."),
+        page.getByText("Se o email existir, foi criado um pedido de recuperação."),
     ).toBeVisible();
     await expect(page).not.toHaveURL(/token=/u);
 
-    await page.getByRole("button", { name: "Já tenho um token" }).click();
+    await page.getByRole("button", { name: "Já tenho um código" }).click();
     await page.getByTestId("token-input").fill(MF2_RESET_TOKEN);
     await page.getByTestId("password-input").fill(MF2_RESET_NEW_PASSWORD);
     await page.getByTestId("reset-submit").click();
