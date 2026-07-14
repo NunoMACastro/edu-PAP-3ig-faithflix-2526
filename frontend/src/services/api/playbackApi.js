@@ -6,6 +6,19 @@ import { apiClient } from "./apiClient.js";
 
 export const playbackApi = {
     /**
+     * Obtém a fonte privada e limitada a 1080p para o hero do detalhe.
+     *
+     * @param {string} contentId Identificador do conteúdo elegível.
+     * @param {{ signal?: AbortSignal }} [options] Opções de cancelamento.
+     * @returns {Promise<unknown>} DTO mínimo do preview autenticado.
+     */
+    getPreview(contentId, options = {}) {
+        return apiClient.get(
+            `/api/playback/${encodeURIComponent(contentId)}/preview`,
+            options,
+        );
+    },
+    /**
      * Obtém o estado de reprodução de um conteúdo.
      *
      * A API devolve progresso, preferências e dados necessários para retomar a

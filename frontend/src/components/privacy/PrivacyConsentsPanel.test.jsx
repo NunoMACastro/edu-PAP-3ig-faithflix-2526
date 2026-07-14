@@ -82,6 +82,22 @@ describe("PrivacyConsentsPanel", () => {
         expect(mocks.getMyConsents).toHaveBeenCalledTimes(2);
     });
 
+    it("explica que o opt-out preserva os avisos essenciais da conta", async () => {
+        render(<PrivacyConsentsPanel />);
+
+        expect(
+            await screen.findByLabelText("Alertas opcionais de continuidade"),
+        ).toBeChecked();
+        expect(
+            screen.getByText(
+                /avisos essenciais de segurança, subscrição e conta mantêm-se ativos/u,
+            ),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByLabelText("Notificações da conta"),
+        ).not.toBeInTheDocument();
+    });
+
     it("reverte para o último estado confirmado quando a escrita falha", async () => {
         let rejectUpdate;
         mocks.updateMyConsents.mockReturnValue(

@@ -17,6 +17,7 @@ import {
     assertAdminUserUpdate,
     assertParentalSettings,
     assertProfileUpdate,
+    assertRoleUpdate,
     parseAdminUserPagination,
 } from "./user.validation.js";
 
@@ -43,7 +44,7 @@ function toPublicUser(user) {
  */
 function asUserObjectId(userId) {
     if (!ObjectId.isValid(userId)) {
-        throw new HttpError(400, "Utilizador invalido.");
+        throw new HttpError(400, "Utilizador inválido.");
     }
 
     return new ObjectId(userId);
@@ -117,7 +118,7 @@ export async function getMyProfile(userId) {
         .findOne({ _id: asUserObjectId(userId) });
 
     if (!user) {
-        throw new HttpError(404, "Utilizador nao encontrado.");
+        throw new HttpError(404, "Utilizador não encontrado.");
     }
 
     return toPublicUser(user);
@@ -140,7 +141,7 @@ export async function updateMyProfile(userId, input) {
     );
 
     if (!user) {
-        throw new HttpError(404, "Utilizador nao encontrado.");
+        throw new HttpError(404, "Utilizador não encontrado.");
     }
 
     return toPublicUser(user);
@@ -163,7 +164,7 @@ export async function updateParentalSettings(userId, input) {
     );
 
     if (!user) {
-        throw new HttpError(404, "Utilizador nao encontrado.");
+        throw new HttpError(404, "Utilizador não encontrado.");
     }
 
     return toPublicUser(user);
@@ -211,7 +212,12 @@ export async function updateUserRole(
     input,
     context = {},
 ) {
-    return updateUserByAdmin(actorUserId, targetUserId, input, context);
+    return updateUserByAdmin(
+        actorUserId,
+        targetUserId,
+        assertRoleUpdate(input),
+        context,
+    );
 }
 
 /**
@@ -238,14 +244,14 @@ export async function updateUserByAdmin(
         if (update.role && update.role !== "admin") {
             throw new HttpError(
                 400,
-                "Nao podes remover o teu proprio acesso admin.",
+                "Não podes remover o teu próprio acesso admin.",
             );
         }
 
         if (update.accountStatus === "blocked") {
             throw new HttpError(
                 400,
-                "Nao podes bloquear a tua propria conta.",
+                "Não podes bloquear a tua própria conta.",
             );
         }
     }
@@ -258,7 +264,7 @@ export async function updateUserByAdmin(
         );
 
         if (!before) {
-            throw new HttpError(404, "Utilizador nao encontrado.");
+            throw new HttpError(404, "Utilizador não encontrado.");
         }
 
         // Preserva o estado anterior mesmo em doubles que devolvem a mesma referencia.
@@ -281,7 +287,7 @@ export async function updateUserByAdmin(
         );
 
         if (!user) {
-            throw new HttpError(409, "O utilizador foi alterado em concorrencia.");
+            throw new HttpError(409, "O utilizador foi alterado em concorrência.");
         }
 
         if (update.accountStatus === "blocked") {

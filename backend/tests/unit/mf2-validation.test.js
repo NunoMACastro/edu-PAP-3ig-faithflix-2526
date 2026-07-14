@@ -9,6 +9,8 @@ import {
     getLatestDevPasswordResetToken,
     requestPasswordReset,
 } from "../../src/modules/auth/auth.service.js";
+import { hashToken } from "../../src/modules/auth/token.js";
+import { listDemoMailbox } from "../../src/modules/demo-mailbox/demo-mailbox.service.js";
 import {
     assertValidEmail,
     assertValidName,
@@ -102,7 +104,29 @@ test("password reset expoe token apenas no canal dev-only separado", async () =>
     process.env.ENABLE_DEV_RESET_TOKEN_OUTBOX = "true";
     process.env.NODE_ENV = "development";
 
+    /**
+     * Cria o cursor mínimo usado pela caixa demo, sem simular operações MongoDB
+     * que não participam nesta jornada.
+     *
+     * @param {object[]} rows Registos já limitados ao cenário.
+     * @returns {{ sort: () => object, limit: () => object, toArray: () => Promise<object[]> }} Cursor encadeável.
+     */
+    function mailboxCursor(rows) {
+        return {
+            sort() {
+                return this;
+            },
+            limit() {
+                return this;
+            },
+            async toArray() {
+                return [...rows];
+            },
+        };
+    }
+
     const db = {
+        databaseName: "faithflix_demo",
         /**
          * Documenta `collection`, mantendo explícita a responsabilidade desta função no módulo.
          *
@@ -132,6 +156,13 @@ test("password reset expoe token apenas no canal dev-only separado", async () =>
                         return { insertedId: "dev-reset-token-id" };
                     },
                     findOne: async () => devOutbox.at(-1),
+                    find: () => mailboxCursor(devOutbox),
+                };
+            }
+
+            if (name === "demo_email_outbox") {
+                return {
+                    find: () => mailboxCursor([]),
                 };
             }
 
@@ -148,12 +179,31 @@ test("password reset expoe token apenas no canal dev-only separado", async () =>
             "aluno@example.com",
             { db },
         );
+        const mailbox = await listDemoMailbox(
+            { email: "aluno@example.com" },
+            {
+                db,
+                source: {
+                    NODE_ENV: "development",
+                    DEMO_MODE: "true",
+                    ENABLE_DEMO_MAILBOX: "true",
+                    MONGODB_DB_NAME: "faithflix_demo",
+                },
+                remoteAddress: "127.0.0.1",
+            },
+        );
 
         assert.deepEqual(Object.keys(publicResponse), ["message"]);
         assert.equal(insertedTokens.length, 1);
         assert.equal(devOutbox.length, 1);
         assert.equal(typeof devOutbox[0].resetToken, "string");
         assert.equal(devResponse.resetToken, devOutbox[0].resetToken);
+        assert.equal(mailbox.messages.length, 1);
+        assert.equal(mailbox.messages[0].resetToken, devResponse.resetToken);
+        assert.equal(
+            hashToken(mailbox.messages[0].resetToken),
+            insertedTokens[0].tokenHash,
+        );
     } finally {
         if (previousFlag === undefined) {
             delete process.env.ENABLE_DEV_RESET_TOKEN_OUTBOX;
@@ -341,6 +391,18 @@ test("users e library validam roles, parental e tipos de lista", () => {
     });
     assert.equal(assertListType("favorite"), "favorite");
     assert.throws(() => assertRoleUpdate({ role: "owner" }), /Role/);
+    assert.throws(
+        () =>
+            assertRoleUpdate({
+                role: "moderator",
+                accountStatus: "blocked",
+            }),
+        /Atualização de role inválida/u,
+    );
+    assert.throws(
+        () => assertRoleUpdate({ accountStatus: "blocked" }),
+        /Atualização de role inválida/u,
+    );
     assert.throws(() => assertListType("favourite"), /lista/);
 });
 

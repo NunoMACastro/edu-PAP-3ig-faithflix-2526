@@ -58,6 +58,7 @@ function playbackResponse(overrides = {}) {
         content: {
             id: "content-1",
             title: "Filme de teste",
+            slug: "filme-de-teste",
             mediaStatus: "ready",
             isPlayable: true,
             source: {
@@ -170,6 +171,22 @@ describe("PlaybackPage", () => {
         view.unmount();
         expect(mocks.destroyAdapter).toHaveBeenCalledOnce();
         expect(mocks.queue.close).toHaveBeenCalledWith(12);
+    });
+
+    it("regressa ao detalhe por slug e omite seletores sem alternativas", async () => {
+        mocks.getPlayback.mockResolvedValue(playbackResponse({
+            tracks: { subtitles: [], audio: [{ language: "pt", label: "Original" }] },
+            qualityOptions: [],
+        }));
+        renderPage();
+
+        expect(await screen.findByRole("link", { name: "Voltar" }))
+            .toHaveAttribute("href", "/catalogo/filme-de-teste");
+        expect(screen.queryByLabelText("Legendas")).not.toBeInTheDocument();
+        expect(screen.queryByLabelText("Áudio")).not.toBeInTheDocument();
+        expect(screen.queryByLabelText("Qualidade")).not.toBeInTheDocument();
+        expect(screen.queryByRole("group", { name: "Opções de média" }))
+            .not.toBeInTheDocument();
     });
 
     it("explica MEDIA_NOT_READY e permite repetir a leitura", async () => {

@@ -13,6 +13,9 @@ pnpm-debug.log*
 package-lock.json
 .pnpm-debug.log
 
+# Media local gerada em runtime
+backend/.local-media/
+
 # Logs
 logs/
 *.log
@@ -50,5 +53,4 @@ Thumbs.db
 
 # Husky
 .husky/_/
-
 

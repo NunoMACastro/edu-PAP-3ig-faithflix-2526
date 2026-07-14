@@ -21,7 +21,7 @@ const MAX_ADMIN_SEARCH_LENGTH = 80;
  */
 export function assertProfileUpdate(input) {
     if (!input || typeof input !== "object" || Array.isArray(input)) {
-        throw new HttpError(400, "Atualizacao de perfil invalida.");
+        throw new HttpError(400, "Atualização de perfil inválida.");
     }
 
     const name = typeof input.name === "string" ? input.name.trim() : "";
@@ -40,10 +40,20 @@ export function assertProfileUpdate(input) {
  * @returns {{ role: string }} Atualização segura de role.
  */
 export function assertRoleUpdate(input) {
+    if (
+        !input ||
+        typeof input !== "object" ||
+        Array.isArray(input) ||
+        Object.keys(input).length !== 1 ||
+        !("role" in input)
+    ) {
+        throw new HttpError(400, "Atualização de role inválida.");
+    }
+
     const role = typeof input?.role === "string" ? input.role.trim() : "";
 
     if (!VALID_ROLES.includes(role)) {
-        throw new HttpError(400, "Role invalida.");
+        throw new HttpError(400, "Role inválida.");
     }
 
     return { role };
@@ -68,7 +78,7 @@ function escapeRegexLiteral(value) {
  */
 export function assertAdminUserUpdate(input = {}) {
     if (!input || typeof input !== "object" || Array.isArray(input)) {
-        throw new HttpError(400, "Atualizacao administrativa invalida.");
+        throw new HttpError(400, "Atualização administrativa inválida.");
     }
 
     const update = {};
@@ -77,7 +87,7 @@ export function assertAdminUserUpdate(input = {}) {
         const role = typeof input.role === "string" ? input.role.trim() : "";
 
         if (!VALID_ROLES.includes(role)) {
-            throw new HttpError(400, "Role invalida.");
+            throw new HttpError(400, "Role inválida.");
         }
 
         update.role = role;
@@ -90,7 +100,7 @@ export function assertAdminUserUpdate(input = {}) {
                 : "";
 
         if (!VALID_ACCOUNT_STATUSES.includes(accountStatus)) {
-            throw new HttpError(400, "Estado de conta invalido.");
+            throw new HttpError(400, "Estado de conta inválido.");
         }
 
         update.accountStatus = accountStatus;
@@ -112,7 +122,7 @@ export function assertAdminUserUpdate(input = {}) {
  */
 export function assertAdminUserFilters(filters = {}) {
     if (!filters || typeof filters !== "object" || Array.isArray(filters)) {
-        throw new HttpError(400, "Filtros de utilizador invalidos.");
+        throw new HttpError(400, "Filtros de utilizador inválidos.");
     }
 
     const safeFilters = {};
@@ -130,11 +140,11 @@ export function assertAdminUserFilters(filters = {}) {
               : null;
 
     if (search === null) {
-        throw new HttpError(400, "Pesquisa invalida.");
+        throw new HttpError(400, "Pesquisa inválida.");
     }
 
     if (status === null) {
-        throw new HttpError(400, "Filtro de estado invalido.");
+        throw new HttpError(400, "Filtro de estado inválido.");
     }
 
     if (search.length > MAX_ADMIN_SEARCH_LENGTH) {
@@ -147,7 +157,7 @@ export function assertAdminUserFilters(filters = {}) {
 
     if (status) {
         if (!FILTER_ACCOUNT_STATUSES.includes(status)) {
-            throw new HttpError(400, "Filtro de estado invalido.");
+            throw new HttpError(400, "Filtro de estado inválido.");
         }
 
         safeFilters.status = status;
@@ -181,7 +191,7 @@ export function assertParentalSettings(input) {
         parentalMaxAgeRating < 0 ||
         parentalMaxAgeRating > 18
     ) {
-        throw new HttpError(400, "Limite parental invalido.");
+        throw new HttpError(400, "Limite parental inválido.");
     }
 
     return { parentalMaxAgeRating };

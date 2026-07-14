@@ -9,6 +9,7 @@ import { requireActiveSubscription } from "../subscriptions/subscription-access.
 import {
     getContinueWatching,
     getPlaybackByContent,
+    getPlaybackPreviewByContent,
     getPlaybackPreferences,
     putPlaybackPreferences,
     putPlaybackProgress,
@@ -20,5 +21,6 @@ playbackRouter.use(requireAuth);
 playbackRouter.get("/preferences", asyncHandler(getPlaybackPreferences));
 playbackRouter.put("/preferences", asyncHandler(putPlaybackPreferences));
 playbackRouter.get("/me/continue-watching", asyncHandler(getContinueWatching));
+playbackRouter.get("/:contentId/preview", requireActiveSubscription, asyncHandler(getPlaybackPreviewByContent));
 playbackRouter.get("/:contentId", requireActiveSubscription, asyncHandler(getPlaybackByContent));
 playbackRouter.put("/:contentId/progress", requireActiveSubscription, asyncHandler(putPlaybackProgress));

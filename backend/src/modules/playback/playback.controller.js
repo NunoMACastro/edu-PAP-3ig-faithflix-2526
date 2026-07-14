@@ -8,6 +8,7 @@ import {
 } from "./media-preferences.service.js";
 import {
     getPlayback,
+    getPlaybackPreview,
     listContinueWatching,
     savePlaybackProgress,
 } from "./playback.service.js";
@@ -27,6 +28,23 @@ export async function getPlaybackByContent(req, res) {
     const playback = await getPlayback(req.params.contentId, req.user.id);
 
     return res.status(200).json(playback);
+}
+
+/**
+ * Devolve a fonte privada limitada a 1080p usada no hero do detalhe.
+ *
+ * @param {import("express").Request} req Pedido autenticado com `contentId`.
+ * @param {import("express").Response} res Resposta privada não armazenável.
+ * @returns {Promise<unknown>} DTO mínimo do preview.
+ */
+export async function getPlaybackPreviewByContent(req, res) {
+    res.setHeader("Cache-Control", "private, no-store");
+    const preview = await getPlaybackPreview(
+        req.params.contentId,
+        req.user.id,
+    );
+
+    return res.status(200).json(preview);
 }
 
 /**

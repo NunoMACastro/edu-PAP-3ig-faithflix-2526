@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { attachMediaSource } from "../playback/mediaAdapter.js";
 import { formatContentType } from "../../utils/contentTypeLabels.js";
 
 /**
@@ -15,9 +16,62 @@ function prefersDataSaving() {
 }
 
 /**
+ * Desenha o símbolo do controlo de preview sem depender de uma biblioteca de
+ * ícones. O SVG é decorativo porque o botão fornece sempre um nome acessível.
+ *
+ * @param {{ type: "pause" | "play" | "muted" | "sound" }} props Estado visual.
+ * @returns {JSX.Element} Ícone vetorial decorativo.
+ */
+function PreviewControlIcon({ type }) {
+    if (type === "pause") {
+        return (
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M7 5.5h3.5v13H7zM13.5 5.5H17v13h-3.5z" />
+            </svg>
+        );
+    }
+
+    if (type === "play") {
+        return (
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M8 5.2v13.6L18.5 12z" />
+            </svg>
+        );
+    }
+
+    if (type === "muted") {
+        return (
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 9.25v5.5h3.5L12 18.5v-13L7.5 9.25z" />
+                <path
+                    d="m15.25 9.25 4.5 4.5m0-4.5-4.5 4.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                />
+            </svg>
+        );
+    }
+
+    return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 9.25v5.5h3.5L12 18.5v-13L7.5 9.25z" />
+            <path
+                d="M15 8.5a5 5 0 0 1 0 7M17.5 6a8.5 8.5 0 0 1 0 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+            />
+        </svg>
+    );
+}
+
+/**
  * Hero full-bleed com preview promocional e fallback para imagem editorial.
  *
- * @param {{ content: Record<string, unknown>, durationLabel: string, ageRatingLabel: string, primaryAction: React.ReactNode, children?: React.ReactNode }} props Propriedades do hero.
+ * @param {{ content: Record<string, unknown>, durationLabel: string, ageRatingLabel: string, primaryAction: React.ReactNode, previewSource?: Record<string, string> | null, children?: React.ReactNode }} props Propriedades do hero.
  * @returns {JSX.Element} Cabeçalho cinematográfico.
  */
 export function ContentDetailHero({
@@ -25,6 +79,7 @@ export function ContentDetailHero({
     durationLabel,
     ageRatingLabel,
     primaryAction,
+    previewSource = null,
     children,
 }) {
     const heroRef = useRef(null);
@@ -33,6 +88,7 @@ export function ContentDetailHero({
     const [reducedMotion, setReducedMotion] = useState(true);
     const [saveData, setSaveData] = useState(prefersDataSaving);
     const [previewFailed, setPreviewFailed] = useState(false);
+    const [previewReady, setPreviewReady] = useState(false);
     const [paused, setPaused] = useState(false);
     const [muted, setMuted] = useState(true);
 
@@ -61,12 +117,22 @@ export function ContentDetailHero({
 
     useEffect(() => {
         setPreviewFailed(false);
+        setPreviewReady(false);
         setPaused(false);
         setMuted(true);
-    }, [content.id, content.assets?.previewUrl]);
+    }, [
+        content.id,
+        content.assets?.previewUrl,
+        previewSource?.mimeType,
+        previewSource?.protocol,
+        previewSource?.url,
+    ]);
+
+    const editorialPreviewUrl = content.assets?.previewUrl;
+    const hasPreview = Boolean(previewSource?.url || editorialPreviewUrl);
 
     const canShowPreview = Boolean(
-        content.assets?.previewUrl &&
+        hasPreview &&
             largeViewport &&
             !reducedMotion &&
             !saveData &&
@@ -74,7 +140,54 @@ export function ContentDetailHero({
     );
 
     useEffect(() => {
-        if (!canShowPreview || !videoRef.current) return undefined;
+        if (!canShowPreview || !previewSource || !videoRef.current) {
+            return undefined;
+        }
+
+        const controller = new AbortController();
+        let active = true;
+        let adapter = null;
+
+        setPreviewReady(false);
+        attachMediaSource(videoRef.current, previewSource, {
+            signal: controller.signal,
+            onError: () => {
+                if (active) setPreviewFailed(true);
+            },
+        })
+            .then((nextAdapter) => {
+                if (!active) {
+                    nextAdapter.destroy();
+                    return;
+                }
+                adapter = nextAdapter;
+                setPreviewReady(true);
+            })
+            .catch((error) => {
+                if (active && error?.name !== "AbortError") {
+                    setPreviewFailed(true);
+                }
+            });
+
+        return () => {
+            active = false;
+            controller.abort();
+            adapter?.destroy();
+        };
+    }, [
+        canShowPreview,
+        previewSource,
+        previewSource?.mimeType,
+        previewSource?.protocol,
+        previewSource?.url,
+    ]);
+
+    const previewPrepared = previewSource ? previewReady : true;
+
+    useEffect(() => {
+        if (!canShowPreview || !previewPrepared || !videoRef.current) {
+            return undefined;
+        }
 
         const video = videoRef.current;
         let intersecting = true;
@@ -107,7 +220,7 @@ export function ContentDetailHero({
             document.removeEventListener("visibilitychange", syncVisibility);
             video.pause?.();
         };
-    }, [canShowPreview, paused]);
+    }, [canShowPreview, paused, previewPrepared]);
 
     /** @returns {void} Alterna pausa explícita do preview. */
     function togglePaused() {
@@ -137,7 +250,13 @@ export function ContentDetailHero({
 
     return (
         <header
-            className={`content-detail-hero${reducedMotion || !largeViewport ? " content-detail-hero-static" : ""}`}
+            className={[
+                "content-detail-hero",
+                canShowPreview ? "content-detail-hero-previewing" : "",
+                reducedMotion || !largeViewport
+                    ? "content-detail-hero-static"
+                    : "",
+            ].filter(Boolean).join(" ")}
             ref={heroRef}
             aria-labelledby="content-detail-title"
         >
@@ -155,7 +274,7 @@ export function ContentDetailHero({
                     <video
                         ref={videoRef}
                         className="content-detail-preview"
-                        src={content.assets.previewUrl}
+                        src={previewSource ? undefined : editorialPreviewUrl}
                         poster={content.assets?.backdropUrl || undefined}
                         autoPlay
                         loop
@@ -194,17 +313,21 @@ export function ContentDetailHero({
                         type="button"
                         className="content-detail-control"
                         aria-pressed={paused}
+                        aria-label={paused ? "Reproduzir preview" : "Pausar preview"}
+                        title={paused ? "Reproduzir preview" : "Pausar preview"}
                         onClick={togglePaused}
                     >
-                        {paused ? "Reproduzir preview" : "Pausar preview"}
+                        <PreviewControlIcon type={paused ? "play" : "pause"} />
                     </button>
                     <button
                         type="button"
                         className="content-detail-control"
                         aria-pressed={!muted}
+                        aria-label={muted ? "Ativar som do preview" : "Silenciar preview"}
+                        title={muted ? "Ativar som do preview" : "Silenciar preview"}
                         onClick={toggleMuted}
                     >
-                        {muted ? "Ativar som do preview" : "Silenciar preview"}
+                        <PreviewControlIcon type={muted ? "muted" : "sound"} />
                     </button>
                 </div>
             ) : null}

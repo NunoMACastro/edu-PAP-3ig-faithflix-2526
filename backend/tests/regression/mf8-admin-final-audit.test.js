@@ -380,6 +380,12 @@ function installTestDatabase() {
                 tokenHash: hashToken(adminSessionToken),
                 expiresAt: new Date("2027-01-01T00:00:00.000Z"),
             },
+            {
+                _id: new ObjectId("64f800000000000000000012"),
+                userId: testIds.targetUser,
+                tokenHash: hashToken("c".repeat(64)),
+                expiresAt: new Date("2027-01-01T00:00:00.000Z"),
+            },
         ]),
         contents: collection([
             {
@@ -906,4 +912,92 @@ test("F4 HTTP pagina catálogo admin e revisões com metadados estáveis", async
     );
     assert.deepEqual(forbiddenBody.details, { field: "mediaStatus" });
     assert.equal(collections.content_revisions.rows.length, 2);
+});
+
+test("users HTTP liga perfil e parental à sessão autenticada", async () => {
+    const csrfResponse = await requestAdminSurface({
+        path: "/api/session/csrf-token",
+        userCookie: true,
+    });
+    const { csrfToken } = await csrfResponse.json();
+    const profileResponse = await requestAdminSurface({
+        method: "PATCH",
+        path: "/api/users/me",
+        userCookie: true,
+        csrfToken,
+        body: { name: "Utilizador atualizado", role: "admin" },
+    });
+    const profileBody = await profileResponse.json();
+    const parentalResponse = await requestAdminSurface({
+        method: "PATCH",
+        path: "/api/users/me/parental",
+        userCookie: true,
+        csrfToken,
+        body: { parentalMaxAgeRating: 12 },
+    });
+    const parentalBody = await parentalResponse.json();
+    const persistedUser = collections.users.rows.find((user) =>
+        sameId(user._id, testIds.regularUser));
+
+    assert.equal(csrfResponse.status, 200);
+    assert.equal(profileResponse.status, 200);
+    assert.equal(profileBody.user.id, String(testIds.regularUser));
+    assert.equal(profileBody.user.name, "Utilizador atualizado");
+    assert.equal(profileBody.user.role, "user");
+    assert.equal("passwordHash" in profileBody.user, false);
+    assert.equal(parentalResponse.status, 200);
+    assert.equal(parentalBody.user.parentalMaxAgeRating, 12);
+    assert.equal(persistedUser.name, "Utilizador atualizado");
+    assert.equal(persistedUser.role, "user");
+    assert.equal(persistedUser.parentalMaxAgeRating, 12);
+});
+
+test("users HTTP confirma update admin e fecha o contrato da rota legacy", async () => {
+    const csrfResponse = await requestAdminSurface({
+        path: "/api/session/csrf-token",
+        adminCookie: true,
+    });
+    const { csrfToken } = await csrfResponse.json();
+    const auditCountBefore = collections.admin_audit_logs.rows.length;
+    const legacyRoleResponse = await requestAdminSurface({
+        method: "PATCH",
+        path: `/api/users/${testIds.targetUser}/role`,
+        adminCookie: true,
+        csrfToken,
+        body: { role: "moderator" },
+    });
+    const legacyRoleBody = await legacyRoleResponse.json();
+    const updateResponse = await requestAdminSurface({
+        method: "PATCH",
+        path: `/api/users/${testIds.targetUser}/admin`,
+        adminCookie: true,
+        csrfToken,
+        body: { role: "user", accountStatus: "blocked" },
+    });
+    const updateBody = await updateResponse.json();
+    const legacyResponse = await requestAdminSurface({
+        method: "PATCH",
+        path: `/api/users/${testIds.targetUser}/role`,
+        adminCookie: true,
+        csrfToken,
+        body: { accountStatus: "active" },
+    });
+    const legacyBody = await legacyResponse.json();
+    const targetSessions = collections.sessions.rows.filter((session) =>
+        sameId(session.userId, testIds.targetUser));
+
+    assert.equal(csrfResponse.status, 200);
+    assert.equal(legacyRoleResponse.status, 200);
+    assert.equal(legacyRoleBody.user.role, "moderator");
+    assert.equal(updateResponse.status, 200);
+    assert.equal(updateBody.user.role, "user");
+    assert.equal(updateBody.user.accountStatus, "blocked");
+    assert.equal(targetSessions.length, 0);
+    assert.equal(
+        collections.admin_audit_logs.rows.length,
+        auditCountBefore + 2,
+    );
+    assert.equal(legacyResponse.status, 400);
+    assert.equal(legacyBody.message, "Atualização de role inválida.");
+    assert.equal(collections.admin_audit_logs.rows.length, auditCountBefore + 2);
 });

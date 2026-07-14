@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ConfirmDialog } from "../components/admin/ConfirmDialog.jsx";
 import { EmptyState } from "../components/ui/EmptyState.jsx";
+import { useSession } from "../context/SessionContext.jsx";
 import { toUserMessage } from "../services/api/apiErrors.js";
 import { userApi } from "../services/api/userApi.js";
 
@@ -17,6 +18,7 @@ const STATUS_LABELS = { active: "Ativa", blocked: "Bloqueada", deleted: "Elimina
 
 /** @returns {JSX.Element} Tabela pesquisável e diálogo de gestão. */
 export function AdminUsersPage() {
+    const { user: sessionUser } = useSession();
     const searchParams = new URLSearchParams(window.location.search);
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState(() => searchParams.get("search") ?? "");
@@ -109,7 +111,17 @@ export function AdminUsersPage() {
             {status ? <p role="status">{status}</p> : null}
             {!loading && !error && users.length === 0 ? <EmptyState title="Sem utilizadores" description="Não existem contas para os filtros aplicados." /> : null}
 
-            {users.length ? <div className="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Papel</th><th>Estado</th><th><span className="visually-hidden">Ações</span></th></tr></thead><tbody>{users.map((user) => <tr key={user.id}><td>{user.name}</td><td>{user.email}</td><td><span className={`status-badge status-${user.role}`}>{ROLE_LABELS[user.role]}</span></td><td><span className={`status-badge status-${user.accountStatus ?? "active"}`}>{STATUS_LABELS[user.accountStatus ?? "active"]}</span></td><td><button type="button" disabled={user.accountStatus === "deleted"} onClick={() => openManagement(user)}>{user.accountStatus === "deleted" ? "Só leitura" : "Gerir"}</button></td></tr>)}</tbody></table></div> : null}
+            {users.length ? <div className="table-wrap" role="region" aria-label="Tabela de utilizadores" tabIndex={0}><table><thead><tr><th>Nome</th><th>Email</th><th>Papel</th><th>Estado</th><th><span className="visually-hidden">Ações</span></th></tr></thead><tbody>{users.map((user) => {
+                const isCurrentUser = user.id === sessionUser?.id;
+                const isDeleted = user.accountStatus === "deleted";
+                const actionLabel = isCurrentUser
+                    ? "Conta atual"
+                    : isDeleted
+                      ? "Só leitura"
+                      : "Gerir";
+
+                return <tr key={user.id}><td>{user.name}</td><td>{user.email}</td><td><span className={`status-badge status-${user.role}`}>{ROLE_LABELS[user.role]}</span></td><td><span className={`status-badge status-${user.accountStatus ?? "active"}`}>{STATUS_LABELS[user.accountStatus ?? "active"]}</span></td><td><button type="button" disabled={isCurrentUser || isDeleted} onClick={() => openManagement(user)}>{actionLabel}</button></td></tr>;
+            })}</tbody></table></div> : null}
 
             {pagination.totalPages > 1 ? <nav className="pagination" aria-label="Paginação de utilizadores"><button type="button" disabled={loading || page <= 1} onClick={() => setPage((value) => value - 1)}>Anterior</button><span>Página {pagination.page} de {pagination.totalPages} ({pagination.total})</span><button type="button" disabled={loading || page >= pagination.totalPages} onClick={() => setPage((value) => value + 1)}>Seguinte</button></nav> : null}
 

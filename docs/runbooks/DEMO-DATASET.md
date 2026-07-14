@@ -1,6 +1,6 @@
 # Runbook do dataset de demonstração
 
-- `last_updated`: `2026-07-11`
+- `last_updated`: `2026-07-14`
 - `scope`: `real_dev` / MongoDB Atlas ou replica set loopback descartável
 - `production_status`: `PROIBIDO`
 
@@ -136,6 +136,24 @@ novo `npm run seed:demo`; o seed nunca é executado automaticamente no arranque.
 | Trial | `trial@faithflix.demo` | `DEMO_USER_PASSWORD` |
 | Associação | `associacao@faithflix.demo` | `DEMO_USER_PASSWORD` |
 | Cold-start | `cold-start@faithflix.demo` | `DEMO_USER_PASSWORD` |
+
+### Atividade e recomendações
+
+O seed mantém a persona cold-start sem atividade e gera utilização coerente para
+os restantes 29 utilizadores ativos: pelo menos duas entradas de biblioteca,
+sete progressos e seis ratings por conta, sempre dentro do respetivo limite
+parental. Os 300 ratings cobrem todos os filmes, documentários e séries
+publicados; os 240 progressos preservam quatro níveis de popularidade distintos.
+
+As personas principais têm perfis editoriais diferentes. Por exemplo, Pro dá
+mais peso a Bíblia/testemunhos, Owner Família a família/serviço e Membro Família
+a juventude/família. Favoritos, watchlist, histórico e ratings positivos usam
+esses perfis de forma consistente, permitindo comparar recomendações semânticas
+realmente diferentes. O consentimento continua a ser obrigatório: uma conta com
+opt-out recebe apenas cold start, mesmo que tenha atividade persistida.
+
+Comentários visíveis usam texto contextualizado pelo conteúdo e as notificações
+pertencem exclusivamente à lista fechada aceite pelo módulo de notificações.
 
 ## Roteiro curto
 

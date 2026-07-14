@@ -14,6 +14,7 @@ import { useSession } from "../context/SessionContext.jsx";
 import { biblicalPassagesApi } from "../services/api/biblicalPassagesApi.js";
 import { toUserMessage } from "../services/api/apiErrors.js";
 import { catalogApi } from "../services/api/catalogApi.js";
+import { playbackApi } from "../services/api/playbackApi.js";
 import { buildLoginRedirectPath } from "../utils/authRedirect.js";
 
 /**
@@ -151,6 +152,7 @@ export function ContentDetailPage() {
     const [passagesLoadedFor, setPassagesLoadedFor] = useState("");
     const [passageLoading, setPassageLoading] = useState(false);
     const [passageError, setPassageError] = useState("");
+    const [previewSource, setPreviewSource] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [errorStatus, setErrorStatus] = useState(null);
@@ -195,6 +197,41 @@ export function ContentDetailPage() {
             controller.abort();
         };
     }, [contentReloadVersion, idOrSlug]);
+
+    useEffect(() => {
+        setPreviewSource(null);
+
+        if (
+            sessionStatus !== "authenticated" ||
+            !content?.isPlayable ||
+            content.type === "series"
+        ) {
+            return undefined;
+        }
+
+        const controller = new AbortController();
+        let active = true;
+
+        playbackApi
+            .getPreview(content.id, { signal: controller.signal })
+            .then((response) => {
+                if (active) {
+                    setPreviewSource(response?.content?.source ?? null);
+                }
+            })
+            .catch((requestError) => {
+                if (active && requestError?.code !== "REQUEST_ABORTED") {
+                    // O preview é um melhoramento progressivo: o backdrop
+                    // mantém o detalhe utilizável perante qualquer falha.
+                    setPreviewSource(null);
+                }
+            });
+
+        return () => {
+            active = false;
+            controller.abort();
+        };
+    }, [content?.id, content?.isPlayable, content?.type, sessionStatus]);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -351,6 +388,7 @@ export function ContentDetailPage() {
                 durationLabel={durationLabel}
                 ageRatingLabel={ageRatingLabel}
                 primaryAction={primaryAction}
+                previewSource={previewSource}
             >
                 <LibraryActions contentId={content.id} variant="hero" />
             </ContentDetailHero>

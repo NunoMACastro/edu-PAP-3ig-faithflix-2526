@@ -21,6 +21,7 @@ const qualityAssetId = new ObjectId("64f300000000000000000082");
 const invalidUploadId = new ObjectId("64f300000000000000000083");
 const interruptedUploadId = new ObjectId("64f300000000000000000084");
 const tamperedUploadId = new ObjectId("64f300000000000000000085");
+const variantUploadId = new ObjectId("64f300000000000000000086");
 
 const allowedUserId = new ObjectId("64f100000000000000000081");
 const noSubscriptionUserId = new ObjectId("64f100000000000000000082");
@@ -42,6 +43,7 @@ const storageKeys = Object.freeze({
     invalid: `${"3".repeat(64)}.mp4`,
     interrupted: `${"4".repeat(64)}.mp4`,
     tampered: `${"5".repeat(64)}.mp4`,
+    variant: `${"6".repeat(64)}.mp4`,
 });
 
 const mediaBytes = Buffer.from(
@@ -55,6 +57,7 @@ const qualityMediaBytes = Buffer.from(
 const invalidMediaBytes = Buffer.from("not-an-mp4", "utf8");
 const expectedTamperedBytes = Buffer.from("original-same-size", "utf8");
 const actualTamperedBytes = Buffer.from("tampered-same-size", "utf8");
+const variantMediaBytes = Buffer.from("FaithFlix-private-4k-fixture", "utf8");
 
 let storageRoot;
 let server;
@@ -224,6 +227,14 @@ function collection(rows = []) {
             if (!row) return { matchedCount: 0, modifiedCount: 0 };
             applyUpdate(row, update);
             return { matchedCount: 1, modifiedCount: 1 };
+        },
+        async updateMany(query, update) {
+            const matched = rows.filter((candidate) => matches(candidate, query));
+            matched.forEach((row) => applyUpdate(row, update));
+            return {
+                matchedCount: matched.length,
+                modifiedCount: matched.length,
+            };
         },
         async findOneAndUpdate(query, update, options = {}) {
             const row = rows.find((candidate) => matches(candidate, query));
@@ -519,6 +530,27 @@ before(async () => {
             updatedAt: now,
             uploadedAt: now,
         },
+        {
+            _id: variantUploadId,
+            contentId,
+            storageKey: storageKeys.variant,
+            quality: "2160p",
+            mimeType: "video/mp4",
+            expectedSizeBytes: variantMediaBytes.length,
+            expectedSha256: createHash("sha256")
+                .update(variantMediaBytes)
+                .digest("hex"),
+            sizeBytes: variantMediaBytes.length,
+            sha256: createHash("sha256")
+                .update(variantMediaBytes)
+                .digest("hex"),
+            status: "uploaded",
+            active: false,
+            createdBy: adminUserId,
+            createdAt: now,
+            updatedAt: now,
+            uploadedAt: now,
+        },
     ];
 
     collections = {
@@ -549,6 +581,9 @@ before(async () => {
         actualTamperedBytes,
         { mode: 0o600 },
     );
+    await writeFile(join(storageRoot, storageKeys.variant), variantMediaBytes, {
+        mode: 0o600,
+    });
 
     const app = createApp();
     server = app.listen(0, "127.0.0.1");
@@ -759,6 +794,48 @@ test("ativação recalcula SHA-256 e recusa tamper com o mesmo tamanho", async (
     assert.equal(content.version, 3);
     assert.equal(JSON.stringify(body).includes(storageKeys.tampered), false);
     assert.equal(JSON.stringify(body).includes(storageRoot), false);
+});
+
+test("ativação conserva HD e acrescenta 4K como variante ativa", async () => {
+    const csrfToken = await getAdminCsrfToken();
+    const content = collections.contents.rows.find(
+        (row) => String(row._id) === String(contentId),
+    );
+    const hdAsset = collections.media_assets.rows.find(
+        (row) => String(row._id) === String(assetId),
+    );
+    const response = await fetch(
+        `${baseUrl}/api/catalog/${contentId}/media-uploads/${variantUploadId}/activate`,
+        {
+            method: "POST",
+            headers: {
+                ...authHeaders(sessionTokens.admin),
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrfToken,
+            },
+            body: JSON.stringify({ expectedVersion: content.version }),
+        },
+    );
+    const body = await response.json();
+    const variantAsset = collections.media_assets.rows.find(
+        (row) => String(row._id) === String(variantUploadId),
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(body.contentVersion, 4);
+    assert.equal(hdAsset.active, true);
+    assert.equal(hdAsset.status, "ready");
+    assert.equal(variantAsset.active, true);
+    assert.equal(variantAsset.status, "ready");
+    assert.equal(content.media.quality, "1080p");
+    assert.deepEqual(
+        content.qualityOptions.map((option) => option.value),
+        ["1080p", "2160p"],
+    );
+    assert.equal(
+        content.qualityOptions[1].source.url,
+        `/api/media/${variantUploadId}`,
+    );
 });
 
 test("PUT MP4 inválido falha fechado e remove final/partial", async () => {

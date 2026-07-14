@@ -8,7 +8,7 @@ import { privacyApi } from "../../services/api/privacyApi.js";
 
 const CONSENT_LABELS = {
     personalizedRecommendations: "Recomendações personalizadas",
-    operationalNotifications: "Notificações da conta",
+    operationalNotifications: "Alertas opcionais de continuidade",
     anonymousMetrics: "Partilha de utilização anónima",
 };
 
@@ -170,6 +170,10 @@ export function PrivacyConsentsPanel() {
         <section className="form-panel">
             <h2>Consentimentos</h2>
             <p>Controla escolhas opcionais associadas à tua conta.</p>
+            <p className="muted-text">
+                Os avisos essenciais de segurança, subscrição e conta mantêm-se
+                ativos mesmo quando desligas os alertas opcionais de continuidade.
+            </p>
             {error ? <p role="alert">{error}</p> : null}
             {status ? <p role="status">{status}</p> : null}
             <form

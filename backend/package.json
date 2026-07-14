@@ -22,6 +22,8 @@
         "seed:biblical-passages": "node scripts/seed-biblical-passages.js",
         "migrate:payment-attempts:v2": "node scripts/migrate-payment-attempts-v2.js",
         "migrate:series-episodes": "node scripts/migrate-series-episodes.js",
+        "media:import:presentation": "node --env-file=.env scripts/import-presentation-media.js",
+        "media:verify:presentation": "node --env-file=.env scripts/verify-presentation-media.js",
         "backup:db": "node scripts/backup-database.js",
         "restore:verify": "node scripts/verify-database-restore.js",
         "embeddings:generate": "node scripts/generate-content-embeddings.js",

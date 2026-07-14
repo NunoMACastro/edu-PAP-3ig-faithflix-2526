@@ -138,4 +138,38 @@ describe("RelatedContent", () => {
         expect(link).toHaveTextContent("90 min");
         expect(link.querySelector("img")).toBeNull();
     });
+
+    it("mostra três títulos e permite navegar para os restantes sem scroll horizontal", async () => {
+        mocks.related.mockResolvedValue({
+            items: [
+                item("titulo-1", "Título um"),
+                item("titulo-2", "Título dois"),
+                item("titulo-3", "Título três"),
+                item("titulo-4", "Título quatro"),
+            ],
+        });
+        const user = userEvent.setup();
+
+        renderRelated("content-1");
+
+        expect(await screen.findByText("Título um")).toBeInTheDocument();
+        expect(screen.getByText("Título dois")).toBeInTheDocument();
+        expect(screen.getByText("Título três")).toBeInTheDocument();
+        expect(screen.queryByText("Título quatro")).not.toBeInTheDocument();
+        expect(screen.getByText("1–3 de 4")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "Ver títulos anteriores" }))
+            .toBeDisabled();
+
+        await user.click(
+            screen.getByRole("button", { name: "Ver títulos seguintes" }),
+        );
+
+        expect(screen.getByText("Título quatro")).toBeInTheDocument();
+        expect(screen.queryByText("Título um")).not.toBeInTheDocument();
+        expect(screen.getByText("2–4 de 4")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "Ver títulos seguintes" }))
+            .toBeDisabled();
+        expect(screen.getByRole("button", { name: "Ver títulos anteriores" }))
+            .toBeEnabled();
+    });
 });

@@ -22,7 +22,7 @@ const DUMMY_LOGIN_PASSWORD = "faithflix-login-dummy-not-a-credential";
 const DUMMY_LOGIN_PASSWORD_HASH =
     "6661697468666c69782d617574682d31:c1b23e369fa188e56b73762de813e69fd650766ad66d10809525c0b9726e2d64c53464bca9af1c24153dd7217edf26cbb3b960836fe8c11b7864455ee338d691";
 const PASSWORD_RESET_RESPONSE = {
-    message: "Se o email existir, foi criado um pedido de recuperacao.",
+    message: "Se o email existir, foi criado um pedido de recuperação.",
 };
 
 /**
@@ -234,7 +234,7 @@ export async function loginUser(input, options = {}) {
     ) {
         throw new HttpError(
             401,
-            "Credenciais invalidas.",
+            "Credenciais inválidas.",
             undefined,
             "AUTH_INVALID_CREDENTIALS",
         );

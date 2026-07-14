@@ -51,7 +51,7 @@ export async function assertAnotherActiveAdminRemains(input) {
   if (activeAdminCount <= 1) {
     throw new HttpError(
       409,
-      "A operacao removeria o ultimo administrador ativo.",
+      "A operação removeria o último administrador ativo.",
       undefined,
       "LAST_ACTIVE_ADMIN",
     );

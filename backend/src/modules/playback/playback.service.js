@@ -172,6 +172,30 @@ function resolvePlayableMedia(content, preferences, entitlements) {
         declaredQualityOptions,
         entitlements,
     );
+    const playableVariants = declaredQualityOptions
+        .map((option) => {
+            const quality = playbackSource(
+                option?.value ?? option?.label,
+            ).toLowerCase();
+            const source = canonicalSource(option);
+
+            if (!source || !isAllowedQuality(quality, entitlements)) {
+                return null;
+            }
+
+            return { quality, source };
+        })
+        .filter(Boolean)
+        .sort(
+            (left, right) =>
+                qualityRankForValue(left.quality) -
+                qualityRankForValue(right.quality),
+        );
+    const preferredQuality = playbackSource(preferences?.quality).toLowerCase();
+    const selectedVariant =
+        playableVariants.find(
+            (variant) => variant.quality === preferredQuality,
+        ) ?? playableVariants.at(-1);
     const baseSource = canonicalSource(content.media);
     const baseQuality = candidateQuality(content.media);
     const canUseBase =
@@ -180,12 +204,13 @@ function resolvePlayableMedia(content, preferences, entitlements) {
     const effectiveQuality = isSupportedQualityValue(baseQuality)
         ? baseQuality
         : "";
+    const selectedQuality = selectedVariant?.quality ?? effectiveQuality;
 
     return {
-        source: canUseBase ? baseSource : null,
+        source: selectedVariant?.source ?? (canUseBase ? baseSource : null),
         selectedAudioLanguage: "",
-        selectedQuality: effectiveQuality,
-        qualityOptions: publicQualityOptions(qualityOptions, effectiveQuality),
+        selectedQuality,
+        qualityOptions: publicQualityOptions(qualityOptions, selectedQuality),
     };
 }
 
@@ -379,6 +404,7 @@ function publicPlaybackContent(content, preferences, entitlements) {
     return {
         id: String(content._id),
         title: content.title,
+        slug: content.slug,
         type: content.type,
         durationSeconds: content.durationSeconds,
         mediaStatus: "ready",
@@ -462,6 +488,66 @@ export async function getPlayback(contentId, userId) {
         content: publicPlaybackContent(content, preferences, effectiveAccess.entitlements),
         progress: publicProgress(progress, content.durationSeconds),
         ...hierarchy,
+    };
+}
+
+/**
+ * Devolve uma fonte privada adequada a preview editorial no detalhe.
+ *
+ * O preview reutiliza toda a elegibilidade do playback, mas aplica um teto
+ * independente de 1080p. Assim, uma conta com acesso a 4K nunca transfere essa
+ * variante em autoplay e uma obra exclusivamente 4K mantém o backdrop.
+ *
+ * @param {string} contentId Identificador do conteúdo publicado.
+ * @param {string} userId Identificador do utilizador autenticado.
+ * @returns {Promise<{ content: { id: string, title: string, source: Record<string, string>, selectedQuality: string } }>} DTO mínimo do preview privado.
+ */
+export async function getPlaybackPreview(contentId, userId) {
+    const db = await getDb();
+    const contentObjectId = asObjectId(contentId, "Conteudo");
+    const userObjectId = asObjectId(userId, "Utilizador");
+    const { content } = await loadPlaybackEligibility(
+        db,
+        contentObjectId,
+        userObjectId,
+    );
+    const effectiveAccess = await getEffectiveSubscriptionAccess(userId);
+
+    if (!effectiveAccess.hasPremiumAccess) {
+        throw new HttpError(
+            403,
+            "Subscricao ativa obrigatoria para reproduzir este conteudo.",
+            undefined,
+            "SUBSCRIPTION_REQUIRED",
+        );
+    }
+
+    const previewEntitlements = {
+        ...effectiveAccess.entitlements,
+        maxQuality: "1080p",
+        qualityRank: Math.min(
+            qualityRankForValue("1080p"),
+            Number(effectiveAccess.entitlements?.qualityRank) ||
+                qualityRankForValue(effectiveAccess.entitlements?.maxQuality),
+        ),
+    };
+    const selectedMedia = resolvePlayableMedia(
+        content,
+        { audioLanguage: "", quality: "1080p" },
+        previewEntitlements,
+    );
+
+    if (!selectedMedia.source) {
+        throw mediaNotReadyError();
+    }
+
+    return {
+        content: {
+            id: String(content._id),
+            title: content.title,
+            source: selectedMedia.source,
+            selectedQuality: selectedMedia.selectedQuality,
+        },
     };
 }
 

@@ -10,7 +10,10 @@ import { ObjectId } from "mongodb";
 import { getDb, runInTransaction } from "../../config/database.js";
 import { HttpError } from "../../utils/http-error.js";
 import { writeAdminAudit } from "../audit/audit.service.js";
-import { canonicalMediaSource } from "../catalog/catalog-media.js";
+import {
+    canonicalMediaSource,
+    mediaCandidateQuality,
+} from "../catalog/catalog-media.js";
 import {
     getEffectiveSubscriptionAccess,
     isSupportedQualityValue,
@@ -37,6 +40,13 @@ const ABORTABLE_ASSET_STATUSES = [
     "uploaded",
     "failed",
 ];
+const MEDIA_QUALITY_LABELS = Object.freeze({
+    "480p": "SD (480p)",
+    "720p": "HD (720p)",
+    "1080p": "Full HD (1080p)",
+    "2160p": "4K (2160p)",
+    "4k": "4K (2160p)",
+});
 
 /**
  * Converte um identificador externo em ObjectId com erro de domínio estável.
@@ -118,6 +128,58 @@ function assertPlayableContentType(content) {
 }
 
 /**
+ * Constrói a fonte privada canónica de um asset ativo.
+ *
+ * @param {Record<string, unknown> & { _id: ObjectId }} asset Asset persistido.
+ * @returns {{ value: string, label: string, source: { url: string, protocol: "progressive", mimeType: "video/mp4" } }} Variante editorial.
+ */
+function qualityOptionForAsset(asset) {
+    return {
+        value: asset.quality,
+        label: MEDIA_QUALITY_LABELS[asset.quality] ?? asset.quality,
+        source: {
+            url: `/api/media/${asset._id}`,
+            protocol: "progressive",
+            mimeType: MEDIA_MP4_MIME_TYPE,
+        },
+    };
+}
+
+/**
+ * Deriva a fonte base e todas as variantes ativas, ordenadas da menor para a
+ * maior qualidade. A fonte base mantém compatibilidade com documentos legacy;
+ * o player escolhe depois a melhor variante permitida pelo plano.
+ *
+ * @param {Array<Record<string, unknown> & { _id: ObjectId }>} activeAssets Assets ativos do conteúdo.
+ * @returns {{ media: Record<string, unknown>, qualityOptions: Record<string, unknown>[] }} Configuração editorial canónica.
+ */
+function mediaConfigurationForAssets(activeAssets) {
+    const qualityOptions = activeAssets
+        .map(qualityOptionForAsset)
+        .sort(
+            (left, right) =>
+                qualityRankForValue(left.value) -
+                    qualityRankForValue(right.value) ||
+                left.value.localeCompare(right.value),
+        );
+    const base = qualityOptions[0];
+
+    if (!base) {
+        throw new HttpError(
+            409,
+            "Asset de media indisponivel.",
+            undefined,
+            "MEDIA_ASSET_NOT_READY",
+        );
+    }
+
+    return {
+        media: { ...base.source, quality: base.value },
+        qualityOptions,
+    };
+}
+
+/**
  * Expõe apenas metadata administrativa; `storageKey` nunca atravessa a API.
  *
  * @param {Record<string, unknown> & { _id: ObjectId }} asset Documento interno.
@@ -155,9 +217,21 @@ export async function ensureMediaAssetIndexes() {
     await assets.createIndex({ storageKey: 1 }, { unique: true });
     await assets.createIndex({ contentId: 1, createdAt: -1, _id: 1 });
     await assets.createIndex({ status: 1, updatedAt: 1 });
+    if (typeof assets.dropIndex === "function") {
+        await assets.dropIndex("contentId_1_active_1").catch((error) => {
+            if (
+                error?.code !== 27 &&
+                error?.code !== "IndexNotFound" &&
+                error?.codeName !== "IndexNotFound"
+            ) {
+                throw error;
+            }
+        });
+    }
     await assets.createIndex(
-        { contentId: 1, active: 1 },
+        { contentId: 1, quality: 1, active: 1 },
         {
+            name: "contentId_1_quality_1_active_1",
             unique: true,
             partialFilterExpression: { active: true },
         },
@@ -467,18 +541,13 @@ export async function activateMediaUpload(
         }
 
         const now = new Date();
-        const mediaUrl = `/api/media/${assetObjectId}`;
-        const nextMedia = {
-            url: mediaUrl,
-            protocol: "progressive",
-            mimeType: MEDIA_MP4_MIME_TYPE,
-            quality: asset.quality,
-        };
         const nextTracks = {
             subtitles: Array.isArray(content.tracks?.subtitles)
                 ? content.tracks.subtitles
                 : [],
-            audio: [],
+            audio: Array.isArray(content.tracks?.audio)
+                ? content.tracks.audio
+                : [],
         };
 
         await transactionDb.collection("content_revisions").insertOne(
@@ -494,6 +563,7 @@ export async function activateMediaUpload(
         await assets.updateMany(
             {
                 contentId: contentObjectId,
+                quality: asset.quality,
                 active: true,
                 _id: { $ne: assetObjectId },
             },
@@ -534,6 +604,21 @@ export async function activateMediaUpload(
             );
         }
 
+        const activeAssets = await assets
+            .find(
+                {
+                    contentId: contentObjectId,
+                    status: "ready",
+                    active: true,
+                },
+                { session },
+            )
+            .toArray();
+        const {
+            media: nextMedia,
+            qualityOptions: nextQualityOptions,
+        } = mediaConfigurationForAssets(activeAssets);
+
         const nextVersion = currentVersion + 1;
         const contentResult = await transactionDb
             .collection("contents")
@@ -544,7 +629,7 @@ export async function activateMediaUpload(
                         media: nextMedia,
                         mediaStatus: "ready",
                         tracks: nextTracks,
-                        qualityOptions: [],
+                        qualityOptions: nextQualityOptions,
                         version: nextVersion,
                         updatedBy: new ObjectId(actorUserId),
                         updatedAt: now,
@@ -570,6 +655,7 @@ export async function activateMediaUpload(
             },
             after: {
                 media: nextMedia,
+                qualityOptions: nextQualityOptions,
                 mediaStatus: "ready",
                 version: nextVersion,
                 assetId: String(assetObjectId),
@@ -717,13 +803,25 @@ export async function getMediaDeliveryContext(assetId, userId) {
         );
     }
 
-    const source = canonicalMediaSource(content.media);
     const expectedUrl = `/api/media/${assetObjectId}`;
+    const configuredVariants = [
+        content.media,
+        ...(Array.isArray(content.qualityOptions)
+            ? content.qualityOptions
+            : []),
+    ];
+    const sourceIsConfigured = configuredVariants.some((variant) => {
+        const source = canonicalMediaSource(variant);
+        return (
+            source?.url === expectedUrl &&
+            source.protocol === "progressive" &&
+            source.mimeType === MEDIA_MP4_MIME_TYPE &&
+            mediaCandidateQuality(variant) === asset.quality
+        );
+    });
     if (
         content.mediaStatus !== "ready" ||
-        source?.url !== expectedUrl ||
-        source.protocol !== "progressive" ||
-        source.mimeType !== MEDIA_MP4_MIME_TYPE
+        !sourceIsConfigured
     ) {
         throw new HttpError(
             409,

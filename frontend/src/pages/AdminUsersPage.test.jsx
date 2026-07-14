@@ -10,9 +10,13 @@ import { AdminUsersPage } from "./AdminUsersPage.jsx";
 const mocks = vi.hoisted(() => ({
     listUsers: vi.fn(),
     updateUserAdmin: vi.fn(),
+    sessionUser: { id: "admin-1", role: "admin" },
 }));
 
 vi.mock("../services/api/userApi.js", () => ({ userApi: mocks }));
+vi.mock("../context/SessionContext.jsx", () => ({
+    useSession: () => ({ user: mocks.sessionUser }),
+}));
 
 const testUser = {
     id: "user-1",
@@ -36,6 +40,7 @@ function usersResponse(overrides = {}) {
 describe("AdminUsersPage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mocks.sessionUser = { id: "admin-1", role: "admin" };
         mocks.listUsers.mockResolvedValue(usersResponse());
         mocks.updateUserAdmin.mockResolvedValue({ user: testUser });
     });
@@ -77,6 +82,36 @@ describe("AdminUsersPage", () => {
 
         expect(await screen.findByText("Conta Eliminada")).toBeInTheDocument();
         expect(screen.getByRole("button", { name: "Só leitura" })).toBeDisabled();
+        expect(mocks.updateUserAdmin).not.toHaveBeenCalled();
+    });
+
+    it("identifica a própria conta e não oferece uma mutação impossível", async () => {
+        mocks.listUsers.mockResolvedValue(
+            usersResponse({
+                users: [
+                    {
+                        ...testUser,
+                        id: "admin-1",
+                        name: "Admin atual",
+                        role: "admin",
+                    },
+                ],
+                total: 1,
+                totalPages: 1,
+            }),
+        );
+
+        render(<AdminUsersPage />);
+
+        expect(await screen.findByText("Admin atual")).toBeInTheDocument();
+        expect(
+            screen.getByRole("region", { name: "Tabela de utilizadores" }),
+        ).toHaveAttribute("tabindex", "0");
+        expect(
+            screen.getByRole("button", { name: "Conta atual" }),
+        ).toBeDisabled();
+        expect(screen.queryByRole("button", { name: "Gerir" }))
+            .not.toBeInTheDocument();
         expect(mocks.updateUserAdmin).not.toHaveBeenCalled();
     });
 

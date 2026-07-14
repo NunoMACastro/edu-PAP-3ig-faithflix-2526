@@ -50,6 +50,8 @@ describe("AdminLayout", () => {
         renderLayout();
         expect(screen.getAllByRole("link", { name: "Catálogo" }).length).toBeGreaterThan(0);
         expect(screen.getAllByRole("link", { name: "Passagens bíblicas" }).length).toBeGreaterThan(0);
+        expect(screen.getAllByRole("link", { name: "A minha conta" })[0])
+            .toHaveAttribute("href", "/conta");
         expect(screen.queryByRole("link", { name: "Contas e permissões" })).not.toBeInTheDocument();
         expect(screen.queryByRole("link", { name: "Métricas" })).not.toBeInTheDocument();
     });

@@ -72,7 +72,7 @@ describe("AuthForms", () => {
         mocks.login.mockResolvedValue({ user: { id: "user-1" } });
         mocks.register.mockResolvedValue({ user: { id: "user-1" } });
         mocks.forgotPassword.mockResolvedValue({
-            message: "Se o email existir, foi criado um pedido de recuperacao.",
+            message: "Se o email existir, foi criado um pedido de recuperação.",
         });
         mocks.resetPassword.mockResolvedValue({ ok: true });
         mocks.refreshSession.mockResolvedValue({ id: "user-1" });

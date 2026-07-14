@@ -6,6 +6,7 @@ import { isAbsolute, relative, resolve } from "node:path";
 import { mediaStorageConfig } from "../src/modules/media/media-storage.service.js";
 import { assertAnonymousMetricEvent } from "../src/modules/analytics/analytics.validation.js";
 import { assertPersistedIntegration } from "../src/modules/integrations/integrations.validation.js";
+import { NOTIFICATION_TYPES } from "../src/modules/notifications/notifications.validation.js";
 import {
     DEMO_EXPECTED_COUNTS,
     DEMO_FIXTURE,
@@ -376,6 +377,7 @@ export async function verifyDemoDataset(db, options = {}) {
     );
 
     const contentById = new Map(contents.map((row) => [key(row._id), row]));
+    const usersById = new Map(users.map((row) => [key(row._id), row]));
     const seriesContents = contents.filter((row) => row.type === "series");
     const episodeContents = contents.filter((row) => row.type === "episode");
     assert(
@@ -425,6 +427,21 @@ export async function verifyDemoDataset(db, options = {}) {
         }),
         "progresso ligado a serie agregadora ou conteudo nao publicado.",
     );
+    for (const [rows, label] of [
+        [lists, "listas"],
+        [playback, "progresso"],
+        [ratings, "ratings"],
+        [comments, "comentários"],
+    ]) {
+        assert(
+            rows.every((row) => {
+                const user = usersById.get(key(row.userId));
+                const content = contentById.get(key(row.contentId));
+                return content?.ageRating <= user?.parentalMaxAgeRating;
+            }),
+            `${label} contém atividade acima do limite parental do utilizador.`,
+        );
+    }
 
     const statusCount = (rows, status) => rows.filter((row) => row.status === status).length;
     const accountStatusCount = (status) => users.filter((row) => row.accountStatus === status).length;
@@ -433,6 +450,10 @@ export async function verifyDemoDataset(db, options = {}) {
     assert([1, 2, 3, 4, 5].every((value, index) => ratings.filter((row) => row.value === value).length === [20, 30, 70, 100, 80][index]), "distribuição de ratings inválida.");
     assert(statusCount(comments, "visible") === 42 && statusCount(comments, "pending_review") === 10 && statusCount(comments, "rejected") === 8, "estados de comentários inválidos.");
     assert(notifications.filter((row) => row.readAt).length === 24, "a demo deve ter 24 notificações lidas.");
+    assert(
+        notifications.every((row) => NOTIFICATION_TYPES.includes(row.type)),
+        "a demo contém tipos de notificação fora do contrato canónico.",
+    );
     assert(["pending", "active", "declined", "removed", "left"].every((status) => statusCount(familyMemberships, status) === 1), "estados familiares incompletos.");
     assert(statusCount(applications, "approved") === 6 && statusCount(applications, "pending") === 24 && statusCount(applications, "rejected") === 4, "estados de candidaturas inválidos.");
     assert(statusCount(passages, "published") === 12 && statusCount(passages, "draft") === 4, "estados das passagens inválidos.");
@@ -460,6 +481,41 @@ export async function verifyDemoDataset(db, options = {}) {
         const combinations = rows.map((row) => fields.map((field) => key(row[field])).join("|"));
         assert(new Set(combinations).size === combinations.length, `${label} contém combinações duplicadas.`);
     }
+    const personalListPairs = lists.map((row) =>
+        [key(row.userId), key(row.contentId)].join("|"));
+    assert(
+        new Set(personalListPairs).size === personalListPairs.length,
+        "o mesmo conteúdo está simultaneamente nos favoritos e na watchlist.",
+    );
+
+    const engagedUsers = users.filter(
+        (user) =>
+            user.accountStatus === "active" &&
+            user.email !== "cold-start@faithflix.demo",
+    );
+    for (const user of engagedUsers) {
+        const owns = (rows) => rows.filter((row) => key(row.userId) === key(user._id));
+        assert(
+            owns(lists).length >= 2 &&
+                owns(playback).length >= 7 &&
+                owns(ratings).length >= 6 &&
+                owns(ratings).some((row) => row.value >= 4),
+            `utilizador ativo ${user.email} sem sinais suficientes para recomendação.`,
+        );
+    }
+
+    const ratingCoverage = contents
+        .filter(
+            (content) =>
+                content.status === "published" &&
+                ["movie", "series", "documentary"].includes(content.type),
+        )
+        .map((content) =>
+            ratings.filter((row) => key(row.contentId) === key(content._id)).length);
+    assert(
+        ratingCoverage.every((count) => count >= 8 && count <= 12),
+        "ratings não cobrem o catálogo público de forma representativa.",
+    );
 
     const watchCounts = new Map();
     playback.forEach((row) => watchCounts.set(key(row.contentId), (watchCounts.get(key(row.contentId)) ?? 0) + 1));
@@ -467,6 +523,17 @@ export async function verifyDemoDataset(db, options = {}) {
     assert(JSON.stringify(topWatchCounts) === JSON.stringify([24, 18, 12, 8]), `popularidade inesperada: ${topWatchCounts.join(",")}.`);
     const pro = users.find((user) => user.email === "pro@faithflix.demo");
     assert(lists.filter((row) => key(row.userId) === key(pro?._id) && row.type === "favorite").length >= 13, "biblioteca Pro não ultrapassa a paginação.");
+    assert(
+        lists.some(
+            (row) =>
+                key(row.userId) === key(pro?._id) && row.type === "watchlist",
+        ) &&
+            playback.some((row) => key(row.userId) === key(pro?._id)) &&
+            ratings.some(
+                (row) => key(row.userId) === key(pro?._id) && row.value >= 4,
+            ),
+        "persona Pro não cobre favoritos, watchlist, histórico e rating positivo.",
+    );
 
     const approvedPayments = payments.filter((row) => row.status === "approved");
     assert(approvedPayments.length === 48 && payments.filter((row) => row.status === "failed").length === 4, "estados dos pagamentos inválidos.");
@@ -483,7 +550,6 @@ export async function verifyDemoDataset(db, options = {}) {
     const firstFinancialStart = new Date(`${distributions.map((row) => row.month).sort()[0]}-01T00:00:00.000Z`);
     assert(charities.every((row) => row.approvedAt && new Date(row.approvedAt) < firstFinancialStart), "associação aprovada depois do início financeiro.");
 
-    const usersById = new Map(users.map((row) => [key(row._id), row]));
     assert(deletionRequests.every((row) => usersById.get(key(row.userId))?.accountStatus === "deleted"), "pedido de eliminação ligado a conta não eliminada.");
     const publicPublishedContentIds = new Set(
         contents

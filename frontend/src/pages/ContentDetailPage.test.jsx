@@ -2,7 +2,7 @@
  * @file Regressão do CTA de reprodução para conteúdo sem media.
  */
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -14,6 +14,7 @@ import {
 
 const mocks = vi.hoisted(() => ({
     getDetail: vi.fn(),
+    getPreview: vi.fn(),
     listForContent: vi.fn(),
     sessionStatus: "authenticated",
     refreshSession: vi.fn(),
@@ -24,6 +25,9 @@ vi.mock("../services/api/catalogApi.js", () => ({
 }));
 vi.mock("../services/api/biblicalPassagesApi.js", () => ({
     biblicalPassagesApi: { listForContent: mocks.listForContent },
+}));
+vi.mock("../services/api/playbackApi.js", () => ({
+    playbackApi: { getPreview: mocks.getPreview },
 }));
 vi.mock("../context/SessionContext.jsx", () => ({
     useSession: () => ({
@@ -78,6 +82,7 @@ describe("ContentDetailPage", () => {
         mocks.sessionStatus = "authenticated";
         mocks.refreshSession.mockResolvedValue(null);
         mocks.listForContent.mockResolvedValue({ items: [] });
+        mocks.getPreview.mockResolvedValue({ content: { source: null } });
     });
 
     it("desativa reprodução e explica media pendente", async () => {
@@ -101,6 +106,42 @@ describe("ContentDetailPage", () => {
 
         expect(await screen.findByRole("link", { name: "Reproduzir" }))
             .toHaveAttribute("href", "/ver/content%2Fcom%20espa%C3%A7o");
+        await waitFor(() => expect(mocks.getPreview).toHaveBeenCalledWith(
+            "content/com espaço",
+            { signal: expect.any(AbortSignal) },
+        ));
+    });
+
+    it("não pede preview para visitante nem para media pendente", async () => {
+        mocks.sessionStatus = "anonymous";
+        mocks.getDetail.mockResolvedValue({ content: content(true) });
+        renderPage();
+
+        expect(await screen.findByRole("link", {
+            name: "Entrar para reproduzir",
+        })).toBeInTheDocument();
+        expect(mocks.getPreview).not.toHaveBeenCalled();
+
+        mocks.sessionStatus = "authenticated";
+        mocks.getDetail.mockResolvedValue({ content: content(false) });
+        renderPage("/catalogo/outro-conteudo");
+        expect(await screen.findByRole("button", {
+            name: "Vídeo ainda não disponível",
+        })).toBeDisabled();
+        expect(mocks.getPreview).not.toHaveBeenCalled();
+    });
+
+    it("aborta o preview privado no unmount sem bloquear o detalhe", async () => {
+        mocks.getDetail.mockResolvedValue({ content: content(true) });
+        mocks.getPreview.mockReturnValue(new Promise(() => {}));
+        const view = renderPage();
+
+        await screen.findByRole("link", { name: "Reproduzir" });
+        await waitFor(() => expect(mocks.getPreview).toHaveBeenCalledOnce());
+        const previewSignal = mocks.getPreview.mock.calls[0][1].signal;
+
+        view.unmount();
+        expect(previewSignal.aborted).toBe(true);
     });
 
     it("apresenta metadados, temas e créditos apenas quando existem", async () => {

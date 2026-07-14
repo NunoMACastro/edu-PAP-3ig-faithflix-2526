@@ -71,6 +71,25 @@ function currentPosition(video, fallback = 0) {
 }
 
 /**
+ * Resolve o detalhe canónico usado pelo botão de retorno do player.
+ *
+ * Episódios regressam ao contexto da série; filmes e documentários usam o
+ * slug autenticado devolvido pelo backend. O catálogo é o fallback seguro para
+ * contratos antigos que ainda não incluam slug.
+ *
+ * @param {Record<string, unknown>} playback Resposta autenticada do playback.
+ * @returns {string} Caminho interno seguro.
+ */
+function detailPathForPlayback(playback) {
+    if (playback?.content?.type === "episode" && playback?.canonicalPath) {
+        return playback.canonicalPath;
+    }
+
+    const slug = String(playback?.content?.slug ?? "").trim();
+    return slug ? `/catalogo/${encodeURIComponent(slug)}` : "/catalogo";
+}
+
+/**
  * Authenticated playback page with protocol adapters and durable progress.
  *
  * @returns {JSX.Element} Página de reprodução.
@@ -426,7 +445,7 @@ export function PlaybackPage() {
     if (!activePlayback && requestError) {
         const mediaPending = requestError.code === "MEDIA_NOT_READY";
         return (
-            <section className="page-section">
+            <section className="playback-page playback-page-state">
                 <h1>{mediaPending ? "Vídeo ainda não disponível" : "Reprodução indisponível"}</h1>
                 <p role="alert">
                     {mediaPending
@@ -445,7 +464,7 @@ export function PlaybackPage() {
 
     if (!activePlayback) {
         return (
-            <section className="page-section">
+            <section className="playback-page playback-page-state">
                 <p role="status">A carregar player...</p>
             </section>
         );
@@ -483,24 +502,39 @@ export function PlaybackPage() {
         ? preferences.quality
         : "";
     const controlsDisabled = Boolean(preferenceBusy) || loading;
+    const showSubtitles = subtitleTracks.length > 0;
+    const showAudio = audioTracks.length > 1;
+    const showQuality = qualityOptions.length > 0;
+    const hasMediaOptions = showSubtitles || showAudio || showQuality;
+    const selectedQualityLabel =
+        qualityOptions.find(
+            (option) =>
+                option.value === content.selectedQuality && !option.locked,
+        )?.label ?? content.selectedQuality ?? "Automática";
+    const episodeContext = activePlayback.series
+        ? `${activePlayback.series.title} · T${content.seasonNumber} E${content.episodeNumber}`
+        : "FaithFlix";
 
     return (
-        <section className="page-section">
-            {activePlayback.series ? (
-                <nav aria-label="Contexto do episódio">
-                    <Link
-                        to={`/catalogo/${encodeURIComponent(activePlayback.series.slug)}`}
-                    >
-                        {activePlayback.series.title}
-                    </Link>
-                    <span>
-                        {" "}· T{content.seasonNumber} E{content.episodeNumber}
-                    </span>
-                </nav>
-            ) : null}
-            <h1>{content.title}</h1>
+        <section className="playback-page">
+            <header className="playback-topbar">
+                <Link
+                    className="playback-back-link"
+                    to={detailPathForPlayback(activePlayback)}
+                >
+                    <span aria-hidden="true">←</span>
+                    Voltar
+                </Link>
+                <div className="playback-heading">
+                    <p>{episodeContext}</p>
+                    <h1>{content.title}</h1>
+                </div>
+                <p className="playback-quality-badge" aria-label="Qualidade atual">
+                    {selectedQualityLabel}
+                </p>
+            </header>
             {requestError ? (
-                <div role="alert">
+                <div className="playback-notice" role="alert">
                     <p>{requestError.message}</p>
                     <button
                         type="button"
@@ -510,124 +544,138 @@ export function PlaybackPage() {
                     </button>
                 </div>
             ) : null}
-            {progressError ? <p role="alert">{progressError}</p> : null}
-            <div
-                className="player-controls"
-                role="group"
-                aria-label="Opções de média"
-            >
-                <label>
-                    Legendas
-                    <select
-                        value={subtitleValue}
-                        disabled={controlsDisabled}
-                        onChange={(event) =>
-                            updatePreference(
-                                "subtitleLanguage",
-                                event.target.value,
-                            )
-                        }
-                    >
-                        <option value="">Sem legendas</option>
-                        {subtitleTracks.map((track) => (
-                            <option
-                                key={track.language}
-                                value={track.language}
-                                disabled={Boolean(track.locked)}
-                            >
-                                {track.label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <label>
-                    Áudio
-                    <select
-                        value={audioValue}
-                        disabled={controlsDisabled}
-                        onChange={(event) =>
-                            updatePreference(
-                                "audioLanguage",
-                                event.target.value,
-                            )
-                        }
-                    >
-                        <option value="">Original</option>
-                        {audioTracks.map((track) => (
-                            <option
-                                key={track.language}
-                                value={track.language}
-                                disabled={Boolean(track.locked)}
-                            >
-                                {track.label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <label>
-                    Qualidade
-                    <select
-                        value={qualityValue}
-                        disabled={controlsDisabled}
-                        onChange={(event) =>
-                            updatePreference("quality", event.target.value)
-                        }
-                    >
-                        <option value="">Automática</option>
-                        {qualityOptions.map((option) => (
-                            <option
-                                key={option.value}
-                                value={option.value}
-                                disabled={option.locked}
-                            >
-                                {option.locked
-                                    ? `${option.label} - ${option.lockedReason ?? "indisponível no plano atual"}`
-                                    : option.label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-            </div>
-            {mediaStatus === "loading" ? (
-                <p role="status">A preparar vídeo...</p>
+            {progressError ? (
+                <p className="playback-notice" role="alert">{progressError}</p>
             ) : null}
-            {mediaError ? (
-                <div role="alert">
-                    <p>{mediaError}</p>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setMediaError("");
-                            setMediaRetryVersion((current) => current + 1);
-                        }}
-                    >
-                        Tentar reproduzir novamente
-                    </button>
+            <div className="playback-stage">
+                {mediaStatus === "loading" ? (
+                    <p className="playback-media-status" role="status">
+                        A preparar vídeo...
+                    </p>
+                ) : null}
+                {mediaError ? (
+                    <div className="playback-media-error" role="alert">
+                        <p>{mediaError}</p>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setMediaError("");
+                                setMediaRetryVersion((current) => current + 1);
+                            }}
+                        >
+                            Tentar reproduzir novamente
+                        </button>
+                    </div>
+                ) : null}
+                <video
+                    ref={videoRef}
+                    controls
+                    hidden={mediaStatus === "error"}
+                    data-testid="faithflix-player"
+                    aria-label={`Player de vídeo: ${content.title}`}
+                    onLoadedMetadata={handleLoadedMetadata}
+                    onCanPlay={() => setMediaStatus("ready")}
+                    onError={() => {
+                        setMediaStatus("error");
+                        setMediaError(
+                            "O vídeo ficou indisponível durante a reprodução. Tenta novamente.",
+                        );
+                    }}
+                    onTimeUpdate={handleTimeUpdate}
+                    onPause={handlePause}
+                    onPlay={handlePlay}
+                    onEnded={handleEnded}
+                >
+                    O teu browser não suporta vídeo HTML5.
+                </video>
+            </div>
+            {hasMediaOptions ? (
+                <div
+                    className="playback-settings"
+                    role="group"
+                    aria-label="Opções de média"
+                >
+                    {showSubtitles ? (
+                        <label>
+                            Legendas
+                            <select
+                                value={subtitleValue}
+                                disabled={controlsDisabled}
+                                onChange={(event) =>
+                                    updatePreference(
+                                        "subtitleLanguage",
+                                        event.target.value,
+                                    )
+                                }
+                            >
+                                <option value="">Sem legendas</option>
+                                {subtitleTracks.map((track) => (
+                                    <option
+                                        key={track.language}
+                                        value={track.language}
+                                        disabled={Boolean(track.locked)}
+                                    >
+                                        {track.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    ) : null}
+                    {showAudio ? (
+                        <label>
+                            Áudio
+                            <select
+                                value={audioValue}
+                                disabled={controlsDisabled}
+                                onChange={(event) =>
+                                    updatePreference(
+                                        "audioLanguage",
+                                        event.target.value,
+                                    )
+                                }
+                            >
+                                <option value="">Original</option>
+                                {audioTracks.map((track) => (
+                                    <option
+                                        key={track.language}
+                                        value={track.language}
+                                        disabled={Boolean(track.locked)}
+                                    >
+                                        {track.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    ) : null}
+                    {showQuality ? (
+                        <label>
+                            Qualidade
+                            <select
+                                value={qualityValue}
+                                disabled={controlsDisabled}
+                                onChange={(event) =>
+                                    updatePreference("quality", event.target.value)
+                                }
+                            >
+                                <option value="">Automática</option>
+                                {qualityOptions.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                        disabled={option.locked}
+                                    >
+                                        {option.locked
+                                            ? `${option.label} - ${option.lockedReason ?? "indisponível no plano atual"}`
+                                            : option.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    ) : null}
                 </div>
             ) : null}
-            <video
-                ref={videoRef}
-                controls
-                hidden={mediaStatus === "error"}
-                data-testid="faithflix-player"
-                aria-label={`Player de vídeo: ${content.title}`}
-                onLoadedMetadata={handleLoadedMetadata}
-                onCanPlay={() => setMediaStatus("ready")}
-                onError={() => {
-                    setMediaStatus("error");
-                    setMediaError(
-                        "O vídeo ficou indisponível durante a reprodução. Tenta novamente.",
-                    );
-                }}
-                onTimeUpdate={handleTimeUpdate}
-                onPause={handlePause}
-                onPlay={handlePlay}
-                onEnded={handleEnded}
-            >
-                O teu browser não suporta vídeo HTML5.
-            </video>
             {activePlayback.series ? (
-                <nav className="button-row" aria-label="Navegação entre episódios">
+                <nav className="playback-episode-navigation" aria-label="Navegação entre episódios">
                     {activePlayback.previousEpisode ? (
                         <Link
                             className="secondary-button"

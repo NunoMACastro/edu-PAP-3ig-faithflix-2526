@@ -634,7 +634,7 @@ test("MF5 contas bloqueadas nao entram por login nem por sessao existente", asyn
                 email: "blocked@example.test",
                 password: "password1234",
             }),
-        /Credenciais invalidas/,
+        /Credenciais inválidas/,
     );
 
     assert.equal(collections.sessions.rows.length, 1);
@@ -703,7 +703,7 @@ test("MF5 gestao admin audita rota legacy e invalida sessoes ao bloquear", async
             updateUserRole(String(actorUserId), String(actorUserId), {
                 role: "user",
             }),
-        /proprio acesso admin/,
+        /próprio acesso admin/u,
     );
 
     const roleUpdate = await updateUserRole(
@@ -734,7 +734,7 @@ test("MF5 gestao admin audita rota legacy e invalida sessoes ao bloquear", async
             updateUserByAdmin(String(actorUserId), String(actorUserId), {
                 accountStatus: "blocked",
             }),
-        /propria conta/,
+        /própria conta/u,
     );
 });
 

@@ -8,6 +8,7 @@ import { ObjectId } from "mongodb";
 import { setDbForTests } from "../../src/config/database.js";
 import {
     getPlayback,
+    getPlaybackPreview,
     listContinueWatching,
     savePlaybackProgress,
 } from "../../src/modules/playback/playback.service.js";
@@ -233,10 +234,118 @@ for (const sourceCase of [{
 
         assert.deepEqual(response.content.source, sourceCase);
         assert.equal(response.content.selectedQuality, "1080p");
+        assert.equal(response.content.slug, "fixture-canonica-playback");
         assert.deepEqual(response.content.qualityOptions, []);
         assert.equal("media" in response.content, false);
     });
 }
+
+test("preview Família escolhe 1080p e devolve apenas o contrato mínimo", async () => {
+    const fullHdAssetId = new ObjectId();
+    const ultraHdAssetId = new ObjectId();
+    const content = readyContent({ url: `/api/media/${fullHdAssetId}` });
+    content.qualityOptions = [
+        {
+            value: "1080p",
+            label: "Full HD",
+            source: {
+                url: `/api/media/${fullHdAssetId}`,
+                protocol: "progressive",
+                mimeType: "video/mp4",
+            },
+        },
+        {
+            value: "2160p",
+            label: "4K",
+            source: {
+                url: `/api/media/${ultraHdAssetId}`,
+                protocol: "progressive",
+                mimeType: "video/mp4",
+            },
+        },
+    ];
+    const familyPlan = collection([{
+        _id: new ObjectId(),
+        code: "faithflix-monthly",
+        active: true,
+        tier: "family",
+        maxQuality: "2160p",
+        familySharing: true,
+        maxFamilyMembers: 5,
+    }]);
+    const setup = installPlaybackDb({
+        content,
+        preferences: { quality: "2160p" },
+        overrides: { subscription_plans: familyPlan },
+    });
+
+    const response = await getPlaybackPreview(
+        String(setup.contentId),
+        String(setup.userId),
+    );
+
+    assert.deepEqual(Object.keys(response), ["content"]);
+    assert.deepEqual(Object.keys(response.content), [
+        "id",
+        "title",
+        "source",
+        "selectedQuality",
+    ]);
+    assert.equal(response.content.selectedQuality, "1080p");
+    assert.deepEqual(response.content.source, {
+        url: `/api/media/${fullHdAssetId}`,
+        protocol: "progressive",
+        mimeType: "video/mp4",
+    });
+    assert.equal(JSON.stringify(response).includes(String(ultraHdAssetId)), false);
+});
+
+test("preview usa a melhor variante inferior quando 1080p não existe", async () => {
+    const content = readyContent({});
+    content.media.quality = "720p";
+    content.qualityOptions = [{
+        value: "720p",
+        label: "HD",
+        source: {
+            url: content.media.url,
+            protocol: "progressive",
+            mimeType: "video/mp4",
+        },
+    }];
+    const setup = installPlaybackDb({ content });
+
+    const response = await getPlaybackPreview(
+        String(setup.contentId),
+        String(setup.userId),
+    );
+
+    assert.equal(response.content.selectedQuality, "720p");
+    assert.equal(response.content.source.url, content.media.url);
+});
+
+test("preview rejeita conteúdo exclusivamente 4K", async () => {
+    const content = readyContent({});
+    content.media = {
+        url: `/api/media/${new ObjectId()}`,
+        protocol: "progressive",
+        mimeType: "video/mp4",
+        quality: "2160p",
+    };
+    content.qualityOptions = [{
+        value: "2160p",
+        label: "4K",
+        source: { ...content.media },
+    }];
+    const setup = installPlaybackDb({ content });
+
+    await assert.rejects(
+        () => getPlaybackPreview(
+            String(setup.contentId),
+            String(setup.userId),
+        ),
+        (error) => error.statusCode === 409 && error.code === "MEDIA_NOT_READY",
+    );
+});
 
 test("playback rejeita URLs legacy e protocolos HLS/DASH no produto", async () => {
     const legacyContent = readyContent({
@@ -284,6 +393,95 @@ test("qualidade desconhecida fica locked e nunca é a fonte canónica", async ()
     assert.equal(response.content.selectedQuality, "1080p");
     assert.equal(response.content.qualityOptions[0].locked, true);
     assert.equal(response.content.qualityOptions[0].selected, false);
+});
+
+test("playback escolhe HD para Pro e 4K para Família sem expor URLs alternativas", async () => {
+    const hdAssetId = new ObjectId();
+    const ultraHdAssetId = new ObjectId();
+    const content = readyContent({
+        url: `/api/media/${hdAssetId}`,
+    });
+    content.qualityOptions = [
+        {
+            value: "1080p",
+            label: "HD",
+            source: {
+                url: `/api/media/${hdAssetId}`,
+                protocol: "progressive",
+                mimeType: "video/mp4",
+            },
+        },
+        {
+            value: "2160p",
+            label: "4K",
+            source: {
+                url: `/api/media/${ultraHdAssetId}`,
+                protocol: "progressive",
+                mimeType: "video/mp4",
+            },
+        },
+    ];
+
+    const pro = installPlaybackDb({
+        content,
+        preferences: { quality: "2160p" },
+    });
+    const proResponse = await getPlayback(
+        String(pro.contentId),
+        String(pro.userId),
+    );
+
+    assert.equal(proResponse.content.selectedQuality, "1080p");
+    assert.equal(
+        proResponse.content.source.url,
+        `/api/media/${hdAssetId}`,
+    );
+    assert.equal(proResponse.content.qualityOptions[1].locked, true);
+    assert.equal(
+        JSON.stringify(proResponse.content.qualityOptions).includes(
+            String(ultraHdAssetId),
+        ),
+        false,
+    );
+
+    setDbForTests(null);
+    const familyPlan = collection([
+        {
+            _id: new ObjectId(),
+            code: "faithflix-monthly",
+            active: true,
+            tier: "family",
+            maxQuality: "2160p",
+            familySharing: true,
+            maxFamilyMembers: 5,
+        },
+    ]);
+    const family = installPlaybackDb({
+        content: { ...content, _id: new ObjectId() },
+        preferences: { quality: "" },
+        overrides: { subscription_plans: familyPlan },
+    });
+    const familyResponse = await getPlayback(
+        String(family.contentId),
+        String(family.userId),
+    );
+
+    assert.equal(familyResponse.content.selectedQuality, "2160p");
+    assert.equal(
+        familyResponse.content.source.url,
+        `/api/media/${ultraHdAssetId}`,
+    );
+    assert.deepEqual(
+        familyResponse.content.qualityOptions.map((option) => ({
+            value: option.value,
+            locked: option.locked,
+            selected: option.selected,
+        })),
+        [
+            { value: "1080p", locked: false, selected: false },
+            { value: "2160p", locked: false, selected: true },
+        ],
+    );
 });
 
 test("containers media malformados são normalizados sem 500 ou fonte ambígua", async () => {

@@ -7,6 +7,15 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ContentDetailHero } from "./ContentDetailHero.jsx";
 
+const mocks = vi.hoisted(() => ({
+    attachMediaSource: vi.fn(),
+    destroyAdapter: vi.fn(),
+}));
+
+vi.mock("../playback/mediaAdapter.js", () => ({
+    attachMediaSource: mocks.attachMediaSource,
+}));
+
 const content = {
     id: "content-1",
     title: "Vozes da Capela",
@@ -48,19 +57,21 @@ function configureEnvironment({
     });
 }
 
-function renderHero() {
+function renderHero(props = {}) {
     return render(
         <ContentDetailHero
             content={content}
             durationLabel="49 min"
             ageRatingLabel="6+"
             primaryAction={<button type="button">Reproduzir</button>}
+            {...props}
         />,
     );
 }
 
 describe("ContentDetailHero", () => {
     beforeEach(() => {
+        vi.clearAllMocks();
         vi.restoreAllMocks();
         vi.unstubAllGlobals();
         mediaState = { paused: false };
@@ -80,6 +91,10 @@ describe("ContentDetailHero", () => {
         vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => {
             mediaState.paused = true;
         });
+        mocks.attachMediaSource.mockResolvedValue({
+            kind: "progressive",
+            destroy: mocks.destroyAdapter,
+        });
     });
 
     it("reproduz preview elegível sem som e oferece controlos explícitos", async () => {
@@ -93,6 +108,8 @@ describe("ContentDetailHero", () => {
         });
         expect(video).toHaveAttribute("src", "/preview.mp4");
         expect(video).toHaveAttribute("playsinline");
+        expect(document.querySelector(".content-detail-hero"))
+            .toHaveClass("content-detail-hero-previewing");
         expect(HTMLMediaElement.prototype.play).toHaveBeenCalled();
 
         await user.click(
@@ -147,5 +164,53 @@ describe("ContentDetailHero", () => {
         expect(HTMLMediaElement.prototype.pause).toHaveBeenCalled();
         act(() => intersectionCallback([{ isIntersecting: true }]));
         expect(HTMLMediaElement.prototype.play).toHaveBeenCalled();
+    });
+
+    it("liga a fonte privada pelo adapter e destrói-a no cleanup", async () => {
+        const privateSource = {
+            url: "/api/media/private-preview",
+            protocol: "progressive",
+            mimeType: "video/mp4",
+        };
+        const view = renderHero({ previewSource: privateSource });
+
+        const video = await waitFor(() => {
+            expect(mocks.attachMediaSource).toHaveBeenCalledOnce();
+            return document.querySelector("video");
+        });
+        expect(video).not.toHaveAttribute("src", "/preview.mp4");
+        expect(mocks.attachMediaSource).toHaveBeenCalledWith(
+            video,
+            privateSource,
+            expect.objectContaining({
+                signal: expect.any(AbortSignal),
+                onError: expect.any(Function),
+            }),
+        );
+        await waitFor(() => expect(HTMLMediaElement.prototype.play)
+            .toHaveBeenCalled());
+
+        view.unmount();
+        expect(mocks.destroyAdapter).toHaveBeenCalledOnce();
+    });
+
+    it("volta ao backdrop quando o adapter privado sinaliza erro", async () => {
+        renderHero({
+            previewSource: {
+                url: "/api/media/private-preview",
+                protocol: "progressive",
+                mimeType: "video/mp4",
+            },
+        });
+        await waitFor(() => expect(mocks.attachMediaSource).toHaveBeenCalledOnce());
+
+        act(() => {
+            mocks.attachMediaSource.mock.calls[0][2].onError(
+                new Error("media indisponível"),
+            );
+        });
+
+        await waitFor(() => expect(document.querySelector("video")).toBeNull());
+        expect(document.querySelector('img[src="/backdrop.jpg"]')).not.toBeNull();
     });
 });

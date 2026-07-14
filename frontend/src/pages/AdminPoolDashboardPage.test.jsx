@@ -54,10 +54,39 @@ describe("AdminPoolDashboardPage", () => {
 
             render(<AdminPoolDashboardPage />);
 
-            expect(await screen.findByText("Estado: Concluída"))
-                .toBeInTheDocument();
+            expect((await screen.findAllByText("Concluída")).length)
+                .toBeGreaterThan(0);
         },
     );
+
+    it("apresenta KPI úteis e um histórico tabular acessível", async () => {
+        mocks.getPoolDashboard.mockResolvedValue({
+            months: [
+                {
+                    month: "2026-06",
+                    totalPoolCents: 840,
+                    charitiesCount: 6,
+                    status: "completed",
+                },
+                {
+                    month: "2026-05",
+                    totalPoolCents: 420,
+                    charitiesCount: 3,
+                    status: "completed",
+                },
+            ],
+        });
+
+        render(<AdminPoolDashboardPage />);
+
+        expect(await screen.findByRole("table", {
+            name: "Distribuições mensais da pool solidária",
+        })).toBeInTheDocument();
+        expect(screen.getAllByText("Total distribuído")).toHaveLength(2);
+        expect(screen.getByText("Média mensal")).toBeInTheDocument();
+        expect(screen.getByText("Último fecho")).toBeInTheDocument();
+        expect(screen.queryByText("Meses apresentados")).not.toBeInTheDocument();
+    });
 
     it("mostra erro seguro e repete apenas por ação explícita", async () => {
         mocks.getPoolDashboard

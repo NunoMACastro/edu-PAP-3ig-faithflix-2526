@@ -11,10 +11,12 @@ import { hashToken } from "../../src/modules/auth/token.js";
 import { startTestServer } from "../helpers/test-server.js";
 
 const userId = new ObjectId("64f100000000000000000071");
+const userWithoutSubscriptionId = new ObjectId("64f100000000000000000074");
 const progressiveId = new ObjectId("64f200000000000000000071");
 const pendingId = new ObjectId("64f200000000000000000072");
 const parentalId = new ObjectId("64f200000000000000000073");
 const sessionToken = "7".repeat(64);
+const noSubscriptionSessionToken = "6".repeat(64);
 
 let testServer;
 
@@ -111,12 +113,26 @@ before(async () => {
                 accountStatus: "active",
                 parentalMaxAgeRating: 12,
             },
+            {
+                _id: userWithoutSubscriptionId,
+                name: "Utilizador sem subscrição",
+                email: "sem-subscricao@example.test",
+                role: "user",
+                accountStatus: "active",
+                parentalMaxAgeRating: 18,
+            },
         ]),
         sessions: collection([
             {
                 _id: new ObjectId(),
                 userId,
                 tokenHash: hashToken(sessionToken),
+                expiresAt: new Date("2999-01-01T00:00:00.000Z"),
+            },
+            {
+                _id: new ObjectId(),
+                userId: userWithoutSubscriptionId,
+                tokenHash: hashToken(noSubscriptionSessionToken),
                 expiresAt: new Date("2999-01-01T00:00:00.000Z"),
             },
         ]),
@@ -192,8 +208,8 @@ after(async () => {
  *
  * @returns {Record<string, string>} Headers de autenticação.
  */
-function authHeaders() {
-    return { cookie: `${sessionConfig.cookieName}=${sessionToken}` };
+function authHeaders(token = sessionToken) {
+    return { cookie: `${sessionConfig.cookieName}=${token}` };
 }
 
 test("GET playback devolve fonte canónica e no-store", async () => {
@@ -211,6 +227,74 @@ test("GET playback devolve fonte canónica e no-store", async () => {
         mimeType: "video/mp4",
     });
     assert.deepEqual(body.content.qualityOptions, []);
+});
+
+test("GET preview devolve contrato mínimo 1080p e no-store", async () => {
+    const response = await fetch(
+        `${testServer.baseUrl}/api/playback/${progressiveId}/preview`,
+        { headers: authHeaders() },
+    );
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("cache-control"), "private, no-store");
+    assert.deepEqual(Object.keys(body.content), [
+        "id",
+        "title",
+        "source",
+        "selectedQuality",
+    ]);
+    assert.equal(body.content.selectedQuality, "1080p");
+    assert.deepEqual(body.content.source, {
+        url: `/api/media/${progressiveId}`,
+        protocol: "progressive",
+        mimeType: "video/mp4",
+    });
+});
+
+test("GET preview exige autenticação e subscrição ativa", async () => {
+    const anonymousResponse = await fetch(
+        `${testServer.baseUrl}/api/playback/${progressiveId}/preview`,
+    );
+    const anonymousBody = await anonymousResponse.json();
+    const unsubscribedResponse = await fetch(
+        `${testServer.baseUrl}/api/playback/${progressiveId}/preview`,
+        { headers: authHeaders(noSubscriptionSessionToken) },
+    );
+    const unsubscribedBody = await unsubscribedResponse.json();
+
+    assert.equal(anonymousResponse.status, 401);
+    assert.equal(anonymousBody.code, "AUTH_REQUIRED");
+    assert.equal(unsubscribedResponse.status, 403);
+    assert.equal(
+        unsubscribedResponse.headers.get("cache-control"),
+        "private, no-store",
+    );
+    assert.equal(unsubscribedBody.code, "SUBSCRIPTION_REQUIRED");
+    assert.equal("source" in unsubscribedBody, false);
+});
+
+test("GET preview preserva media pending e controlo parental", async () => {
+    const pendingResponse = await fetch(
+        `${testServer.baseUrl}/api/playback/${pendingId}/preview`,
+        { headers: authHeaders() },
+    );
+    const pendingBody = await pendingResponse.json();
+    const parentalResponse = await fetch(
+        `${testServer.baseUrl}/api/playback/${parentalId}/preview`,
+        { headers: authHeaders() },
+    );
+    const parentalBody = await parentalResponse.json();
+
+    assert.equal(pendingResponse.status, 409);
+    assert.equal(pendingBody.code, "MEDIA_NOT_READY");
+    assert.equal(
+        pendingResponse.headers.get("cache-control"),
+        "private, no-store",
+    );
+    assert.equal(parentalResponse.status, 403);
+    assert.match(parentalBody.message, /parental/u);
+    assert.equal("source" in parentalBody, false);
 });
 
 test("MEDIA_NOT_READY mantém envelope e no-store na resposta 409", async () => {

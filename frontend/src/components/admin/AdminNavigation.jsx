@@ -42,6 +42,11 @@ export const ADMIN_NAVIGATION_GROUPS = [
             { to: "/admin/integracoes", label: "Integrações" },
         ],
     },
+    {
+        label: "Conta",
+        roles: ["admin", "moderator"],
+        items: [{ to: "/conta", label: "A minha conta" }],
+    },
 ];
 
 /**
